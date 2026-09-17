@@ -48,9 +48,19 @@ def _node_row(n) -> Dict[str, str]:
                        or n.identity.rsplit("|", 1)[-1]),
            "description": str(n.properties.get("description") or "")}
     for k, v in sorted(n.properties.items()):
-        if k in ("name", "description") or isinstance(v, (dict, list)):
+        if k in ("name", "description"):
             continue
-        row[_camel(k)] = "" if v is None else str(v)
+        # F2+F4 (ruled 2026-09-17, THE ONE SEPARATOR): list and
+        # dict fields ride as "; "-joined text — lists as items,
+        # dict pairs as "code = meaning" (the joins_to house form).
+        # The old blanket drop silently ate pk_columns and values.
+        if isinstance(v, dict):
+            row[_camel(k)] = "; ".join(f"{a} = {b}"
+                                       for a, b in v.items())
+        elif isinstance(v, list):
+            row[_camel(k)] = "; ".join(str(x) for x in v)
+        else:
+            row[_camel(k)] = "" if v is None else str(v)
     return row
 
 
@@ -123,12 +133,32 @@ def _scope_tables(read: ReadApi,
             "operation": str(n.properties.get("operation") or ""),
             "position": str(n.properties.get("position") or ""),
             "fragment": str(n.properties.get("fragment") or "")})
+    # M5 (Brief_M5_Statement_Layer, 2026-09-17): one row per
+    # statement; the operational 31 carry empty description BY
+    # RULE (the (b) ruling) — counted, never a gap
+    st_rows = []
+    for n in sorted(read.nodes("statement"),
+                    key=lambda x: x.identity):
+        # literal: shape
+        st_rows.append({
+            "nodeId": n.identity,
+            "name": str(n.properties.get("name") or ""),
+            "description": str(n.properties.get("description")
+                               or ""),
+            "does": str(n.properties.get("does") or ""),
+            "subkind": str(n.properties.get("subkind") or "")})
     # literal: shape
     tables: Dict[str, List[Dict[str, str]]] = {
         "graph_scope": scope_rows, "graph_join": join_rows,
         "graph_direct_read": dr_rows,
         "graph_condition": cond_rows, "graph_param": param_rows,
-        "graph_derived_column": dcol_rows}
+        "graph_derived_column": dcol_rows,
+        "graph_statement": st_rows}
+    tables["graph_has_part_statementScope"] = sorted(
+        ({"sourceId": e.from_id, "targetId": e.to_id}
+         for e in store.current_edges("has_part")
+         if "::stmt/" in e.from_id and "::cond#" not in e.to_id),
+        key=lambda r: (r["sourceId"], r["targetId"]))
     tables["graph_has_part_scopeJoin"] = sorted(
         ({"sourceId": e.from_id, "targetId": e.to_id}
          for e in store.current_edges("has_part")
@@ -148,7 +178,7 @@ def _scope_tables(read: ReadApi,
         ({"sourceId": e.from_id, "targetId": e.to_id}
          for e in store.current_edges("cites")),
         key=lambda r: (r["sourceId"], r["targetId"]))
-    hp_jc, hp_sc, hp_cc = [], [], []
+    hp_jc, hp_sc, hp_cc, hp_stc = [], [], [], []
     for e in store.current_edges("has_part"):
         if "::cond#" not in e.to_id:
             continue
@@ -158,11 +188,14 @@ def _scope_tables(read: ReadApi,
             hp_jc.append(row)
         elif "::cond#" in e.from_id:
             hp_cc.append(row)
+        elif "::stmt/" in e.from_id:
+            hp_stc.append(row)  # M5: statement-rooted predicates
         else:
             hp_sc.append(row)
     for name, rows_ in (("joinCondition", hp_jc),
                         ("scopeCondition", hp_sc),
-                        ("conditionCondition", hp_cc)):
+                        ("conditionCondition", hp_cc),
+                        ("statementCondition", hp_stc)):
         tables[f"graph_has_part_{name}"] = sorted(
             rows_, key=lambda r: (r["sourceId"], r["targetId"]))
     rt_col, rt_par = [], []
@@ -175,10 +208,15 @@ def _scope_tables(read: ReadApi,
         rt_col, key=lambda r: (r["sourceId"], r["targetId"], r["role"]))
     tables["graph_resolves_to_conditionParam"] = sorted(
         rt_par, key=lambda r: (r["sourceId"], r["targetId"], r["role"]))
+    up_scope, up_stmt = [], []
+    for e in store.current_edges("uses_param"):
+        row = {"sourceId": e.from_id, "targetId": e.to_id}
+        (up_stmt if "::stmt/" in e.from_id
+         else up_scope).append(row)
     tables["graph_uses_param_scopeParam"] = sorted(
-        ({"sourceId": e.from_id, "targetId": e.to_id}
-         for e in store.current_edges("uses_param")),
-        key=lambda r: (r["sourceId"], r["targetId"]))
+        up_scope, key=lambda r: (r["sourceId"], r["targetId"]))
+    tables["graph_uses_param_statementParam"] = sorted(
+        up_stmt, key=lambda r: (r["sourceId"], r["targetId"]))
     for side in ("left_side", "right_side"):
         by_target: Dict[str, List[Dict[str, str]]] = {
             "Table": [], "Scope": []}

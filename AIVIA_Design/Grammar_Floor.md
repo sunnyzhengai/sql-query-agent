@@ -1,4 +1,5 @@
-# The Floor Grammar — v2.10.0 (THE COMPUTED OUTPUT ratified
+# The Floor Grammar — v2.11.0 (THE STATEMENT STEP ratified
+# 2026-09-17; v2.10.0 THE COMPUTED OUTPUT
 # 2026-09-16; v2.9.0 THE OWNER-POSSESSIVE 2026-09-14; v2.8.0 THE
 # BLESSED NAME 2026-09-12; v2.7.0 the relation rule + v2.6.0
 # recordedness identifies + v2.5.0 NOT folds same day; v2.4.0
@@ -6,7 +7,7 @@
 # v2.0.0 POLICY-WALK major 2026-09-06; v1.3.1 RATIFIED Sunny
 # 2026-09-05)
 
-**Status: RATIFIED v2.10.0 (THE COMPUTED OUTPUT, 2026-09-16).**
+**Status: RATIFIED v2.11.0 (THE STATEMENT STEP §R11, 2026-09-17).**
 (Header line added 2026-09-17, audit CI-C3.)
 
 *v2.10.0 (RATIFIED Sunny 2026-09-16, "ratified — go on M4";
@@ -805,6 +806,75 @@ suppressed, s-ending 's, both-grains composition), the estate
 text changes ride Sunny's blessing pace + next console boot,
 per the R5.b seed law; M3 export debt rides the batch law.
 
+## R11 — THE STATEMENT STEP (**RATIFIED v2.11.0, Sunny 2026-09-17
+## "ratified" — the 36 rendered sentences gap-checked at the
+## mid-build checkpoint, his own run; authored the same session,
+## suite-first per the 2026-09-10 ruling; the composed-OR form
+## replaced the structural summary BEFORE presentation**)
+
+The statement grain's voicing (M5). A statement is one step of a
+procedure; its description says what the step DOES and NAMES the
+selections involved — its own aboutness, never its scopes'
+floors (the speech contract; the 4,600-char wall is the standing
+corpse). Detail lives at the grains that own it: the scope's
+floor says what the selection means, R10's delivery lead says
+what the file delivers; R11 says only what THIS STEP does.
+
+### The three voiced kinds (the closed, measured library —
+### kg2_kind_library Statement_Voicings, registries 1.46.0)
+
+1. **SELECT INTO** (33 in the estate) — the step that builds a
+   temp-table selection:
+
+   > Builds the base pop selection.
+
+   With CTE helpers, they are named in preparation order:
+
+   > Builds the basepopabx selection, preparing the abx
+   > selection first.
+
+   Plural helpers enumerate with commas and a final "and". The
+   selection name speaks through the SAME fold `_source_phrase`
+   uses for named scopes (author's words: # stripped,
+   underscores to spaces, lowercased) — one home, R5.b's
+   no-blessing-gate standing for author-named things.
+
+2. **IF** (2) — a decision step; the voice embeds the
+   statement-rooted predicate's own R1–R7 render, first letter
+   lowered (the floor-composition precedent). A TOP-LEVEL OR/AND
+   composite speaks its children's phrases joined by "or"/"and" —
+   never the composite's structural summary ("any of its 2 parts
+   holds" says nothing at statement grain; the leaves say
+   everything):
+
+   > A decision step, taken when the start date parameter is not
+   > recorded or the start date parameter is ''.
+
+3. **SELECT that emits** (1) — the delivery step:
+
+   > Delivers the procedure's result set.
+
+   WHICH result it is stays R10's delivery lead — one home per
+   meaning; the step-voice only marks the delivery act.
+
+### The silent kinds
+
+Operational statements (the T-2 closed list, 2026-09-06) store
+NO description — empty-by-rule, the emptiness COUNTED (the (b)
+ruling 2026-09-17: a fixed phrase would restate the node's own
+kind field; derivable is never stored). An UNLISTED
+data-producing kind stores nothing and lands a COUNTED
+`statement_remainders` row — never silent (the R12 remainder
+precedent).
+
+### What R11 does NOT touch
+
+- The ask index — statements are ruled-silent (THE RULED-SILENT
+  LIST, re-affirmed 2026-09-17); this is store speech only.
+- Scope floors, delivery leads, condition phrases — each grain
+  keeps its own voice; R11 composes only the predicate phrase it
+  embeds, by the same render the condition node itself stores.
+
 ## R12 — THE COMPUTED OUTPUT (RATIFIED v2.10.0, Sunny 2026-09-16
 ## "ratified — go on M4"; authored same day at his "author the
 ## grammar rule + function library")
@@ -898,7 +968,7 @@ children's finished phrases. FLOOR over DATEDIFF:
 - Passthrough projections (312 measured) and anonymous
   EXISTS-SELECT members (5) — NOT nodes (the sealed M4 census),
   so no phrase; their columns reach the graph through `cites`.
-- Statement renders — R11's reserved seat (M5).
+- Statement renders — §R11 (landed at M5, ratified v2.11.0).
 - Window OVER internals beyond the ROW_NUMBER template —
   partition/order slots are drafted in the sheet; further window
   functions arrive as rows when an estate practices them.

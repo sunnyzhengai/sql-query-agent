@@ -242,4 +242,4 @@ def test_skeletons_mirror_the_registry():
 
 
 def test_grammar_version_bumped():
-    assert produce.FLOOR_GRAMMAR_VERSION == "2.10.0"
+    assert produce.FLOOR_GRAMMAR_VERSION == "2.11.0"

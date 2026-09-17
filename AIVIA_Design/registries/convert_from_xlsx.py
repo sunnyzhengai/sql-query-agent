@@ -193,7 +193,7 @@ SOURCES = {
 # deliveries lead, spine voiced, intermediates counted, census
 # closes; the file's ask-index words = the delivery lead, so file
 # embeddings embed meaning, never name-noise).
-STAMP_VERSION = "1.45.0"
+STAMP_VERSION = "1.46.0"
 RATIFIED = True
 DOC_STAMP = ("v1.0.0 (ratified 2026-09-05, Sunny); v1.1.0 twin-graph "
              "ruling ADR 0077; v1.2.0 Phase A metamodel bump; v1.3.0 "
@@ -295,7 +295,27 @@ DOC_STAMP = ("v1.0.0 (ratified 2026-09-05, Sunny); v1.1.0 twin-graph "
              "— the translator reads kind/name/args only); "
              "ROW_NUMBER partition/order + list-idiom <order> "
              "slots DEFERRED with recorded reasons (over/ORDER BY "
-             "are structure flags, not contents)")
+             "are structure flags, not contents); "
+             "v1.46.0 = M5 THE STATEMENT LAYER (Sunny's 'approved' "
+             "2026-09-17, Brief_M5_Statement_Layer — every "
+             "ambiguity ruled one at a time): statement flips "
+             "PRESENT (::stmt/N grain = file::stmt/<position>, the "
+             "2026-09-10 identity ruling; twin-authored 67; subkind "
+             "READ from the translator's T-2 field, never "
+             "re-derived — one writer since 2026-09-06) with "
+             "statement—has_part→scope birth edges pointing DOWN "
+             "(built AFTER scopes BEFORE conditions — M5-1 'build "
+             "order is the reverse. after scopes'); descriptions = "
+             "R11 renders for the 36 data-producing, the 31 "
+             "operational EMPTY-BY-RULE counted (the (b) ruling "
+             "'b': no fixed phrases restating the kind field — "
+             "derivable is never stored); ruled-silent in the ask "
+             "index (THE RULED-SILENT LIST, gap-checked + "
+             "re-affirmed 'leave as is'); the 31 counted-missing "
+             "in the connection census, landing M6 "
+             "(file→statement); the Speech_Sources join row's "
+             "stale 'with scopes' phrasing corrected same breath "
+             "(scopes are IN)")
 CONVERTED_ON = "2026-09-05"
 
 
@@ -691,6 +711,49 @@ TWIN_SHEETS = {
              "Cites": "Function_Voicings sheet (v1.44.0; the "
              "closed named-function set — composite kinds voice "
              "by rule, Grammar_Floor §R12)"},
+        ],
+        "Statement_Voicings": [
+            {"Statement kind": "_ruling",
+             "Voicing template (DRAFT — Sunny gap-checks the 36)":
+             "THE STATEMENT-VOICING LIBRARY (Brief_M5_Statement_"
+             "Layer, Sunny's 'approved' 2026-09-17): statement "
+             "kinds voice by their row — a CLOSED, MEASURED set "
+             "(ed_sepsis_dev census 2026-09-17: SELECT INTO 33 · "
+             "IF 2 · delivering SELECT 1). An unlisted "
+             "data-producing kind stores NOTHING and lands a "
+             "COUNTED statement_remainders row, never silent (the "
+             "R12 remainder precedent). OPERATIONAL kinds (T-2, "
+             "2026-09-06) voice NEVER — no description property, "
+             "the emptiness counted (the (b) ruling 2026-09-17). "
+             "Selection names speak through the SAME fold "
+             "_source_phrase uses (author's words, # stripped, "
+             "underscores to spaces, lowercased — one home).",
+             "Source": "Brief_M5_Statement_Layer",
+             "Estate count (measured 2026-09-17)": "-"},
+            {"Statement kind": "SELECT INTO",
+             "Voicing template (DRAFT — Sunny gap-checks the 36)":
+             "Builds the <selection> selection. | with CTE "
+             "helpers: Builds the <selection> selection, "
+             "preparing <the A selection[, the B selection] and "
+             "the C selection> first.",
+             "Source": "authored 2026-09-17",
+             "Estate count (measured 2026-09-17)": "33"},
+            {"Statement kind": "IF",
+             "Voicing template (DRAFT — Sunny gap-checks the 36)":
+             "A decision step, taken when <condition phrase>. "
+             "(<condition phrase> = the statement-rooted "
+             "predicate's R1-R7 render, first letter lowered; a "
+             "top-level OR/AND composite joins its children's "
+             "phrases with or/and — never the structural summary)",
+             "Source": "authored 2026-09-17",
+             "Estate count (measured 2026-09-17)": "2"},
+            {"Statement kind": "SELECT (emits)",
+             "Voicing template (DRAFT — Sunny gap-checks the 36)":
+             "Delivers the procedure's result set. (the per-step "
+             "voice; WHICH result stays R10's delivery lead — one "
+             "home per meaning)",
+             "Source": "authored 2026-09-17",
+             "Estate count (measured 2026-09-17)": "1"},
         ],
         "Function_Voicings": [
             {"Operation": "_ruling", "Kind": "-", "Slots": "-",
@@ -1094,9 +1157,21 @@ TWIN_SHEETS = {
             {"Label": "join (ON predicate container)",
              "Speech": "stored description (deterministic render)",
              "Meaning": "which pair combines, on what predicate — "
-             "verbatim-law checked; out of the search index until "
-             "the scoring work resumes (ruled-silent with scopes/"
-             "statements)"},
+             "verbatim-law checked; out of the search index (THE "
+             "RULED-SILENT LIST, gap-checked 2026-09-17: joins/"
+             "direct_reads/statements OUT, scopes IN — the stale "
+             "'with scopes' phrasing corrected at v1.46.0)"},
+            {"Label": "statement",
+             "Speech": "stored description — the R11 statement "
+             "render (M5) for the 36 data-producing; the 31 "
+             "operational speak NOTHING (empty-by-rule, counted — "
+             "the (b) ruling 2026-09-17 + the T-2 voiced-never "
+             "class 2026-09-06)",
+             "Meaning": "ruled-silent in the ask index (re-affirmed "
+             "2026-09-17: 'leave as is, no searchable statement "
+             "descriptions for now') — store speech only: the "
+             "meaning console walks it, served GQL reaches it; "
+             "un-silencing enters with the §D resume decision"},
             {"Label": "derived_column", "Speech": "stored "
              "description (the M4 node's R12 computed-output "
              "phrase) — ONE voice, store grain, uniform with "
@@ -1347,9 +1422,17 @@ TWIN_SHEETS = {
              "the materialization build",
              "Notes": "tree blob remains builder provenance"},
             {"Kind": "node", "Name": "statement",
-             "Status": "TARGET — landing: the materialization build",
-             "Description obligation": "stored (grammar-rendered at "
-             "build)", "Notes": "today: rows inside the tree blob"},
+             "Status": "PRESENT",
+             "Description obligation": "stored (the R11 statement "
+             "render, 36 data-producing) — counted-gap allowed BY "
+             "RULE: the 31 operational are EMPTY-BY-RULE (the (b) "
+             "ruling 2026-09-17), the emptiness counted never a "
+             "true gap",
+             "Notes": "M5 (Sunny's 'approved' 2026-09-17): "
+             "::stmt/N grain (file::stmt/<position>); subkind read "
+             "from the twin's T-2 field; statement—has_part→scope "
+             "birth edges; file→statement lands M6; ruled-silent "
+             "in the ask index"},
             {"Kind": "node", "Name": "scope", "Status": "PRESENT",
              "Description obligation": "stored — the lead render, "
              "landed M2 (bottom-up ruling 2026-09-10); verbatim "
@@ -1429,9 +1512,9 @@ TWIN_SHEETS = {
              "Notes": "consumption layer"},
             {"Kind": "edge", "Name": "has_part", "Status": "PRESENT",
              "Description obligation": "-",
-             "Notes": "db→schema→table→column spine; TARGET grows: "
-             "file→statement→scope→condition/parameter at "
-             "materialization"},
+             "Notes": "db→schema→table→column spine + "
+             "statement→scope (M5, 2026-09-17); TARGET remains: "
+             "file→statement at M6"},
             {"Kind": "edge", "Name": "joins_to", "Status": "PRESENT",
              "Description obligation": "-",
              "Notes": "DECLARED dictionary joins (Epic Clarity "
@@ -1593,6 +1676,15 @@ TWIN_SHEETS = {
              "Meaning": "M3: minted from references; born by the "
              "scopes that consult it (scope —uses_param→ param); "
              "file—has_part→param lands at M6"},
+            {"Label": "statement", "Edge": "has_part",
+             "Status": "edged",
+             "Meaning": "M5 (2026-09-17): born pointing DOWN at "
+             "its scopes (statement —has_part→ scope; built after "
+             "scopes, before conditions — the M5-1 ordering "
+             "ruling). The 31 OPERATIONAL statements carry NO "
+             "downward edge — DECLARED counted-missing, landing "
+             "step M6 (file —has_part→ statement); the per-node "
+             "census counts them honestly"},
             {"Label": "derived_column", "Edge": "has_part",
              "Status": "edged",
              "Meaning": "M4 (2026-09-16): born by its scope "

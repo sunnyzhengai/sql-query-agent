@@ -36,6 +36,7 @@ GOVERNED_ENTRIES = frozenset({
     "AIVIA_Product",
     "AIVIA_Test",
     "aivia",
+    ".claude",
     ".github",
     ".gitignore",
     "CHANGELOG.md",

@@ -1577,3 +1577,91 @@ open — latest ..."), updated same breath as any brief lands or
 moves status; per-brief INDEX lines never — the naming law's
 intent applied at the briefs' grain (high-volume by design).
 INDEX line converted same breath. Audit row stamped.
+
+**COMMIT 48433c1 (Sunny's "ok") + THE M5 BRIEF PRESENTED (same
+sitting):** the night's 29 files committed on dev. Brief_M5_
+Statement_Layer landed PRESENTED — class planned addition (fills
+FL2), inheriting F2+F4 (the ruled separator forms) + FS1 (the
+counts test before the republish) + the (b) numbers (36/31);
+16 declared files, four ambiguities OPEN (M5-1 builder ordering ·
+M5-2 the counter's real value · M5-3 the subkind writer
+investigation-first · M5-4 the R11 draft→gap-check→ratify arc);
+the 31 counted-missing debt stands declared with its M6 landing
+step; statements ruled-silent → NO new searchable sentences → no
+recording run this batch. INDEX briefs count-line: 5 briefs,
+4 CLOSED · 1 PRESENTED.
+
+**THE M5 AMBIGUITIES CLOSED (Sunny, 2026-09-17, one at a time):**
+M5-1 "build order is the reverse. after scopes" — the boot
+sequence is scopes → STATEMENTS → conditions → deriveds (his
+containment shape file→statement→scope CONFIRMED as the graph's
+top-down read; the build runs bottom-up per the batch law) ·
+M5-2 "real value" — held_statement_rooted counts the measured
+statement-rooted conditions (expected 6, keyed), never a
+constant zero · M5-3 RESOLVED by investigation — the subkind
+writer is the TRANSLATOR's T-2 ruled list (Sunny 2026-09-06,
+"operational statement kinds carry no voice"); the M5 builder
+reads, never re-derives · M5-4 "confirmed" — the R12 arc for
+R11, with the mid-build checkpoint: THE 36 SENTENCES presented
+for his gap-check before ratification and the 2.11.0 bump.
+Brief_M5_Statement_Layer: ZERO open ambiguities; awaiting his
+approval word.
+
+**RE-AFFIRMED at the M5 brief (Sunny, 2026-09-17: "let's leave
+as is, no searchable statement descriptions for now"):** M5 ships
+statements RULED-SILENT as gap-checked — 36 R11 descriptions in
+the STORE (meaning console + served GQL reach them), none in the
+ask index; un-silencing enters via its own brief with the §D
+resume / ask-console convergence decision, where FL1 also waits.
+
+**THE HARD GATE'S FIRST LIVE CATCH (2026-09-17, mid-M5-build):**
+the gate BLOCKED the write of tests/aivia/test_statement_layer.py
+— the M5 brief had under-declared by one file (the M4 precedent
+splits fixture-structure pins from render pins; the brief named
+only the render file). Sunny's "yes" amended the declared list
+per H5; the brief records the amendment. The mechanism he
+approved at the top of the night refused its own builder before
+the first sunrise.
+
+**M5 THE STATEMENT LAYER BUILT (one sitting, 2026-09-17 — the
+FIRST batch built under the ratified process and THE HARD GATE;
+Brief_M5_Statement_Layer: four rulings one at a time, four H5
+list amendments, R11 ratified at the mid-build checkpoint):**
+statement ×67 minted (::stmt/N, twin subkind READ per T-2 — one
+writer; built after scopes before conditions per M5-1 "build
+order is the reverse. after scopes") · statement—has_part→scope
+44 · the M3 holdovers land: +6 statement-rooted conditions
+(2 roots + 4 nested), +2 params (@StartDate/@EndDate),
+resolves_to +4, uses_param statement→param +2 ·
+held_statement_rooted = 6 MEASURED (FL8's dead counter fires —
+"real value") · §R11 THE STATEMENT STEP authored DRAFT →
+suite-first pins → THE 36 PRESENTED (Sunny ran them himself,
+"all passed") → composed-OR form replaced the structural summary
+BEFORE presentation → "ratified" → v2.11.0, the two version pins
+moved consciously · the (b) split holds: 36 voiced + 31
+EMPTY-BY-RULE counted · THE F2+F4 EXPORT FIX LIVE: the line-51
+blanket drop replaced by "; "-joined text (lists; dict pairs as
+"code = meaning") — pkColumns reaches Fabric after weeks
+counted; graph_column byte-identical (zero values data in this
+estate, the fix's tripwire is a synthetic-node pin) · FS1's
+counts-vs-key test GREEN against the regenerated parquets (the
+generator gained an import-safe counting step, pandas-free) ·
+registries 1.46.0 (Statement_Voicings library + the three sheet
+rows + the stale "with scopes" phrasing corrected) · export
+regen: 5 parquets changed + 4 NEW, all else byte-identical ·
+ladder pins evolved frozen-row style (M3/M4 freeze via
+::stmt/ exclusion — the M4 precedent) · THE GATE'S NIGHT: four
+live catches (statement_layer test, speech.py — which
+verification then DISPROVED as needed at all, shape_census, the
+version-pin pair), every amendment by Sunny's word, zero
+undeclared edits landed. FULL SUITE 2196 passed · 25 skipped ·
+8 xfailed · 0 failed (12:06); ruff clean (the two documented
+converter E501s + untouched validate_fixtures pre-exist).
+Contract_Logic stamped (dc.statement LIVE, FL2 CLOSED, R11 in
+the grammar row); GQL_Gates §M5 corrected to the (b) arithmetic
++ THE LOAD STEPS authored. REMAINS: Sunny's load (5 changed + 4
+new parquets, 4 model mappings, ONE refresh), the served §M5
+gates, the visual republish — then the brief CLOSES with the
+declared-vs-actual diff. NOTE for his console boot: +2 param
+index sentences (the M5 params) embed at his next keyed boot —
+sub-cent, automatic, by content key.

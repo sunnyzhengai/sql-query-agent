@@ -197,3 +197,41 @@ def metamodel_ledger():
     from aivia.graph import metamodel
     sheet = metamodel.load("lenses").sheets["Shape_Ledger"]
     return [(r["Name"], r) for r in sheet if r["Name"] != "-"]
+
+
+# ---- M5 rides: the F2+F4 export fix (Brief_M5_Statement_Layer) ----
+# Ruled 2026-09-17 (F2 "yes" + F4 "yes" on all three parts): list
+# and dict node properties export as "; "-joined text — lists as
+# "A; B", dict pairs as "code = meaning" — instead of the silent
+# line-51 drop that ate pk_columns and values.
+
+def test_pk_columns_ride_as_joined_text(world):
+    read, tables = world
+    rows = {r["nodeId"]: r for r in tables["graph_table"]}
+    witnessed = 0
+    for n in read.nodes("table"):
+        pk = n.properties.get("pk_columns")
+        if pk:
+            witnessed += 1
+            assert rows[n.identity]["pkColumns"] == "; ".join(pk)
+    assert witnessed, "the fixture carries pk_columns tables"
+
+
+def test_dict_values_ride_as_code_meaning_pairs():
+    """No estate fixture carries a values dict today (measured:
+    sepsis 0, ed_sepsis_dev 0) — the witness is a synthetic node,
+    so the pin can never be silently vacuous (the placeholder
+    law's no-naked-pin clause)."""
+    from aivia.graph.store import Store
+    store = Store()
+    store.append_node(
+        "column", "simemr|dbo|T|CODE",
+        {"description": "a coded field",
+         "values": {"1": "Emergency", "2": "Urgent"},
+         "data_type": "varchar"},
+        "2026-09-17T00:00:00Z", "kg1@test")
+    tables = export_graph.export_tables(ReadApi(store),
+                                        labels=("column",))
+    row = tables["graph_column"][0]
+    assert row["values"] == "1 = Emergency; 2 = Urgent"
+    assert row["dataType"] == "varchar"

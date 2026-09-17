@@ -45,6 +45,7 @@ VERIFIERS = {
     "kind (node type)": "self-rows",
     "join (ON predicate container)": "absent",
     "operational statement": "absent",
+    "statement": "absent",
 }
 
 

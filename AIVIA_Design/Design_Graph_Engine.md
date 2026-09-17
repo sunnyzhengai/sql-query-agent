@@ -279,9 +279,9 @@ algorithm · evidence returned with the query as artifact).
 
 ## The laws carried forward from v1 (storage-independent, all kept)
 
-[registry stamps: kg1_technical v1.45.0 · kg2_logic v1.45.0 ·
-kg2_kind_library v1.45.0 · kg3_artifacts v1.45.0 ·
-kg4_concepts v1.45.0 · flows v1.45.0 · lenses v1.45.0]
+[registry stamps: kg1_technical v1.46.0 · kg2_logic v1.46.0 ·
+kg2_kind_library v1.46.0 · kg3_artifacts v1.46.0 ·
+kg4_concepts v1.46.0 · flows v1.46.0 · lenses v1.46.0]
 (stamp block restored 2026-09-10 — the ratification rename dropped
 v1's per-section stamps; RG-A2 caught it same day. One block here,
 the same-breath rule mechanical again; registries carry their own
@@ -322,7 +322,17 @@ STAY FLAT — one node per computed output, expression trees at
 L1), scope—has_part→derived_column + scope—cites→column at
 store grain (cites 100→97 by measurement); grammar constant
 2.10.0 closes the declared deferral; the mapper's
-arithmetic/unary operator property lands — twin untouched.)
+arithmetic/unary operator property lands — twin untouched.
+1.46.0 = M5 THE STATEMENT LAYER, Sunny's "approved" 2026-09-17
+(Brief_M5_Statement_Layer, every ambiguity ruled one at a time):
+statement flips PRESENT (::stmt/N grain, twin-authored 67;
+subkind read from the translator's T-2 field, one writer) with
+statement—has_part→scope birth edges, built after scopes before
+conditions (M5-1); descriptions = R11 renders for the 36
+data-producing, the 31 operational EMPTY-BY-RULE counted (the
+(b) ruling); ruled-silent in the ask index, re-affirmed; the 31
+counted-missing until file→statement at M6; the F2+F4 export
+fix rides the batch.)
 
 Conservation (handled ⊎ counted == everything) · meaning-identity
 anchoring (contentKeys → drift) · the voicing grammar (registry-

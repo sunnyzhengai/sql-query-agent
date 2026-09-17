@@ -260,22 +260,33 @@ def test_m2_coverage_invariants(booted):
 
 def test_m3_store_matches_census(booted, exported):
     want = CENSUS["M3"]
+    # the M3-era census FREEZES here: M4's derived rows and M5's
+    # statement-rooted rows are excluded (the frozen-row precedent
+    # from the M4 build; each later batch's own test asserts its
+    # full sum)
+    m5_params = set(DELTA["M5"]["param_names_new"])
+
+    def sans_stmt(rows):
+        return [r for r in rows if "::stmt/" not in r["nodeId"]]
     got_nodes = {"db": 1, "db_schema": 3,
                  "table": len(exported["graph_table"]),
                  "column": len(exported["graph_column"]),
                  "scope": len(exported["graph_scope"]),
                  "join": len(exported["graph_join"]),
                  "direct_read": len(exported["graph_direct_read"]),
-                 "condition": len(exported["graph_condition"]),
-                 "param": len(exported["graph_param"])}
+                 "condition": len(sans_stmt(exported["graph_condition"])),
+                 "param": sum(1 for r in exported["graph_param"]
+                              if r["name"] not in m5_params)}
     assert got_nodes == want["nodes"]
-    # the M3-era census: the M4 birth-edge table is excluded
-    # (this row froze at M3; M4's own test asserts the full sum)
-    has_part = sum(len(v) for k, v in exported.items()
-                   if k.startswith("graph_has_part")
-                   and k != "graph_has_part_scopeDerivedColumn")
+    has_part = sum(
+        len([r for r in v if "::stmt/" not in r["sourceId"]])
+        for k, v in exported.items()
+        if k.startswith("graph_has_part")
+        and k != "graph_has_part_scopeDerivedColumn")
     resolves = (len(exported["graph_resolves_to_conditionColumn"])
-                + len(exported["graph_resolves_to_conditionParam"]))
+                + len([r for r in
+                       exported["graph_resolves_to_conditionParam"]
+                       if "::stmt/" not in r["sourceId"]]))
     got_edges = {"has_part": has_part,
                  "joins_to": len(exported["graph_joins_to_tableTable"]),
                  "left_side": len(exported["graph_left_side_joinTable"])
@@ -290,7 +301,9 @@ def test_m3_store_matches_census(booted, exported):
 
 def test_m3_condition_conservation_and_kinds(booted):
     want = DELTA["M3"]
-    conds = booted.current_nodes("condition")
+    # frozen at M3: the M5 statement-rooted conditions excluded
+    conds = [c for c in booted.current_nodes("condition")
+             if "::stmt/" not in c.identity]
     assert len(conds) == want["new_nodes"]["condition"]
     parents = {e.to_id: e.from_id
                for e in booted.current_edges("has_part")
@@ -317,19 +330,22 @@ def test_m3_condition_conservation_and_kinds(booted):
 
 def test_m3_resolves_roles_and_params(booted):
     want = DELTA["M3"]
-    roles = Counter(e.properties.get("role")
-                    for e in booted.current_edges("resolves_to"))
+    # frozen at M3: statement-rooted rows (M5) excluded
+    rts = [e for e in booted.current_edges("resolves_to")
+           if "::stmt/" not in e.from_id]
+    roles = Counter(e.properties.get("role") for e in rts)
     assert dict(roles) == want["resolves_to_roles"]
-    cols = [e for e in booted.current_edges("resolves_to")
-            if "::param/" not in e.to_id]
-    pars = [e for e in booted.current_edges("resolves_to")
-            if "::param/" in e.to_id]
+    cols = [e for e in rts if "::param/" not in e.to_id]
+    pars = [e for e in rts if "::param/" in e.to_id]
     assert len(cols) == want["new_edges"]["resolves_to_conditionColumn"]
     assert len(pars) == want["new_edges"]["resolves_to_conditionParam"]
+    m5_params = set(DELTA["M5"]["param_names_new"])
     params = sorted(n.properties["name"]
-                    for n in booted.current_nodes("param"))
+                    for n in booted.current_nodes("param")
+                    if n.properties["name"] not in m5_params)
     assert params == want["param_names"]
-    assert len(booted.current_edges("uses_param")) \
+    assert sum(1 for e in booted.current_edges("uses_param")
+               if "::stmt/" not in e.from_id) \
         == want["new_edges"]["uses_param_scopeParam"]
 
 
@@ -443,10 +459,17 @@ def test_m4_export_matches_census(exported):
                  "scope": len(exported["graph_scope"]),
                  "join": len(exported["graph_join"]),
                  "direct_read": len(exported["graph_direct_read"]),
-                 "condition": len(exported["graph_condition"]),
-                 "param": len(exported["graph_param"]),
+                 "condition": len(
+                     [r for r in exported["graph_condition"]
+                      if "::stmt/" not in r["nodeId"]]),
+                 "param": sum(
+                     1 for r in exported["graph_param"]
+                     if r["name"] not in
+                     set(DELTA["M5"]["param_names_new"])),
                  "derived_column":
                      len(exported["graph_derived_column"])}
+    # frozen at M4: M5's statement-rooted rows excluded (the
+    # frozen-row precedent); M5's own test asserts the full sums
     assert got_nodes == want["nodes"]
     has_part = (len(exported["graph_has_part_dbSchema"])
                 + len(exported["graph_has_part_schemaTable"])
@@ -455,7 +478,9 @@ def test_m4_export_matches_census(exported):
                 + len(exported["graph_has_part_scopeDirectRead"])
                 + len(exported["graph_has_part_joinCondition"])
                 + len(exported["graph_has_part_scopeCondition"])
-                + len(exported["graph_has_part_conditionCondition"])
+                + len([r for r in
+                       exported["graph_has_part_conditionCondition"]
+                       if "::stmt/" not in r["sourceId"]])
                 + len(exported["graph_has_part_scopeDerivedColumn"]))
     left = (len(exported["graph_left_side_joinTable"])
             + len(exported["graph_left_side_joinScope"])
@@ -463,7 +488,9 @@ def test_m4_export_matches_census(exported):
     right = (len(exported["graph_right_side_joinTable"])
              + len(exported["graph_right_side_joinScope"]))
     resolves = (len(exported["graph_resolves_to_conditionColumn"])
-                + len(exported["graph_resolves_to_conditionParam"]))
+                + len([r for r in
+                       exported["graph_resolves_to_conditionParam"]
+                       if "::stmt/" not in r["sourceId"]]))
     got_edges = {
         "has_part": has_part,
         "joins_to": len(exported["graph_joins_to_tableTable"]),
@@ -492,7 +519,7 @@ def test_m4_case_conditions_stay_parented_to_scope(booted):
     their scope/condition parentage — never re-parented under
     derived_column (stay-flat, Sunny 2026-09-16)."""
     conds = booted.current_nodes("condition")
-    assert len(conds) == CENSUS["M3"]["nodes"]["condition"]
+    assert len(conds) == CENSUS["M5"]["nodes"]["condition"]
     dcol_ids = {n.identity
                 for n in booted.current_nodes("derived_column")}
     cond_ids = {n.identity for n in conds}
@@ -535,6 +562,89 @@ def test_m5_key_matches_twin(twin):
     floaters = [i for i in idx if i not in has_scope and i not in has_cond]
     assert len(floaters) == 31  # the declared Connection_Ledger debt
     assert want["new_edges"]["has_part_statementScope"] == 44
+
+
+def test_m5_store_matches_key(booted):
+    """The M5 census ON THE BOOTED STORE == the answer key
+    (Brief_M5_Statement_Layer, approved 2026-09-17)."""
+    want = DELTA["M5"]
+    sts = booted.current_nodes("statement")
+    assert len(sts) == want["new_nodes"]["statement"]
+    assert all(re.search(r"::stmt/\d+$", n.identity) for n in sts)
+    ops = [n for n in sts
+           if n.properties.get("subkind") == "operational"]
+    assert len(ops) == want["statement_operational_subkind"]
+    st_ids = {n.identity for n in sts}
+    scope_ids = {n.identity for n in booted.current_nodes("scope")}
+    st_scope = [e for e in booted.current_edges("has_part")
+                if e.from_id in st_ids and e.to_id in scope_ids]
+    assert len(st_scope) == want["new_edges"]["has_part_statementScope"]
+    conds = booted.current_nodes("condition")
+    assert len(conds) == CENSUS["M5"]["nodes"]["condition"]
+    assert len(booted.current_nodes("param")) \
+        == CENSUS["M5"]["nodes"]["param"]
+    cond_ids = {n.identity for n in conds}
+    st_cond = [e for e in booted.current_edges("has_part")
+               if e.from_id in st_ids and e.to_id in cond_ids]
+    assert len(st_cond) == want["new_edges"]["has_part_statementCondition"]
+    st_param = [e for e in booted.current_edges("uses_param")
+                if e.from_id in st_ids]
+    assert len(st_param) == want["new_edges"]["uses_param_statementParam"]
+
+
+def test_m5_descriptions_36_voiced_31_empty_by_rule(booted):
+    """The (b) ruling (Sunny 'b', 2026-09-17): 36 data-producing
+    statements carry R11 descriptions; the 31 operational store
+    NOTHING — empty-by-rule, counted here, never silent."""
+    want = DELTA["M5"]["checks"]
+    sts = booted.current_nodes("statement")
+    voiced = [n for n in sts if n.properties.get("description")]
+    assert len(voiced) == want["r11_descriptions_nonempty"]
+    ops = [n for n in sts
+           if n.properties.get("subkind") == "operational"]
+    assert len(ops) == want["statement_operational_empty_by_rule"]
+    assert not any(n.properties.get("description") for n in ops)
+
+
+def test_m5_descriptions_stored_and_verbatim(booted):
+    """The verbatim law at statement grain: stored == the R11
+    recompute, byte-exact, for every voiced statement."""
+    from aivia.flows import inbound
+    read = ReadApi(booted)
+    recomputed = inbound._render_statement_descriptions(read)
+    nodes = {n.identity: n
+             for n in booted.current_nodes("statement")}
+    voiced = {i for i, n in nodes.items()
+              if n.properties.get("description")}
+    assert set(recomputed) == voiced
+    for sid, text in recomputed.items():
+        assert nodes[sid].properties["description"] == text
+
+
+def test_m5_statement_rooted_conditions_at_store_grain(booted):
+    """FL8 closed (Sunny 'real value', 2026-09-17): the 6
+    statement-rooted conditions EXIST at store grain — the
+    receipt-grain counter pin lives in test_statement_layer.py
+    (a fresh build; the booted store's rerun skips idempotently)."""
+    st_cond = [n for n in booted.current_nodes("condition")
+               if "::stmt/" in n.identity]
+    assert len(st_cond) == 6
+    kinds = Counter(n.properties["kind"] for n in st_cond)
+    assert dict(kinds) == DELTA["M5"]["condition_by_kind_new"]
+
+
+def test_m5_export_matches_census(exported):
+    """The FULL M5 census against the export tables — the numbers
+    Sunny's GQL gate asserts after his load + ONE refresh."""
+    want = CENSUS["M5"]
+    assert len(exported["graph_statement"]) \
+        == want["nodes"]["statement"]
+    got_nodes = {k: len(exported[f"graph_{k}"])
+                 for k in want["nodes"]}
+    assert got_nodes == want["nodes"]
+    has_part = sum(len(rows) for name, rows in exported.items()
+                   if name.startswith("graph_has_part"))
+    assert has_part == want["edges"]["has_part"]
 
 
 # ---------------------------------------------------------------

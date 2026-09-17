@@ -8,6 +8,7 @@ never silent.
 """
 import json
 import pathlib
+import re
 from dataclasses import dataclass, field
 from typing import Any, Dict, List, Set
 
@@ -256,6 +257,12 @@ def receive_estate(store, reg: Dict[str, Any], estate_dir,
             store, f"{location}{name}", tree, manifest["as_of"])
     _store_scope_descriptions(store, manifest["as_of"])
     report.join_layer = _store_join_layer(store, manifest["as_of"])
+    # M5-1 (ruled: "build order is the reverse. after scopes"):
+    # statements build AFTER scopes, BEFORE conditions — their
+    # birth edges point DOWN at scopes; statement-rooted
+    # predicates then find their parent standing.
+    report.statement_layer = _store_statement_layer(
+        store, manifest["as_of"])
     report.condition_layer = _store_condition_layer(
         store, manifest["as_of"])
     report.derived_layer = _store_derived_column_layer(
@@ -537,6 +544,121 @@ def _condition_refs(pred):
     return out
 
 
+def _twin_statement_subkinds(store, tree) -> Dict[int, str]:
+    """M5-3 (resolved by investigation, Sunny shown 2026-09-17):
+    subkind is READ from the translator's T-2 field on the twin —
+    never re-derived here (one writer since 2026-09-06)."""
+    for mt in store.current_nodes("meaning_twin"):
+        twin = mt.properties.get("twin", {})
+        if twin.get("file") != tree.get("name"):
+            continue
+        out = {}
+        for n in twin["nodes"]:
+            m = re.fullmatch(r"/statements/(\d+)",
+                             n.get("points_at", ""))
+            if m and n.get("kind") == "statement" \
+                    and n.get("subkind"):
+                out[int(m.group(1))] = n["subkind"]
+        return out
+    return {}
+
+
+def _render_statement_descriptions(read) -> Dict[str, str]:
+    """The R11 recompute surface — the verbatim law's second
+    reading (stored == recomputed, byte-exact). Voiced statements
+    only; the silent kinds return nothing here by construction."""
+    from aivia.flows import produce
+
+    def composed(pred, voice):
+        # R11: a top-level OR/AND speaks its children's phrases
+        # joined by or/and — never the composite's structural
+        # summary ("any of its 2 parts holds" says nothing at
+        # statement grain; the leaves say everything)
+        kids = pred.get("children") or []
+        kind = pred.get("kind", "")
+        if kind in ("OR", "AND") and kids:
+            joiner = " or " if kind == "OR" else " and "
+            parts = [condition_render(k, voice).rstrip(".")
+                     for k in kids]
+            parts = [p[0].lower() + p[1:] if p else p
+                     for p in parts]
+            return joiner.join(parts) + "."
+        return condition_render(pred, voice)
+
+    out: Dict[str, str] = {}
+    for key, tree in sorted(read.trees().items()):
+        voice = produce._Voice(read, tree)
+        for i, st in enumerate(tree["statements"]):
+            phrase = None
+            if st.get("predicate") is not None:
+                phrase = composed(st["predicate"], voice)
+            text = produce.statement_phrase(
+                st, predicate_phrase=phrase)
+            if text:
+                out[f"{key}::stmt/{i + 1}"] = text
+    return out
+
+
+def _store_statement_layer(store, as_of) -> dict:
+    """M5 THE STATEMENT LAYER (Brief_M5_Statement_Layer, Sunny's
+    'approved' 2026-09-17): one node per statement — identity
+    file::stmt/<position> (the 2026-09-10 ruling) — built after
+    scopes, before conditions (M5-1). Descriptions: R11 renders
+    for the voiced kinds; operational statements store NOTHING
+    (the (b) ruling — the emptiness COUNTED); an unlisted
+    data-producing kind is a COUNTED remainder, never silent.
+    statement—has_part→scope birth edges point DOWN at verified
+    scopes; the 31 operational stay counted-missing until M6."""
+    from aivia.graph.read_api import ReadApi
+    read = ReadApi(store)
+    files = {n.identity: n for n in store.current_nodes("file")}
+    scope_ids = {n.identity for n in read.nodes("scope")}
+    texts = _render_statement_descriptions(read)
+    # literal: shape
+    counts = {"statements": 0, "voiced": 0, "operational": 0,
+              "scope_edges": 0, "statement_remainders": {}}
+    for key, tree in sorted(read.trees().items()):
+        existing = [n for n in read.nodes("statement")
+                    if n.identity.startswith(f"{key}::stmt/")]
+        if existing:  # already materialized this boot
+            counts["statements"] += len(existing)
+            continue
+        extract = files[key].extract_id
+        subk = _twin_statement_subkinds(store, tree)
+        for i, st in enumerate(tree["statements"]):
+            sid = f"{key}::stmt/{i + 1}"
+            kind = st.get("statement_kind", "")
+            # literal: shape
+            props: Dict[str, Any] = {"name": f"stmt/{i + 1}",
+                                     "does": kind}
+            if i in subk:
+                props["subkind"] = subk[i]
+            text = texts.get(sid)
+            if text:
+                props["description"] = text
+                counts["voiced"] += 1
+            elif subk.get(i) == "operational":
+                counts["operational"] += 1
+            elif st.get("scope") or st.get("ctes"):
+                counts["statement_remainders"][kind] = \
+                    counts["statement_remainders"].get(kind, 0) + 1
+            store.append_node("statement", sid, props, as_of,
+                              extract)
+            counts["statements"] += 1
+            for cte in st.get("ctes") or []:
+                nk = cte.get("name_key")
+                if nk in scope_ids:
+                    store.append_edge("has_part", sid, nk, {},
+                                      as_of, extract)
+                    counts["scope_edges"] += 1
+            nk = (st.get("scope") or {}).get("name_key")
+            if nk in scope_ids:
+                store.append_edge("has_part", sid, nk, {},
+                                  as_of, extract)
+                counts["scope_edges"] += 1
+    return counts
+
+
 def _store_condition_layer(store, as_of) -> dict:
     """THE CONDITION LAYER, M3: every predicate under a named scope
     becomes a condition node with its stored voiced phrase — ON
@@ -648,6 +770,71 @@ def _store_condition_layer(store, as_of) -> dict:
             for pid in sorted(scope_params):
                 store.append_edge("uses_param", node.identity, pid,
                                   {}, as_of, node.extract_id)
+                counts["uses_param"] += 1
+
+        # M5 (the M5-1 ordering makes this reachable; FL8 closed —
+        # Sunny "real value"): statement-rooted predicates parent
+        # to their STATEMENT node; held_statement_rooted counts
+        # every condition minted here — measured, never zero-by-
+        # unreachability.
+        st_nodes = {n.identity: n for n in read.nodes("statement")}
+        for i, st in enumerate(tree["statements"]):
+            pred = st.get("predicate")
+            if pred is None:
+                continue
+            sid = f"{key}::stmt/{i + 1}"
+            snode = st_nodes.get(sid)
+            if snode is None:
+                continue  # statements not built (pre-M5 store)
+            prefix = sid + "::cond#"
+            if any(n.identity.startswith(prefix)
+                   for n in read.nodes("condition")):
+                continue  # already materialized this boot
+            st_seq = 0
+            st_params: Set[str] = set()
+
+            def emit_st(pred_, parent_id):
+                nonlocal st_seq
+                st_seq += 1
+                cid = f"{sid}::cond#{st_seq}"
+                kind = pred_.get("kind", "")
+                leaf = pred_.get("node") == "predicate"
+                degen = bool(leaf and decisions.is_degenerate(pred_))
+                if degen:
+                    counts["degenerate"] += 1
+                store.append_node(
+                    "condition", cid,
+                    # literal: shape
+                    {"name": f"cond#{st_seq}", "kind": kind,
+                     "degenerate": "true" if degen else "false",
+                     "description": condition_render(pred_, voice),
+                     "fragment": (pred_.get("evidence") or {})
+                     .get("fragment", "")},
+                    as_of, snode.extract_id)
+                store.append_edge("has_part", parent_id, cid,
+                                  {}, as_of, snode.extract_id)
+                counts["conditions"] += 1
+                counts["held_statement_rooted"] += 1
+                for role, target in _condition_refs(pred_):
+                    if target.startswith("@"):
+                        pid = ensure_param(target, snode.extract_id)
+                        store.append_edge(
+                            "resolves_to", cid, pid,
+                            {"role": role}, as_of, snode.extract_id)
+                        counts["resolves_param"] += 1
+                        st_params.add(pid)
+                    else:
+                        store.append_edge(
+                            "resolves_to", cid, target,
+                            {"role": role}, as_of, snode.extract_id)
+                        counts["resolves_column"] += 1
+                for child in pred_.get("children") or []:
+                    emit_st(child, cid)
+
+            emit_st(pred, sid)
+            for pid in sorted(st_params):
+                store.append_edge("uses_param", sid, pid,
+                                  {}, as_of, snode.extract_id)
                 counts["uses_param"] += 1
     return counts
 

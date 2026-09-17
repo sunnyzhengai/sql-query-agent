@@ -19,25 +19,25 @@ structures born from parsing the estate's files.
 | ds.cites_store_grain | cites = distinct (scope, dictionary column) its outputs draw on | RULED 09-16 (measured re-base) | Design_Graph_Engine edge vocabulary — cites (the tuple definition landed 2026-09-17, CI-A4) |
 | ds.birth_edge_law | a node ships only in the batch where its birth edge points DOWN at verified nodes | RULED | Design_Graph_Engine — Migration, THE BATCH LAW (re-homed 2026-09-17, CI-A3) |
 | ds.ruled_silent_index | joins, direct_reads, statements stay OUT of the ask index (connective structure / until §D); scopes are IN | RULED | Design_Chatbot riders — THE RULED-SILENT LIST (consolidated 2026-09-17, CI-A5) |
-| R1–R7 · R10 · R12 · (R11 reserved) | the voicing grammar per grain (R10 = the file/report floor) | RULED (R11 unwritten — M5) | Grammar_Floor |
+| R1–R7 · R10 · R11 · R12 | the voicing grammar per grain (R10 = the file floor; R11 = the statement step, ratified v2.11.0 at M5) | RULED | Grammar_Floor |
 
 ## DATA_CONTRACTS
 
 | dc_id | kind | what it is | writer | count (ed_sepsis_dev) | status |
 |---|---|---|---|---|---|
 | dc.file | node | one SQL file of the estate | estate intake | 1 | LIVE |
-| dc.statement | node | one statement of a file (id file::stmt/N) | (M5 builder) | 0 | **TARGET — M5, planned** |
+| dc.statement | node | one statement of a file (id file::stmt/N) | M5 builder (_store_statement_layer, after scopes before conditions — M5-1) | 67 | LIVE (M5 BUILT 2026-09-17) |
 | dc.scope | node | one named selection (CTE / #temp / delivery) | scope builder | 44 | LIVE |
 | dc.join | node | one observed join: which pair combines, how, on what | join layer builder | 95 | LIVE |
 | dc.direct_read | node | the single-table FROM's sided node (no ON, no type — absence in the KIND) | era-3 builder | 6 | LIVE |
-| dc.condition | node | one predicate, leaf or composite (kind = property) | condition layer builder | 1,141 | LIVE |
-| dc.param | node | a procedure parameter consulted by scopes | condition layer builder | 2 (+2 at M5) | LIVE |
+| dc.condition | node | one predicate, leaf or composite (kind = property) | condition layer builder | 1,147 (+6 statement-rooted at M5) | LIVE |
+| dc.param | node | a procedure parameter consulted by scopes or statements | condition layer builder | 4 (+2 at M5: @StartDate/@EndDate) | LIVE |
 | dc.derived_column | node | one computed output of a scope (STAY FLAT) | M4 builder | 156 | LIVE |
 | dc.meaning_twin | node (internal) | the translated twin blob of a file | translator | 1 | LIVE — retires at M9 (parse records) |
-| dc.has_part (logic rows) | edge | scope→join · scope→direct_read · join/scope/condition→condition · scope→derived_column (+ file→statement at M6) | the respective builders | 1,398 | LIVE |
+| dc.has_part (logic rows) | edge | scope→join · scope→direct_read · join/scope/statement/condition→condition · scope→derived_column · statement→scope (+ file→statement at M6) | the respective builders | 1,448 (+50 at M5) | LIVE |
 | dc.left_side / dc.right_side | edge | a join's or direct_read's resolved pair (side order syntactic) | join + era-3 builders | 101 / 87 | LIVE |
-| dc.resolves_to | edge | condition → dictionary column or param, ROLE-tagged | condition layer builder | 165 | LIVE |
-| dc.uses_param | edge | scope → param it consults | condition layer builder | 2 | LIVE |
+| dc.resolves_to | edge | condition → dictionary column or param, ROLE-tagged | condition layer builder | 169 (+4 at M5) | LIVE |
+| dc.uses_param | edge | scope or statement → param it consults | condition layer builder | 4 (+2 statement→param at M5) | LIVE |
 | dc.cites | edge | scope → dictionary column its outputs draw on | M4 builder | 97 | LIVE |
 
 ## CONTRACT_FIELDS (per type; name fields omitted where verbatim-from-source)
@@ -55,14 +55,14 @@ structures born from parsing the estate's files.
 | dc.derived_column | description | R12 renderer + function library | inv.verbatim · library words | verbatim + parity gate |
 | dc.derived_column | derivation · operation · position · fragment | parse, machine facts | ds.m4_stay_flat | estate M4 battery |
 | dc.resolves_to | role | parse (closed role vocabulary) | ds.kind_vs_label (roles) | role census |
-| dc.statement | (planned) description | R11 renderer — **R11 UNWRITTEN** | operational subkind voiced NEVER — **RULED (b) (Sunny "b", 2026-09-17): the 36 data-producing statements get R11 descriptions; the 31 operational store NOTHING (none-ruled, zero is legal — the db/db_schema precedent), the emptiness COUNTED never silent; a fixed phrase would restate the node's own kind field (derivable is never stored). Gate check re-pins 67→36 nonempty + 31 empty-by-rule** | (M5 tests) |
+| dc.statement | description | R11 renderer (**RATIFIED v2.11.0, Sunny "ratified" 2026-09-17** — the 36 gap-checked at the mid-build checkpoint) | operational subkind voiced NEVER — **RULED (b) (Sunny "b", 2026-09-17): the 36 data-producing statements get R11 descriptions; the 31 operational store NOTHING (none-ruled, zero is legal — the db/db_schema precedent), the emptiness COUNTED never silent; a fixed phrase would restate the node's own kind field (derivable is never stored). Gate check re-pins 67→36 nonempty + 31 empty-by-rule** | test_statement_render (11 incl. the 2 byte-exact estate IFs) · test_statement_layer · estate M5 battery · parity absent-check |
 
 ## CONSUMERS
 
 | dc_id | consumer | reads | re-verify |
 |---|---|---|---|
 | dc.scope · dc.condition · dc.param · dc.derived_column · dc.file | sc.ask_console | description as searchable text | speech parity gate |
-| dc.join · dc.direct_read | sc.ask_console | **NOTHING — ruled-silent (ds.ruled_silent_index)** | parity gate (absent check) |
+| dc.join · dc.direct_read · dc.statement | sc.ask_console | **NOTHING — ruled-silent (ds.ruled_silent_index; statement re-affirmed at M5: "leave as is")** | parity gate (absent check) |
 | all LIVE types | sc.meaning_console | descriptions + structure walks | console battery (18 blessed) |
 | all LIVE types + edges | sc.fabric_export | per-type graph_* parquets | export census tests |
 | all LIVE types | sc.graph_visual | name · description · edges | visual counts vs key |
@@ -73,7 +73,7 @@ structures born from parsing the estate's files.
 
 | ds_id | governs |
 |---|---|
-| ds.scope_identity | dc.scope (identity), dc.statement (planned identity) |
+| ds.scope_identity | dc.scope (identity); dc.statement identity (file::stmt/N, landed M5) |
 | ds.m2_join_redesign | dc.join · dc.left_side/right_side · the read-set walk |
 | ds.kind_vs_label | dc.condition.kind · dc.resolves_to.role (closed sets) |
 | ds.m3_condition_layer | dc.condition · dc.param · dc.resolves_to · dc.uses_param |
@@ -101,7 +101,7 @@ structures born from parsing the estate's files.
 | id | finding | kind | status |
 |---|---|---|---|
 | FL1 | a reference to a COMPUTED or temp-table column carries NO store edge (dc.resolves_to reaches dictionary columns only) → "which scope reads derived_column X" is not graph-walkable; meaning resolves through the defining projection (Gap B) but no edge lands | missing edge class — surfaced in the AGE_IN_DAYS "correct behavior" discussion | RULED (Sunny "yes", 2026-09-16): a declared OPEN SLOT — **THE COMPUTED-READ EDGE**, sequenced AFTER M5; enters via its own brief carrying its design questions (edge name · extend resolves_to with a role vs a new edge · exact grain — Sunny's rulings, never builder picks); pairs with the ask-console convergence decision |
-| FL2 | dc.statement is TARGET: M5 planned (67; operational 31 = counted-missing debt until M6); R11 unwritten | planned OPEN slot | OPEN by design — the M5 entry gate |
+| FL2 | dc.statement was TARGET: M5 planned (67; operational 31 = counted-missing debt until M6); R11 unwritten | planned OPEN slot | CLOSED (M5 BUILT 2026-09-17, Brief_M5_Statement_Layer): 67 LIVE, R11 RATIFIED v2.11.0, the 31 counted-missing stand declared until M6 |
 | FL3 | dc.meaning_twin duplicates meaning beside the graph (one-home tension) with retirement PLANNED at M9 (parse records) | declared, dated tension | OPEN — rides the Phase-2 ladder |
 | FL4 | joins/direct_reads/statements are ruled-silent in the ask index — deliberate, now visible as consumer rows reading NOTHING | deliberate fact made visible | CLOSED — the rows are the proof |
 | FL5 | description quality: unblessed vendor words produce dangling phrases ("the date and time when") across condition AND derived_column descriptions — the R5 steward class | steward queue, not a code defect | OPEN — rides Sunny's blessing pace |

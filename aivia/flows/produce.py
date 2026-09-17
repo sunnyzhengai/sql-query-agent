@@ -87,7 +87,7 @@ ECON = json.loads((pathlib.Path(__file__).parent / "econ_params.json")
 # + counted remainder (voice.function_remainders). The ADR 0076
 # value() overlays (COALESCE/LEFT/RIGHT/DATEADD) absorb into
 # _fill_overlay — condition-context phrases BYTE-IDENTICAL (A1).
-FLOOR_GRAMMAR_VERSION = "2.10.0"
+FLOOR_GRAMMAR_VERSION = "2.11.0"
 # literal: grammar Grammar_Floor R1
 _PREPOSITIONS = ("of", "on", "per", "for", "in", "at", "by", "with")
 # rider (c) amended (Sunny 2026-09-13): the dictionary's declared
@@ -766,12 +766,59 @@ def _twin_selection(read: ReadApi, tree, scope):
     return None, None
 
 
+def _spoken_selection(name: str) -> str:
+    """The author's selection name, spoken — # stripped, separators
+    to spaces, lowercased (R5.b standing: the author's own words, no
+    blessing gate). ONE home: _source_phrase and R11 both fold
+    through here."""
+    return re.sub(r"[_\W]+", " ",
+                  (name or "").lstrip("#")).strip().lower()
+
+
+# literal: schema-mirror kg2_kind_library Statement_Voicings
+_STATEMENT_VOICED = frozenset({"SELECT INTO", "IF", "SELECT"})
+
+
+def statement_phrase(stmt, predicate_phrase: Optional[str] = None
+                     ) -> Optional[str]:
+    """R11 — THE STATEMENT STEP (DRAFT, Brief_M5_Statement_Layer
+    approved 2026-09-17; Sunny gap-checks the rendered 36 before
+    ratification). What THIS STEP does, naming its selections —
+    never its scopes' floors (the speech contract). Returns None
+    for the silent kinds: T-2 operational and unlisted (the
+    builder COUNTS those; this function never invents a phrase)."""
+    kind = stmt.get("statement_kind", "")
+    if kind not in _STATEMENT_VOICED:
+        return None
+    scope = stmt.get("scope") or {}
+    sel = _spoken_selection(scope.get("name")
+                            or (scope.get("name_key") or ""
+                                ).rsplit("::", 1)[-1])
+    if kind == "SELECT INTO" and sel:
+        helpers = [f"the {_spoken_selection(c.get('name') or (c.get('name_key') or '').rsplit('::', 1)[-1])} selection"
+                   for c in stmt.get("ctes") or []]
+        if helpers:
+            listed = (helpers[0] if len(helpers) == 1
+                      else ", ".join(helpers[:-1])
+                      + " and " + helpers[-1])
+            return (f"Builds the {sel} selection, preparing "
+                    f"{listed} first.")
+        return f"Builds the {sel} selection."
+    if kind == "IF" and predicate_phrase:
+        p = predicate_phrase.strip().rstrip(".")
+        return (f"A decision step, taken when "
+                f"{p[0].lower()}{p[1:]}.")
+    if kind == "SELECT" and stmt.get("emits"):
+        return "Delivers the procedure's result set."
+    return None
+
+
 def _source_phrase(name: str, resolved, depth2_counter: List[int],
                    blessed=None) -> str:
     if resolved and str(resolved).startswith("SAME-TREE"):
         # named scope refs stay OUT of R5.b — the author's own
         # words, no vendor dictionary row
-        words = re.sub(r"[_\W]+", " ", name.lstrip("#")).strip().lower()
+        words = _spoken_selection(name)
         return (f"the {words} selection defined earlier in this "
                 "procedure")
     if name is None:  # an anonymous derived table — depth-1 inline

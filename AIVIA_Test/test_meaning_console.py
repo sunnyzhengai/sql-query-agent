@@ -59,7 +59,7 @@ def test_scope_carries_the_speaking_technical_grains(world):
         1 for e in full if e["label"] == "column")
     assert counts["scope"] == 44          # the second target (M2)
     assert counts["condition"] > 300      # the third target (M3)
-    assert counts["param"] == 2
+    assert counts["param"] == 4  # +2 at M5 (@StartDate/@EndDate)
     kinds = {e["name"] for e in entries if e["label"] == "label"}
     assert kinds == {"table", "column", "scope", "condition",
                      "parameter"}
@@ -724,7 +724,8 @@ def test_scope_rooted_conditions_speak_on_conditions_stay_out(
 def test_params_speak(world):
     _, entries, _, _, _ = world
     assert {e["name"] for e in entries if e["label"] == "param"} \
-        == {"@dStartDate", "@dEndDate"}
+        == {"@dStartDate", "@dEndDate",
+            "@StartDate", "@EndDate"}  # +2 at M5 (the IF params)
 
 
 def test_where_bullets_join_the_scope_neighborhood(world):

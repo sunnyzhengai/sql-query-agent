@@ -549,9 +549,36 @@ steward act, never a code fix.
 | expect | value |
 |---|---|
 | new nodes | statement 67 (operational subkind 31, voiced never) · condition +6 (the IF predicates: total→1147, the measured M3 re-base 1141 + 6) · param +2 (@StartDate @EndDate: total→4) |
-| new edges | has_part +50 (statement→scope 44 · statement→condition 2 · condition→condition 4) · resolves_to +4 (→param: total 156) · uses_param +2 (total 4) |
-| descriptions | 67/67 R11-rendered non-empty |
+| new edges | has_part +50 (statement→scope 44 · statement→condition 2 · condition→condition 4) · resolves_to +4 (→param; total resolves_to 169) · uses_param +2 (statement→param; total 4) |
+| descriptions | **36 R11-rendered non-empty + 31 EMPTY-BY-RULE (the (b) ruling, Sunny "b" 2026-09-17: operational statements store NOTHING — a fixed phrase would restate the kind field); the split is the check, corrected from the pre-ruling 67/67 draft** |
 | counted debt | 31 operational statements have NO downward edge — DECLARED Connection_Ledger counted-missing, landing step named M6 (file→statement). Not silent, not a failure: a counted row |
+| census after | nodes 6167 (statement 67) · edges 6618 (has_part 6095 · resolves_to 169 · uses_param 4) — census_after.M5 in the key |
+
+**M5 load steps (Sunny's hand, after the build commit):**
+
+1. Copy the changed graph_export parquets to the lakehouse: 5
+   updated (graph_table — pkColumns arrives, the F2 fix ·
+   graph_condition · graph_param ·
+   graph_has_part_conditionCondition ·
+   graph_resolves_to_conditionParam) + 4 NEW (graph_statement ·
+   graph_has_part_statementScope ·
+   graph_has_part_statementCondition ·
+   graph_uses_param_statementParam). Everything else is
+   byte-identical — including graph_column (no values data in
+   this estate; the F4 dict fix is live but writes nothing here).
+2. In the Fabric graph model: add node `statement`
+   (graph_statement, key nodeId) · add has_part mappings
+   statement→scope (graph_has_part_statementScope) and
+   statement→condition (graph_has_part_statementCondition) ·
+   add uses_param mapping statement→param
+   (graph_uses_param_statementParam) → Save → item-level
+   Refresh now (ONE — the capacity law).
+3. Run the gate queries (answer key: expected_m_gates.json,
+   basis 1.46.0). Good looks like: statement 67 · the 36/31
+   description split · node total 6167 · edge total 6618.
+4. Republish the graph visual (devtools/graph_visual/
+   generate_m1.py — the FS1 counts test is GREEN first, the
+   standing rule).
 
 ### M6 gate — file
 
