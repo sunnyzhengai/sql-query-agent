@@ -193,7 +193,7 @@ SOURCES = {
 # deliveries lead, spine voiced, intermediates counted, census
 # closes; the file's ask-index words = the delivery lead, so file
 # embeddings embed meaning, never name-noise).
-STAMP_VERSION = "1.46.0"
+STAMP_VERSION = "1.47.0"
 RATIFIED = True
 DOC_STAMP = ("v1.0.0 (ratified 2026-09-05, Sunny); v1.1.0 twin-graph "
              "ruling ADR 0077; v1.2.0 Phase A metamodel bump; v1.3.0 "
@@ -345,7 +345,7 @@ def sheet_records(ws):
 PATCHES = [
     ("kg3_artifacts", "Classes",
      {"Class": "description"},
-     {"Payload": "text; status: gate_passed | skeleton_floor | flagged | "
+     {"Payload": "text; status: gate_passed | skeleton_floor | flagged | approved | "
       "drafted (machine) / authored implicit (human)",
       "Notes": "RULING APPLIED 2026-09-09 (E1, the speech contract, Scribe "
       "route): 'drafted' joins the machine status vocabulary — the Scribe's "
@@ -1417,10 +1417,17 @@ TWIN_SHEETS = {
              "Description obligation": "stored — counted-gap allowed",
              "Notes": "dictionary-loaded"},
             {"Kind": "node", "Name": "file", "Status": "PRESENT",
-             "Description obligation": "TARGET stored (Scribe-"
-             "drafted, blessed) — today artifact-linked; landing: "
-             "the materialization build",
-             "Notes": "tree blob remains builder provenance"},
+             "Description obligation": "stored, TWO FIELDS (M6, "
+             "2026-09-17) — approved-only: description = "
+             "the Scribe's caged summary of the technical "
+             "definition, APPROVED only (zero-before-approval is "
+             "LEGAL and counted, never a wall); "
+             "technical_definition = R13 THE CATCH-ALL "
+             "(deterministic, verbatim-law) — NOT index speech "
+             "(M6-6)",
+             "Notes": "tree blob remains builder provenance, "
+             "never exported (M6-4); Collibra-named fields; the "
+             "PBI report derives both at M7 by cherry-picking"},
             {"Kind": "node", "Name": "statement",
              "Status": "PRESENT",
              "Description obligation": "stored (the R11 statement "
@@ -1513,8 +1520,9 @@ TWIN_SHEETS = {
             {"Kind": "edge", "Name": "has_part", "Status": "PRESENT",
              "Description obligation": "-",
              "Notes": "db→schema→table→column spine + "
-             "statement→scope (M5, 2026-09-17); TARGET remains: "
-             "file→statement at M6"},
+             "statement→scope (M5) + file→statement + file→param "
+             "(M6, 2026-09-17) — the containment chain COMPLETE "
+             "from file to column"},
             {"Kind": "edge", "Name": "joins_to", "Status": "PRESENT",
              "Description obligation": "-",
              "Notes": "DECLARED dictionary joins (Epic Clarity "
@@ -1679,12 +1687,12 @@ TWIN_SHEETS = {
             {"Label": "statement", "Edge": "has_part",
              "Status": "edged",
              "Meaning": "M5 (2026-09-17): born pointing DOWN at "
-             "its scopes (statement —has_part→ scope; built after "
-             "scopes, before conditions — the M5-1 ordering "
-             "ruling). The 31 OPERATIONAL statements carry NO "
-             "downward edge — DECLARED counted-missing, landing "
-             "step M6 (file —has_part→ statement); the per-node "
-             "census counts them honestly"},
+             "its scopes (statement —has_part→ scope). THE DEBT "
+             "RETIRED AT M6 (same day): every statement now "
+             "birth-edges via file —has_part→ statement — the 31 "
+             "operational included; counted-missing CLOSED at its "
+             "named landing step (the placeholder law honored "
+             "end to end)"},
             {"Label": "derived_column", "Edge": "has_part",
              "Status": "edged",
              "Meaning": "M4 (2026-09-16): born by its scope "
@@ -1995,7 +2003,7 @@ TWIN_SHEETS = {
              "run_event",
              "Cites": "Classes sheet (event rows)"},
             {"Set": "DESCRIPTION_STATUS",
-             "Members": "gate_passed|skeleton_floor|flagged|drafted",
+             "Members": "gate_passed|skeleton_floor|flagged|drafted|approved",
              "Cites": "Classes description row; 'drafted' = E1 "
              "Scribe ruling 2026-09-09"},
             {"Set": "RULINGS",

@@ -235,3 +235,19 @@ def test_dict_values_ride_as_code_meaning_pairs():
     row = tables["graph_column"][0]
     assert row["values"] == "1 = Emergency; 2 = Urgent"
     assert row["dataType"] == "varchar"
+
+
+# ---- M6 rides: the file's blob-free row (Brief_M6_File_Layer) ----
+
+def test_file_rows_are_blob_free(world):
+    """M6-4 (Sunny "yes" #2): nodeId · name · description ·
+    technicalDefinition · contentHash · loadedAt ONLY — the tree
+    and twin blobs NEVER ride the export."""
+    read, tables = world
+    rows = tables["graph_file"]
+    assert rows, "the file ships at M6"
+    for r in rows:
+        assert set(r) == {"nodeId", "name", "description",
+                          "technicalDefinition", "contentHash",
+                          "loadedAt"}
+        assert "tree" not in r and "twin" not in r

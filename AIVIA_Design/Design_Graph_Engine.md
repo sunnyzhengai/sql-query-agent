@@ -279,9 +279,9 @@ algorithm · evidence returned with the query as artifact).
 
 ## The laws carried forward from v1 (storage-independent, all kept)
 
-[registry stamps: kg1_technical v1.46.0 · kg2_logic v1.46.0 ·
-kg2_kind_library v1.46.0 · kg3_artifacts v1.46.0 ·
-kg4_concepts v1.46.0 · flows v1.46.0 · lenses v1.46.0]
+[registry stamps: kg1_technical v1.47.0 · kg2_logic v1.47.0 ·
+kg2_kind_library v1.47.0 · kg3_artifacts v1.47.0 ·
+kg4_concepts v1.47.0 · flows v1.47.0 · lenses v1.47.0]
 (stamp block restored 2026-09-10 — the ratification rename dropped
 v1's per-section stamps; RG-A2 caught it same day. One block here,
 the same-breath rule mechanical again; registries carry their own
@@ -332,7 +332,19 @@ conditions (M5-1); descriptions = R11 renders for the 36
 data-producing, the 31 operational EMPTY-BY-RULE counted (the
 (b) ruling); ruled-silent in the ask index, re-affirmed; the 31
 counted-missing until file→statement at M6; the F2+F4 export
-fix rides the batch.)
+fix rides the batch.
+1.47.0 = M6 THE FILE LAYER, Sunny's "yes, yes, yes. approved"
+2026-09-17 (THE TWO GOVERNANCE FIELDS ruled at his design
+sitting): the file joins the served graph carrying technical
+definition (R13 THE CATCH-ALL — the presented columns + the
+population logic: delivery-chain WHERE conditions + INNER joins
+with ON; deterministic, verbatim-law) and report description
+(the Scribe's caged summary OF that definition, drafted → his
+approval, meaning-key anchored; NOT index speech); computed at
+the FILE, derived at the PBI report at M7 by cherry-picking to
+the report's bound fields; file—has_part→statement 67 retires
+THE 31-STATEMENT DEBT at its named landing step +
+file—has_part→param 4; blobs never ride the export.)
 
 Conservation (handled ⊎ counted == everything) · meaning-identity
 anchoring (contentKeys → drift) · the voicing grammar (registry-

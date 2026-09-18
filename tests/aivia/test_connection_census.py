@@ -118,10 +118,10 @@ def test_connection_census_equation_holds(accreted):
     assert c["birth_edged"] + c["counted_missing"] + c["rooted"] \
         == c["total"]
     # the ten unwalkable rows are healed AND (step 2) terms are
-    # well-born here; since M5 the ONE missing kind is statement —
-    # the DECLARED debt (operational statements carry no downward
-    # edge until file→statement lands at M6; Connection_Ledger row)
-    assert c["counted_missing_kinds"] == ["statement"]
+    # well-born here; at M6 the statement debt RETIRED at its
+    # named landing step (file→statement birth-edges all 67 —
+    # the placeholder law honored end to end): nothing is missing
+    assert c["counted_missing_kinds"] == []
     assert c["unledgered_kinds"] == []  # closed at birth
 
 

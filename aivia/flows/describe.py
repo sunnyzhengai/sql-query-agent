@@ -40,15 +40,22 @@ def scan_undescribed(read: ReadApi) -> List[str]:
 
 
 def evidence(read: ReadApi, identity: str) -> str:
-    """The node's OWN anatomy, for the Scribe to distill — the
-    structural voicing. Evidence, never copy-source: the contract
-    bans landing it verbatim as speech."""
+    """The node's OWN anatomy, for the Scribe to distill.
+    Evidence, never copy-source: the contract bans landing it
+    verbatim as speech. M6 (the two-field design, Sunny's chain
+    "we summarize this technical definition using LLM"): when the
+    node carries the R13 catch-all, THAT is the one evidence —
+    already true, already population-focused; the old anatomy/
+    shell evidence (catalog recitation) retires behind it."""
     from aivia.flows import speech as speech_mod
     node = next((n for n in read.nodes(None)
                  if n.identity == identity), None)
     if node is None:
         return ""
     name = node.properties.get("name") or identity
+    td = node.properties.get("technical_definition")
+    if td:
+        return f"{name}. {td}"
     return f"{name}. {speech_mod._file_voicing(read, identity)}"
 
 
@@ -66,14 +73,17 @@ def draft(read: ReadApi,
 
 
 def land(store, drafts: Dict[str, str], basis: Dict[str, str],
-         created_at: str) -> int:
+         created_at: str, status: str = "drafted") -> int:
     """Drafts become kg3 description artifacts: machine author,
-    status 'drafted', basis mandatory (the witness chain)."""
+    basis mandatory (the witness chain). Status defaults
+    'drafted'; 'approved' rides ONLY when the estate file records
+    Sunny's approval act (M6 — the blessed_subjects precedent:
+    his act as estate data, every boot speaks it)."""
     n = 0
     for identity, text in sorted(drafts.items()):
         kg3_artifacts.append_description(
             store, f"description::{identity}", [identity], text,
-            status="drafted", author=SCRIBE_AUTHOR, basis=basis,
+            status=status, author=SCRIBE_AUTHOR, basis=basis,
             created_at=created_at)
         n += 1
     return n

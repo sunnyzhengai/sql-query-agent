@@ -267,6 +267,9 @@ def receive_estate(store, reg: Dict[str, Any], estate_dir,
         store, manifest["as_of"])
     report.derived_layer = _store_derived_column_layer(
         store, manifest["as_of"])
+    # M6 (approved 2026-09-17): the file layer runs LAST — its
+    # downward edges and its R13 catch-all read every layer below
+    report.file_layer = _store_file_layer(store, manifest["as_of"])
     return report
 
 
@@ -544,6 +547,217 @@ def _condition_refs(pred):
     return out
 
 
+def _composed_condition(pred, voice) -> str:
+    """R11's composed form, shared with R13 (checkpoint rulings
+    C1+C2, Sunny "all three" 2026-09-17): FULLY RECURSIVE — a
+    composite at ANY depth speaks its children (a nested OR reads
+    "either X or Y"), never the structural summary; DEGENERATE
+    leaves (the author's 1=1 idiom, flagged by the condition
+    layer) are PRUNED from the composition — they stay in the
+    graph, counted, but say nothing at file/statement grain."""
+    from aivia.lenses import decisions
+
+    def phrase(p_, top):
+        kind = p_.get("kind", "")
+        kids = p_.get("children") or []
+        if p_.get("node") == "predicate" or not kids                 or kind not in ("OR", "AND"):
+            if p_.get("node") == "predicate"                     and decisions.is_degenerate(p_):
+                return ""
+            return condition_render(p_, voice).rstrip(".")
+        sub = [phrase(k, False) for k in kids]
+        sub = [s for s in sub if s]
+        if not sub:
+            return ""
+        if len(sub) == 1:
+            return sub[0]
+        lowered = [s[0].lower() + s[1:] for s in sub]
+        if kind == "AND":
+            return " and ".join(lowered)
+        joined = " or ".join(lowered)
+        return joined if top else "either " + joined
+
+    text = phrase(pred, True)
+    if not text:
+        return ""
+    return text + "."
+
+
+def _render_technical_definition(read, file_id: str) -> str:
+    """R13 THE CATCH-ALL (DRAFT, Brief_M6_File_Layer — Sunny
+    gap-checks the real render before ratification). The file's
+    technical definition, composed FROM THE GRAPH'S OWN ROWS:
+    Presents (the delivery's output list — passthroughs by folded
+    name, computed outputs by their stored R12 phrases) +
+    Population filters (the delivery chain's WHERE-rooted
+    condition phrases; CASE whens excluded — projection logic,
+    not population) + Inner joins (joinType Inner on the chain;
+    outer joins excluded — they do not restrict the population).
+    Deterministic; verbatim law: stored == recomputed."""
+    from aivia.flows import produce
+    from aivia.lenses import decisions
+    tree = read.trees().get(file_id)
+    if tree is None:
+        return ""
+    store = read._store
+    scopes = {sc["name_key"]: sc
+              for sc in decisions.named_scopes(tree)}
+    deliveries = [st["scope"] for st in tree["statements"]
+                  if st.get("emits") and st.get("scope")
+                  and st["scope"].get("name_key")]
+    voice = produce._Voice(read, tree)
+
+    # section 1 — Presents: the delivery's TOP-LEVEL output list
+    # (nested subquery members are interior machinery, not
+    # presented columns — the checkpoint's first find). The dcol
+    # seq walks ALL members (the store's id grain); the top-level
+    # filter applies to what is VOICED.
+    dnodes = {n.identity: n
+              for n in store.current_nodes("derived_column")}
+    presents: List[str] = []
+    for d in deliveries:
+        top = [m for m in d.get("projection") or []
+               if isinstance(m, dict)
+               and m.get("node") == "projection_member"]
+        top_ids = {id(m) for m in top}
+        seq = 0
+        for m in _derived_members(d):
+            if _is_derived_node(m):
+                seq += 1
+                if id(m) not in top_ids:
+                    continue
+                node = dnodes.get(f"{d['name_key']}::dcol#{seq}")
+                if node is not None:
+                    presents.append(str(
+                        node.properties.get("description")
+                        or "").rstrip("."))
+                    continue
+            if id(m) not in top_ids:
+                continue
+            if m.get("star"):
+                src = " and ".join(
+                    produce._spoken_selection(
+                        str(ref.get("table_ref") or ""))
+                    for ref in d.get("from_refs") or []
+                    if ref.get("table_ref")) or "its source"
+                presents.append(f"every column of the {src} "
+                                "selection")
+                continue
+            name = m.get("name")
+            if name:
+                presents.append(produce._readable_name(name))
+
+    # the delivery chain — the R10 spine walk
+    on_chain: List[str] = []
+
+    def walk(scope):
+        for ref in decisions.nested_sources(scope):
+            rt = str(ref.get("resolves_to") or "")
+            if rt.startswith("SAME-TREE scope "):
+                nk = rt.replace("SAME-TREE scope ", "")
+                if nk in scopes and nk not in on_chain:
+                    on_chain.append(nk)
+                    walk(scopes[nk])
+    for d in deliveries:
+        walk(d)
+    chain = [d["name_key"] for d in deliveries] + on_chain
+
+    # section 2a — Population filters, GROUPED by selection
+    # (checkpoint ruling C3, "all three"): each chain scope's
+    # filters open with its spoken name — 58 items gain addresses
+    filters: List[str] = []
+    for sk in chain:
+        wheres: List[dict] = []
+
+        def collect(d):
+            if isinstance(d, dict):
+                if isinstance(d.get("where"), dict):
+                    wheres.append(d["where"])
+                for v in d.values():
+                    collect(v)
+            elif isinstance(d, list):
+                for v in d:
+                    collect(v)
+        collect(scopes.get(sk) or next(
+            (x for x in deliveries if x["name_key"] == sk), {}))
+        items = []
+        for pred in wheres:
+            txt = _composed_condition(pred, voice).rstrip(".")
+            if txt:
+                items.append(txt[0].lower() + txt[1:])
+        if items:
+            spoken = produce._spoken_selection(
+                sk.rsplit("::", 1)[-1])
+            filters.append(f"In the {spoken} selection: "
+                           + "; ".join(items) + ".")
+
+    # section 2b — Inner joins on the chain (stored phrases)
+    joins = {n.identity: n for n in store.current_nodes("join")}
+    inner: List[str] = []
+    for sk in chain:
+        jids = sorted(
+            (j for j in joins if j.startswith(f"{sk}::join#")),
+            key=lambda j: int(j.rsplit("#", 1)[-1]))
+        for jid in jids:
+            n = joins[jid]
+            if str(n.properties.get("joinType") or "") == "Inner":
+                inner.append(str(n.properties.get("description")
+                                 or "").rstrip("."))
+
+    parts: List[str] = []
+    if presents:
+        parts.append("Presents: " + "; ".join(presents) + ".")
+    if filters:
+        parts.append("Population filters: " + " ".join(filters))
+    if inner:
+        parts.append("Inner joins: " + "; ".join(inner) + ".")
+    return " ".join(parts)
+
+
+def _store_file_layer(store, as_of) -> dict:
+    """M6 THE FILE LAYER (Brief_M6_File_Layer, Sunny's 'yes, yes,
+    yes. approved' 2026-09-17): file—has_part→statement for EVERY
+    statement — THE 31-STATEMENT DEBT RETIRES at its named
+    landing step — + file—has_part→param; the TWO GOVERNANCE
+    FIELDS land on the node: technical_definition (R13, verbatim)
+    and description (the approved Scribe summary ONLY)."""
+    from aivia.graph.read_api import ReadApi
+    read = ReadApi(store)
+    # literal: shape
+    counts = {"files": 0, "statement_edges": 0, "param_edges": 0,
+              "definitions": 0}
+    files = {n.identity: n for n in store.current_nodes("file")}
+    st_ids = {n.identity for n in read.nodes("statement")}
+    p_ids = {n.identity for n in read.nodes("param")}
+    for key, tree in sorted(read.trees().items()):
+        fnode = files.get(key)
+        if fnode is None:
+            continue
+        counts["files"] += 1
+        already = any(e.from_id == key and e.to_id in st_ids
+                      for e in store.current_edges("has_part"))
+        if already:  # this boot already materialized the layer
+            continue
+        for i in range(len(tree["statements"])):
+            sid = f"{key}::stmt/{i + 1}"
+            if sid in st_ids:
+                store.append_edge("has_part", key, sid, {},
+                                  as_of, fnode.extract_id)
+                counts["statement_edges"] += 1
+        for pid in sorted(p_ids):
+            if pid.startswith(f"{key}::param/"):
+                store.append_edge("has_part", key, pid, {},
+                                  as_of, fnode.extract_id)
+                counts["param_edges"] += 1
+        td = _render_technical_definition(read, key)
+        if td:
+            props = dict(fnode.properties)
+            props["technical_definition"] = td
+            counts["definitions"] += 1
+            store.append_node("file", key, props, as_of,
+                              fnode.extract_id)
+    return counts
+
+
 def _twin_statement_subkinds(store, tree) -> Dict[int, str]:
     """M5-3 (resolved by investigation, Sunny shown 2026-09-17):
     subkind is READ from the translator's T-2 field on the twin —
@@ -569,29 +783,13 @@ def _render_statement_descriptions(read) -> Dict[str, str]:
     only; the silent kinds return nothing here by construction."""
     from aivia.flows import produce
 
-    def composed(pred, voice):
-        # R11: a top-level OR/AND speaks its children's phrases
-        # joined by or/and — never the composite's structural
-        # summary ("any of its 2 parts holds" says nothing at
-        # statement grain; the leaves say everything)
-        kids = pred.get("children") or []
-        kind = pred.get("kind", "")
-        if kind in ("OR", "AND") and kids:
-            joiner = " or " if kind == "OR" else " and "
-            parts = [condition_render(k, voice).rstrip(".")
-                     for k in kids]
-            parts = [p[0].lower() + p[1:] if p else p
-                     for p in parts]
-            return joiner.join(parts) + "."
-        return condition_render(pred, voice)
-
     out: Dict[str, str] = {}
     for key, tree in sorted(read.trees().items()):
         voice = produce._Voice(read, tree)
         for i, st in enumerate(tree["statements"]):
             phrase = None
             if st.get("predicate") is not None:
-                phrase = composed(st["predicate"], voice)
+                phrase = _composed_condition(st["predicate"], voice)
             text = produce.statement_phrase(
                 st, predicate_phrase=phrase)
             if text:
@@ -1070,6 +1268,25 @@ def receive_descriptions(store, path) -> int:
     if not path.is_file():
         return 0
     data = _json.loads(path.read_text())
-    return _describe.land(store, data["descriptions"],
-                          basis=data["basis"],
-                          created_at=data["created_at"])
+    n = _describe.land(store, data["descriptions"],
+                       basis=data["basis"],
+                       created_at=data["created_at"],
+                       status=data.get("status", "drafted"))
+    # M6 (Sunny's "APPROVED" 2026-09-17): an APPROVED artifact's
+    # text lands on the file NODE — this loader is the ONE writer
+    # of file.description (it runs after the file layer and holds
+    # the approval act; empty-until-approved stays the counted
+    # posture)
+    if data.get("status") == "approved":
+        files = {f.identity: f for f in store.current_nodes("file")}
+        for identity, text in sorted(data["descriptions"].items()):
+            node = files.get(identity)
+            if node is None or not text:
+                continue
+            if node.properties.get("description") == text:
+                continue
+            props = dict(node.properties)
+            props["description"] = text
+            store.append_node("file", identity, props,
+                              data["created_at"], node.extract_id)
+    return n

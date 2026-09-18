@@ -647,7 +647,66 @@ and the end-date twin — byte-identical to the ratified 36.
    generate_m1.py — the FS1 counts test is GREEN first, the
    standing rule).
 
-### M6 gate — file
+### M6 gate — file + THE TWO GOVERNANCE FIELDS
+
+**The M6 gate queries (paste one at a time):**
+
+Q1 — the full node census:
+
+```
+MATCH (n) RETURN labels(n) AS nodeType, count(*) AS cnt GROUP BY nodeType
+```
+
+→ file 1 · statement 67 · condition 1147 · param 4 · the rest
+unchanged; total 6168.
+
+Q2 — the edge battery:
+
+```
+MATCH ()-[r:has_part]->() RETURN count(r) AS cnt
+```
+
+→ **6166**; then the total:
+
+```
+MATCH ()-[r]->() RETURN count(r) AS totalEdges
+```
+
+→ **6689**.
+
+Q3 — THE DEBT RETIRES (every statement birth-edged from the file):
+
+```
+MATCH (f:file)-[:has_part]->(s:statement) RETURN count(*) AS cnt
+```
+
+→ **67** — the 31 operational included; the counted-missing row
+closed at its named landing step.
+
+Q4 — the two governance fields, served:
+
+```
+MATCH (f:file) RETURN f.name AS name, f.description AS descr
+```
+
+→ one row: "sepsis patient encounters, vital signs and scoring
+times, for monitoring treatment compliance and outcomes."
+(Sunny's APPROVED sentence, byte-identical), and:
+
+```
+MATCH (f:file) WHERE f.technicalDefinition STARTS WITH 'Presents: ' RETURN count(f) AS cnt
+```
+
+→ **1** (the R13 catch-all, 16,195 chars, served whole).
+
+Q5 — the era-3 walk from the top:
+
+```
+MATCH (f:file)-[:has_part]->(s:statement)-[:has_part]->(sc:scope) RETURN count(DISTINCT sc) AS cnt
+```
+
+→ **44** — every scope reachable from the file through its
+statements.
 
 | expect | value |
 |---|---|
@@ -655,7 +714,22 @@ and the end-date twin — byte-identical to the ratified 36.
 | new edges | has_part +71 (file→statement 67 · file→param 4); NO file—reads→table rollup (0) |
 | debt closed | the 31 counted-missing statements birth-edge via file→statement; the Connection_Ledger row retires |
 | composition | the file description contains its children's words (the summing law) |
-| walk | file-[:has_part*]->scope-[:reads]->table is complete: every one of the 90-table dictionary's tables the proc touches is reachable |
+| walk | THE ERA-3 WALK complete (re-based 2026-09-17, M6-3 — the reads store edge retired): file-[:has_part]->statement-[:has_part]->scope-[:has_part]->(join\|direct_read)-[:left_side\|right_side]->table reaches every side-target table the proc touches |
+
+**M6 load steps (Sunny's hand, after the build commit):**
+
+1. Copy the 3 NEW parquets to the lakehouse: graph_file ·
+   graph_has_part_fileStatement · graph_has_part_fileParam.
+   ALL 33 prior files are byte-identical — nothing else moves.
+2. In the Fabric graph model: add node `file` (graph_file, key
+   nodeId; description + technicalDefinition ride as properties)
+   · add has_part mappings file→statement
+   (graph_has_part_fileStatement) and file→param
+   (graph_has_part_fileParam) → Save → item-level Refresh now
+   (ONE — the capacity law).
+3. Run Q1–Q5 above (answer key basis 1.47.0).
+4. Republish the graph visual (FS1 counts test GREEN against the
+   M6 census first — it already is).
 
 ### M7 gate — governance + consumption
 

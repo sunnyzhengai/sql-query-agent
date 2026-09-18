@@ -32,7 +32,7 @@ def _generator():
 def test_visual_counts_match_the_answer_key():
     mod = _generator()
     counts = mod.build_payload()["counts"]
-    want = KEY["census_after"]["M5"]
+    want = KEY["census_after"]["M6"]
     assert counts["nodes"] == want["nodes"]
     assert sum(counts["edges"].values()) \
         == sum(want["edges"].values())

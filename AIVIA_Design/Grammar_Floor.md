@@ -1,5 +1,5 @@
-# The Floor Grammar — v2.11.0 (THE STATEMENT STEP ratified
-# 2026-09-17; v2.10.0 THE COMPUTED OUTPUT
+# The Floor Grammar — v2.12.0 (THE CATCH-ALL ratified
+# 2026-09-17; v2.11.0 THE STATEMENT STEP same day; v2.10.0 THE COMPUTED OUTPUT
 # 2026-09-16; v2.9.0 THE OWNER-POSSESSIVE 2026-09-14; v2.8.0 THE
 # BLESSED NAME 2026-09-12; v2.7.0 the relation rule + v2.6.0
 # recordedness identifies + v2.5.0 NOT folds same day; v2.4.0
@@ -7,7 +7,7 @@
 # v2.0.0 POLICY-WALK major 2026-09-06; v1.3.1 RATIFIED Sunny
 # 2026-09-05)
 
-**Status: RATIFIED v2.11.0 (THE STATEMENT STEP §R11, 2026-09-17).**
+**Status: RATIFIED v2.12.0 (THE CATCH-ALL §R13, 2026-09-17).**
 (Header line added 2026-09-17, audit CI-C3.)
 
 *v2.10.0 (RATIFIED Sunny 2026-09-16, "ratified — go on M4";
@@ -874,6 +874,58 @@ precedent).
 - Scope floors, delivery leads, condition phrases — each grain
   keeps its own voice; R11 composes only the predicate phrase it
   embeds, by the same render the condition node itself stores.
+
+## R13 — THE CATCH-ALL (**RATIFIED v2.12.0, Sunny 2026-09-17
+## "ratified" — the real USP_ED_SEPSIS render gap-checked at the
+## checkpoint, 16,195 chars; his three checkpoint rulings "all
+## three": C1 degenerate leaves PRUNED (the 1=1 idiom — the rows
+## stay in the graph, counted) · C2 composition FULLY RECURSIVE
+## (a nested OR speaks "either X or Y"; no structural summary at
+## any depth) · C3 filters GROUPED by selection ("In the base pop
+## selection: …"); Presents = TOP-LEVEL members only, the star
+## spoken as "every column of the <source> selection"**)
+
+The file grain's TECHNICAL DEFINITION — the Collibra-named
+governance field for serious users who want accurate filters.
+Deterministic, verbatim-law (stored == recomputed, byte-exact),
+complete by construction: no editorial opinion at the file
+level. The render COMPOSES FROM THE GRAPH'S OWN STORED ROWS —
+the graph is the reality; the definition is a walk over it.
+
+### The two sections, in order (columns first — M6-5)
+
+**1. Presents:** the delivery scope's output list, in position
+order, "; "-joined (the one-separator idiom): a passthrough
+column speaks its author's name through the readable-name fold
+(AGE_IN_DAYS → "age in days"); a computed output speaks its
+FULL stored R12 phrase ("age in days: the number of days
+between the patient's birth date and the arrival time").
+
+**2. Population** — Sunny's ruling verbatim: "all population
+defining conditions, join (inner) and conditions":
+
+- **Population filters:** every WHERE-rooted condition on the
+  DELIVERY CHAIN (the delivery scope + every named scope it
+  transitively draws from — the R10 spine walk), speaking the
+  condition nodes' STORED phrases, chain order, "; "-joined.
+  CASE whens are EXCLUDED — value-branching is projection
+  logic, not population. Degenerate conditions ride (they are
+  stored rows; completeness beats tidiness at catch-all grain).
+- **Inner joins:** every join on the chain whose joinType is
+  Inner, speaking the join nodes' STORED descriptions (which
+  pair combines, on what predicate), chain order, "; "-joined.
+  OUTER JOINS EXCLUDED — they do not restrict the population
+  (Sunny's "(inner)").
+
+### What R13 does NOT touch
+
+- The ask index — the technical definition is NOT speech
+  (M6-6): the file speaks its approved description only.
+- The scope floors, condition phrases, join phrases — R13
+  composes their stored texts, writes none of them (one home
+  per meaning; the walk cites, never re-renders).
+- The PBI report — its definition is the M7 CHERRY-PICK of this
+  one, never a recomputation.
 
 ## R12 — THE COMPUTED OUTPUT (RATIFIED v2.10.0, Sunny 2026-09-16
 ## "ratified — go on M4"; authored same day at his "author the

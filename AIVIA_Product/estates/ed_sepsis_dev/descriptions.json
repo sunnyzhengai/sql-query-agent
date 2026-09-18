@@ -1,12 +1,19 @@
 {
  "author": "agent:scribe",
  "basis": {
-  "evidence": "structural voicing / shell+displays",
+  "evidence": "R13 technical definition (the catch-all)",
   "model": "gpt-4o-mini",
   "prompt_version": "1.1.0"
  },
- "created_at": "2026-09-09T15:42:21.946776+00:00",
+ "created_at": "2026-09-18T01:19:57.863273+00:00",
+ "status": "approved",
  "descriptions": {
-  "repo://sepsis-corpus/reporting/USP_ED_SEPSIS.sql": "sepsis cases, their severity classification, for clinical reporting and analysis."
+  "repo://sepsis-corpus/reporting/USP_ED_SEPSIS.sql": "sepsis patient encounters, vital signs and scoring times, for monitoring treatment compliance and outcomes."
+ },
+ "approval": {
+  "by": "Sunny",
+  "words": "APPROVED",
+  "at": "2026-09-17",
+  "cage_check": "presented concept-by-concept against the R13 catch-all before the word: nothing invented; two faithful generalizations (vital signs <- blood pressure/flowsheets; outcomes <- readmissions/dispositions) accepted by his eye"
  }
 }

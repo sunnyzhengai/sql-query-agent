@@ -28,7 +28,7 @@ def _rows(path):
 # literal: schema-mirror lenses.Shape_Ledger (the PRESENT labels)
 NODE_LABELS = ("db", "db_schema", "table", "column", "scope",
                "join", "direct_read", "condition", "param",
-               "derived_column", "statement")
+               "derived_column", "statement", "file")
 EDGE_FAMILIES = ("has_part", "joins_to", "left_side", "right_side",
                  "resolves_to", "uses_param", "cites")
 

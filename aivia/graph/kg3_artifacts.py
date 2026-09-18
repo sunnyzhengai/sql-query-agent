@@ -29,7 +29,11 @@ EVENT_CLASSES = ("disposition", "usage", "proposal", "redaction",
 RUN_OUTCOMES = ("completed", "aborted")
 # literal: schema-mirror kg3_artifacts.Classes description row
 DESCRIPTION_STATUS = ("gate_passed", "skeleton_floor", "flagged",
-                      "drafted")  # E1: Scribe aboutness pre-bless
+                      "drafted", "approved")
+# E1: Scribe aboutness pre-bless; "approved" landed at M6 (Sunny's
+# "APPROVED" 2026-09-17 — the speech contract's drafted→approved
+# gate reached its second state for the first time; registry
+# 1.47.0 same breath)
 # literal: schema-mirror kg3_artifacts.Classes disposition row
 RULINGS = ("accept", "reject", "revoke", "acknowledge")
 # literal: schema-mirror kg3_artifacts.Usage_Actions

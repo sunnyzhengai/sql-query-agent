@@ -25,7 +25,7 @@ structures born from parsing the estate's files.
 
 | dc_id | kind | what it is | writer | count (ed_sepsis_dev) | status |
 |---|---|---|---|---|---|
-| dc.file | node | one SQL file of the estate | estate intake | 1 | LIVE |
+| dc.file | node | one SQL file of the estate — SERVED at M6 with THE TWO GOVERNANCE FIELDS | estate intake; fields: file layer (technical_definition) + receive_descriptions (description, approved-only) | 1 | LIVE (M6 BUILT 2026-09-17) |
 | dc.statement | node | one statement of a file (id file::stmt/N) | M5 builder (_store_statement_layer, after scopes before conditions — M5-1) | 67 | LIVE (M5 BUILT 2026-09-17) |
 | dc.scope | node | one named selection (CTE / #temp / delivery) | scope builder | 44 | LIVE |
 | dc.join | node | one observed join: which pair combines, how, on what | join layer builder | 95 | LIVE |
@@ -34,7 +34,7 @@ structures born from parsing the estate's files.
 | dc.param | node | a procedure parameter consulted by scopes or statements | condition layer builder | 4 (+2 at M5: @StartDate/@EndDate) | LIVE |
 | dc.derived_column | node | one computed output of a scope (STAY FLAT) | M4 builder | 156 | LIVE |
 | dc.meaning_twin | node (internal) | the translated twin blob of a file | translator | 1 | LIVE — retires at M9 (parse records) |
-| dc.has_part (logic rows) | edge | scope→join · scope→direct_read · join/scope/statement/condition→condition · scope→derived_column · statement→scope (+ file→statement at M6) | the respective builders | 1,448 (+50 at M5) | LIVE |
+| dc.has_part (logic rows) | edge | scope→join · scope→direct_read · join/scope/statement/condition→condition · scope→derived_column · statement→scope · file→statement · file→param | the respective builders | 1,519 (+71 at M6 — THE 31-STATEMENT DEBT RETIRED at its named landing step) | LIVE |
 | dc.left_side / dc.right_side | edge | a join's or direct_read's resolved pair (side order syntactic) | join + era-3 builders | 101 / 87 | LIVE |
 | dc.resolves_to | edge | condition → dictionary column or param, ROLE-tagged | condition layer builder | 169 (+4 at M5) | LIVE |
 | dc.uses_param | edge | scope or statement → param it consults | condition layer builder | 4 (+2 statement→param at M5) | LIVE |
@@ -44,7 +44,8 @@ structures born from parsing the estate's files.
 
 | dc_id | field | writer | rules | checks |
 |---|---|---|---|---|
-| dc.file | description (speech) | kg3 description artifact via the Scribe, gated drafted→approved — NOT a node property | R10 file floor · LLM cage | produce gates + F4 |
+| dc.file | description (report description, Collibra-named) | receive_descriptions — the ONE writer; lands ONLY approved artifact text (the Scribe summary OF the technical definition; Sunny "APPROVED" 2026-09-17); empty-until-approved COUNTED | the LLM cage vs the R13 catch-all · meaning-key anchor | test_m6_two_governance_fields · speech parity (aboutness) |
+| dc.file | technical_definition (Collibra-named) | file layer (R13 THE CATCH-ALL, RATIFIED v2.12.0) | inv.verbatim — stored == recomputed byte-exact | test_file_render (hash pin) · estate M6 battery |
 | dc.scope | description | grammar renderer (scope lead) | inv.verbatim | test_scope_layer |
 | dc.scope | structures | parse, machine fact | inv.derivable_never_stored | mapper tests |
 | dc.join | description · onPredicate · joinType | join renderer + tree | inv.verbatim; joinType from tree | estate M2 battery |

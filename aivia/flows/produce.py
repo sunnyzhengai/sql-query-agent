@@ -87,7 +87,16 @@ ECON = json.loads((pathlib.Path(__file__).parent / "econ_params.json")
 # + counted remainder (voice.function_remainders). The ADR 0076
 # value() overlays (COALESCE/LEFT/RIGHT/DATEADD) absorb into
 # _fill_overlay — condition-context phrases BYTE-IDENTICAL (A1).
-FLOOR_GRAMMAR_VERSION = "2.11.0"
+# 2.11.0: R11 THE STATEMENT STEP (ratified Sunny 2026-09-17, the
+# 36 gap-checked at the M5 checkpoint): statement_phrase — the
+# closed Statement_Voicings library; operational + unlisted
+# kinds speak NOTHING (the (b) ruling).
+# 2.12.0: R13 THE CATCH-ALL (ratified Sunny 2026-09-17, the real
+# USP render gap-checked; "all three" checkpoint rulings):
+# inbound._render_technical_definition — Presents (top-level) +
+# grouped Population filters (degenerates pruned, recursion
+# full) + Inner joins; the file grain's governance field.
+FLOOR_GRAMMAR_VERSION = "2.12.0"
 # literal: grammar Grammar_Floor R1
 _PREPOSITIONS = ("of", "on", "per", "for", "in", "at", "by", "with")
 # rider (c) amended (Sunny 2026-09-13): the dictionary's declared

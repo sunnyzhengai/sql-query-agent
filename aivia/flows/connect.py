@@ -32,6 +32,17 @@ def build_adjacency(read) -> Dict[str, List[Tuple[str, str]]]:
 
     for n in read.nodes("column"):
         link(n.identity, n.identity.rsplit("|", 1)[0], "has_part")
+    # M6 (Brief_M6_File_Layer, Sunny's "yes" 2026-09-17 — the
+    # gate's catch): the file/statement spine exists as STORE
+    # edges; adjacency must see them or the connection census
+    # reads the retired debt as still missing (the M2 lesson).
+    # getattr: lens-only readers (no _store) simply have no store
+    # edges to add — the derived links above still stand.
+    _store = getattr(read, "_store", None)
+    if _store is not None:
+        for e in _store.current_edges("has_part"):
+            if "::stmt/" in e.from_id or "::stmt/" in e.to_id:
+                link(e.from_id, e.to_id, "has_part")
     # THE BIRTH-EDGE UPGRADE (Connection Ledger step 1, 2026-09-07):
     # the governance world's connections existed as PROPERTIES and
     # were invisible to traversal — Sunny's overrule ("a usage event

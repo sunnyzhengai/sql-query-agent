@@ -282,7 +282,9 @@ def test_m3_store_matches_census(booted, exported):
         len([r for r in v if "::stmt/" not in r["sourceId"]])
         for k, v in exported.items()
         if k.startswith("graph_has_part")
-        and k != "graph_has_part_scopeDerivedColumn")
+        and k not in ("graph_has_part_scopeDerivedColumn",
+                      "graph_has_part_fileStatement",
+                      "graph_has_part_fileParam"))
     resolves = (len(exported["graph_resolves_to_conditionColumn"])
                 + len([r for r in
                        exported["graph_resolves_to_conditionParam"]
@@ -635,7 +637,9 @@ def test_m5_statement_rooted_conditions_at_store_grain(booted):
 
 def test_m5_export_matches_census(exported):
     """The FULL M5 census against the export tables — the numbers
-    Sunny's GQL gate asserts after his load + ONE refresh."""
+    Sunny's GQL gate asserts after his load + ONE refresh.
+    Frozen at M5: the M6 file tables excluded (the frozen-row
+    precedent)."""
     want = CENSUS["M5"]
     assert len(exported["graph_statement"]) \
         == want["nodes"]["statement"]
@@ -643,7 +647,9 @@ def test_m5_export_matches_census(exported):
                  for k in want["nodes"]}
     assert got_nodes == want["nodes"]
     has_part = sum(len(rows) for name, rows in exported.items()
-                   if name.startswith("graph_has_part"))
+                   if name.startswith("graph_has_part")
+                   and name not in ("graph_has_part_fileStatement",
+                                    "graph_has_part_fileParam"))
     assert has_part == want["edges"]["has_part"]
 
 
@@ -664,3 +670,90 @@ def test_m6_m7_key_matches_store(booted):
     unresolved = [e for e in executes if not e.startswith("repo://")]
     assert len(resolved) == want["new_edges"]["executes"]
     assert unresolved == want["checks"]["executes_counted_unresolved"]
+
+
+def test_m6_store_matches_key(booted):
+    """M6 (Brief_M6_File_Layer, approved 2026-09-17): the file's
+    downward edges — THE 31-STATEMENT DEBT RETIRES at its named
+    landing step."""
+    want = DELTA["M6"]
+    fid = booted.current_nodes("file")[0].identity
+    st_ids = {n.identity for n in booted.current_nodes("statement")}
+    p_ids = {n.identity for n in booted.current_nodes("param")}
+    f_st = [e for e in booted.current_edges("has_part")
+            if e.from_id == fid and e.to_id in st_ids]
+    f_p = [e for e in booted.current_edges("has_part")
+           if e.from_id == fid and e.to_id in p_ids]
+    assert len(f_st) == want["new_edges"]["has_part_fileStatement"]
+    assert len(f_p) == want["new_edges"]["has_part_fileParam"]
+    # the debt: EVERY statement now birth-edges from the file
+    assert {e.to_id for e in f_st} == st_ids
+
+
+def test_m6_two_governance_fields(booted):
+    """The two-field design (Sunny's sitting, 2026-09-17):
+    technical definition = the R13 catch-all, verbatim-law;
+    description = the APPROVED Scribe summary of it."""
+    from aivia.flows import inbound
+    f = booted.current_nodes("file")[0]
+    td = f.properties.get("technical_definition")
+    assert td and td.strip()
+    read = ReadApi(booted)
+    assert td == inbound._render_technical_definition(read,
+                                                      f.identity)
+    desc = f.properties.get("description")
+    assert desc and desc.strip()
+    # the cage (M6-2): no words in the summary that the catch-all
+    # + the file's own name words cannot account for is checked at
+    # approval; here the stored text == the approved artifact
+    arts = [n for n in booted.current_nodes("description")
+            if f.identity in str(n.properties.get("about", ""))]
+    approved = [n for n in arts
+                if n.properties.get("status") == "approved"]
+    assert approved, "the description stores ONLY approved text"
+    assert desc == approved[-1].properties.get("description")
+
+
+def test_m6_era3_walk_complete(booted):
+    """M6-3 (re-based): file→statement→scope→(join|direct_read)
+    →sides→table reaches every side-target table."""
+    fid = booted.current_nodes("file")[0].identity
+    hp = {}
+    for e in booted.current_edges("has_part"):
+        hp.setdefault(e.from_id, set()).add(e.to_id)
+    scope_ids = {n.identity for n in booted.current_nodes("scope")}
+    reached_scopes = set()
+    for st in hp.get(fid, set()):
+        reached_scopes |= (hp.get(st, set()) & scope_ids)
+    assert reached_scopes == scope_ids  # every scope walks from file
+    table_ids = {n.identity for n in booted.current_nodes("table")}
+    sided = set()
+    for side in ("left_side", "right_side"):
+        for e in booted.current_edges(side):
+            if e.to_id in table_ids:
+                sided.add(e.to_id)
+    walked = set()
+    for sc in reached_scopes:
+        for mid in hp.get(sc, set()):  # join / direct_read
+            for side in ("left_side", "right_side"):
+                for e in booted.current_edges(side):
+                    if e.from_id == mid and e.to_id in table_ids:
+                        walked.add(e.to_id)
+    assert walked == sided
+
+
+def test_m6_export_matches_census(exported):
+    """The FULL M6 census + the M6-4 row shape (blob-free)."""
+    want = CENSUS["M6"]
+    rows = exported["graph_file"]
+    assert len(rows) == want["nodes"]["file"]
+    assert set(rows[0]) == {"nodeId", "name", "description",
+                            "technicalDefinition", "contentHash",
+                            "loadedAt"}
+    assert rows[0]["technicalDefinition"].strip()
+    got_nodes = {k: len(exported[f"graph_{k}"])
+                 for k in want["nodes"]}
+    assert got_nodes == want["nodes"]
+    has_part = sum(len(v) for k, v in exported.items()
+                   if k.startswith("graph_has_part"))
+    assert has_part == want["edges"]["has_part"]

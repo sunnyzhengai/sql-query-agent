@@ -1689,3 +1689,93 @@ gate; the queue behind it: the CI-B program (17 rows, its own
 sitting) · FL1 THE COMPUTED-READ EDGE (sequenced after M5, now
 unblocked, enters via its own brief) · the §D / ask-console
 convergence decision (statements' un-silencing waits there).
+
+**THE M6 BRIEF PRESENTED (Sunny's "LET'S DESIGN M6" + "yes,
+draft the M6 brief", 2026-09-17):** Brief_M6_File_Layer landed
+PRESENTED — the file joins the served graph (graph_file + 71
+has_part edges), the containment chain completes, THE 31-
+STATEMENT DEBT RETIRES at its named landing step. His opening
+question answered on the record: the file description is
+searchable in the ask console TODAY (the aboutness artifact,
+speech contract 2026-09-09); what M6 changes is the SERVED
+side — the file node ships to Fabric with its aboutness stored.
+Four ambiguities OPEN: M6-1 the ONE writer of the stored
+description (Scribe aboutness vs R10 delivery lead — the
+recommendation is (a) aboutness, three laws aligned) · M6-2 the
+composition check's direction (the CAGE form, not the summing
+form — the summing form would resurrect the 4,600-char wall) ·
+M6-3 the walk strings' era-3 re-base (the FL7 class, found at
+authoring: the key and sheet still speak the retired reads
+edge) · M6-4 the export row shape (blobs never ride). NINETEEN
+files declared up front — the M5 lesson (five mid-build
+amendments) applied.
+
+**THE TWO-FIELD DESIGN RULED (Sunny's pause, 2026-09-17 — "the
+mechanism is better than i thought. but i want to pause and take
+a moment to design the right solution"; three confirmations):**
+the file carries TWO Collibra-named governance fields, one
+writer each — **technical definition = R13 THE CATCH-ALL**
+(deterministic, verbatim-law: THE PRESENTED COLUMNS + THE
+POPULATION LOGIC — his ruling: "all population defining
+conditions, join (inner) and conditions"; outer joins excluded,
+they don't restrict population) and **report description = the
+Scribe's caged summary OF that definition** (his chain: "we
+summarize this technical definition using LLM"; the old
+anatomy/shell evidence retires — it was catalog recitation).
+Computed at the FILE ("file level is catch-all"), derived at the
+PBI REPORT at M7 by CHERRY-PICKING to the report's bound fields
+("PBI report level is cherry picking from the file level") —
+report descriptions become report-specific by construction.
+Collibra first, Purview later; files stay lineage, reports are
+the customer-facing assets. DECLARED for M7, never silent: the
+cherry-pick needs the PBI field bindings (TMDL/displays); PBI
+report-level filters (DAX) can narrow the true population
+beyond the proc's — an M7 design question, counted. DECLARED
+for M6: the 2026-09-09 draft redrafts from the new basis —
+Sunny's paid run, his approval, his AIVIA_RECORD run.
+Brief_M6_File_Layer amended to this shape: M6-1 RULED, M6-5
+(the R13 checkpoint arc) + M6-6 (not index speech — the stated
+default) join; 27 files declared.
+
+**M6 APPROVED (Sunny "yes, yes, yes. approved", 2026-09-17):**
+M6-3 walk re-base · M6-4 the blob-free row shape · M6-6 the
+technical definition is NOT index speech — all ruled; the build
+opens. Three Sunny-hand moments declared in the arc: the R13
+catch-all checkpoint · the Scribe redraft (his paid run + his
+approval + his AIVIA_RECORD run) · the load + ONE refresh.
+
+**M6 THE FILE LAYER BUILT (2026-09-17, the same continuous
+sitting as M5 — TWO batches through the ratified process in one
+arc; Brief_M6_File_Layer):** the file joins the served graph
+carrying THE TWO GOVERNANCE FIELDS from Sunny's design sitting —
+technical_definition = §R13 THE CATCH-ALL RATIFIED v2.12.0 (his
+checkpoint rulings "all three": degenerate 1=1 leaves PRUNED ·
+composition FULLY RECURSIVE, "either X or Y" at any depth ·
+filters GROUPED by selection; Presents = top-level members, the
+star spoken as "every column of the final selection"; the real
+USP render 16,195 chars, pinned by sha256+length) · description
+= the Scribe's caged summary OF that definition (the redraft
+from the NEW evidence — the old catalog-recitation basis
+retired; his run, gpt-4o-mini; the cage walked concept-by-
+concept; his "APPROVED": "sepsis patient encounters, vital signs
+and scoring times, for monitoring treatment compliance and
+outcomes."). THE 31-STATEMENT DEBT RETIRES: file—has_part→
+statement 67 + file—has_part→param 4 (+71; has_part 6166, total
+6689); the connection census reads NOTHING MISSING — the
+placeholder law honored declaration → count → landing step, end
+to end. THE CLOSED SET GREW BY RULING: description-status gains
+APPROVED (the speech contract's drafted→approved gate reached
+its second state for the FIRST time; registry row + code mirror
+same breath, his "yes"). THE GATE'S M6 CATCHES: connect.py
+(adjacency never knew the file/statement spine — the M2 lesson
+found sleeping) + kg3_artifacts.py (the closed set), both
+declared at his word. ONE WRITER kept: receive_descriptions
+lands the approved text on the node (it runs after the file
+layer and holds the act). His recording run: 2210 passed, the
+new sentence's vector in the fixture. Export: 3 NEW parquets,
+all 33 prior BYTE-IDENTICAL. §M6 gate queries Q1–Q5 authored
+WITH the sheet (the M5 lesson). Brief BUILT; remains: his load
+(3 parquets, node file + 2 mappings, ONE refresh), Q1–Q5 on the
+served graph, the republish → CLOSED. M7 queue holds: executes +
+the report's derived pair by CHERRY-PICK + the DAX-filter
+question (declared).

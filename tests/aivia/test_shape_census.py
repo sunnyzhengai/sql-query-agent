@@ -88,6 +88,11 @@ def test_q2_description_obligations_hold(world):
                       or n.properties.get("definition")
                       or n.properties.get("expansions")))
         if ob.startswith("stored"):
+            if "approved-only" in ob:
+                # the file grain (M6): text lands ONLY at Sunny's
+                # approval — zero before it is LEGAL and counted,
+                # never a broken load
+                continue
             assert has == len(pop) or "counted-gap" in ob, (
                 f"'{name}': {has}/{len(pop)} carry descriptions; "
                 f"obligation is {ob!r}")

@@ -147,13 +147,40 @@ def _scope_tables(read: ReadApi,
                                or ""),
             "does": str(n.properties.get("does") or ""),
             "subkind": str(n.properties.get("subkind") or "")})
+    # M6 (Brief_M6_File_Layer, Sunny "yes" #2 — the blob-free
+    # row): nodeId · name · description · technicalDefinition ·
+    # contentHash · loadedAt ONLY; the tree/twin blobs NEVER ride
+    file_rows = []
+    for n in sorted(read.nodes("file"), key=lambda x: x.identity):
+        # literal: shape
+        file_rows.append({
+            "nodeId": n.identity,
+            "name": n.identity.rsplit("/", 1)[-1],
+            "description": str(n.properties.get("description")
+                               or ""),
+            "technicalDefinition": str(
+                n.properties.get("technical_definition") or ""),
+            "contentHash": str(n.properties.get("content_hash")
+                               or ""),
+            "loadedAt": str(n.properties.get("loaded_at") or "")})
     # literal: shape
     tables: Dict[str, List[Dict[str, str]]] = {
         "graph_scope": scope_rows, "graph_join": join_rows,
         "graph_direct_read": dr_rows,
         "graph_condition": cond_rows, "graph_param": param_rows,
         "graph_derived_column": dcol_rows,
-        "graph_statement": st_rows}
+        "graph_statement": st_rows,
+        "graph_file": file_rows}
+    tables["graph_has_part_fileStatement"] = sorted(
+        ({"sourceId": e.from_id, "targetId": e.to_id}
+         for e in store.current_edges("has_part")
+         if "::stmt/" in e.to_id and "::" not in e.from_id),
+        key=lambda r: (r["sourceId"], r["targetId"]))
+    tables["graph_has_part_fileParam"] = sorted(
+        ({"sourceId": e.from_id, "targetId": e.to_id}
+         for e in store.current_edges("has_part")
+         if "::param/" in e.to_id and "::" not in e.from_id),
+        key=lambda r: (r["sourceId"], r["targetId"]))
     tables["graph_has_part_statementScope"] = sorted(
         ({"sourceId": e.from_id, "targetId": e.to_id}
          for e in store.current_edges("has_part")
