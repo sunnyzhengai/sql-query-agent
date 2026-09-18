@@ -1,6 +1,6 @@
 # Brief_M6_File_Layer — the file joins the served graph with THE TWO GOVERNANCE FIELDS; the containment chain completes; the 31-statement debt retires
 
-**Status: BUILT** (2026-09-17: R13 ratified v2.12.0 · the redraft approved ("APPROVED") · the recording run green (Sunny's hand, 2210 passed) · export regen 3 new parquets, all 33 prior byte-identical; CLOSED follows his load + the served §M6 gates + the republish)
+**Status: CLOSED** (2026-09-17 — the second batch of the one continuous sitting to run its whole arc inside the process and under the gate: design sitting → four rulings + the R13 checkpoint ("all three", "ratified") → his Scribe run → the cage walk → "APPROVED" → his recording run → suite 2212/0 → his load → Q1–Q5 served GREEN ("Q1 to Q5 all passed") → the republish → this close. His gate-verdict message ALSO caught the stale composition row — the reader of last resort working)
 
 | field | content |
 |---|---|
@@ -10,7 +10,7 @@
 | ambiguities | M6-1 RULED (the design sitting); M6-2 · M6-3 · M6-4 · M6-5 · M6-6 below — open or defaulted; each blocks its slice |
 | debt declared | none new; this batch RETIRES the 31-statement counted-missing debt (declared at M5, landing step honored) |
 | Sunny's approval | **"yes, yes, yes. approved"**; R13 checkpoint: "all three" (C1 prune degenerates · C2 recurse · C3 group by selection) then **"ratified. yes"** (the catch-all text RATIFIED + connect.py declared — the gate's M6 catch: adjacency never learned the file→statement spine); "yes" again: the description-status closed set gains APPROVED (the vocabulary the speech contract promised, first reached tonight) + kg3_artifacts.py declared for the mirror; "yes. commit": TEST_MAP.md declared (the map regen for the two new test files — the M5 ride) + the commit word, held for the closing suite — 2026-09-17: M6-3 the walk re-base · M6-4 the row shape · M6-6 not-index-speech, then the build word; M6-1 ruled at the design sitting; M6-2/M6-5 resolve at the R13 checkpoint by design |
-| closing check | (filled at CLOSED) |
+| closing check | **BALANCED** — the declared files == the changed set across the build commit (c769c13) + the closing stamps, plus the exempt classes (registry JSONs regenerated · design-doc same-breath stamps · the 3 new export parquets declared in impacts, all 33 prior byte-identical). THE GATE'S M6 LEDGER: three catches (connect.py · kg3_artifacts.py · TEST_MAP.md), each declared at Sunny's word; zero undeclared edits landed. Served verdict verbatim: "Q1 to Q5 all passed" |
 
 ## The ambiguities — Sunny rules each
 

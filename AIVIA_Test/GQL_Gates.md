@@ -647,7 +647,11 @@ and the end-date twin — byte-identical to the ratified 36.
    generate_m1.py — the FS1 counts test is GREEN first, the
    standing rule).
 
-### M6 gate — file + THE TWO GOVERNANCE FIELDS
+### M6 gate — file + THE TWO GOVERNANCE FIELDS [BUILT + LOADED +
+### GATED GREEN 2026-09-17 — Sunny's load, Q1–Q5 run on the
+### served graph, his verdict: "Q1 to Q5 all passed"; his same
+### message caught the STALE composition row below — re-based to
+### the ruled cage form in this same breath]
 
 **The M6 gate queries (paste one at a time):**
 
@@ -713,7 +717,7 @@ statements.
 | new nodes | file 1, aboutness STORED + meaning-key anchored |
 | new edges | has_part +71 (file→statement 67 · file→param 4); NO file—reads→table rollup (0) |
 | debt closed | the 31 counted-missing statements birth-edge via file→statement; the Connection_Ledger row retires |
-| composition | the file description contains its children's words (the summing law) |
+| composition | THE CAGE, not the summing (re-based 2026-09-17 at Sunny's catch — M6-2 REJECTED the summing direction: one sentence cannot contain 44 scopes' words; that direction built the 4,600-char wall): the description may contain NO concept absent from the technical definition — checked concept-by-concept before his "APPROVED" |
 | walk | THE ERA-3 WALK complete (re-based 2026-09-17, M6-3 — the reads store edge retired): file-[:has_part]->statement-[:has_part]->scope-[:has_part]->(join\|direct_read)-[:left_side\|right_side]->table reaches every side-target table the proc touches |
 
 **M6 load steps (Sunny's hand, after the build commit):**

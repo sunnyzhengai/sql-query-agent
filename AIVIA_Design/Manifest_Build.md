@@ -1779,3 +1779,27 @@ WITH the sheet (the M5 lesson). Brief BUILT; remains: his load
 served graph, the republish → CLOSED. M7 queue holds: executes +
 the report's derived pair by CHERRY-PICK + the DAX-filter
 question (declared).
+
+**M6 CLOSES ON THE SERVED GRAPH (Sunny's hand, 2026-09-17):**
+the load landed (3 new parquets, node file + the two has_part
+mappings, ONE refresh) and Q1–Q5 ran GREEN — his verdict: **"Q1
+to Q5 all passed"** — file 1 · totals 6168/6689 · THE DEBT
+RETIRED SERVED (file→statement 67) · both governance fields
+byte-identical served (his APPROVED sentence + the 16,195-char
+catch-all) · 44 scopes reachable from the file. HIS SAME
+MESSAGE CAUGHT A STALE ROW: the M6 expect-table's composition
+line still spoke the SUMMING direction his M6-2 ruling rejected
+— re-based to the CAGE form in the closing breath (the reader
+of last resort working; the row predated the ruling by a week).
+The visual republished to the standing URL. Brief_M6_File_Layer
+CLOSED, closing check BALANCED (three gate catches, zero
+undeclared edits landed). THE COMMIT CARRYING THIS ROW IS THE
+BATCH'S CLOSING COMMIT (build commit c769c13). THE DAY'S ARC,
+whole: the process ratified at midnight → the hard gate built →
+M5 brief/build/load/close → the M6 design sitting (the two
+governance fields) → M6 brief/build/load/close — TWO SERVED
+BATCHES and the governance machinery itself, one continuous
+sitting. M7 holds the next entry gate: executes · pbi_report's
+derived pair by CHERRY-PICK (his ruling) · the DAX-filter
+question (declared) · governance/consumption labels — and the
+CI-B program + FL1 wait behind it.
