@@ -1,14 +1,11 @@
 {
-  "_comment": "TEMPLATE (Brief_Work_Dryrun) — copy to AIVIA_Product/estates/work_<name>/registration.json IN THE WORK CLONE and fill every <placeholder>. The DBA prerequisite: one source owns every schema; schemas not listed here will not map.",
-  "db_name": "<the source database name>",
-  "server": "<the server name>",
+  "_comment": "TEMPLATE (Brief_Work_Dryrun; minimal form per Brief_Minimal_Registration, MR1a 2026-09-19) — copy to the estate folder as registration.json and fill. db_name and server are OPTIONAL: omit db_name and the graph roots at your single source (db:clarity); naming the db on BOTH this file and the extract manifest arms the wrong-database refusal (INTAKE-8). One source owns every schema; schemas not listed here will not map.",
   "dba_team": "role:<the owning team>",
   "registered_sources": [
     "<source, e.g. clarity>"
   ],
   "registered_at": "<ISO timestamp, e.g. 2026-09-22T00:00:00Z>",
   "schema_sources": {
-    "<schema, e.g. dbo>": "<source>",
-    "<schema, e.g. reporting>": "<source>"
+    "<schema, e.g. dbo>": "<source>"
   }
 }

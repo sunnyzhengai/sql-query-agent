@@ -93,6 +93,8 @@ there; proceed below only on a LAPTOP-green verdict.
 
         AIVIA_Product/estates/work_pilot/
             registration.json          <- from registration_template.json, values filled
+                                          (db_name/server OPTIONAL — MR1a: absent, the
+                                          graph roots at db:<your single source>)
             <source>_snapshot/         <- the step-5 extract (folder name = "<source>_snapshot", e.g. clarity_snapshot)
             estate_snapshot/           <- the small batch of work .sql files
 

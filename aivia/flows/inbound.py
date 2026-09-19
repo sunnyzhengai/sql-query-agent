@@ -36,7 +36,8 @@ def render_intake_report(reg: Dict[str, Any], extract_reports,
     DATA FIRST — every number here is recomputed from the graph and
     the reports, never hand-written."""
     lines = ["AIVIA INTAKE REPORT",
-             f"Registered db: {reg['db_name']} (server {reg['server']}); "
+             f"Registered db: {kg1_intake.registered_db_name(reg)} "
+             f"(server {reg.get('server') or 'unnamed'}); "
              f"sources: {', '.join(reg['registered_sources'])}; "
              f"DBA: {reg['dba_team']}", ""]
     tables = read.nodes("table")

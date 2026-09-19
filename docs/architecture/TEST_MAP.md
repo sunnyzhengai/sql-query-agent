@@ -7,7 +7,7 @@
 
 # Test Map — what every test proves
 
-90 modules, 723 tests, every module accounted: claimed by an ADR in the trace registry or declaring a law/contract in its docstring (`Proves:` line).
+92 modules, 732 tests, every module accounted: claimed by an ADR in the trace registry or declaring a law/contract in its docstring (`Proves:` line).
 
 ## By ADR
 
@@ -113,6 +113,7 @@
 
 ### contract:aivia-design-to-code — aivia code and tests consume the ratified registries and fixture answer keys, never the doc's prose (Design-to-Code protocol, slices 0-8; claimed per-module 2026-09-06 when the suite-map gate reached the aivia suite)
 
+- `AIVIA_Test/test_clarity_source_pack.py` (3): Brief_Clarity_Source_Pack (Sunny, 2026-09-19: "we need contracts
 - `AIVIA_Test/test_ed_sepsis_dev_estate.py` (30): The one-proc dev estate + THE M-GATE ANSWER KEY (Sunny's
 - `AIVIA_Test/test_fabric_wire.py` (15): THE LIVE-WIRE TOGGLE's tests (Design_Chatbot.md rider, ruled
 - `AIVIA_Test/test_joins_to_lock.py` (6): THE JOINS_TO LOCK (Sunny's directive 2026-09-10, after the
@@ -149,6 +150,7 @@
 - `tests/aivia/test_literal_census.py` (1): E3 LOCK 1 — THE LITERAL CENSUS (the literal law, ratified
 - `tests/aivia/test_meaning_smells.py` (18): THE MEANING-SMELL CENSUS + THE PHRASE-CORPUS SWEEP (Sunny's go,
 - `tests/aivia/test_metamodel.py` (7): Slice 0: the registry loader — code consumes ratified registries only.
+- `tests/aivia/test_minimal_registration.py` (6): Brief_Minimal_Registration (Sunny, 2026-09-19: "keep db name and
 - `tests/aivia/test_part_edges.py` (4): STEP 4 of the Connection Ledger build — PART EDGES. The test
 - `tests/aivia/test_pbi_layer.py` (5): PHASE H — THE PBI LAYER (Sunny's ruling 2026-09-08: every proc
 - `tests/aivia/test_person_nodes.py` (7): STEP 3 of the Connection Ledger build — PERSON NODES. The test

@@ -20,8 +20,12 @@ from aivia.graph.store import Store
 REQUIRED_FILES = ("manifest.json", "tables.csv", "columns.csv",
                   "pk.csv", "joins.csv")
 # literal: shape L1_KG1_CONTRACT_DATALOAD
-MANIFEST_FIELDS = ("source", "operator", "db_name", "server", "as_of",
+MANIFEST_FIELDS = ("source", "operator", "as_of",
                    "source_pack_version")
+# db_name and server are OPTIONAL (Brief_Minimal_Registration,
+# Sunny 2026-09-19: "keep db name and server names optional");
+# naming the db on BOTH sides arms the wrong-database cross-check
+# (INTAKE-8/9) — omission waives it, the caller's recorded choice.
 # Phrase rule (source-pack data in production; one pack, one variant here):
 # opportunistic — no match yields ABSENT + a counted gap row, never a guess.
 GRAIN_PHRASE = re.compile(
@@ -97,16 +101,34 @@ def new_store() -> Store:
     return Store()
 
 
+def registered_db_name(reg: Dict[str, Any]) -> str:
+    """MR1 ruled "a" (Brief_Minimal_Registration, 2026-09-19):
+    db_name is optional; absent, the graph roots at the estate's
+    SINGLE registered source (db:clarity). Two sources with no
+    db_name cannot anchor — a named refusal, never a guess."""
+    name = reg.get("db_name")
+    if name:
+        return name
+    sources = reg.get("registered_sources") or []
+    if len(sources) == 1:
+        return sources[0]
+    raise Refusal(
+        "INTAKE-10",
+        f"no db_name and {len(sources)} registered sources — the "
+        "graph root needs ONE anchor: name the db, or register "
+        "exactly one source (MR1a)")
+
+
 def apply_registration(store: Store, reg: Dict[str, Any]) -> None:
     """Mint the db node and its layer-3 dba responsibility from the
     DBA-completed prerequisite — BEFORE any intake (A1 refined)."""
-    db_id = f"db:{reg['db_name']}"
+    db_id = f"db:{registered_db_name(reg)}"
     if any(n.identity == db_id for n in store.current_nodes("db")):
         return
     as_of = reg["registered_at"]
     # literal: shape
     store.append_node("db", db_id, {
-        "name": reg["db_name"],
+        "name": registered_db_name(reg),
         "minted_from": "registration prerequisite (DBA-completed)",
         "registered_at": as_of,
     }, as_of=as_of, extract_id="registration")
@@ -127,12 +149,13 @@ def validate_extract(reg: Dict[str, Any], snap: ExtractSnapshot,
     if pack not in known_packs:
         raise Refusal("INTAKE-7", f"source-pack version '{pack}' is unknown "
                       "or retired — extracts load only from registered packs")
-    if m["db_name"] != reg["db_name"]:
-        raise Refusal("INTAKE-8", f"db '{m['db_name']}' is not registered; "
-                      f"registration prerequisite lists: {reg['db_name']}")
-    captured = m.get("captured_db_name", m["db_name"])
-    if captured != m["db_name"]:
-        raise Refusal("INTAKE-9", f"declared '{m['db_name']}' vs captured "
+    declared, named = reg.get("db_name"), m.get("db_name")
+    if declared and named and named != declared:
+        raise Refusal("INTAKE-8", f"db '{named}' is not registered; "
+                      f"registration prerequisite lists: {declared}")
+    captured = m.get("captured_db_name", named)
+    if named and captured and captured != named:
+        raise Refusal("INTAKE-9", f"declared '{named}' vs captured "
                       f"'{captured}' — both values named; correct the "
                       "registration or rerun against the right database")
     mapping = reg["schema_sources"]
@@ -189,7 +212,7 @@ def phrase_extract(description: str) -> Optional[str]:
 def _desired_state(store, reg, snap, report):
     source, as_of = snap.source, snap.manifest["as_of"]
     mapping = reg["schema_sources"]
-    db_id = f"db:{reg['db_name']}"
+    db_id = f"db:{registered_db_name(reg)}"
     nodes: Dict[str, Tuple[str, Dict[str, Any]]] = {}
     contains: Set[Tuple[str, str]] = set()
 

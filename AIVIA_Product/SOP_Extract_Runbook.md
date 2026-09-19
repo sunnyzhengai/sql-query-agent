@@ -1,8 +1,10 @@
 # AIVIA Data Extract — DBA Runbook
 
 *This runbook is vendor-neutral and ships with the product. The
-scripts it references come from your engagement's SOURCE PACK,
-provided separately for your licensed source system. Time required:
+scripts it references are your source system's SOURCE PACK, shipped
+beside this file under `source_packs/` (Epic Clarity:
+`source_packs/clarity/` — six scripts, one per extract file, with
+their own README). Time required:
 about 15 minutes. Nothing in this procedure reads patient data —
 only your system's own data dictionary.*
 
