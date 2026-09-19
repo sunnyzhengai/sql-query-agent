@@ -9,6 +9,8 @@
 | impacts (computed, step-2 query) | contract rows · registries · tests · surfaces · served data (Sunny's load?) |
 | ambiguities | each question the design does not answer — OPEN, or Sunny's ruling QUOTED |
 | debt declared | deferrals with recorded reason + landing step; placeholders WITH their tripwire test |
+| retirement (pivots only, the 2026-09-19 law) | what this supersedes + the old code's fate: retired in this act, or FROZEN with a dated retirement slot; old tests retire WITH their code |
+| does this promote? (the Promotion Gate) | at close: promote dev → main, or name what blocks it |
 | Sunny's approval | his words, quoted, with date |
 | closing check | files changed == files declared (filled at CLOSED) |
 

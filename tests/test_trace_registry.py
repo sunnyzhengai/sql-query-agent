@@ -196,9 +196,13 @@ def test_hierarchy_is_acyclic_and_totally_covered():
 
 
 def test_single_classification_governed_or_internal():
+    # tracked AND about-to-be-tracked — the 2026-09-19 echo fix,
+    # same enumeration as tests/test_zones.py: the latch fires on
+    # the working tree, not after the push
     import subprocess
-    out = subprocess.run(["git", "ls-files"], cwd=REPO, capture_output=True,
-                         text=True, check=True).stdout
+    out = subprocess.run(
+        ["git", "ls-files", "--cached", "--others", "--exclude-standard"],
+        cwd=REPO, capture_output=True, text=True, check=True).stdout
     tops = {line.split("/", 1)[0] for line in out.splitlines() if line}
     unclassified = sorted(t for t in tops if classify(t) is None)
     assert not unclassified, f"unclassified top-level path(s): {unclassified}"

@@ -10,12 +10,29 @@ CHECK-TL-4 / CHECK-KG2-7 / CHECK-KG3-7 / CHECK-KG4-3) arrives with
 slice 1 — this module ships load-only in slice 0.
 """
 import json
+import os
 import pathlib
 from dataclasses import dataclass, field
 from typing import Any, Dict, List
 
-REGISTRY_DIR = (pathlib.Path(__file__).resolve().parents[2]
-                / "AIVIA_Design" / "registries")
+
+def _resolve_registry_dir() -> pathlib.Path:
+    """One reader, three homes (Brief_Fabric_Resident FR3): an
+    explicit AIVIA_REGISTRY_DIR wins; the repo layout serves every
+    dev call unchanged; installed as a wheel (no repo anywhere),
+    the JSONs ride INSIDE the package (aivia/_registries — copied
+    in by devtools/build_wheel.py at build time, never tracked)."""
+    env = os.environ.get("AIVIA_REGISTRY_DIR")
+    if env:
+        return pathlib.Path(env)
+    repo = (pathlib.Path(__file__).resolve().parents[2]
+            / "AIVIA_Design" / "registries")
+    if repo.is_dir():
+        return repo
+    return pathlib.Path(__file__).resolve().parents[1] / "_registries"
+
+
+REGISTRY_DIR = _resolve_registry_dir()
 # literal: schema-mirror registries-on-disk
 REGISTRY_NAMES = ("kg1_technical", "kg2_kind_library", "kg2_logic",
                   "kg3_artifacts", "kg4_concepts", "lenses", "flows")

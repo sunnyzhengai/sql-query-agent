@@ -63,3 +63,9 @@ AIVIA_Product/estates/*/.cache/
 # work estates exist only in the work clone and can never enter
 # a commit — engine-outbound only, work data never comes back
 AIVIA_Product/estates/work_*/
+
+# Brief_Fabric_Resident FR1 (2026-09-19): build-time package copies
+# (devtools/build_wheel.py) — the registries' one home stays
+# AIVIA_Design/registries; these transients never enter a commit
+aivia/_registries/
+aivia/_libs/

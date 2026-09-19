@@ -7,7 +7,7 @@
 
 # Test Map — what every test proves
 
-197 modules, 2120 tests, every module accounted: claimed by an ADR in the trace registry or declaring a law/contract in its docstring (`Proves:` line).
+199 modules, 2127 tests, every module accounted: claimed by an ADR in the trace registry or declaring a law/contract in its docstring (`Proves:` line).
 
 ## By ADR
 
@@ -19,7 +19,7 @@
 | 0004 | Two-stage human-in-the-loop certification | `tests/governance/test_steward.py` (5) |
 | 0005 | Agent refuses when no certified path exists | `tests/governance/test_display_names.py` (7), `tests/test_agent_backend.py` (7), `tests/test_graph_agent_harness.py` (6) |
 | 0006 | Knowledge graph answers questions; Purview discovers reports | `tests/adapters/test_adapters.py` (10) |
-| 0007 | BYOT deployment as a Python library (.whl) | `tests/test_build_deployment_package.py` (8), `tests/test_engine_floor.py` (4), `tests/test_release_consistency.py` (4), `tests/test_secrets_vault.py` (6), `tests/test_validate_deployment.py` (14) |
+| 0007 | BYOT deployment as a Python library (.whl) | `tests/test_build_deployment_package.py` (8), `tests/test_engine_floor.py` (4), `tests/test_release_consistency.py` (3), `tests/test_secrets_vault.py` (6), `tests/test_validate_deployment.py` (14) |
 | 0009 | Catalog integrations are optional adapters | `tests/adapters/test_adapters.py` (10), `tests/adapters/test_collibra.py` (10), `tests/governance/test_publish_log.py` (3), `tests/test_docs_consistency.py` (11) |
 | 0013 | List as transactable SaaS on the commercial marketplace | `tests/marketplace/test_fulfillment.py` (16), `tests/marketplace/test_host.py` (13) |
 | 0014 | Ground the agent in metric_logic; dictionary is mandatory | `tests/governance/test_validation.py` (6), `tests/steps/test_steps.py` (41), `tests/test_dictionary.py` (8) |
@@ -174,6 +174,7 @@
 - `tests/aivia/test_derived_render.py` (19): R12 THE COMPUTED OUTPUT (Grammar v2.10.0, ratified Sunny
 - `tests/aivia/test_design_validators.py` (4): Slice 0: the design validators run in CI — every push re-proves the
 - `tests/aivia/test_doubles.py` (6): THE SCRIPTED-PROPOSALS CONTRACT (Sunny's ruling, 2026-09-09:
+- `tests/aivia/test_fabric_run.py` (4): Brief_Fabric_Resident FR4+FR5 (Sunny's "all eight as proposed,
 - `tests/aivia/test_file_layer.py` (5): M6 THE FILE LAYER — structural pins on the F2 fixture estate
 - `tests/aivia/test_file_render.py` (6): §R13 THE CATCH-ALL — form pins on the F2 fixture estate
 - `tests/aivia/test_flows_change_quanta.py` (6): The flows' change quanta (CONTRACT_DATALOAD §13 + the flows
@@ -213,7 +214,7 @@
 - `tests/aivia/test_sepsis_shakedown.py` (10): The sepsis shakedown (round 2) — conservation counters pinned;
 - `tests/aivia/test_shape_census.py` (4): THE SHAPE CENSUS — integrity battery #13 (THE SHAPE CONTRACT,
 - `tests/aivia/test_shapes_shakedown.py` (5): The shapes shakedown — the engine over the 38-file ADR 0055 corpus,
-- `tests/aivia/test_ship_surface.py` (4): Brief_Packaging slice 1 (Sunny's "all four as proposed, build
+- `tests/aivia/test_ship_surface.py` (5): Brief_Packaging slice 1 (Sunny's "all four as proposed, build
 - `tests/aivia/test_speech_contract.py` (8): E1 — THE SPEECH CONTRACT build (ruled 2026-09-09, Scribe route).
 - `tests/aivia/test_statement_layer.py` (5): M5 THE STATEMENT LAYER — structural pins on the F2 fixture
 - `tests/aivia/test_statement_render.py` (10): §R11 THE STATEMENT STEP — byte-exact render pins (authored
@@ -221,6 +222,7 @@
 - `tests/aivia/test_term_origins.py` (6): STEP 2 of the Connection Ledger build — TERM ORIGINS. The test
 - `tests/aivia/test_verbatim_census.py` (3): E2 — THE VERBATIM CENSUS (integrity battery #8, ratified in
 - `tests/aivia/test_visual_counts.py` (1): FS1 — the graph visual's counts-vs-key re-verify (ruled by
+- `tests/aivia/test_wheel_boot.py` (3): Brief_Fabric_Resident FR7 (Sunny's "all eight as proposed,
 - `tests/live/test_live_seats.py` (4): THE LIVE TIER — the live-seat rule (Sunny's ruling, 2026-09-09):
 
 ## By spec axiom

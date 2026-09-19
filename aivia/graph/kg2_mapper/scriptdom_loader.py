@@ -28,6 +28,10 @@ _REPO_ROOT = Path(__file__).resolve().parents[3]
 _DLL_CANDIDATES = (
     os.environ.get("SCRIPTDOM_DLL", ""),
     str(_REPO_ROOT / "libs" / "Microsoft.SqlServer.TransactSql.ScriptDom.dll"),
+    # Brief_Fabric_Resident FR1: installed as a wheel, the DLL rides
+    # INSIDE the package (aivia/_libs — build_wheel.py copies it in)
+    str(Path(__file__).resolve().parents[2] / "_libs"
+        / "Microsoft.SqlServer.TransactSql.ScriptDom.dll"),
     "/lakehouse/default/Files/sql-query-agent/libs/"
     "Microsoft.SqlServer.TransactSql.ScriptDom.dll",
 )

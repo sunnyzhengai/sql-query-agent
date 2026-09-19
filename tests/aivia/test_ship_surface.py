@@ -69,6 +69,13 @@ def test_no_sql_ships(archive_paths):
     assert not [p for p in archive_paths if p.endswith(".sql")]
 
 
+def test_the_wheel_rides_its_own_road(archive_paths):
+    """Brief_Fabric_Resident FR2: the zip is the SOURCE route, the
+    wheel is the FABRIC route — dist/ never enters the archive."""
+    assert not [p for p in archive_paths
+                if p.startswith("dist/") or p.endswith(".whl")]
+
+
 def test_no_design_docs_ship(archive_paths):
     assert not [p for p in archive_paths
                 if p.startswith("AIVIA_Design/") and p.endswith(".md")]

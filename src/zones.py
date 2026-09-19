@@ -34,6 +34,9 @@ GOVERNED_ENTRIES = frozenset({
     # answer keys, and the clean-room engine package.
     "AIVIA_Design",
     "AIVIA_Product",
+    # Brief_Packaging (2026-09-19): the ship-surface allowlist —
+    # the export law itself is governed
+    ".gitattributes",
     "AIVIA_Test",
     "aivia",
     ".claude",

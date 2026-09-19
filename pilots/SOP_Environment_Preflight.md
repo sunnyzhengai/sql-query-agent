@@ -9,6 +9,25 @@ internal paths) is ever written back into this repo's tracked
 files. Findings return as rows: step id · good/blocked · the exact
 message, scrubbed of anything internal.**
 
+## FIRST — the settled decisions + the fast gate (Sunny's ruling
+## 2026-09-19: "document these decisions should be the first thing
+## for future checks" — read THIS before any battery below)
+
+The full P/F batteries below exist for the FIRST evaluation and
+for surprises. Once you know an environment, these four tests
+re-answer it in minutes:
+
+| environment | the requirement (one line) | test 1 | test 2 |
+|---|---|---|---|
+| Windows laptop | a Python 3.11 the user can run WITHOUT admin — already installed, per-user installable, or offered by the company app portal | `python --version` → `3.11.x` (or `py -0` lists one) | if absent: ONE per-user install attempt (python.org "Install Now") — an admin credential prompt = the route is DEAD until IT pre-approves Python |
+| Fabric workspace | role Contributor or higher ON a workspace with Fabric capacity | workspace → Manage access = Contributor+ AND License info = Fabric capacity / Trial (not bare Pro) | one notebook cell: `import sys, pythonnet; print(sys.version, pythonnet.__version__)` → `3.11.x` + `3.0.1` (runtime, session, install rights, all in one) |
+
+Both tests green in a column = that route works; test 1 or 2
+hard-blocked = that route is dead there — record it and stop
+re-testing. (First live run, 2026-09-19: Windows blocked at the
+admin prompt with no portal Python; Fabric green through F9 with
+ZERO installs — pythonnet 3.0.1 built into the runtime.)
+
 ## The verdict table (fill after running Parts A and B)
 
 | Windows (Part A) | Fabric (Part B) | route |

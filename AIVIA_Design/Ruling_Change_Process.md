@@ -73,6 +73,30 @@ Fits none cleanly → that IS an ambiguity → step 4 before anything.
 | the chronological record | Manifest_Build.md (the ledger — history, never current law) |
 | mechanical enforcement | integrity checks in the test suite + THE HARD GATE (ruled P2): a pre-code hook (.claude/settings.json) refuses code edits not covered by an APPROVED brief; the hook's own build enters via its own brief — the first change under this ratified process |
 
+## The Retirement Law + The Promotion Gate (ruled 2026-09-19)
+
+Born from the era-collision day (Brief_Fabric_Resident's close:
+the 2.0.0 wheel went green while two ERA-1 LAWS — "the wheel
+packages src/*", "the Environment item carries the pyproject
+wheel" — fired red against the ruled new direction). Sunny's
+words: "when we developed new code to pivot to a new direction,
+we need ruling that this new direction is confirmed and the old
+directions need to be retired. the history is always in git
+history … to keep the current 'production' free of un-used old
+code … we never actively ask ourselves are we at a point to
+commit to prod branch" → "approved".
+
+| clause | law |
+|---|---|
+| THE RETIREMENT LAW | a brief that lands a pivot carries a RETIREMENT section: what it supersedes, and the old code's fate — retired in the same act, or FROZEN with a dated retirement slot. Old laws (tests) retire WITH their code. No pivot leaves the old direction standing silently. Git history keeps every retired byte. |
+| THE PROMOTION GATE | `main` is production. Every brief close asks the standing question "does this promote?"; promotion is a deliberate act: suite green · briefs CLOSED · zero era-collisions · ship surfaces verified (the zip pin + the wheel pin) · merge dev → main at Sunny's word. `dev` stays the workbench. |
+
+First acts under the law: Brief_Fabric_Resident's retro
+RETIREMENT section (the 48 era-1 wheels retired; sql-logic-env
+frozen) and the RETIREMENT BRIEF (queued: src/ + its tests, the
+era-1 notebooks, the Fabric item folders, sql-logic-env — the
+test-census table as its worksheet).
+
 ## Decisions (all ruled by Sunny, 2026-09-16)
 
 | # | decision | ruling |
@@ -80,3 +104,5 @@ Fits none cleanly → that IS an ambiguity → step 4 before anything.
 | P1 | ratify this process document | **RATIFIED** — "yes" |
 | P2 | the pre-code hook: hard gate or discipline + closing check? | **HARD GATE** — "hard gate"; the hook refuses code edits not covered by an APPROVED brief; its build enters via its own brief |
 | P3 | the lightweight FIX lane (step 3 skip) — keep or remove? | **KEEP** — "keep the step 3 skip" — **SUPERSEDED the same night by H2(c) ("c", Brief_Hard_Gate_Hook): with the hard gate live, every class including FIX needs an APPROVED brief; the skip is retired** |
+| P4 | a pivot brief must retire (or freeze, dated) the direction it supersedes — tests included? | **RATIFIED** (2026-09-19) — "approved"; see The Retirement Law above |
+| P5 | main = production; "does this promote?" asked at every brief close? | **RATIFIED** (2026-09-19) — "approved"; see The Promotion Gate above |

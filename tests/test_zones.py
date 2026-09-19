@@ -10,16 +10,22 @@ from src.zones import INTERNAL_ZONE, classify
 REPO = Path(__file__).resolve().parent.parent
 
 
-def _top_level_tracked():
+def _top_level_entries():
+    """Tracked AND about-to-be-tracked (untracked, not ignored).
+    THE ECHO FIX (2026-09-19, second firing of the same class:
+    pilots/ at the M7 close, .gitattributes at the Packaging push):
+    enumerating only committed files let a new top-level path ride
+    every pre-commit suite green and fail AFTER the push. Now the
+    latch fires on the working tree, before any commit."""
     out = subprocess.run(
-        ["git", "ls-files"], cwd=REPO, capture_output=True, text=True,
-        check=True,
+        ["git", "ls-files", "--cached", "--others", "--exclude-standard"],
+        cwd=REPO, capture_output=True, text=True, check=True,
     ).stdout
     return sorted({line.split("/", 1)[0] for line in out.splitlines() if line})
 
 
 def test_every_top_level_path_is_classified():
-    unclassified = [e for e in _top_level_tracked() if classify(e) is None]
+    unclassified = [e for e in _top_level_entries() if classify(e) is None]
     assert not unclassified, (
         f"unclassified top-level path(s) {unclassified} — declare them in "
         f"src/zones.py GOVERNED_ENTRIES or move them under {INTERNAL_ZONE}/"

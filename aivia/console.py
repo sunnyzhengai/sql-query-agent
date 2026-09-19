@@ -332,9 +332,22 @@ def make_embedder(key: str):
     return embed
 
 
-def build_store(estate: str, journal_path=None, descriptions=True):
-    base = (pathlib.Path(__file__).resolve().parents[1]
+def _estate_base(estate: str) -> pathlib.Path:
+    """FR4 (Brief_Fabric_Resident): an estate is named EITHER by its
+    folder name under AIVIA_Product/estates/ (the repo route — every
+    existing call unchanged) OR by an explicit path to an estate
+    folder — the Fabric route, where estates live in lakehouse Files
+    far from any repo. A path is recognized by the one thing that
+    makes a folder an estate: its registration.json."""
+    p = pathlib.Path(estate)
+    if (p / "registration.json").is_file():
+        return p
+    return (pathlib.Path(__file__).resolve().parents[1]
             / "AIVIA_Product" / "estates" / estate)
+
+
+def build_store(estate: str, journal_path=None, descriptions=True):
+    base = _estate_base(estate)
     store = kg1_intake.new_store()
     reg = json.loads((base / "registration.json").read_text())
     kg1_intake.apply_registration(store, reg)

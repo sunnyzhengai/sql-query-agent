@@ -14,12 +14,12 @@ work clone.
 
 | prerequisite | Windows laptop | Fabric (notebook route) |
 |---|---|---|
-| the engine files | the GitHub ship zip (~7.5 MB), extracted | wheel + notebooks in the workspace — NOT YET REBUILT for the current engine (the marketplace slice) |
+| the engine files | the GitHub ship zip (~7.5 MB), extracted | ONE wheel — `dist/sql_query_agent-2.0.0-py3-none-any.whl` from GitHub; engine + registries + DLL all inside (Brief_Fabric_Resident) |
 | Python 3.11 (3.10–3.12 fine; dev = 3.11.15) | per-user install, no admin (P3) | comes WITH the runtime — pick the Environment runtime whose Python is 3.11 (Runtime 1.3 today); never a library install |
 | pythonnet — 3.0.1 exact (Fabric-proven 2026-08; floor ≥3.0.1; dev = 3.1.0) | `pip install pythonnet` (P4) | already in the built-in libraries; pin 3.0.1 under Public libraries only if absent |
 | .NET runtime 8 (6+ works) | often preinstalled; else per-user (P6) | built into the Fabric runtime — the SOP's F8 probe proves it |
-| ScriptDom DLL — 18.0.78.1 (6.9 MB, sha256 `400a457a…`) | ships inside the zip (`libs/`) | that same file uploaded once to the lakehouse Files — a file, never pip |
-| the 7 registry JSONs | ship inside the zip (`AIVIA_Design/registries/`) | same files, uploaded with the engine |
+| ScriptDom DLL — 18.0.78.1 (6.9 MB, sha256 `400a457a…`) | ships inside the zip (`libs/`) | inside the wheel — nothing separate to upload |
+| the 7 registry JSONs | ship inside the zip (`AIVIA_Design/registries/`) | inside the wheel — nothing separate |
 | OpenAI API key | `.env` file at the repo root | notebook secret / environment setting |
 | outbound HTTPS to api.openai.com | for asking questions + Scribe drafts only (deterministic descriptions need no network) | same |
 | outbound HTTPS to pypi.org | install-time only; proxy fallback in P4 | Fabric reaches pypi natively |
@@ -27,9 +27,32 @@ work clone.
 | admin rights | NOT required — every install is per-user | not applicable |
 | git | NOT required (the zip route) | not required |
 
-The Fabric column records the proven August-era mechanics; the
-current engine runs laptop-first, and its Fabric-resident rebuild
-is a queued slice, not available today.
+## The Fabric route (Brief_Fabric_Resident, the turn-key form)
+
+The whole deployment is the FIVE-STEP CENSUS (the brief's FR8 —
+any step beyond these five is a defect):
+
+1. Environment: "+ New item" → Environment → runtime with Python
+   3.11 → Custom libraries → upload the wheel (download it first:
+   `https://github.com/sunnyzhengai/sql-query-agent/raw/dev/dist/sql_query_agent-2.0.0-py3-none-any.whl`)
+   → Publish → attach to the notebook (or set as workspace
+   default). Good = publish completes; takes minutes.
+2. Lakehouse: "+ New item" → Lakehouse. Good = it opens.
+3. Estate upload: one folder into the lakehouse Files —
+   `registration.json` (from `pilots/work_dryrun/registration_template.json`,
+   values filled) + `<source>_snapshot/` (the dictionary extract)
+   + `estate_snapshot/` (the SQL batch). Estate data lives in the
+   tenant only — the wall.
+4. Notebook: "+ New item" → Notebook → attach the Environment →
+   paste the three one-line cells:
+       import aivia.fabric_run as f
+       f.dry_run("/lakehouse/default/Files/<estate folder>")
+       f.scribe("/lakehouse/default/Files/<estate folder>")
+   Good = cell 2 prints the node census and every description.
+   Cell 3 is the PAID seat — run last, your hand, your key,
+   contingent on the F10 egress test.
+5. The key (only for cell 3 / asking): the OpenAI key as an
+   environment setting or notebook secret.
 
 ## Preflight — run FIRST
 

@@ -98,10 +98,12 @@ def test_verify_rejects_zip_with_internal_content(tmp_path):
 
 
 def test_devtools_can_never_ship():
-    """The wheel packages src/* only; devtools (local LLM stand-in, evals)
-    must stay out of both the wheel config and the deployment package."""
+    """The wheel packages the aivia engine (Brief_Fabric_Resident FR6,
+    2026-09-19 — the era-1 line packaged src/*, retired per The
+    Retirement Law); devtools (build tooling, local stand-ins) must
+    stay out of both the wheel config and the deployment package."""
     pyproject = (REPO_ROOT / "pyproject.toml").read_text()
-    assert 'include = ["src", "src.*"]' in pyproject
+    assert 'include = ["aivia", "aivia.*"]' in pyproject
     assert "devtools" not in pyproject
 
 

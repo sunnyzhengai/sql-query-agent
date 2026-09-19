@@ -1,14 +1,15 @@
-"""Release consistency: a version bump must land in ALL THREE places.
+"""Release consistency — the era-2 law (Brief_Fabric_Resident +
+The Retirement Law, 2026-09-19): a version lives in pyproject.toml
+and as EXACTLY ONE wheel in dist/ — the turn-key carrier a Fabric
+Environment installs (downloaded from GitHub, uploaded by hand).
 
-A version lives in pyproject.toml, as a wheel in dist/, and as the custom
-library inside the sql-logic-env Environment item — the third is what the
-Fabric workspace actually installs. Pushes have shipped these out of sync
-more than once (2026-08-15: dist/ had 1.6.0 while the Environment still
-carried 1.5.6, so notebooks kept running old code). CI runs on every push,
-so any inconsistent push goes red here.
-
-The dist/ half is already pinned by tests/test_build_deployment_package.py;
-this file pins the Environment half.
+The era-1 law bound a THIRD place — the git-synced sql-logic-env
+Environment item (2026-08-15: dist/ had 1.6.0 while the Environment
+carried 1.5.6, so notebooks ran old code). That item is FROZEN
+era-1 residue: it keeps its last era-1 wheel (1.83.0) untouched
+until the Retirement Brief rules its removal. The freeze is pinned
+here so any drift in either direction — feeding it new wheels, or
+silent edits — goes red.
 """
 
 import re
@@ -26,38 +27,28 @@ def pyproject_version() -> str:
     return match.group(1)
 
 
-def test_environment_ships_exactly_one_product_wheel():
-    wheels = sorted(ENV_LIBS.glob("sql_query_agent-*.whl"))
-    assert len(wheels) == 1, (
-        f"sql-logic-env must carry exactly one product wheel, found "
-        f"{[w.name for w in wheels]} — Fabric installs whatever is here."
+def test_dist_ships_exactly_the_pyproject_wheel():
+    """The living law: dist/ carries EXACTLY ONE product wheel and
+    its name matches pyproject (FR2: one current wheel, old wheels
+    live in git history)."""
+    version = pyproject_version()
+    wheels = [w.name for w in (REPO / "dist").glob("sql_query_agent-*.whl")]
+    assert wheels == [f"sql_query_agent-{version}-py3-none-any.whl"], (
+        f"pyproject.toml says {version} but dist/ holds {wheels}. "
+        f"Release: bump pyproject -> python3.11 devtools/build_wheel.py "
+        f"-> git rm the superseded wheel, git add the new one."
     )
 
 
-def test_environment_wheel_matches_pyproject_version():
-    version = pyproject_version()
-    expected = f"sql_query_agent-{version}-py3-none-any.whl"
+def test_frozen_era1_environment_item_is_untouched():
+    """The freeze pin: sql-logic-env keeps exactly its last era-1
+    wheel until the Retirement Brief rules its removal. If this
+    fires because the folder is GONE, the freeze ended by ruling —
+    retire this whole module's ENV_LIBS half in the same act."""
     wheels = [w.name for w in ENV_LIBS.glob("sql_query_agent-*.whl")]
-    assert expected in wheels, (
-        f"pyproject.toml says {version} but sql-logic-env ships {wheels}. "
-        f"Release checklist: bump pyproject -> python -m build --wheel -> "
-        f"copy dist/{expected} into {ENV_LIBS.relative_to(REPO)}/ "
-        f"(replacing the old wheel) -> commit all three together."
-    )
-
-
-def test_environment_wheel_is_byte_identical_to_dist():
-    """Same filename is not enough — a stale copy with the right name would
-    still ship old code. The Environment wheel must BE the dist wheel."""
-    version = pyproject_version()
-    name = f"sql_query_agent-{version}-py3-none-any.whl"
-    dist_wheel = REPO / "dist" / name
-    env_wheel = ENV_LIBS / name
-    if not dist_wheel.exists() or not env_wheel.exists():
-        return  # the two tests above already report the actionable failure
-    assert env_wheel.read_bytes() == dist_wheel.read_bytes(), (
-        f"{name} differs between dist/ and the Environment item — "
-        f"re-copy from dist/ so Fabric installs the wheel you built."
+    assert wheels == ["sql_query_agent-1.83.0-py3-none-any.whl"], (
+        f"the frozen era-1 Environment item changed: {wheels} — "
+        f"nothing lands there anymore (The Retirement Law, 2026-09-19)."
     )
 
 
