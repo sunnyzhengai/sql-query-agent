@@ -20,8 +20,13 @@ exactly the intake headers).
 How to run (any SQL client, read-only, dictionary metadata only —
 never row-level business data):
 
-1. Paste your batch's table list into the ONE `IN (...)` block —
-   the same list in 01, 02, 03.
+0. THE AUTOMATED FORM (the derived-list law): with the wheel
+   installed, one notebook cell —
+   `f.extract_scripts("/lakehouse/default/Files/<estate>")` —
+   parses your estate_snapshot/*.sql and writes these scripts
+   LIST-FILLED to `<estate>/extract_scripts/`; skip step 1.
+1. (manual fallback) Paste your batch's table list into the ONE
+   `IN (...)` block — the same list in 01, 02, 03 (twice in 04).
 2. Run each script; save each grid as its CSV with headers
    included (SSMS: Tools → Options → include column headers).
 3. 04 filters BOTH sides to your batch list — include the ZC_*

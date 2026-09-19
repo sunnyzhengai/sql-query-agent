@@ -7,7 +7,7 @@
 
 # Test Map — what every test proves
 
-92 modules, 732 tests, every module accounted: claimed by an ADR in the trace registry or declaring a law/contract in its docstring (`Proves:` line).
+93 modules, 736 tests, every module accounted: claimed by an ADR in the trace registry or declaring a law/contract in its docstring (`Proves:` line).
 
 ## By ADR
 
@@ -131,6 +131,7 @@
 - `tests/aivia/test_derived_render.py` (19): R12 THE COMPUTED OUTPUT (Grammar v2.10.0, ratified Sunny
 - `tests/aivia/test_design_validators.py` (4): Slice 0: the design validators run in CI — every push re-proves the
 - `tests/aivia/test_doubles.py` (6): THE SCRIPTED-PROPOSALS CONTRACT (Sunny's ruling, 2026-09-09:
+- `tests/aivia/test_extract_autogen.py` (4): Brief_Extract_Autogen (Sunny, 2026-09-19: "this is too manual.
 - `tests/aivia/test_fabric_run.py` (4): Brief_Fabric_Resident FR4+FR5 (Sunny's "all eight as proposed,
 - `tests/aivia/test_file_layer.py` (5): M6 THE FILE LAYER — structural pins on the F2 fixture estate
 - `tests/aivia/test_file_render.py` (6): §R13 THE CATCH-ALL — form pins on the F2 fixture estate

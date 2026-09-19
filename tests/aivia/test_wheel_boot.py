@@ -20,8 +20,10 @@ import pytest
 from aivia.graph.metamodel import REGISTRY_NAMES
 
 ROOT = pathlib.Path(__file__).resolve().parents[2]
-WHEEL_NAME = "sql_query_agent-2.0.0-py3-none-any.whl"
+WHEEL_NAME = "sql_query_agent-2.1.0-py3-none-any.whl"
 DLL = "Microsoft.SqlServer.TransactSql.ScriptDom.dll"
+PACK_SCRIPTS = ("01_tables.sql", "02_columns.sql", "03_pk.sql",
+                "04_joins.sql", "05_values.sql", "06_manifest.sql")
 
 
 @pytest.fixture(scope="module")
@@ -35,6 +37,7 @@ def test_wheel_carries_the_whole_engine(wheel):
     names = set(zipfile.ZipFile(wheel).namelist())
     missing = sorted(
         ({f"aivia/_registries/{n}.json" for n in REGISTRY_NAMES}
+         | {f"aivia/_source_packs/clarity/{s}" for s in PACK_SCRIPTS}
          | {f"aivia/_libs/{DLL}", "aivia/console.py",
             "aivia/fabric_run.py"}) - names)
     assert not missing, f"wheel incomplete: {missing}"
@@ -48,7 +51,7 @@ def test_wheel_metadata_is_lean(wheel):
         meta_name = next(n for n in z.namelist()
                          if n.endswith(".dist-info/METADATA"))
         meta = z.read(meta_name).decode()
-    assert "\nVersion: 2.0.0" in meta
+    assert "\nVersion: 2.1.0" in meta
     hard_deps = [line for line in meta.splitlines()
                  if line.startswith("Requires-Dist:")
                  and "extra ==" not in line]

@@ -28,13 +28,18 @@ def build(outdir) -> str:
     reg_src = ROOT / "AIVIA_Design" / "registries"
     reg_dst = ROOT / "aivia" / "_registries"
     lib_dst = ROOT / "aivia" / "_libs"
+    pack_src = ROOT / "AIVIA_Product" / "source_packs" / "clarity"
+    pack_dst = ROOT / "aivia" / "_source_packs" / "clarity"
     try:
         reg_dst.mkdir(exist_ok=True)
         lib_dst.mkdir(exist_ok=True)
+        pack_dst.mkdir(parents=True, exist_ok=True)
         for name in REGISTRY_NAMES:
             shutil.copy2(reg_src / f"{name}.json",
                          reg_dst / f"{name}.json")
         shutil.copy2(ROOT / "libs" / DLL, lib_dst / DLL)
+        for script in pack_src.glob("*.sql"):
+            shutil.copy2(script, pack_dst / script.name)
         proc = subprocess.run(
             [sys.executable, "-m", "build", "--wheel",
              "--no-isolation", "--outdir", str(outdir)],
@@ -45,6 +50,8 @@ def build(outdir) -> str:
     finally:
         shutil.rmtree(reg_dst, ignore_errors=True)
         shutil.rmtree(lib_dst, ignore_errors=True)
+        shutil.rmtree(ROOT / "aivia" / "_source_packs",
+                      ignore_errors=True)
     wheels = sorted(pathlib.Path(outdir).glob("*.whl"))
     if not wheels:
         raise RuntimeError(f"no wheel appeared in {outdir}")

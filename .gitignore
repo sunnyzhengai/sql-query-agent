@@ -69,3 +69,4 @@ AIVIA_Product/estates/work_*/
 # AIVIA_Design/registries; these transients never enter a commit
 aivia/_registries/
 aivia/_libs/
+aivia/_source_packs/

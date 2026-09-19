@@ -40,6 +40,76 @@ def _base(estate: str) -> pathlib.Path:
     return base
 
 
+def _pack_dir() -> pathlib.Path:
+    """The clarity pack's home: the repo layout when present, the
+    wheel's package copy otherwise (the registry pattern —
+    build_wheel.py copies AIVIA_Product/source_packs/clarity in as
+    aivia/_source_packs/clarity, never tracked)."""
+    repo = (pathlib.Path(__file__).resolve().parents[1]
+            / "AIVIA_Product" / "source_packs" / "clarity")
+    if repo.is_dir():
+        return repo
+    return (pathlib.Path(__file__).resolve().parent
+            / "_source_packs" / "clarity")
+
+
+def _collect_table_refs(node, out):
+    if isinstance(node, dict):
+        ref = node.get("table_ref")
+        if isinstance(ref, str) and ref and not ref.startswith("#"):
+            out.add(ref.split(".")[-1].upper())
+        for v in node.values():
+            _collect_table_refs(v, out)
+    elif isinstance(node, list):
+        for v in node:
+            _collect_table_refs(v, out)
+
+
+def extract_scripts(estate: str):
+    """THE DERIVED-LIST LAW (Brief_Extract_Autogen, Sunny
+    2026-09-19: "i don't want to keep manually writing and
+    maintaining these lists and files"): parse every
+    estate_snapshot/*.sql through the ONE parse door (map_tree),
+    derive the batch table list, and write the pack scripts with
+    the list filled to <estate>/extract_scripts/. Unparseable
+    files are counted and named, never fatal (EA2); stray names
+    (CTEs, temp survivors) match nothing in the dictionary and
+    are harmless. Returns the sorted table list."""
+    from aivia.graph.kg2_mapper import map_tree
+    base = _base(estate)
+    sql_dir = base / "estate_snapshot"
+    files = sorted(sql_dir.glob("*.sql"))
+    if not files:
+        print(f"no .sql files in {sql_dir} — the estate's SQL batch "
+              "is the list's source of truth", file=sys.stderr)
+        raise SystemExit(2)
+    tables, unparseable = set(), []
+    for f in files:
+        try:
+            tree = map_tree(f.name, f.read_text(errors="replace"))
+        except Exception as err:  # noqa: BLE001 — EA2: counted, named
+            unparseable.append(f"{f.name} ({type(err).__name__})")
+            continue
+        _collect_table_refs(tree, tables)
+    names = sorted(tables)
+    print(f"parsed {len(files) - len(unparseable)} of {len(files)} "
+          f"files · {len(names)} tables referenced · "
+          f"{len(unparseable)} unparseable")
+    for line in unparseable:
+        print(f"  unparseable: {line}")
+    quoted = ",\n    ".join(f"'{n}'" for n in names)
+    out_dir = base / "extract_scripts"
+    out_dir.mkdir(exist_ok=True)
+    for template in sorted(_pack_dir().glob("*.sql")):
+        text = template.read_text().replace(
+            "'PASTE_YOUR_BATCH_TABLES_HERE'", quoted)
+        (out_dir / template.name).write_text(text)
+        print(f"  -> {out_dir / template.name}")
+    print("copy each script into your SQL client, run, save the "
+          "grids as the six extract files")
+    return names
+
+
 def dry_run(estate: str):
     """Boot the estate, speak the census + every governance text.
     Returns the store so later cells can keep asking it."""

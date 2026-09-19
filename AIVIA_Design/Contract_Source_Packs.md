@@ -32,6 +32,7 @@ extract-file key.
 | ONE BATCH LIST | the customer's table list is pasted ONCE per script, the same list in 01/02/03 — never maintained twice |
 | THE WALL'S SCOPE | "only metadata is fine. no real data." — dictionary metadata may cross for engine work; row-level business data never |
 | EXTRAS TOLERATED | intake reads by header name; a customer adding trailing columns breaks nothing; the shipped scripts emit the exact shape |
+| THE DERIVED-LIST LAW | (Brief_Extract_Autogen, "i don't want to keep manually writing and maintaining these lists and files") the batch list is DERIVED: `aivia.fabric_run.extract_scripts(estate)` parses estate_snapshot/*.sql through the one parse door and writes the pack scripts list-filled to `<estate>/extract_scripts/`; the SQL batch is the list's source of truth; hand-pasting stays the no-notebook fallback |
 
 ## FINDINGS
 

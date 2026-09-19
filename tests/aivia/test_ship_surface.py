@@ -66,7 +66,15 @@ def test_everything_shipped_is_allowlisted(archive_paths):
 
 
 def test_no_sql_ships(archive_paths):
-    assert not [p for p in archive_paths if p.endswith(".sql")]
+    """His ruling banned DATA sql ("i don't need to download any
+    sql files. i will use my work's"); the source-pack scripts are
+    PRODUCT TOOLS he ruled INTO the zip the same week ("every
+    hospital customer who uses epic would use the exact same
+    scripts") — the two intents meet here: no SQL ships outside
+    the packs."""
+    strays = [p for p in archive_paths if p.endswith(".sql")
+              and not p.startswith("AIVIA_Product/source_packs/")]
+    assert not strays, strays
 
 
 def test_the_wheel_rides_its_own_road(archive_paths):

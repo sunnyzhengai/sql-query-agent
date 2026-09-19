@@ -27,32 +27,51 @@ work clone.
 | admin rights | NOT required — every install is per-user | not applicable |
 | git | NOT required (the zip route) | not required |
 
-## The Fabric route (Brief_Fabric_Resident, the turn-key form)
+## The Fabric route (Brief_Fabric_Resident + Brief_Extract_Autogen)
 
-The whole deployment is the FIVE-STEP CENSUS (the brief's FR8 —
-any step beyond these five is a defect):
+The deployment stays the FIVE-STEP CENSUS (FR8 — any step beyond
+these is a defect); the extract writes itself (the derived-list
+law). In order, after downloading the wheel
+(`https://github.com/sunnyzhengai/sql-query-agent/raw/dev/dist/sql_query_agent-2.1.0-py3-none-any.whl`):
 
 1. Environment: "+ New item" → Environment → runtime with Python
-   3.11 → Custom libraries → upload the wheel (download it first:
-   `https://github.com/sunnyzhengai/sql-query-agent/raw/dev/dist/sql_query_agent-2.0.0-py3-none-any.whl`)
-   → Publish → attach to the notebook (or set as workspace
-   default). Good = publish completes; takes minutes.
+   3.11 → Custom libraries → upload the wheel → Publish → attach
+   to the notebook (or set as workspace default). Replacing an
+   older wheel: remove it, upload the new one, Publish again.
+   Good = publish completes; takes minutes.
 2. Lakehouse: "+ New item" → Lakehouse. Good = it opens.
-3. Estate upload: one folder into the lakehouse Files —
-   `registration.json` (from `pilots/work_dryrun/registration_template.json`,
-   values filled) + `<source>_snapshot/` (the dictionary extract)
-   + `estate_snapshot/` (the SQL batch). Estate data lives in the
-   tenant only — the wall.
+3. The estate's FIRST HALF into lakehouse Files —
+   `<estate>/registration.json` (minimal form: dba_team,
+   registered_sources, registered_at, schema_sources; db_name and
+   server OPTIONAL per MR1a) and `<estate>/estate_snapshot/` (the
+   work .sql batch). Estate data lives in the tenant only — the
+   wall; dictionary metadata is fine, row-level data never.
 4. Notebook: "+ New item" → Notebook → attach the Environment →
-   paste the three one-line cells:
-       import aivia.fabric_run as f
-       f.dry_run("/lakehouse/default/Files/<estate folder>")
-       f.scribe("/lakehouse/default/Files/<estate folder>")
-   Good = cell 2 prints the node census and every description.
-   Cell 3 is the PAID seat — run last, your hand, your key,
-   contingent on the F10 egress test.
-5. The key (only for cell 3 / asking): the OpenAI key as an
-   environment setting or notebook secret.
+   cell 1: `import aivia.fabric_run as f`
+   cell 2: `f.extract_scripts("/lakehouse/default/Files/<estate>")`
+   Good = it prints "parsed N files · M tables referenced · K
+   unparseable" (unparseable files NAMED — findings, not
+   failures) and `<estate>/extract_scripts/01..06.sql` appear
+   with the table list already filled.
+5. The extract, in your SQL client (read-only, metadata only):
+   run 01–04, save each grid as its CSV (headers on); 05 is the
+   two-step generator — run it, paste its output into a new
+   window, delete the LAST line's trailing UNION ALL, run, save
+   as values.csv; run 06 and write manifest.json from its values
+   (minimal form: source, operator, as_of, source_pack_version,
+   default_schema). Upload the six files as
+   `<estate>/clarity_snapshot/`.
+6. Back in the notebook:
+   cell 3: `f.dry_run("/lakehouse/default/Files/<estate>")`
+   Good = the node census prints, then every table and column
+   description Epic's dictionary carries. First-run eyes: the
+   description column reads as SENTENCES (the 02 prose-field
+   check) · compound joins group sanely (F-CP6).
+7. LAST, paid, your hand — contingent on the F10 egress test and
+   the OpenAI key set as an environment/notebook secret:
+   cell 4: `f.scribe("/lakehouse/default/Files/<estate>")`
+   Good = drafts print and land in descriptions_draft.json;
+   landing approved text in descriptions.json stays your act.
 
 ## Preflight — run FIRST
 
@@ -84,6 +103,10 @@ there; proceed below only on a LAPTOP-green verdict.
 
 5. Follow `AIVIA_Product/SOP_Extract_Runbook.md` to run the
    source-pack extraction against the work Clarity database.
+   Fabric route shortcut: upload the SQL batch first, then the
+   cell `f.extract_scripts("<estate path>")` writes the pack
+   scripts with the table list derived from your SQL — no
+   hand-maintained list (Brief_Extract_Autogen).
    Good = `columns.csv`, `joins.csv`, and a `manifest.json`
    carrying `source_pack_version`.
 

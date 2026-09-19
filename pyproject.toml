@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "sql-query-agent"
-version = "2.0.0"
+version = "2.1.0"
 description = "SQL Intelligence Agent for Microsoft Fabric. Extract business logic from SQL, build knowledge graphs, answer questions in plain English."
 readme = "README.md"
 requires-python = ">=3.9"
@@ -87,7 +87,8 @@ exclude = ["tests", "tests.*", "scripts", "notebooks", "docs", "data", "build"]
 [tool.setuptools.package-data]
 # FR1 all-in-one: the 7 registry JSONs + the ScriptDom DLL ride in
 # the wheel (build_wheel.py copies them in at build; never tracked)
-aivia = ["_registries/*.json", "_libs/*.dll"]
+aivia = ["_registries/*.json", "_libs/*.dll",
+         "_source_packs/clarity/*.sql"]
 
 [tool.pytest.ini_options]
 testpaths = ["tests", "AIVIA_Test"]
