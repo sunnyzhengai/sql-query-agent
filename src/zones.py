@@ -53,6 +53,9 @@ GOVERNED_ENTRIES = frozenset({
     "libs",
     "marketplace_host",
     "notebooks",
+    # Declared at Sunny's "add it" (2026-09-19, Brief_Packaging):
+    # tracked since the M7 close, ships in the archive — governed.
+    "pilots",
     "scripts",
     "src",
     "tests",

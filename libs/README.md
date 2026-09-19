@@ -1,11 +1,22 @@
 # libs/
 
-Place external DLL files here for use in Fabric notebooks.
+The ScriptDom DLL ships HERE — tracked in the repo (MIT-licensed,
+github.com/microsoft/SqlScriptDOM) and included in every ship zip.
+Nothing to download.
 
-## Required for ScriptDom parsing:
+- `Microsoft.SqlServer.TransactSql.ScriptDom.dll` — file version
+  18.0.78.1, 6.9 MB, sha256
+  `400a457ae1f34f54063538aa1e6c4ce80893d2dd709690cf42789bfb05ce54d3`.
+  The ONLY parser (the native-parser law, ADR 0001); the parse
+  validation and the recorded fixtures came from this exact binary.
 
-1. Download from NuGet: https://www.nuget.org/packages/Microsoft.SqlServer.TransactSql.ScriptDom
-2. Rename `.nupkg` to `.zip`, extract
-3. Copy `lib/netstandard2.0/Microsoft.SqlServer.TransactSql.ScriptDom.dll` here
+Where it runs:
 
-The `.dll` file is gitignored (binary, not source code).
+- Laptop: the loader (`aivia/graph/kg2_mapper/scriptdom_loader.py`)
+  finds it in this folder automatically.
+- Fabric: this same file, uploaded once to the lakehouse Files.
+
+Replacing the DLL is a ruled change (its own brief): the new binary
+from NuGet `Microsoft.SqlServer.TransactSql.ScriptDom`
+(`lib/netstandard2.0/`), with the version + hash lines above and
+the recorded fixtures re-verified in the same act.

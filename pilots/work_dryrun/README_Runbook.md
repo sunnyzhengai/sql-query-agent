@@ -10,11 +10,47 @@ Findings come back as words about the engine only.**
 This file contains PLACEHOLDERS only. Fill values at work, in the
 work clone.
 
+## Prerequisites — everything AIVIA needs to run
+
+| prerequisite | Windows laptop | Fabric (notebook route) |
+|---|---|---|
+| the engine files | the GitHub ship zip (~7.5 MB), extracted | wheel + notebooks in the workspace — NOT YET REBUILT for the current engine (the marketplace slice) |
+| Python 3.11 (3.10–3.12 fine; dev = 3.11.15) | per-user install, no admin (P3) | comes WITH the runtime — pick the Environment runtime whose Python is 3.11 (Runtime 1.3 today); never a library install |
+| pythonnet — 3.0.1 exact (Fabric-proven 2026-08; floor ≥3.0.1; dev = 3.1.0) | `pip install pythonnet` (P4) | already in the built-in libraries; pin 3.0.1 under Public libraries only if absent |
+| .NET runtime 8 (6+ works) | often preinstalled; else per-user (P6) | built into the Fabric runtime — the SOP's F8 probe proves it |
+| ScriptDom DLL — 18.0.78.1 (6.9 MB, sha256 `400a457a…`) | ships inside the zip (`libs/`) | that same file uploaded once to the lakehouse Files — a file, never pip |
+| the 7 registry JSONs | ship inside the zip (`AIVIA_Design/registries/`) | same files, uploaded with the engine |
+| OpenAI API key | `.env` file at the repo root | notebook secret / environment setting |
+| outbound HTTPS to api.openai.com | for asking questions + Scribe drafts only (deterministic descriptions need no network) | same |
+| outbound HTTPS to pypi.org | install-time only; proxy fallback in P4 | Fabric reaches pypi natively |
+| a web browser | the console at localhost:8377 | none — no console; outputs land in notebook cells |
+| admin rights | NOT required — every install is per-user | not applicable |
+| git | NOT required (the zip route) | not required |
+
+The Fabric column records the proven August-era mechanics; the
+current engine runs laptop-first, and its Fabric-resident rebuild
+is a queued slice, not available today.
+
+## Preflight — run FIRST
+
+The full preflight battery (Windows P-steps AND Fabric F-steps,
+plus the verdict table naming which environment to use) lives in
+ONE home: `pilots/SOP_Environment_Preflight.md`. Run Part A
+there; proceed below only on a LAPTOP-green verdict.
+
 ## One-time setup (work machine)
 
-1. Clone the repo. Good = `git status` clean.
-2. Install python 3.11 (Homebrew or work-approved equivalent) and
-   the .NET runtime; set `DOTNET_ROOT` to the runtime folder.
+1. Get the engine — either route:
+   - the ship zip (no git needed):
+     `https://github.com/sunnyzhengai/sql-query-agent/archive/refs/heads/dev.zip`
+     (or pin an exact commit: `.../archive/<sha>.zip`); extract.
+     Good = ~7.5 MB, unzips in seconds, contains `aivia/`,
+     `libs/`, `pilots/`, `devtools/`, `AIVIA_Design/registries/`,
+     `AIVIA_Product/` and nothing else.
+   - or clone the repo. Good = `git status` clean.
+2. Python 3.11, pythonnet, and the .NET runtime are present —
+   the preflight proves all three. Set `DOTNET_ROOT` to the
+   runtime folder (the SOP's P6 shows the per-user form).
 3. Check the parser loads:
    `python3.11 -c "from aivia.graph.kg2_mapper import scriptdom_loader; scriptdom_loader.load()"`
    Good = no output, exit 0. (The ScriptDom DLL ships in `libs/`.)

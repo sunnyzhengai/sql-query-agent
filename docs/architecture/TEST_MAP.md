@@ -7,7 +7,7 @@
 
 # Test Map — what every test proves
 
-196 modules, 2116 tests, every module accounted: claimed by an ADR in the trace registry or declaring a law/contract in its docstring (`Proves:` line).
+197 modules, 2120 tests, every module accounted: claimed by an ADR in the trace registry or declaring a law/contract in its docstring (`Proves:` line).
 
 ## By ADR
 
@@ -213,6 +213,7 @@
 - `tests/aivia/test_sepsis_shakedown.py` (10): The sepsis shakedown (round 2) — conservation counters pinned;
 - `tests/aivia/test_shape_census.py` (4): THE SHAPE CENSUS — integrity battery #13 (THE SHAPE CONTRACT,
 - `tests/aivia/test_shapes_shakedown.py` (5): The shapes shakedown — the engine over the 38-file ADR 0055 corpus,
+- `tests/aivia/test_ship_surface.py` (4): Brief_Packaging slice 1 (Sunny's "all four as proposed, build
 - `tests/aivia/test_speech_contract.py` (8): E1 — THE SPEECH CONTRACT build (ruled 2026-09-09, Scribe route).
 - `tests/aivia/test_statement_layer.py` (5): M5 THE STATEMENT LAYER — structural pins on the F2 fixture
 - `tests/aivia/test_statement_render.py` (10): §R11 THE STATEMENT STEP — byte-exact render pins (authored

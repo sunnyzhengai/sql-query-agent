@@ -1,0 +1,36 @@
+# THE SHIP SURFACE — Brief_Packaging slice 1 (Sunny: "all four as
+# proposed, build it", 2026-09-19). git archive — and therefore
+# every GitHub zip download, main and dev alike — carries ONLY the
+# minimum engine. Nothing is deleted from the repo; only the
+# export surface shrinks. Pinned by tests/aivia/test_ship_surface.py.
+# Order matters: last matching line wins.
+
+# default: nothing ships
+/* export-ignore
+
+# the engine
+/aivia -export-ignore
+
+# the parser DLL
+/libs -export-ignore
+
+# the work runbook + registration template
+/pilots -export-ignore
+
+# the Scribe driver, alone from devtools
+/devtools -export-ignore
+/devtools/* export-ignore
+/devtools/scribe_draft.py -export-ignore
+
+# the 7 registry JSONs, alone from AIVIA_Design (PK2: no design docs)
+/AIVIA_Design -export-ignore
+/AIVIA_Design/* export-ignore
+/AIVIA_Design/registries -export-ignore
+/AIVIA_Design/registries/* export-ignore
+/AIVIA_Design/registries/*.json -export-ignore
+
+# the dictionary-extract machinery, alone from AIVIA_Product
+/AIVIA_Product -export-ignore
+/AIVIA_Product/* export-ignore
+/AIVIA_Product/SOP_Extract_Runbook.md -export-ignore
+/AIVIA_Product/source_packs -export-ignore
