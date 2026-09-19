@@ -104,7 +104,8 @@ numbers; the pre-era-3 rows stand in git history.)*
 | M4 ✅✅ | + derived_column 156 (measured at build; SERVED gate passed 2026-09-16) | **6092** |
 | M5 | + statement 67 · condition→1147 · param→4 (holdovers twin-authored) | **6167** |
 | M6 | + file 1 | **6168** |
-| M7 | + pbi_report 1 · description 1 · agent 1 · role 1 · responsibility 1 · blessed_name 113 | **6286** |
+| M7 | + pbi_report 1 (RE-SCOPED 2026-09-18: consumption ONLY — the governance labels moved to M8, per Sunny's "make governance M8") | **6169** |
+| M8 | governance — DESIGN FIRST (the 2026-09-18 ruling); numbers authored at the M8 brief, after its design sitting | — |
 
 | after | Q3 edges by type | total |
 |---|---|---|
@@ -114,7 +115,8 @@ numbers; the pre-era-3 rows stand in git history.)*
 | M4 ✅✅ | has_part 6045 · + cites 97 (measured at build — 100→97 store grain; SERVED gate passed 2026-09-16) | **6562** |
 | M5 | has_part 6095 · resolves_to 169 · uses_param 4 | **6618** |
 | M6 | has_part 6166 | **6689** |
-| M7 | + executes 1 · describes 1 | **6691** |
+| M7 | + executes 1 (RE-SCOPED 2026-09-18: describes moved to M8 with the governance labels) | **6690** |
+| M8 | governance edges — authored at the M8 brief | — |
 
 (✅ = measured from the built store; unmarked = twin-authored,
 reconciled against the tree at build — precedent: joins 93→95,
@@ -693,9 +695,12 @@ Q4 — the two governance fields, served:
 MATCH (f:file) RETURN f.name AS name, f.description AS descr
 ```
 
-→ one row: "sepsis patient encounters, vital signs and scoring
-times, for monitoring treatment compliance and outcomes."
-(Sunny's APPROVED sentence, byte-identical), and:
+→ one row: "AI-generated: sepsis patient encounters, vital signs
+and scoring times, for monitoring treatment compliance and
+outcomes." (Sunny's APPROVED sentence, byte-identical; the
+"AI-generated: " prefix re-based here 2026-09-18 at his ruling —
+agent-authored text serves labeled; served before that date reads
+without it until the re-upload), and:
 
 ```
 MATCH (f:file) WHERE f.technicalDefinition STARTS WITH 'Presents: ' RETURN count(f) AS cnt
@@ -735,13 +740,165 @@ statements.
 4. Republish the graph visual (FS1 counts test GREEN against the
    M6 census first — it already is).
 
-### M7 gate — governance + consumption
+### M7 gate — THE CONSUMPTION LAYER + THE PHASE BOUNDARY
+
+**RE-SCOPED 2026-09-18 (Sunny: "make M7 only the consumption
+layer … make governance M8"): the governance queries and
+parquets are OUT of this gate — they return at M8, after its
+design sitting. Do NOT load graph_description · graph_agent ·
+graph_role · graph_responsibility · graph_blessed_name; the
+export regen removes them.**
+
+**The M7 gate queries (paste one at a time; answer key
+consumption-only, re-based 2026-09-18):**
+
+Q1 — the full node census:
+
+```
+MATCH (n) RETURN labels(n) AS nodeType, count(*) AS cnt GROUP BY nodeType
+```
+
+→ EXACTLY these 13 labels, these counts (any extra label — e.g.
+a leftover governance label from an earlier partial load — or
+any count off by one = a gate failure):
+
+| label | count |
+|---|---|
+| db | 1 |
+| db_schema | 3 |
+| table | 90 |
+| column | 4554 |
+| scope | 44 |
+| join | 95 |
+| direct_read | 6 |
+| condition | 1147 |
+| param | 4 |
+| derived_column | 156 |
+| statement | 67 |
+| file | 1 |
+| pbi_report | 1 |
+| **total** | **6169** |
+
+Q2 — the full edge census (the per-type form every prior gate
+ran green; `type(r)` is REJECTED by Fabric GQL — 'type' is a
+reserved word, caught live 2026-09-18):
+
+```
+MATCH ()-[r:has_part]->() RETURN count(r) AS cnt
+MATCH ()-[r:joins_to]->() RETURN count(r) AS cnt
+MATCH ()-[r:left_side]->() RETURN count(r) AS cnt
+MATCH ()-[r:right_side]->() RETURN count(r) AS cnt
+MATCH ()-[r:resolves_to]->() RETURN count(r) AS cnt
+MATCH ()-[r:uses_param]->() RETURN count(r) AS cnt
+MATCH ()-[r:cites]->() RETURN count(r) AS cnt
+MATCH ()-[r:executes]->() RETURN count(r) AS cnt
+```
+
+(one at a time), then the grand total:
+
+```
+MATCH ()-[r]->() RETURN count(r) AS totalEdges
+```
+
+→ EXACTLY these 8 edge types, these counts:
+
+| edge type | count |
+|---|---|
+| has_part | 6166 |
+| joins_to | 65 |
+| left_side | 101 |
+| right_side | 87 |
+| resolves_to | 169 |
+| uses_param | 4 |
+| cites | 97 |
+| executes | 1 |
+| **total** | **6690** |
+
+(executes = the one resolved proc; the two unresolved EXEC names
+are a COUNTED list on the report node — Sunny's "not same" ruling
+made them final. NO describes edge — it moved to M8 with the
+governance labels.)
+
+Q3 — the report's derived pair, served (both fields are
+PROPERTIES on the report node — consumption layer, no
+governance nodes involved):
+
+```
+MATCH (r:pbi_report) RETURN r.name AS name, r.description AS descr
+```
+
+→ "AI-generated: sepsis screening metrics, blood pressure
+readings and timing, for emergency department patient
+assessment." (the checkpoint-2 approved summary, byte-identical,
+wearing THE AI-GENERATED PREFIX — Sunny's ruling at this very
+gate, 2026-09-18: agent-authored text serves labeled; needs the
+graph_pbi_report re-upload + refresh after the first LOAD 1
+pass), and:
+
+```
+MATCH (r:pbi_report) WHERE r.technicalDefinition CONTAINS 'may filter further in Power BI' RETURN count(r) AS cnt
+```
+
+→ **1** — THE DISCLOSURE LINE served.
+
+Q4 — the consumption walk:
+
+```
+MATCH (r:pbi_report)-[:executes]->(f:file)-[:has_part]->(s:statement) RETURN count(DISTINCT s) AS cnt
+```
+
+→ **67** — dashboard to statements in two hops.
+
+**M7 load steps (Sunny's hand — TWO loads, one refresh each, per
+his "run all" ruling; wait for the re-scope regen before
+loading):**
+
+LOAD 1 — the dev-estate M7 delta. YOUR STARTING POINT (the
+2026-09-18 partial load, seen on your screen): the governance
+nodes (description · blessed_name · agent · role ·
+responsibility) are ALREADY in the served model, and pbi_report
++ executes are already there too. So this load is a CLEANUP,
+not an add:
+
+1. In the model, REMOVE these five node components and their
+   files: description · blessed_name · agent · role ·
+   responsibility. (They serve at M8, after its design sitting.)
+   Good = the components list shows 13 node types.
+2. KEEP pbi_report (key nodeId) and the executes edge
+   (report→file) — they are this batch. If yesterday's load also
+   added a describes edge component, REMOVE it (its file
+   graph_describes was never produced, so it is likely absent).
+3. Verify the loaded graph_pbi_report and
+   graph_executes_reportFile files match today's regen (same
+   parquets, byte-identical — re-upload from
+   ed_sepsis_dev/graph_export/ if unsure). NOTHING ELSE changed;
+   all prior files byte-identical.
+4. Save → Refresh ONCE.
+5. Run Q1–Q4 above. Good = the two census tables match row for
+   row, no extra labels.
+
+LOAD 2 — THE PHASE BOUNDARY, the full sepsis estate:
+
+6. Export dir: AIVIA_Product/estates/sepsis/graph_export/ (the
+   re-scope regen rebuilds it whole, consumption-only — the same
+   38-table set as the dev estate). Load ALL parquets to the
+   sepsis lakehouse target; build its graph model with the same
+   node+edge mappings as the dev model → Save → Refresh ONCE.
+7. Sanity on the served sepsis graph: files 28 · statements 814
+   · pbi_report 28 · every file's technicalDefinition non-empty
+   · the 28 approved descriptions speak (as file/report
+   PROPERTIES, each starting "AI-generated: " — the 2026-09-18
+   prefix ruling).
+8. Republish the graph visual (the FS1 gate must be green
+   against the DEV census first — the visual stays the dev
+   estate's page; a sepsis visual is its own future call).
+
 
 | expect | value |
 |---|---|
-| new nodes | pbi_report 1 · description 1 · agent 1 · role 1 · responsibility 1 (person/term/usage 0 until acts) |
-| new edges | executes 1 (dashboard→USP_ED_SEPSIS) · describes 1 |
-| counted gap | executes names reports/USP_RPTS_ED_Sepsis.sql — absent from this estate BY DESIGN, must appear as a counted gap, never silently dropped |
+| new nodes | pbi_report 1 ONLY (re-scoped 2026-09-18: the governance labels serve at M8) |
+| new edges | executes 1 (dashboard→USP_ED_SEPSIS) ONLY (describes moved to M8) |
+| counted gap | the report's two unresolved EXEC names (reports/USP_ED_Sepsis.sql · reports/USP_IP_SEPSIS.sql) stay a COUNTED list on the node — Sunny's "not same" ruling made them final, never silently dropped |
 | ledger | Shape_Ledger TARGET rows == 0; shape census Q1/Q2/Q3 green both directions |
 | phase boundary | full sepsis estate re-run against its own key |
 

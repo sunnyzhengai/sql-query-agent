@@ -1,23 +1,23 @@
 {
- "_ruling": "THE M-GATE ANSWER KEY (Sunny's directives 2026-09-10, incl. the M2 REDESIGN): every batch gates on the FULL CENSUS — every node label counted, every edge type counted, totals exact both directions (the blob-corpse lesson: spot checks pass while the graph doesn't exist). Numbers are DERIVED FROM THE PARSE (the twin of USP_ED_SEPSIS at the stamped versions), authored BEFORE the batches build. test_ed_sepsis_dev_estate.py recomputes every derivable number from the twin each run — the key cannot rot silently.",
+ "_ruling": "THE M-GATE ANSWER KEY (Sunny's directives 2026-09-10, incl. the M2 REDESIGN): every batch gates on the FULL CENSUS \u2014 every node label counted, every edge type counted, totals exact both directions (the blob-corpse lesson: spot checks pass while the graph doesn't exist). Numbers are DERIVED FROM THE PARSE (the twin of USP_ED_SEPSIS at the stamped versions), authored BEFORE the batches build. test_ed_sepsis_dev_estate.py recomputes every derivable number from the twin each run \u2014 the key cannot rot silently.",
  "_redesign": "M2 REDESIGNED (Sunny 2026-09-10): a scope reaches tables THROUGH its join nodes; direct reads = the REMAINDER only (tables no join side covers). joins_to re-homed to M1 (dictionary truth). Joins (M2) and conditions (M3) are SEPARATE batches, testable alone. The old M2 (scope + 45 reads) was superseded before its gate ran.",
  "_batch_law": "Bottom-up: a node ships only in the batch where its birth edges point DOWN at already-shipped nodes. 6 IF-statement conditions + @StartDate/@EndDate ship at M5 with their statements; 31 operational statements are DECLARED counted-missing debt at M5, closed by file->statement at M6.",
  "_pin_at_build": [
   "RESOLVED AT M2: reads remainder 6; join 95 (tree > twin's 93)",
-  "RESOLVED AT M3: joinType was IN THE TREE all along (join_type key on ON roots — Inner 39 · LeftOuter 56); the M2 deferral closes with backfill",
-  "RESOLVED AT M3: condition count 1141 (tree truth; the twin's 748 under-counted — e.g., IS NOT NULL is a NOT+NULL_CHECK pair in the tree). Independent whole-tree count matches the builder exactly",
-  "M4/M5 numbers remain TWIN-authored (derived_column 156, statements 67, the 6 IF conditions) — the same tree reconciliation applies at their builds; key updates by measurement",
-  "M1 EXPORT GAP: _node_row drops LIST-valued properties (pk_columns) — fix rides the export rework; counted",
-  "GRAMMAR PHRASING: condition renders compose dictionary words correctly but read clunky in places ('The this item records...') — Grammar_Floor gap-check is Sunny's, per the ladder decision",
+  "RESOLVED AT M3: joinType was IN THE TREE all along (join_type key on ON roots \u2014 Inner 39 \u00b7 LeftOuter 56); the M2 deferral closes with backfill",
+  "RESOLVED AT M3: condition count 1141 (tree truth; the twin's 748 under-counted \u2014 e.g., IS NOT NULL is a NOT+NULL_CHECK pair in the tree). Independent whole-tree count matches the builder exactly",
+  "M4/M5 numbers remain TWIN-authored (derived_column 156, statements 67, the 6 IF conditions) \u2014 the same tree reconciliation applies at their builds; key updates by measurement",
+  "M1 EXPORT GAP: _node_row drops LIST-valued properties (pk_columns) \u2014 fix rides the export rework; counted",
+  "GRAMMAR PHRASING: condition renders compose dictionary words correctly but read clunky in places ('The this item records...') \u2014 Grammar_Floor gap-check is Sunny's, per the ladder decision",
   "RESOLVED AT M4: cites 97 (store grain - three twin-path heads collapse into named scopes); derived_column 156 exact (154 operation + 2 named_literal, twin confirmed); the raw-walk select_refs ALIAS key is skipped (4 phantom members were the alias double-count, caught pre-build)"
  ],
  "basis": {
   "estate": "ed_sepsis_dev",
   "file": "reporting/USP_ED_SEPSIS.sql",
   "translator_version": "1.3.0",
-  "metamodel_version": "1.47.0",
+  "metamodel_version": "1.49.0",
   "authored": "2026-09-10",
-  "_bump_record": "authored at metamodel 1.36.0; re-based 1.37.0 (join-node ruling) then 1.38.0 (M2 join layer lands: ledger flips PRESENT) — every derived count verified by the recompute tests at each bump; re-based 1.39.0 (M3 condition layer lands); re-based 1.40.0 (structure-word claim + relation-word seat, 2026-09-12: prompts and speech rows only — zero twin-structure effect, every derived count re-verified by the recompute tests); re-based 1.41.0 (the namer seat, 2026-09-12: one Seat_Prompts row only — zero twin-structure effect, every derived count re-verified by the recompute tests); re-based at THE BLESSING (2026-09-13, Sunny's delegated curation): +105 blessed_name kg3 nodes (NO person mint — the registry is the act's record; journal self-containment) — governance truth in the STORE census, never in the Fabric export (EXPORT_LABELS); condition census 1141 and all structural counts unchanged, A2 delta = 130 description texts; re-based at THE SECOND BLESSING (2026-09-14, Sunny's hand): +4 blessed_name — the REF_* held rows re-proposed off the AUTHORED descriptions after the sentinel-origin fix and blessed same night (109 total, node_total 6276); zero edge effect, every structural count unchanged; re-based 1.42.0 (the reads relation speaks, 2026-09-14: one Speech_Sources _edge reads row only — zero twin-structure effect, every derived count re-verified by the recompute tests); re-based 1.43.0 at ERA 3 THE FROM-STRUCTURE FAMILY (2026-09-14, ratified): the reads remainder RETIRES into 6 direct_read nodes — the first STRUCTURAL re-base (+6 nodes, +12 edges, -6 reads; every census gate updated both directions); recompute tests verify; re-based at THE RECORDS-RECORDS SITTING (2026-09-15, Sunny's hand): +4 blessed_name (MED_ADMIN_RECORDS, FLOWSHEET_MEASUREMENTS, FLOWSHEET_RECORDS, GROUPER_MED_RECORDS — 113 total, M7 node_total 6286); zero edge effect, structural counts unchanged, texts moved in graph_condition + graph_scope only; re-based 1.44.0 (THE FUNCTION-VOICING LIBRARY, Sunny 2026-09-16: Function_Voicings sheet + Closed_Sets row only — zero twin-structure effect, every derived count re-verified by the recompute tests); re-based 1.45.0 (M4 THE DERIVED-COLUMN LAYER BUILT, 2026-09-16: derived_column PRESENT, cites 100->97 by measurement at store grain, grammar 2.10.0, mapper op property - every derived count re-verified by the recompute tests + the new store-vs-key battery)"
+  "_bump_record": "authored at metamodel 1.36.0; re-based 1.37.0 (join-node ruling) then 1.38.0 (M2 join layer lands: ledger flips PRESENT) \u2014 every derived count verified by the recompute tests at each bump; re-based 1.39.0 (M3 condition layer lands); re-based 1.40.0 (structure-word claim + relation-word seat, 2026-09-12: prompts and speech rows only \u2014 zero twin-structure effect, every derived count re-verified by the recompute tests); re-based 1.41.0 (the namer seat, 2026-09-12: one Seat_Prompts row only \u2014 zero twin-structure effect, every derived count re-verified by the recompute tests); re-based at THE BLESSING (2026-09-13, Sunny's delegated curation): +105 blessed_name kg3 nodes (NO person mint \u2014 the registry is the act's record; journal self-containment) \u2014 governance truth in the STORE census, never in the Fabric export (EXPORT_LABELS); condition census 1141 and all structural counts unchanged, A2 delta = 130 description texts; re-based at THE SECOND BLESSING (2026-09-14, Sunny's hand): +4 blessed_name \u2014 the REF_* held rows re-proposed off the AUTHORED descriptions after the sentinel-origin fix and blessed same night (109 total, node_total 6276); zero edge effect, every structural count unchanged; re-based 1.42.0 (the reads relation speaks, 2026-09-14: one Speech_Sources _edge reads row only \u2014 zero twin-structure effect, every derived count re-verified by the recompute tests); re-based 1.43.0 at ERA 3 THE FROM-STRUCTURE FAMILY (2026-09-14, ratified): the reads remainder RETIRES into 6 direct_read nodes \u2014 the first STRUCTURAL re-base (+6 nodes, +12 edges, -6 reads; every census gate updated both directions); recompute tests verify; re-based at THE RECORDS-RECORDS SITTING (2026-09-15, Sunny's hand): +4 blessed_name (MED_ADMIN_RECORDS, FLOWSHEET_MEASUREMENTS, FLOWSHEET_RECORDS, GROUPER_MED_RECORDS \u2014 113 total, M7 node_total 6286); zero edge effect, structural counts unchanged, texts moved in graph_condition + graph_scope only; re-based 1.44.0 (THE FUNCTION-VOICING LIBRARY, Sunny 2026-09-16: Function_Voicings sheet + Closed_Sets row only \u2014 zero twin-structure effect, every derived count re-verified by the recompute tests); re-based 1.45.0 (M4 THE DERIVED-COLUMN LAYER BUILT, 2026-09-16: derived_column PRESENT, cites 100->97 by measurement at store grain, grammar 2.10.0, mapper op property - every derived count re-verified by the recompute tests + the new store-vs-key battery); re-based 1.49.0 (THE M7 RE-SCOPE, Sunny 2026-09-18: SERVED_LABELS to consumption-only, governance serves at M8 after its design sitting - a registry Closed_Sets row only, zero twin-structure effect; the M7 batch delta and census re-based same breath: 6169 nodes / 6690 edges, every derived count re-verified by the recompute tests)"
  },
  "census_after": {
   "_comment": "THE GATE TABLES: cumulative Fabric-surface censuses after each batch. Q1 = MATCH (n) RETURN labels(n), count(*); Q3 = MATCH ()-[r]->() RETURN type(r), count(*). Exact both directions. M2 numbers are MEASURED FROM THE BUILT STORE (2026-09-10).",
@@ -169,15 +169,9 @@
     "statement": 67,
     "file": 1,
     "pbi_report": 1,
-    "description": 1,
-    "agent": 1,
-    "role": 1,
-    "responsibility": 1,
-    "person": 0,
-    "blessed_name": 113,
     "direct_read": 6
    },
-   "node_total": 6286,
+   "node_total": 6169,
    "edges": {
     "has_part": 6166,
     "joins_to": 65,
@@ -186,10 +180,9 @@
     "resolves_to": 169,
     "uses_param": 4,
     "cites": 97,
-    "executes": 1,
-    "describes": 1
+    "executes": 1
    },
-   "edge_total": 6691
+   "edge_total": 6690
   }
  },
  "description_coverage": {
@@ -209,7 +202,7 @@
  },
  "batch_deltas": {
   "M2": {
-   "status": "BUILT 2026-09-10 — store-verified; Sunny's GQL gate on the DEV ESTATE (his ruling) is the closing step; AMENDED at ERA 3 (2026-09-14, ratified): the reads remainder retired into direct_read nodes — see the ERA3_FROM_STRUCTURE entry for the act",
+   "status": "BUILT 2026-09-10 \u2014 store-verified; Sunny's GQL gate on the DEV ESTATE (his ruling) is the closing step; AMENDED at ERA 3 (2026-09-14, ratified): the reads remainder retired into direct_read nodes \u2014 see the ERA3_FROM_STRUCTURE entry for the act",
    "new_nodes": {
     "scope": 44,
     "join": 95,
@@ -252,12 +245,12 @@
      ]
     ],
     "coverage_invariants": "MEASURED: disjoint (0 double-connected) AND covering (remainder 6 + covered 53 == read-set 59)",
-    "one_sided_joins": "8 ONs reference only one resolvable side (table-vs-param/literal) — left_side only, counted",
+    "one_sided_joins": "8 ONs reference only one resolvable side (table-vs-param/literal) \u2014 left_side only, counted",
     "joinType": "DEFERRED, counted (the tree lacks the operator type)"
    }
   },
   "M3": {
-   "status": "BUILT 2026-09-10 — store-verified; Sunny's GQL gate on the dev estate closes it",
+   "status": "BUILT 2026-09-10 \u2014 store-verified; Sunny's GQL gate on the dev estate closes it",
    "new_nodes": {
     "condition": 1141,
     "param": 2
@@ -308,9 +301,9 @@
     "LeftOuter": 56
    },
    "checks": {
-    "descriptions_nonempty": "condition 1141/1141 · param 2/2 (the ratified grammar voices leaves; containers get structural sentences; fragment fallback)",
+    "descriptions_nonempty": "condition 1141/1141 \u00b7 param 2/2 (the ratified grammar voices leaves; containers get structural sentences; fragment fallback)",
     "held_for_M5": "IF-statement predicates + @StartDate/@EndDate (parents are statements)",
-    "_condition_ruling": "ONE store label `condition` for every predicate — kind is a PROPERTY from the closed library (kind-vs-label standard); per-predicate structure lives in ROLE-tagged resolves_to edges; composite AND/OR/NOT are condition nodes (nested has_part).",
+    "_condition_ruling": "ONE store label `condition` for every predicate \u2014 kind is a PROPERTY from the closed library (kind-vs-label standard); per-predicate structure lives in ROLE-tagged resolves_to edges; composite AND/OR/NOT are condition nodes (nested has_part).",
     "spot": "All_LDAs RANGE condition voices the ED-stay window through dictionary words"
    }
   },
@@ -331,7 +324,7 @@
     "cites_scopeColumn": 97
    },
    "checks": {
-    "scope_ownership": "case_when conditions stay parented to scope/condition — never re-parented to derived_column",
+    "scope_ownership": "case_when conditions stay parented to scope/condition \u2014 never re-parented to derived_column",
     "cites_grain": "RECONCILED AT BUILD (2026-09-16): twin-authored 100 counted (head, column) pairs at TWIN-PATH grain; the ruled edge is scope->column at STORE grain - three subquery/arm heads collapse into their owning named scope, measured 97 (the joins-93->95 precedent: key updates by measurement)"
    }
   },
@@ -361,9 +354,9 @@
    "checks": {
     "r11_descriptions_nonempty": 36,
     "statement_operational_empty_by_rule": 31,
-    "counted_missing_debt": "31 operational statements have NO downward edge — declared Connection_Ledger counted-missing, landing step M6"
+    "counted_missing_debt": "31 operational statements have NO downward edge \u2014 declared Connection_Ledger counted-missing, landing step M6"
    },
-   "_note": "holdover numbers (+6 conditions, +2 params, resolves +4) remain TWIN-authored — the tree reconciliation at M5 build may move them (precedent: 748→1141)"
+   "_note": "holdover numbers (+6 conditions, +2 params, resolves +4) remain TWIN-authored \u2014 the tree reconciliation at M5 build may move them (precedent: 748\u21921141)"
   },
   "M6": {
    "new_nodes": {
@@ -378,36 +371,29 @@
     "aboutness_stored_and_meaning_key_anchored": 1,
     "composition_check": "parent description contains children's words",
     "reads_fileTable_rollup_absent": 0,
-    "walk": "the era-3 walk complete: file-[:has_part]->statement-[:has_part]->scope-[:has_part]->(join|direct_read)-[:left_side|right_side]->table reaches every side-target table (re-based 2026-09-17, M6-3 — the reads store edge retired at era 3)"
+    "walk": "the era-3 walk complete: file-[:has_part]->statement-[:has_part]->scope-[:has_part]->(join|direct_read)-[:left_side|right_side]->table reaches every side-target table (re-based 2026-09-17, M6-3 \u2014 the reads store edge retired at era 3)"
    }
   },
   "M7": {
    "new_nodes": {
-    "pbi_report": 1,
-    "description": 1,
-    "agent": 1,
-    "role": 1,
-    "responsibility": 1,
-    "person": 0,
-    "term": 0,
-    "usage": 0,
-    "blessed_name": 113
+    "pbi_report": 1
    },
    "new_edges": {
-    "executes": 1,
-    "describes": 1
+    "executes": 1
    },
    "checks": {
     "executes_counted_unresolved": [
-     "reports/USP_RPTS_ED_Sepsis.sql"
+     "reports/USP_ED_Sepsis.sql",
+     "reports/USP_IP_SEPSIS.sql"
     ],
-    "pbi_description_derived_via_executes": true,
+    "pbi_description_derived_via_executes": "RE-BASED 2026-09-17 (the M7 sitting): the derived PAIR by CHERRY-PICK to bound_fields + the disclosure line; the description = the Scribe summary, APPROVED only (shell counted until then). Unresolved list re-based 2026-09-18 at Sunny's 'not same' ruling: the reports.* EXECs are NOT the RPTS corpus files \u2014 two counted, final",
     "shape_ledger_target_rows": 0,
     "phase_boundary": "full sepsis estate re-run against its own key"
-   }
+   },
+   "_rescope": "RE-SCOPED (Sunny 2026-09-18): M7 = THE CONSUMPTION LAYER ONLY \u2014 'make governance M8. plus we need to really design M8 before implementing.' The governance labels (description, agent, role, responsibility, person, term, usage, blessed_name) and the describes edge moved OUT of this delta to M8, whose numbers are authored at its own brief AFTER the M8 design sitting."
   },
   "ERA3_FROM_STRUCTURE": {
-   "status": "RATIFIED + BUILT 2026-09-14 (Sunny: 'ratified — build era 3, a1 if the probe passes'); PROBE GREEN 2026-09-15 (95/88/51, all exact) — a1 CONFIRMED, the a2 contingency DEAD; GQL GATE GREEN 2026-09-15 on the served graph (census 5936/6309 exact, uniform walk 94, read-set 59 rows, spot 6/6) — ERA 3 CLOSED",
+   "status": "RATIFIED + BUILT 2026-09-14 (Sunny: 'ratified \u2014 build era 3, a1 if the probe passes'); PROBE GREEN 2026-09-15 (95/88/51, all exact) \u2014 a1 CONFIRMED, the a2 contingency DEAD; GQL GATE GREEN 2026-09-15 on the served graph (census 5936/6309 exact, uniform walk 94, read-set 59 rows, spot 6/6) \u2014 ERA 3 CLOSED",
    "new_nodes": {
     "direct_read": 6
    },
@@ -418,7 +404,7 @@
    "retired_edges": {
     "reads": 6
    },
-   "invariant": "per scope: side-targets == read-set (COVERING alone; DISJOINT vacuous — one mechanism); numbers unchanged: 6 direct + 53 join-covered == 59 read-set"
+   "invariant": "per scope: side-targets == read-set (COVERING alone; DISJOINT vacuous \u2014 one mechanism); numbers unchanged: 6 direct + 53 join-covered == 59 read-set"
   }
  }
 }

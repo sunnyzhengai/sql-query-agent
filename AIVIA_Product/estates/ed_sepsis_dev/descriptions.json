@@ -8,12 +8,19 @@
  "created_at": "2026-09-18T01:19:57.863273+00:00",
  "status": "approved",
  "descriptions": {
-  "repo://sepsis-corpus/reporting/USP_ED_SEPSIS.sql": "sepsis patient encounters, vital signs and scoring times, for monitoring treatment compliance and outcomes."
+  "repo://sepsis-corpus/reporting/USP_ED_SEPSIS.sql": "sepsis patient encounters, vital signs and scoring times, for monitoring treatment compliance and outcomes.",
+  "pbi://sepsis/ed-sepsis-screening-dashboard": "sepsis screening metrics, blood pressure readings and timing, for emergency department patient assessment."
  },
  "approval": {
   "by": "Sunny",
   "words": "APPROVED",
   "at": "2026-09-17",
-  "cage_check": "presented concept-by-concept against the R13 catch-all before the word: nothing invented; two faithful generalizations (vital signs <- blood pressure/flowsheets; outcomes <- readmissions/dispositions) accepted by his eye"
+  "cage_check": "presented concept-by-concept against the R13 catch-all before the word: nothing invented; two faithful generalizations (vital signs <- blood pressure/flowsheets; outcomes <- readmissions/dispositions) accepted by his eye",
+  "batch_extension": {
+   "by": "Sunny",
+   "words": "approved",
+   "at": "2026-09-18",
+   "scope": "THE SCRIBE BATCH (28) \u2014 checkpoint 2; cage v2 presented per sentence: no fabricated facts; the purpose-word class flagged and accepted by his eye (the M6 precedent)"
+  }
  }
 }

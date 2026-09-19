@@ -1,5 +1,5 @@
-# The Floor Grammar — v2.12.0 (THE CATCH-ALL ratified
-# 2026-09-17; v2.11.0 THE STATEMENT STEP same day; v2.10.0 THE COMPUTED OUTPUT
+# The Floor Grammar — v2.13.0 (THE REPORT GRAIN rider ratified
+# 2026-09-18; v2.12.0 THE CATCH-ALL 2026-09-17; v2.11.0 THE STATEMENT STEP same day; v2.10.0 THE COMPUTED OUTPUT
 # 2026-09-16; v2.9.0 THE OWNER-POSSESSIVE 2026-09-14; v2.8.0 THE
 # BLESSED NAME 2026-09-12; v2.7.0 the relation rule + v2.6.0
 # recordedness identifies + v2.5.0 NOT folds same day; v2.4.0
@@ -7,7 +7,7 @@
 # v2.0.0 POLICY-WALK major 2026-09-06; v1.3.1 RATIFIED Sunny
 # 2026-09-05)
 
-**Status: RATIFIED v2.12.0 (THE CATCH-ALL §R13, 2026-09-17).**
+**Status: RATIFIED v2.13.0 (§R13 + the report-grain rider, 2026-09-18).**
 (Header line added 2026-09-17, audit CI-C3.)
 
 *v2.10.0 (RATIFIED Sunny 2026-09-16, "ratified — go on M4";
@@ -916,6 +916,28 @@ defining conditions, join (inner) and conditions":
   pair combines, on what predicate), chain order, "; "-joined.
   OUTER JOINS EXCLUDED — they do not restrict the population
   (Sunny's "(inner)").
+
+### The report grain (M7 rider — RATIFIED with v2.13.0, Sunny
+### "ratified" 2026-09-17/18, the real pair presented at
+### checkpoint 1)
+
+A PBI report's technical definition DERIVES from its executed
+files' catch-alls — never recomputed, never redrafted:
+
+- **The cherry-pick**: the Presents section filters to the
+  report's bound fields (the SemanticModel's imports, matched
+  through the SAME readable-name fold — one home); the star item
+  survives; unbound named items DROP. A shell (no bound fields)
+  carries the whole catch-all. Population and joins ride WHOLE
+  (Q4: the proc's filters govern every row).
+- **Concatenation (Q3)**: plural resolved procs label their
+  sections "From USP_A: … From USP_B: …" in executes order;
+  single-proc carries no label. (Estate truth 2026-09-18: the
+  alias questions RULED NOT SAME — one proc resolves per estate;
+  the mechanism stands pinned on a synthetic store.)
+- **THE DISCLOSURE LINE**, always last, verbatim: "Filters shown
+  are the procedure's; the report may filter further in Power
+  BI." — standing until THE REPORT-LAYER EXTRACTION lands.
 
 ### What R13 does NOT touch
 

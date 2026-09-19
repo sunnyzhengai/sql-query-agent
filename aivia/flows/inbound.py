@@ -14,6 +14,12 @@ from typing import Any, Dict, List, Set
 
 from aivia.graph import kg1_intake, kg2_mapper, kg2_translator
 
+# THE AI-GENERATED PREFIX (Sunny's ruling 2026-09-18, Brief_M7:
+# "always add this phrase 'AI-generated: '", scope "all
+# agent-authored"): agent-authored description text lands on
+# nodes wearing this label; approved artifact texts stay pure.
+AI_PREFIX = "AI-generated: "
+
 
 def receive_extract(store, reg: Dict[str, Any],
                     snap: "kg1_intake.ExtractSnapshot",
@@ -1239,19 +1245,123 @@ def receive_pbi(store, pbi_dir) -> int:
         slug = row["name"].lower().replace(" ", "-")
         displays = []
         executes = []
+        resolved, unresolved = [], []
         for rel in row["executes"]:
             executes.append(rel_to_key.get(rel, rel))
             displays += displays_of(rel)
+            if rel in rel_to_key:
+                resolved.append(rel_to_key[rel])
+            else:
+                unresolved.append(rel)  # COUNTED, never guessed
+        rid = f"pbi://sepsis/{slug}"
+        # bound_fields keyed by resolved file identity (M7-A,
+        # per-proc for the Q3 concatenation)
+        bound = {}
+        for rel, cols in (row.get("bound_fields") or {}).items():
+            if rel in rel_to_key:
+                bound[rel_to_key[rel]] = cols
         store.append_node(
-            "pbi_report", f"pbi://sepsis/{slug}",
+            "pbi_report", rid,
             # literal: shape
             {"name": row["name"],
              "description": row["description"],
              "displays": displays, "executes": executes,
+             "unresolved_executes": unresolved,
+             "bound_fields": bound,
              "source": row["source"]},
             manifest["as_of"], f"pbi@{manifest['as_of']}")
+        # M7: executes becomes a REAL edge — resolved targets only
+        for fid in resolved:
+            store.append_edge("executes", rid, fid, {},
+                              manifest["as_of"],
+                              f"pbi@{manifest['as_of']}")
         n += 1
+    # the derived pair (after every node exists; the file layer
+    # ran in receive_estate, so the catch-alls stand)
+    read = ReadApi(store)
+    for rpt in store.current_nodes("pbi_report"):
+        td = _render_report_definition(read, rpt.identity)
+        if td and rpt.properties.get("technical_definition") != td:
+            props = dict(rpt.properties)
+            props["technical_definition"] = td
+            store.append_node("pbi_report", rpt.identity, props,
+                              manifest["as_of"],
+                              f"pbi@{manifest['as_of']}")
     return n
+
+
+# M7 (Q4 "a"): the standing disclosure — every report definition
+# carries it until THE REPORT-LAYER EXTRACTION (the named future
+# brief) lands the PBI-side filters
+REPORT_DISCLOSURE = ("Filters shown are the procedure's; the "
+                     "report may filter further in Power BI.")
+
+
+def _cherry_pick_presents(file_td: str, bound_cols) -> str:
+    """The Presents section filtered to the report's bound fields
+    (matched through the SAME readable-name fold the render used —
+    one home); the star item survives (the model's imports beyond
+    named outputs are the star's columns); unbound named items
+    DROP — that is the pick."""
+    from aivia.flows import produce
+    if "Presents: " not in file_td:
+        return file_td
+    head, rest = file_td.split("Presents: ", 1)
+    for marker in ("Population filters: ", "Inner joins: "):
+        if marker in rest:
+            body, tail = rest.split(marker, 1)
+            tail = marker + tail
+            break
+    else:
+        body, tail = rest, ""
+    items = [i.strip() for i in
+             body.rstrip(". ").split("; ") if i.strip()]
+    folded = {produce._readable_name(c) for c in bound_cols}
+    kept = []
+    for item in items:
+        if item.startswith("every column of the "):
+            kept.append(item)
+            continue
+        key = item.split(":", 1)[0].strip().lower()
+        if key in folded:
+            kept.append(item)
+    if not kept:
+        kept = items  # nothing matched: fall back whole, honest
+    return (head + "Presents: " + "; ".join(kept) + ". " + tail)
+
+
+def _render_report_definition(read, report_id: str) -> str:
+    """M7 — the report's technical definition (ds.report_derived_
+    pair): the executed files' catch-alls CHERRY-PICKED to the
+    report's bound fields, population whole, concatenated per
+    proc when plural (Q3 — labeled 'From <PROC>:'), THE
+    DISCLOSURE LINE last. A shell (no bound fields) carries the
+    whole catch-all. Deterministic; verbatim law."""
+    store = read._store
+    rpt = next((n for n in store.current_nodes("pbi_report")
+                if n.identity == report_id), None)
+    if rpt is None:
+        return ""
+    files = {n.identity: n for n in store.current_nodes("file")}
+    targets = [e.to_id for e in store.current_edges("executes")
+               if e.from_id == report_id and e.to_id in files]
+    bound = rpt.properties.get("bound_fields") or {}
+    parts = []
+    for fid in targets:
+        ftd = str(files[fid].properties.get(
+            "technical_definition") or "")
+        if not ftd:
+            continue
+        cols = bound.get(fid) or []
+        section = (_cherry_pick_presents(ftd, cols) if cols
+                   else ftd)
+        if len(targets) > 1:
+            base = fid.rsplit("/", 1)[-1].removesuffix(".sql")
+            section = f"From {base}: {section}"
+        parts.append(section.rstrip())
+    if not parts:
+        return ""
+    return " ".join(parts) + " " + REPORT_DISCLOSURE
 
 
 def receive_descriptions(store, path) -> int:
@@ -1268,25 +1378,46 @@ def receive_descriptions(store, path) -> int:
     if not path.is_file():
         return 0
     data = _json.loads(path.read_text())
-    n = _describe.land(store, data["descriptions"],
-                       basis=data["basis"],
-                       created_at=data["created_at"],
-                       status=data.get("status", "drafted"))
+    # M7: a batch may carry MIXED statuses (per-identity
+    # "statuses" overrides the file-level "status") — the carried
+    # approval rides beside fresh drafts
+    default = data.get("status", "drafted")
+    statuses = data.get("statuses") or {}
+    by_status = {}
+    for ident, text in data["descriptions"].items():
+        by_status.setdefault(statuses.get(ident, default),
+                             {})[ident] = text
+    n = 0
+    for status, drafts in sorted(by_status.items()):
+        n += _describe.land(store, drafts, basis=data["basis"],
+                            created_at=data["created_at"],
+                            status=status)
     # M6 (Sunny's "APPROVED" 2026-09-17): an APPROVED artifact's
     # text lands on the file NODE — this loader is the ONE writer
     # of file.description (it runs after the file layer and holds
     # the approval act; empty-until-approved stays the counted
-    # posture)
-    if data.get("status") == "approved":
+    # posture). THE AI-GENERATED PREFIX (Sunny's 2026-09-18
+    # ruling, scope "all agent-authored"): every text this writer
+    # lands is a Scribe draft (author agent:scribe by
+    # construction), so the node property carries the provenance
+    # label; the approved artifact text stays pure.
+    approved_idents = {i for i in data["descriptions"]
+                       if statuses.get(i, default) == "approved"}
+    if approved_idents:
         files = {f.identity: f for f in store.current_nodes("file")}
+        files.update({r.identity: r
+                      for r in store.current_nodes("pbi_report")})
         for identity, text in sorted(data["descriptions"].items()):
+            if identity not in approved_idents:
+                continue
             node = files.get(identity)
             if node is None or not text:
                 continue
-            if node.properties.get("description") == text:
+            labeled = AI_PREFIX + text
+            if node.properties.get("description") == labeled:
                 continue
             props = dict(node.properties)
-            props["description"] = text
-            store.append_node("file", identity, props,
+            props["description"] = labeled
+            store.append_node(node.label, identity, props,
                               data["created_at"], node.extract_id)
     return n

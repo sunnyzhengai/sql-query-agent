@@ -96,7 +96,7 @@ ECON = json.loads((pathlib.Path(__file__).parent / "econ_params.json")
 # inbound._render_technical_definition — Presents (top-level) +
 # grouped Population filters (degenerates pruned, recursion
 # full) + Inner joins; the file grain's governance field.
-FLOOR_GRAMMAR_VERSION = "2.12.0"
+FLOOR_GRAMMAR_VERSION = "2.13.0"
 # literal: grammar Grammar_Floor R1
 _PREPOSITIONS = ("of", "on", "per", "for", "in", "at", "by", "with")
 # rider (c) amended (Sunny 2026-09-13): the dictionary's declared

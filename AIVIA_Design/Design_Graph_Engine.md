@@ -279,9 +279,9 @@ algorithm · evidence returned with the query as artifact).
 
 ## The laws carried forward from v1 (storage-independent, all kept)
 
-[registry stamps: kg1_technical v1.47.0 · kg2_logic v1.47.0 ·
-kg2_kind_library v1.47.0 · kg3_artifacts v1.47.0 ·
-kg4_concepts v1.47.0 · flows v1.47.0 · lenses v1.47.0]
+[registry stamps: kg1_technical v1.49.0 · kg2_logic v1.49.0 ·
+kg2_kind_library v1.49.0 · kg3_artifacts v1.49.0 ·
+kg4_concepts v1.49.0 · flows v1.49.0 · lenses v1.49.0]
 (stamp block restored 2026-09-10 — the ratification rename dropped
 v1's per-section stamps; RG-A2 caught it same day. One block here,
 the same-breath rule mechanical again; registries carry their own
@@ -370,7 +370,14 @@ hand or word (capacity discipline, carried above).
 
 - **Phase 1 — finish the ladder (in flight):** M3–M7 complete the
   graph's layers exactly as this v2 specifies. Nothing already
-  shipped is discarded.
+  shipped is discarded. **RE-SCOPED 2026-09-18 (Sunny): M7 = THE
+  CONSUMPTION LAYER ONLY (pbi_report · executes · the derived
+  pair as report properties). Governance is M8, its own layer,
+  DESIGNED before built — his ruling: "make governance M8. plus
+  we need to really design M8 before implementing"; the design
+  inputs (actors = nodes · descriptions = properties · records
+  are not nodes) live in Contract_Governance_Layer's M8 DESIGN
+  INPUTS table.**
 - **Phase 2 — the primacy flip:** evidence and parse records
   re-home from snapshot files/blobs into their Delta tables; the
   boot store demotes to a BUILDER that writes the graph tables;

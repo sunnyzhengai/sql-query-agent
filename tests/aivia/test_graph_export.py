@@ -34,6 +34,23 @@ def test_one_node_table_per_label_with_store_counts(world):
         assert len(rows) == len(read.nodes(label))
 
 
+def test_governance_stays_home_until_m8(world):
+    """THE M7 RE-SCOPE (Sunny 2026-09-18, Brief_M7 amendment:
+    "make M7 only the consumption layer … make governance M8.
+    plus we need to really design M8 before implementing"): no
+    governance node table and no describes edge table rides the
+    export until the M8 design sitting rules the physical form
+    per item. SERVED_LABELS (lenses.Closed_Sets, registry 1.49.0)
+    is the mirror. Consumption stays: pbi_report + executes."""
+    _read, tables = world
+    for label in ("description", "agent", "role", "responsibility",
+                  "blessed_name", "person", "term", "usage"):
+        assert f"graph_{label}" not in tables, label
+    assert "graph_describes" not in tables
+    assert "graph_pbi_report" in tables
+    assert "graph_executes_reportFile" in tables
+
+
 def test_camel_case_columns_and_node_id_key(world):
     _read, tables = world
     for name, rows in tables.items():
@@ -47,7 +64,9 @@ def test_camel_case_columns_and_node_id_key(world):
                     or name.startswith("graph_right_side")
                     or name.startswith("graph_resolves_to")
                     or name.startswith("graph_uses_param")
-                    or name.startswith("graph_cites")):
+                    or name.startswith("graph_cites")
+                    or name.startswith("graph_executes")
+                    or name.startswith("graph_describes")):
             assert "nodeId" in rows[0]
             ids = [r["nodeId"] for r in rows]
             assert len(ids) == len(set(ids)), f"{name}: dup nodeIds"

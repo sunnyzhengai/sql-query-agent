@@ -1803,3 +1803,75 @@ sitting. M7 holds the next entry gate: executes · pbi_report's
 derived pair by CHERRY-PICK (his ruling) · the DAX-filter
 question (declared) · governance/consumption labels — and the
 CI-B program + FL1 wait behind it.
+
+**THE M7 DESIGN SITTING (Sunny's "LET'S DESIGN M7", 2026-09-17,
+six rulings one at a time):** Q1 "a" — THE BINDINGS FIRST: the
+SemanticModel's imported columns (the TMDL is in the repo) land
+in the snapshot before the cherry-pick builds · Q2 "yes to
+fabric" — GOVERNANCE SERVES: the 2026-09-13 export ruling
+SUPERSEDED; blessed_name 113 + agent/role/responsibility +
+description artifacts ride to Fabric; the 6286/6691 M7 numbers
+stand as SERVED · Q3 "a" — multi-proc composition CONCATENATES
+labeled by proc, one caged summary (dormant: 1 resolves) · Q4
+"a" — model-grain cherry-pick + THE DISCLOSURE LINE; THE
+REPORT-LAYER EXTRACTION (visual bindings + PBI filters + DAX
+from the .Report folders — present in repo, measured) = a named
+future brief · Q5 contracts-first: Consumption + Governance
+contract docs BORN with the batch (CI-B5 closes) · Q6 "run all
+and scribe drafts all 27. it's ok to pay for this" — the full
+sepsis estate re-runs whole; the Scribe drafts every remaining
+file description (spend authorized); the FULL SEPSIS RELOAD
+rides the close, his hand. GROUND TRUTHS measured at the
+sitting: reports.json carries NO bound fields today; the sepsis
+estate's reports.json does not exist yet (authored in-batch,
+the 2026-09-08 every-proc-feeds-a-PBI mapping); the .Report
+folders exist for the deferred extraction.
+Brief_M7_Consumption_Governance PRESENTED — 36 declared files,
+two ambiguities (M7-A bindings form · M7-B the report-grain
+rider), TWO checkpoints (the rendered pair · the 27-draft
+batch), TWO loads at close.
+
+**M7 CHECKPOINT 1 (Sunny "ratified, not same", 2026-09-18):**
+the report-grain rider RATIFIED v2.13.0 (the real 16,273-char
+pair presented; the cherry-pick kept all 17 — the model binds
+everything, the pick bites when a leaner report binds less; the
+disclosure line verbatim; version pins moved consciously) ·
+FC2 RULED NOT SAME: the reports.* EXECs are NOT the RPTS corpus
+files — both stay counted-unresolved as FINAL truth, no alias
+data, multi-proc dormant (mechanism synthetic-pinned). Next:
+THE SCRIBE BATCH (28 drafts: 27 sepsis files + the dashboard
+summary; his authorized spend) → checkpoint 2.
+
+**M7 CONSUMPTION + GOVERNANCE BUILT (2026-09-18, the sitting's
+THIRD batch; Brief_M7_Consumption_Governance — six design
+rulings + two checkpoints, every word Sunny's):** THE BINDINGS
+EXTRACTOR born (devtools/pbi_extract.py: SemanticModel
+sourceColumns per EXEC'd proc, date plumbing excluded; the
+sepsis reports.json AUTHORED — 1 real + 27 shells, the
+2026-09-08 mapping) · executes a REAL EDGE (1 resolved; the two
+reports.* EXECs RULED NOT SAME at checkpoint 1 — counted-
+unresolved is the FINAL truth, no alias data, multi-proc
+synthetic-pinned) · THE REPORT-GRAIN RIDER RATIFIED v2.13.0
+(the real 16,273-char pair presented; cherry-pick kept all 17 —
+the model binds everything; THE DISCLOSURE LINE verbatim) · THE
+SCRIBE BATCH (his "it's ok to pay for this"): 28 drafts from
+the R13 evidence, cage v2 per sentence (compound-name fold
+fixed live; NO fabricated facts; the PURPOSE-WORD class flagged
+27/28 and accepted by his eye — FG2 lands the standing-form
+question), his "approved" — 27 sepsis descriptions + the
+dashboard summary landed APPROVED, the USP sentence carried ·
+ONE label bug caught by the suite mid-batch (the approved-
+landing minted a pbi node under the file label — node.label
+now) · GOVERNANCE SERVES (Q2): 8 new dev parquets (pbi_report ·
+description · agent · role · responsibility · blessed_name 113
+· executes · describes), ALL prior byte-identical; THE SEPSIS
+EXPORT BORN WHOLE (42 parquets — the phase boundary's payload)
+· registries 1.48.0 (SERVED_LABELS; the supersession stamped) ·
+Contract_Consumption_Layer + Contract_Governance_Layer BORN
+(CI-B5 closes; FC1/FC2 + FG1/FG2 as rows) · keys re-based by
+measurement (28 reports · description 2 · 6287/6692 · the
+unresolved pair). The recording banked ~28 new vectors (his
+authorized spend, two runs). REMAINS: the final suite (running)
+→ BUILT → his gap-checks of the two contracts → the commit →
+HIS TWO LOADS (the dev M7 delta + THE FULL SEPSIS RELOAD, one
+refresh each) → §M7 gates → the republish → CLOSED.

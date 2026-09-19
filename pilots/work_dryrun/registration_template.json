@@ -1,0 +1,14 @@
+{
+  "_comment": "TEMPLATE (Brief_Work_Dryrun) — copy to AIVIA_Product/estates/work_<name>/registration.json IN THE WORK CLONE and fill every <placeholder>. The DBA prerequisite: one source owns every schema; schemas not listed here will not map.",
+  "db_name": "<the source database name>",
+  "server": "<the server name>",
+  "dba_team": "role:<the owning team>",
+  "registered_sources": [
+    "<source, e.g. clarity>"
+  ],
+  "registered_at": "<ISO timestamp, e.g. 2026-09-22T00:00:00Z>",
+  "schema_sources": {
+    "<schema, e.g. dbo>": "<source>",
+    "<schema, e.g. reporting>": "<source>"
+  }
+}

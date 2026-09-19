@@ -92,13 +92,19 @@ def test_every_loaded_registry_is_ratified_v1():
     # (::dcol#, STAY FLAT), has_part birth + cites at store grain
     # (100→97 by measurement); grammar constant 2.10.0; the
     # mapper's arithmetic/unary op property (twin untouched)
+    # 1.49.0 = THE M7 RE-SCOPE (Sunny 2026-09-18, Brief_M7
+    # amendment): M7 = CONSUMPTION ONLY — SERVED_LABELS re-based
+    # (governance labels out; they serve at M8 after its design
+    # sitting) — after
+    # 1.48.0 = M7 CONSUMPTION + GOVERNANCE SERVE (the Q2
+    # supersession; SERVED_LABELS; the derived pair) — after
     # 1.47.0 = M6 THE FILE LAYER (the two governance fields;
     # the 31-statement debt retires) — after 1.46.0 = M5 (Sunny's "approved" +
     # "ratified", 2026-09-17): statement PRESENT, Statement_
     # Voicings library, the (b) 36/31 split, the F2+F4 export fix
     for reg in metamodel.load_all().values():
         assert reg.ratified is True
-        assert reg.version == "1.47.0"
+        assert reg.version == "1.49.0"
 
 
 def test_load_single_exposes_sheets_and_stamp():

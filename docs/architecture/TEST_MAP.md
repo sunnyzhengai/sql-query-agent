@@ -7,7 +7,7 @@
 
 # Test Map — what every test proves
 
-194 modules, 2107 tests, every module accounted: claimed by an ADR in the trace registry or declaring a law/contract in its docstring (`Proves:` line).
+196 modules, 2116 tests, every module accounted: claimed by an ADR in the trace registry or declaring a law/contract in its docstring (`Proves:` line).
 
 ## By ADR
 
@@ -181,7 +181,7 @@
 - `tests/aivia/test_full_circle.py` (7): Slice 7: FULL CIRCLE — one run from empty, every family proven.
 - `tests/aivia/test_glossary.py` (11): THE GLOSSARY PROCESS (Ruling_Glossary_Process.md, ruled
 - `tests/aivia/test_governance_journal.py` (4): PHASE E1 — THE GOVERNANCE JOURNAL (Sunny's ruling: all user
-- `tests/aivia/test_graph_export.py` (12): M1 — THE FABRIC GRAPH EXPORT READING (the materialization plan,
+- `tests/aivia/test_graph_export.py` (13): M1 — THE FABRIC GRAPH EXPORT READING (the materialization plan,
 - `tests/aivia/test_kg1_intake.py` (12): Slice 1: KG1 intake vs the F1 answer key — the graph, node by node.
 - `tests/aivia/test_kg2_mapper.py` (8): Slice 2 exit: the F2 answer key against the BUILT trees.
 - `tests/aivia/test_kg3_artifacts.py` (18): Slice 4: the ledger — KG3 artifact layer lifecycle + derived states.
@@ -204,8 +204,10 @@
 - `tests/aivia/test_produce.py` (10): Slice 5 exit: produce vs the RATIFIED floor grammar — F4 upgraded
 - `tests/aivia/test_refusals.py` (9): Slice 1: the F6 refusal set — every refusal NAMES its rule.
 - `tests/aivia/test_registry_mirrors.py` (11): E3 LOCK 2 — THE MIRROR-CHECKS (the literal law; the
+- `tests/aivia/test_report_layer.py` (6): M7 THE REPORT LAYER — pins authored FAILING (test-first;
 - `tests/aivia/test_root_edges.py` (4): STEP 5 of the Connection Ledger build — ROOT EDGES. The test
 - `tests/aivia/test_scope_layer.py` (3): M2 (bottom-up re-ruling, 2026-09-10) — THE SCOPE LAYER.
+- `tests/aivia/test_scribe_draft.py` (2): Brief_Work_Dryrun (Sunny's "approved, both proposals stand",
 - `tests/aivia/test_search_is_the_answer.py` (10): STEP B — THE SEARCH IS THE ANSWER (Sunny's pipeline, ruled
 - `tests/aivia/test_seat_prompts.py` (4): STEP C of the search rebuild — THE PROMPT IS REGISTRY DATA.
 - `tests/aivia/test_sepsis_shakedown.py` (10): The sepsis shakedown (round 2) — conservation counters pinned;

@@ -58,3 +58,8 @@ internal/private/
 AIVIA_Protected/
 AIVIA_Product/estates/*/governance/
 AIVIA_Product/estates/*/.cache/
+
+# THE WALL (Sunny's ruling 2026-09-18, Brief_Work_Dryrun):
+# work estates exist only in the work clone and can never enter
+# a commit — engine-outbound only, work data never comes back
+AIVIA_Product/estates/work_*/

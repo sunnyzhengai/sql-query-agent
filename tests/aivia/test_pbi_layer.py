@@ -42,9 +42,11 @@ def world():
 def test_pbi_reports_load_with_their_label(world):
     _store, read, _index, _semantic = world
     reports = read.nodes("pbi_report")
-    # 27 since the 1:1 ruling (2026-09-09): the dashboard trimmed
-    # to 2 procs, the freed proc gained its own shell
-    assert len(reports) == 27
+    # 28 since M7 (the honest extractor, 2026-09-18): the demo
+    # trim died with the Q3 concatenation ruling; the reports.*
+    # EXECs are counted-unresolved (Sunny "not same"), so BOTH
+    # RPTS procs keep their own shells — 1 real + 27 shells
+    assert len(reports) == 28
     names = {n.properties["name"] for n in reports}
     assert "ED Sepsis Screening Dashboard" in names  # the real one
 

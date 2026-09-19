@@ -193,7 +193,7 @@ SOURCES = {
 # deliveries lead, spine voiced, intermediates counted, census
 # closes; the file's ask-index words = the delivery lead, so file
 # embeddings embed meaning, never name-noise).
-STAMP_VERSION = "1.47.0"
+STAMP_VERSION = "1.49.0"
 RATIFIED = True
 DOC_STAMP = ("v1.0.0 (ratified 2026-09-05, Sunny); v1.1.0 twin-graph "
              "ruling ADR 0077; v1.2.0 Phase A metamodel bump; v1.3.0 "
@@ -1600,6 +1600,21 @@ TWIN_SHEETS = {
             {"Set": "ASK_VIEWS",
              "Members": "card|lineage|filters|readers|census",
              "Cites": "L4-D4 display hints; Ask_Console sheet"},
+            {"Set": "SERVED_LABELS",
+             "Members": "db|db_schema|table|column|scope|join|"
+             "direct_read|condition|param|derived_column|statement|"
+             "file|pbi_report",
+             "Cites": "RE-SCOPED at v1.49.0 (Sunny 2026-09-18, "
+             "Brief_M7 amendment: 'make M7 only the consumption "
+             "layer … make governance M8'): the labels the Fabric "
+             "export ships = the technical/logic/consumption "
+             "layers ONLY. The governance labels (description, "
+             "agent, role, responsibility, blessed_name, person, "
+             "term, usage) serve at M8, AFTER its design sitting "
+             "rules node-vs-property per item (his positions in "
+             "Contract_Governance_Layer M8 DESIGN INPUTS). Chain: "
+             "store-only 09-13 -> Q2 'yes to fabric' 09-17 -> "
+             "serve-at-M8 09-18"},
             {"Set": "GAP_CENSUS_KEYS",
              "Members": "unresolved_refs|grain_not_declared|"
              "keyless_tables|undocumented_columns|unmapped_remainder|"

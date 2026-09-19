@@ -705,13 +705,16 @@ def test_m6_two_governance_fields(booted):
     assert desc and desc.strip()
     # the cage (M6-2): no words in the summary that the catch-all
     # + the file's own name words cannot account for is checked at
-    # approval; here the stored text == the approved artifact
+    # approval; here the stored text == THE AI-GENERATED PREFIX
+    # (Sunny's 2026-09-18 ruling: agent-authored lands labeled)
+    # + the approved artifact, which stays pure
     arts = [n for n in booted.current_nodes("description")
             if f.identity in str(n.properties.get("about", ""))]
     approved = [n for n in arts
                 if n.properties.get("status") == "approved"]
     assert approved, "the description stores ONLY approved text"
-    assert desc == approved[-1].properties.get("description")
+    assert desc == ("AI-generated: "
+                    + approved[-1].properties.get("description"))
 
 
 def test_m6_era3_walk_complete(booted):

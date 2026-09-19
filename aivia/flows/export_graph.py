@@ -163,8 +163,27 @@ def _scope_tables(read: ReadApi,
             "contentHash": str(n.properties.get("content_hash")
                                or ""),
             "loadedAt": str(n.properties.get("loaded_at") or "")})
+    # M7 THE CONSUMPTION LAYER (re-scoped by Sunny 2026-09-18,
+    # Brief_M7 amendment: governance serves at M8 after its design
+    # sitting — SERVED_LABELS 1.49.0 is the mirror): the report
+    # row, blob-free like every hand row
+    rpt_rows = []
+    for n in sorted(read.nodes("pbi_report"),
+                    key=lambda x: x.identity):
+        # literal: shape
+        rpt_rows.append({
+            "nodeId": n.identity,
+            "name": str(n.properties.get("name") or ""),
+            "description": str(n.properties.get("description")
+                               or ""),
+            "technicalDefinition": str(
+                n.properties.get("technical_definition") or ""),
+            "unresolvedExecutes": "; ".join(
+                n.properties.get("unresolved_executes") or []),
+            "source": str(n.properties.get("source") or "")})
     # literal: shape
     tables: Dict[str, List[Dict[str, str]]] = {
+        "graph_pbi_report": rpt_rows,
         "graph_scope": scope_rows, "graph_join": join_rows,
         "graph_direct_read": dr_rows,
         "graph_condition": cond_rows, "graph_param": param_rows,
@@ -242,6 +261,10 @@ def _scope_tables(read: ReadApi,
          else up_scope).append(row)
     tables["graph_uses_param_scopeParam"] = sorted(
         up_scope, key=lambda r: (r["sourceId"], r["targetId"]))
+    tables["graph_executes_reportFile"] = sorted(
+        ({"sourceId": e.from_id, "targetId": e.to_id}
+         for e in store.current_edges("executes")),
+        key=lambda r: (r["sourceId"], r["targetId"]))
     tables["graph_uses_param_statementParam"] = sorted(
         up_stmt, key=lambda r: (r["sourceId"], r["targetId"]))
     for side in ("left_side", "right_side"):
