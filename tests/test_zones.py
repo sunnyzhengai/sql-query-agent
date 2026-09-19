@@ -40,15 +40,16 @@ def test_internal_zone_exists_and_is_internal():
     )
 
 
-def test_internal_zone_can_never_ship():
-    """The deployment package's FORBIDDEN pattern is the shipped-boundary
-    enforcement; the zone name must stay inside it."""
-    import importlib.util
-    spec = importlib.util.spec_from_file_location(
-        "bdp", REPO / "scripts" / "build_deployment_package.py")
-    bdp = importlib.util.module_from_spec(spec)
-    spec.loader.exec_module(bdp)
-    assert bdp.FORBIDDEN.search(f"{INTERNAL_ZONE}/docs/ROADMAP.md")
+def test_internal_zone_stays_out_of_the_ship_surfaces():
+    """Era 2 (Brief_Retirement, 2026-09-19: the deployment package
+    and its FORBIDDEN pattern retired with era 1): the shipped
+    boundaries are the zip (git archive) and the wheel — the
+    internal zone must be export-ignored, so no archive carries it."""
+    attrs = (REPO / ".gitattributes").read_text()
+    assert "/* export-ignore" in attrs, (
+        "the ship-surface default-deny is gone from .gitattributes")
+    assert f"/{INTERNAL_ZONE} -export-ignore" not in attrs, (
+        "internal/ must never be re-included in the ship zip")
 
 
 def test_old_internal_home_is_gone():

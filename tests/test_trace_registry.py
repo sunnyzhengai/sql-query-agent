@@ -44,12 +44,23 @@ def test_totality_every_module_traces_to_a_decision():
     )
 
 
+def _retired_paths():
+    """The retirement ledger (Brief_Retirement, 2026-09-19, Sunny's
+    "B, reconcile it"): ADR citations are HISTORY and stay verbatim;
+    a cited path is valid if it exists OR is recorded retired in the
+    committed manifest. Anything else dangling is a real break."""
+    manifest = (REPO / "AIVIA_Design" / "briefs"
+                / "Brief_Retirement_manifest.txt")
+    return set(manifest.read_text().splitlines())
+
+
 def test_existence_every_cited_path_exists():
+    retired = _retired_paths()
     dangling = []
     for adr, entry in TRACE_REGISTRY.items():
         for kind in ("modules", "tests", "docs"):
             for rel in entry[kind]:
-                if not (REPO / rel).exists():
+                if not (REPO / rel).exists() and rel not in retired:
                     dangling.append(f"{adr}: {rel}")
         for axiom in entry["axioms"]:
             if axiom not in SPEC_AXIOMS:

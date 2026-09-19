@@ -209,7 +209,16 @@ def test_invariants_are_well_formed():
 
 def test_declared_writers_match_code_ground_truth():
     """The load-bearing test: every observed write must be declared, and
-    every declared writer must actually write."""
+    every declared writer must actually write.
+
+    RETIRED IN PLACE (Brief_Retirement, 2026-09-19, "B, reconcile
+    it"): the ground truth was the 21 pipeline notebooks, which left
+    the tree with era 1. TABLE_REGISTRY stays as the record feeding
+    the docs; with no notebooks there are no observable writes, so
+    the check is vacuously satisfied — and if notebooks ever return,
+    it re-arms by itself."""
+    if not _notebook_files():
+        return
     observed = _observed_writers()
 
     for table, writers in observed.items():

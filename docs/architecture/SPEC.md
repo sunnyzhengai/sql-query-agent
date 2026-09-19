@@ -223,8 +223,8 @@ the set of sentences below. The system is correct when `G ⊨ Φ`.
 *Gloss:* folding twice changes nothing — so it never matters how many times a value has been folded before matching.
 *Origin:* ADR 0016.
 *Grounds in the framework:* axm:D2 — one folding rule, one definition.
-*Checks:* `tests/parser/test_identity.py`
-**Status: ENFORCED**
+*Checks:* (none declared) — enforcement retired with era 1 (Brief_Retirement 2026-09-19, "B, reconcile it"); the dead pins are recorded in retired_checks
+**Status: RETIRED**
 
 **A2 — metric_id is a key.**
 
@@ -233,7 +233,7 @@ the set of sentences below. The system is correct when `G ⊨ Φ`.
 *Gloss:* two metrics with the same id are the same metric, everywhere, including every downstream projection (Purview qualifiedName, exports).
 *Origin:* ADR 0015.
 *Grounds in the framework:* axm:D3 — identity -> exactly one owner per metric.
-*Checks:* `tests/test_invariants.py`, `tests/test_table_contracts.py`
+*Checks:* `tests/test_table_contracts.py`
 **Status: ENFORCED**
 
 **A3 — fold-collisions are rejected loudly.**
@@ -243,8 +243,8 @@ the set of sentences below. The system is correct when `G ⊨ Φ`.
 *Gloss:* two inputs whose identities differ only by case are one object in a case-insensitive database — a data error, never two entries.
 *Origin:* ADR 0016.
 *Grounds in the framework:* axm:D2 — one folding rule, one definition.
-*Checks:* `tests/test_invariants.py`
-**Status: ENFORCED**
+*Checks:* (none declared) — enforcement retired with era 1 (Brief_Retirement 2026-09-19, "B, reconcile it"); the dead pins are recorded in retired_checks
+**Status: RETIRED**
 
 
 ---
@@ -258,8 +258,8 @@ the set of sentences below. The system is correct when `G ⊨ Φ`.
 *Gloss:* every edge in the graph traces to a source fact — a dictionary row (join edges: a (PK, FK) pair), an AST node, a TMDL partition, an org declaration, a governance record. No edge is ever asserted from model memory or heuristic guess. (Refuse- over-guess, ADR 0005, stated as structure.)
 *Origin:* ADRs 0005, 0032, 0044.
 *Grounds in the framework:* axm:B1 — witness totality IS 'no claim without a witness'.
-*Checks:* `tests/test_invariants.py`, `tests/test_tree_contract.py` — PARTIAL by construction in builders; not yet a uniform declared invariant on every edge table
-**Status: PARTIAL** — holds by construction for edges built in 03; not yet a uniform declared invariant on every edge table. Debt: every edge-table contract declares its witness reference.
+*Checks:* (none declared) — PARTIAL by construction in builders; not yet a uniform declared invariant on every edge table
+**Status: RETIRED** — holds by construction for edges built in 03; not yet a uniform declared invariant on every edge table. Debt: every edge-table contract declares its witness reference.
 
 **B2 — description provenance is total and closed.**
 
@@ -268,8 +268,7 @@ the set of sentences below. The system is correct when `G ⊨ Φ`.
 *Gloss:* no description exists without a stated epistemic status; no fourth value; no NULL.
 *Origin:* ADR 0044 clause 6; vocabulary amended by ADR 0074 call 2 (gate_passed = smoothed prose that cleared the gate; skeleton_floor = deterministic composition, unfalsifiable; template_fallback retired with its mechanism)
 *Grounds in the framework:* axm:B1, axm:J4 — provenance closed -> every description judged.
-*Checks:* `tests/test_tree_contract.py`
-**Status: PARTIAL** — stated gap: provenance PERSISTENCE on stored descriptions lands with the ADR 0074 D1 build (the retired phase-3b anchor is superseded)
+**Status: RETIRED** — stated gap: provenance PERSISTENCE on stored descriptions lands with the ADR 0074 D1 build (the retired phase-3b anchor is superseded)
 
 
 ---
@@ -293,8 +292,7 @@ SHAPE_REGISTRY.
 *Gloss:* every kind of source fact — dictionary join rows, dictionary descriptions, SQL decision sites, TMDL partitions, DAX column refs, org reference tables — either has a declared extractor or a recorded "deliberately not extracted, because…". There is no third state ("nobody thought about it").
 *Origin:* the EMR-joins incident: `J_D` (the dictionary's join map) had no functor and no exclusion — the violation existed at the inventory level before any code ran, which is why only a code- walk found it. *Seeded exclusion rows (ruled by Sunny 2026-08-19):* Snowflake views and Databricks/dbt models are **excluded for the Fabric-native v1** — real hospital estates increasingly run them, so the rows exist to make the roadmap pressure visible, per ADR 0001 each future dialect gets its own native parser.
 *Grounds in the framework:* axm:D1 — the enumerated frontier -> nothing unreachable.
-*Checks:* `tests/test_extraction_registry.py`
-**Status: ENFORCED** — `src/extraction_registry.py` + `tests/test_extraction_registry.py` (functor XOR exclusion per row; conservation citations resolve; the joins incident pinned as the acceptance test; every reference structure D/P/M/O/Gov covered).
+**Status: RETIRED** — `src/extraction_registry.py` + `tests/test_extraction_registry.py` (functor XOR exclusion per row; conservation citations resolve; the joins incident pinned as the acceptance test; every reference structure D/P/M/O/Gov covered).
 
 **C2 — conservation per extractor (no third bucket).**
 
@@ -303,8 +301,7 @@ SHAPE_REGISTRY.
 *Gloss:* every source row is either extracted or counted as fallout — the sum matches the total, and nothing vanishes.
 *Origin:* ADR 0044 clause 1 (decision sites: `handled + unextracted == total`), ADR 0041 (M shapes), ADR 0045 (fallout resolution).
 *Grounds in the framework:* axm:R1 — handled + fallout = total (conservation).
-*Checks:* `tests/test_tree_contract.py`, `tests/mquery/test_mquery.py`
-**Status: PARTIAL** — enforced for trees and M shapes; C1's registry (now ENFORCED) carries a conservation citation per row and the citations are checked to resolve — full per-row equation checks remain the stated gap.
+**Status: RETIRED** — enforced for trees and M shapes; C1's registry (now ENFORCED) carries a conservation citation per row and the citations are checked to resolve — full per-row equation checks remain the stated gap.
 
 **C3 — images land in the graph.**
 
@@ -312,8 +309,8 @@ SHAPE_REGISTRY.
 
 *Gloss:* what an extractor extracts actually arrives — no silent drops between extraction and the graph.
 *Grounds in the framework:* axm:R1 — handled + fallout = total (conservation).
-*Checks:* `tests/test_invariants.py`
-**Status: PARTIAL** — (same universality note as C2).
+*Checks:* (none declared) — enforcement retired with era 1 (Brief_Retirement 2026-09-19, "B, reconcile it"); the dead pins are recorded in retired_checks
+**Status: RETIRED** — (same universality note as C2).
 
 **C4 — leaf grounding (the termination axiom).**
 
@@ -323,8 +320,8 @@ SHAPE_REGISTRY.
 *Gloss:* after internal references resolve (CTEs and temp tables resolve to their defining steps), every remaining leaf of every parsed tree must bottom out on a vendor table or an org reference table. Anything else — an unresolvable name, a dynamic-SQL branch — is counted fallout, and "completely parsed" is a **computed per-file verdict**, never an impression. Gives the funnel a new honest number: fraction of files fully grounded.
 *Origin:* Sunny's blind reconstruction, 2026-08-19 ("any AST tree branch that does not end in EMR tables or org's custom reference table is not a completely parsed sql file").
 *Grounds in the framework:* axm:R1, axm:D1 — leaf grounding: termination + reachability.
-*Checks:* `tests/governance/test_leaf_grounding.py`
-**Status: ENFORCED** — `src/governance/leaf_grounding.py` (verdict + fraction + escalated fallout, stage `500_leaf_grounding`), wired into 500; `tests/governance/test_leaf_grounding.py`. First recorded-corpus verdict: 27/28 files completely parsed (USP_Severe_Sepsis reads 6 tables absent from the dictionary — the number is already working).
+*Checks:* (none declared) — enforcement retired with era 1 (Brief_Retirement 2026-09-19, "B, reconcile it"); the dead pins are recorded in retired_checks
+**Status: RETIRED** — `src/governance/leaf_grounding.py` (verdict + fraction + escalated fallout, stage `500_leaf_grounding`), wired into 500; `tests/governance/test_leaf_grounding.py`. First recorded-corpus verdict: 27/28 files completely parsed (USP_Severe_Sepsis reads 6 tables absent from the dictionary — the number is already working).
 
 
 **THE GRAPH IDENTITY THEOREM** (what B and C jointly force):
@@ -351,8 +348,8 @@ layer being "the vendor's complete join map" is the k = J_D instance.
 *Gloss:* the precomputed USES_TABLE / closure edges must equal what a live traversal would compute. The closure is a **cache with a proof obligation**, not a second truth.
 *Origin:* ADRs 0018, 0033, 0037 (closures reclassified as checkable cache; the 5-of-13 undercount was an unstated D1 violation).
 *Grounds in the framework:* axm:D4 — closure = shape-defined derivation.
-*Checks:* `tests/test_recorded_pipeline.py` — oracles ENFORCED; the general closure-vs-live diff is UNBOUND (ADR 0037 stated gap)
-**Status: PARTIAL** — (oracles ENFORCED; general diff UNBOUND).
+*Checks:* (none declared) — oracles ENFORCED; the general closure-vs-live diff is UNBOUND (ADR 0037 stated gap)
+**Status: RETIRED** — (oracles ENFORCED; general diff UNBOUND).
 
 **D2 — count oracles.**
 
@@ -361,8 +358,8 @@ layer being "the vendor's complete join map" is the k = J_D instance.
 *Gloss:* certified cardinalities from recorded fixtures pin the truth; a derivation change that alters a known count is a red build, never a silent undercount.
 *Origin:* ADR 0018.
 *Grounds in the framework:* axm:J1 — count oracles = founder-defined correctness.
-*Checks:* `tests/test_recorded_pipeline.py`
-**Status: ENFORCED**
+*Checks:* (none declared) — enforcement retired with era 1 (Brief_Retirement 2026-09-19, "B, reconcile it"); the dead pins are recorded in retired_checks
+**Status: RETIRED**
 
 **D3 — projections are functions of the record.**
 
@@ -390,8 +387,8 @@ layer being "the vendor's complete join map" is the k = J_D instance.
 *Gloss:* the vendor's join map is a known, finite structure. Given anchored nodes, all candidate paths between them are **facts waiting to be enumerated** — a search problem, not a synthesis problem. Nothing needs to "generate" a path, so nothing stochastic may.
 *Origin:* ADR 0046 (Sunny's position, settled 2026-08-19).
 *Grounds in the framework:* axm:S3 — the path space is data-shaped, hence enumerable.
-*Checks:* `tests/test_spec_gates.py`
-**Status: PARTIAL** — the deterministic primitive is ENFORCED (`src/discovery/paths.py` + `tests/test_spec_gates.py`, 1.33.0: replay-deterministic simple-path enumeration over the join map, both orientations, hop-capped presentation-never- pruning). Stated gap: the composed 0046 engine (anchor→discover+match→rank→pick) is not built.
+*Checks:* (none declared) — enforcement retired with era 1 (Brief_Retirement 2026-09-19, "B, reconcile it"); the dead pins are recorded in retired_checks
+**Status: RETIRED** — the deterministic primitive is ENFORCED (`src/discovery/paths.py` + `tests/test_spec_gates.py`, 1.33.0: replay-deterministic simple-path enumeration over the join map, both orientations, hop-capped presentation-never- pruning). Stated gap: the composed 0046 engine (anchor→discover+match→rank→pick) is not built.
 
 **E2 — replay determinism for retrieval components.**
 
@@ -401,8 +398,8 @@ layer being "the vendor's complete join map" is the k = J_D instance.
 *Gloss:* an LLM fails this **by construction** (it samples) — so it is excluded from these seats by type, not by policy. The recurring "should the LLM help compose the query" debate terminates here: the component violates E2.
 *Origin:* ADRs 0032 (the testable definition of deterministic), 0046.
 *Grounds in the framework:* axm:J2 — replay determinism = the computable type.
-*Checks:* `tests/orchestrator/test_core.py`
-**Status: PARTIAL**
+*Checks:* (none declared) — enforcement retired with era 1 (Brief_Retirement 2026-09-19, "B, reconcile it"); the dead pins are recorded in retired_checks
+**Status: RETIRED**
 
 **E3 — the decision typing rule (which decider is legal where).**
 
@@ -413,8 +410,8 @@ layer being "the vendor's complete join map" is the k = J_D instance.
 *Gloss:* three kinds of decision — computable (code only), judgment (human), linguistic (LLM). An LLM decision is acceptable only where its error mode is visible and bounded. You TEST code; you can only MEASURE models.
 *Origin:* ADR 0035 (the taxonomy), 0032, 0046.
 *Grounds in the framework:* axm:M5, axm:J2 — the decision-typing rule, verbatim.
-*Checks:* `tests/test_methodology.py`
-**Status: ENFORCED** — for the control path; each new component declares its decider kind at review.
+*Checks:* (none declared) — enforcement retired with era 1 (Brief_Retirement 2026-09-19, "B, reconcile it"); the dead pins are recorded in retired_checks
+**Status: RETIRED** — for the control path; each new component declares its decider kind at review.
 
 **E4 — pick containment (the human picks, structurally).**
 
@@ -434,8 +431,8 @@ layer being "the vendor's complete join map" is the k = J_D instance.
 *Gloss:* every literal value in any presented or executed filter comes from a stored decision site, a value-set table (T_org), or the human — never from model memory. Carries the shared- schema/varying-values fact: the EMR schema travels between hospitals; the values never do.
 *Origin:* ADR 0046 grounding rules; ADR 0044's captured fabrications.
 *Grounds in the framework:* axm:B1 — filter values need witnesses.
-*Checks:* `tests/test_spec_gates.py`
-**Status: PARTIAL** — the deterministic primitive is ENFORCED (`src/discovery/grounding.py`, 1.33.0: refuse-over-guess on any value without a source). Stated gap: binds to real presented/executed filters when the 0046 engine composes them.
+*Checks:* (none declared) — enforcement retired with era 1 (Brief_Retirement 2026-09-19, "B, reconcile it"); the dead pins are recorded in retired_checks
+**Status: RETIRED** — the deterministic primitive is ENFORCED (`src/discovery/grounding.py`, 1.33.0: refuse-over-guess on any value without a source). Stated gap: binds to real presented/executed filters when the 0046 engine composes them.
 
 **E6 — presentation honesty.**
 
@@ -447,8 +444,8 @@ layer being "the vendor's complete join map" is the k = J_D instance.
 *Gloss:* "confidence" in conversation always means derived edge/usage weights — never a probability the model invented. Closeness is relative geometry, not a likelihood.
 *Origin:* ADRs 0032 (threshold is a volume control), 0046 (ranking presents, never prunes)
 *Grounds in the framework:* axm:B2, axm:B3 — boundary honesty + bounded quantified claims.
-*Checks:* `tests/orchestrator/test_core.py`, `tests/orchestrator/test_caption_gate.py`
-**Status: ENFORCED** — (plan surface) — the STAMPED HEADLINE is rendered by code from typed metadata (E6 amendment 2026-08-20, stamp don't audit); the caption LINT is retained as defense-in-depth, MEASURED not tested; stated residue: the superseded agent-loop surface (ADR 0035) is unstamped pending its demolition
+*Checks:* (none declared) — enforcement retired with era 1 (Brief_Retirement 2026-09-19, "B, reconcile it"); the dead pins are recorded in retired_checks
+**Status: RETIRED** — (plan surface) — the STAMPED HEADLINE is rendered by code from typed metadata (E6 amendment 2026-08-20, stamp don't audit); the caption LINT is retained as defense-in-depth, MEASURED not tested; stated residue: the superseded agent-loop surface (ADR 0035) is unstamped pending its demolition
 
 
 ---
@@ -465,8 +462,8 @@ layer being "the vendor's complete join map" is the k = J_D instance.
 *Gloss:* the translator renders typed tree facts (never raw SQL) into prose; a blind verifier reconstructs a tree from the prose alone; a deterministic judge compares canonicalized trees; exhausted retries degrade to the stilted-but-true template. The blindness clauses are **information-flow constraints**: the SQL is not merely ignored — it is unreachable from the function's inputs (enforced at the signature, the noninterference trick).
 *Origin:* ADR 0044 clauses 2-6
 *Grounds in the framework:* axm:J4 — the round trip is the description's oracle.
-*Checks:* `tests/test_tree_contract.py`
-**Status: ENFORCED** — as the MEASUREMENT INSTRUMENT — ADR 0074 call 1 re-scoped the round trip out of the production path (acceptance there = gate + skeleton floor); it grades gate output on corpus runs
+*Checks:* (none declared) — enforcement retired with era 1 (Brief_Retirement 2026-09-19, "B, reconcile it"); the dead pins are recorded in retired_checks
+**Status: RETIRED** — ENFORCED as the MEASUREMENT INSTRUMENT — ADR 0074 call 1 re-scoped the round trip out of the production path (acceptance there = gate + skeleton floor); it grades gate output on corpus runs
 
 
 ---
@@ -487,8 +484,8 @@ plus per-capability sanctioned primitives `prims(c)`. Proposed home:
 
 *Gloss:* the registry itself is the proof — a second row claiming an owned capability is a registry validation error, caught before any code review.
 *Grounds in the framework:* axm:D2 — one owner per capability, mechanized.
-*Checks:* `tests/test_capability_registry.py`
-**Status: ENFORCED** — `src/capability_registry.py` (unique keys, one owner prefix per row) + `tests/test_capability_registry.py`.
+*Checks:* (none declared) — enforcement retired with era 1 (Brief_Retirement 2026-09-19, "B, reconcile it"); the dead pins are recorded in retired_checks
+**Status: RETIRED** — `src/capability_registry.py` (unique keys, one owner prefix per row) + `tests/test_capability_registry.py`.
 
 **G2 — sanctioned powers only (import-graph inclusion).**
 
@@ -497,7 +494,7 @@ plus per-capability sanctioned primitives `prims(c)`. Proposed home:
 
 *Gloss:* `Uses` = every (module, powerful-primitive) pair actually present in the code, computed from the AST. `S` = the sanctioned pairs. The check is set difference = empty. Powerful primitives: regex, SQL/M parsers, LLM clients, embedding calls, Delta writes.
 *Grounds in the framework:* axm:D2 — one owner per capability, mechanized.
-*Checks:* `tests/test_capability_registry.py`, `tests/test_native_parser_law.py`, `tests/test_notebook_contract.py`
+*Checks:* `tests/test_native_parser_law.py`
 **Status: ENFORCED** — the general registry + whole-`src/` inclusion check shipped at adoption: `test_capability_registry.py::test_g2_sanctioned_powers_only` computes Uses from the AST and asserts `Uses ∖ S = ∅` for pythonnet/clr/requests/httpx (+ the absolute sqlglot/sqlparse ban, which no row may ever sanction).
 
 **G3 — no undeclared power.**
@@ -506,8 +503,8 @@ plus per-capability sanctioned primitives `prims(c)`. Proposed home:
 
 *Gloss:* every use of a dangerous primitive maps back to a declared capability — nothing powerful is used "off the books."
 *Grounds in the framework:* axm:D2 — one owner per capability, mechanized.
-*Checks:* `tests/test_capability_registry.py`
-**Status: ENFORCED** — same inclusion check (an unowned use fails with the registry named) + `test_g3_banned_parsers_have_no_owner`. *Honest residue:* G-group catches the high-risk primitive classes. Two innocent pure-Python functions independently reimplementing the same logic (a second fold, a second hash) are not mechanically detectable — mitigated by owning primitive operations in single modules and by review. Stated so nobody mistakes the fence for a force field. ---
+*Checks:* (none declared) — enforcement retired with era 1 (Brief_Retirement 2026-09-19, "B, reconcile it"); the dead pins are recorded in retired_checks
+**Status: RETIRED** — same inclusion check (an unowned use fails with the registry named) + `test_g3_banned_parsers_have_no_owner`. *Honest residue:* G-group catches the high-risk primitive classes. Two innocent pure-Python functions independently reimplementing the same logic (a second fold, a second hash) are not mechanically detectable — mitigated by owning primitive operations in single modules and by review. Stated so nobody mistakes the fence for a force field. ---
 
 **G4 — checks are claims: fire and cover.**
 
@@ -518,7 +515,7 @@ plus per-capability sanctioned primitives `prims(c)`. Proposed home:
 *Gloss:* red-first proves a check CAN fire; only an enumerated, deny-by-default frontier proves it COVERS. The injected-violation proof is the mechanical second mind; the ancestry line makes prior art a recorded act.
 *Origin:* ADR 0075 — the sloppy-ban incident: GATE-REGEX-1 v1 checked one hand-picked function by substring, red-first and still wrong
 *Grounds in the framework:* axm:J3, axm:J1 — coverage matches type; correctness of checks is founder-defined too.
-*Checks:* `tests/test_check_contract.py`, `tests/test_skeleton_composer.py`, `tests/test_op_frontier.py`
+*Checks:* `tests/test_check_contract.py`
 **Status: ENFORCED** — by citation for standing instances (G2 inclusion, 0042 planks, 0044 strict-xfail, TestRegexFrontier) + the scanner meta-test; the design protocol (INDEX step 4) carries it forward for new checks
 
 **G5 — structure carried, never lowered.**
@@ -531,8 +528,8 @@ plus per-capability sanctioned primitives `prims(c)`. Proposed home:
 *Gloss:* G2's law extended from the entry point to the whole path: token bags are text-shaped data, and lowering structure to them before its point of use recreates the regex era downstream of a compliant parser. Recursion handles depth; no shape or combination is ever enumerated. Kinds outside the rule table die counted (closed outcomes at every grain the parser provides).
 *Origin:* ADR 0076 — Sunny's first-principles ruling after the depth-1 cliff: three shape-by-shape beats (LIKE ops, aggregates, DATEDIFF) on one generator, ended by compositional interpretation (capture once, interpret by grammar)
 *Grounds in the framework:* axm:D2 — the same parent as G2 — both are the founder's sanctioned-powers doctrine applied to representation: meaning lives in structure, and discarding structure is an unsanctioned lowering.
-*Checks:* `tests/test_skeleton_composer.py`, `tests/test_op_frontier.py` — the kind-frontier totality (RENDERED ⊎ UNRENDERED == EXPR_KINDS) and the compositional-renderer corpses; the op frontier is the layer-1 instance of the same form
-**Status: ENFORCED**
+*Checks:* (none declared) — the kind-frontier totality (RENDERED ⊎ UNRENDERED == EXPR_KINDS) and the compositional-renderer corpses; the op frontier is the layer-1 instance of the same form
+**Status: RETIRED**
 
 
 *Honest residue:* G-group catches the high-risk primitive classes. Two
@@ -552,8 +549,8 @@ mistakes the fence for a force field.
 *Gloss:* everything the pipeline cannot resolve is either recovered by the pipeline or lands on a human's checklist — counted is not the same as owned.
 *Origin:* ADR 0045
 *Grounds in the framework:* axm:R3 — novelty escalates.
-*Checks:* `tests/test_escalation_contract.py`
-**Status: GATED** — strict-xfail skeletons, 4 clauses (status shared with H2)
+*Checks:* (none declared) — enforcement retired with era 1 (Brief_Retirement 2026-09-19, "B, reconcile it"); the dead pins are recorded in retired_checks
+**Status: RETIRED** — strict-xfail skeletons, 4 clauses (status shared with H2)
 
 **H2 — novelty always escalates.**
 
@@ -562,8 +559,8 @@ mistakes the fence for a force field.
 *Gloss:* everything the pipeline cannot resolve is either recovered by the pipeline or lands on a human's checklist — counted is not the same as owned.
 *Origin:* ADR 0045.
 *Grounds in the framework:* axm:R3 — novelty escalates.
-*Checks:* `tests/test_escalation_contract.py`
-**Status: GATED**
+*Checks:* (none declared) — enforcement retired with era 1 (Brief_Retirement 2026-09-19, "B, reconcile it"); the dead pins are recorded in retired_checks
+**Status: RETIRED**
 
 
 ---
@@ -599,8 +596,8 @@ The law is instantiated **three times**, at three grains, with three judges:
     diff (κ-equality)
 
 *Grounds in the framework:* axm:J4 — descriptions - blind verifier + kappa-diff.
-*Checks:* `tests/test_tree_contract.py`
-**Status: ENFORCED** — as the measurement instrument (ADR 0074 call 1); the production judge for descriptions is the grounding gate + skeleton floor. This is spec:F as a family member
+*Checks:* (none declared) — enforcement retired with era 1 (Brief_Retirement 2026-09-19, "B, reconcile it"); the dead pins are recorded in retired_checks
+**Status: RETIRED** — ENFORCED as the measurement instrument (ADR 0074 call 1); the production judge for descriptions is the grounding gate + skeleton floor. This is spec:F as a family member
 
 **T2 — SQL stitching.**
 
@@ -608,8 +605,8 @@ The law is instantiated **three times**, at three grains, with three judges:
     ScriptDom; judge=tree equality (the parser)
 
 *Grounds in the framework:* axm:J4, axm:B1 — SQL stitching - parseability round-trips; kappa-diff is the stated gap.
-*Checks:* `tests/test_run_layer.py` — parseability round-trips; the kappa-equality diff is the stated gap, live when stitching ships
-**Status: PARTIAL** — `src/run_layer.py::check_single_select` parses every executed statement through ScriptDom, so PARSEABILITY round- trips and a malformed compile fails closed. Stated gap: no κ-equality diff between the compiled tree and the source tree; the parser confirms the SQL is well-formed, not that it means the same thing
+*Checks:* (none declared) — parseability round-trips; the kappa-equality diff is the stated gap, live when stitching ships — enforcement retired with era 1 (Brief_Retirement 2026-09-19)
+**Status: RETIRED** — PARTIAL — `src/run_layer.py::check_single_select` parses every executed statement through ScriptDom, so PARSEABILITY round- trips and a malformed compile fails closed. Stated gap: no κ-equality diff between the compiled tree and the source tree; the parser confirms the SQL is well-formed, not that it means the same thing
 
 **T3 — Definition creation.**
 
@@ -714,8 +711,8 @@ The six principles of the merged turn engine, each bound to a check
     planner/judge/captioner minds
 
 *Grounds in the framework:* axm:M2 — one mind, full evidence.
-*Checks:* `tests/orchestrator/test_turn_engine.py`
-**Status: ENFORCED**
+*Checks:* (none declared) — enforcement retired with era 1 (Brief_Retirement 2026-09-19, "B, reconcile it"); the dead pins are recorded in retired_checks
+**Status: RETIRED** — ENFORCED
 
 **P2 — full tool results enter the SAME history and persist across .**
 
@@ -724,8 +721,8 @@ The six principles of the merged turn engine, each bound to a check
     + totals, never drops
 
 *Grounds in the framework:* axm:M2 — one mind, full evidence.
-*Checks:* `tests/orchestrator/test_turn_engine.py`
-**Status: ENFORCED**
+*Checks:* (none declared) — enforcement retired with era 1 (Brief_Retirement 2026-09-19, "B, reconcile it"); the dead pins are recorded in retired_checks
+**Status: RETIRED** — ENFORCED
 
 **P3 — thinking room — no forced tool_choice except the final typed.**
 
@@ -733,8 +730,8 @@ The six principles of the merged turn engine, each bound to a check
     verdict
 
 *Grounds in the framework:* axm:M3 — thinking room.
-*Checks:* `tests/orchestrator/test_turn_engine.py`
-**Status: ENFORCED**
+*Checks:* (none declared) — enforcement retired with era 1 (Brief_Retirement 2026-09-19, "B, reconcile it"); the dead pins are recorded in retired_checks
+**Status: RETIRED** — ENFORCED
 
 **P4 — no question-family casebook anywhere — invariants + tool sem.**
 
@@ -742,8 +739,8 @@ The six principles of the merged turn engine, each bound to a check
     semantics only
 
 *Grounds in the framework:* axm:M4 — no question-shaped control flow.
-*Checks:* `tests/orchestrator/test_turn_engine.py`, `tests/test_methodology.py`
-**Status: ENFORCED**
+*Checks:* (none declared) — enforcement retired with era 1 (Brief_Retirement 2026-09-19, "B, reconcile it"); the dead pins are recorded in retired_checks
+**Status: RETIRED** — ENFORCED
 
 **P5 — honesty at the boundary only.**
 
@@ -752,8 +749,8 @@ The six principles of the merged turn engine, each bound to a check
     confirm, caps as code
 
 *Grounds in the framework:* axm:B2 — honesty at the boundary, never the interior.
-*Checks:* `tests/orchestrator/test_turn_engine.py`
-**Status: ENFORCED**
+*Checks:* (none declared) — enforcement retired with era 1 (Brief_Retirement 2026-09-19, "B, reconcile it"); the dead pins are recorded in retired_checks
+**Status: RETIRED** — ENFORCED
 
 **P6 — failure is observation.**
 
@@ -761,8 +758,8 @@ The six principles of the merged turn engine, each bound to a check
     conversation; caps bound flailing
 
 *Grounds in the framework:* axm:M1 — failure as observation = loop-shape capability.
-*Checks:* `tests/orchestrator/test_turn_engine.py`
-**Status: ENFORCED**
+*Checks:* (none declared) — enforcement retired with era 1 (Brief_Retirement 2026-09-19, "B, reconcile it"); the dead pins are recorded in retired_checks
+**Status: RETIRED** — ENFORCED
 
 
 **Interior vs boundary (the E-group note, restated):** which tool,
@@ -800,8 +797,8 @@ now the permanent CI baseline.
     govmeta:sweep receipt)
 
 *Grounds in the framework:* axm:D1 — accounted connectivity -> nothing unreachable.
-*Checks:* `tests/graph/test_topology.py`
-**Status: ENFORCED**
+*Checks:* (none declared) — enforcement retired with era 1 (Brief_Retirement 2026-09-19, "B, reconcile it"); the dead pins are recorded in retired_checks
+**Status: RETIRED** — ENFORCED
 
 **Q2 — edge soundness.**
 
@@ -810,8 +807,8 @@ now the permanent CI baseline.
     edge type (EDGE_PROVENANCE, 0052-pattern totality)
 
 *Grounds in the framework:* axm:B1 — every edge provenance-mapped.
-*Checks:* `tests/graph/test_topology.py`
-**Status: ENFORCED**
+*Checks:* (none declared) — enforcement retired with era 1 (Brief_Retirement 2026-09-19, "B, reconcile it"); the dead pins are recorded in retired_checks
+**Status: RETIRED** — ENFORCED
 
 **Q3 — relative completeness.**
 
@@ -854,8 +851,8 @@ things thinking may land on.
     be confirmed.
 
 *Grounds in the framework:* axm:M4, axm:M5 — parse-never-generate: free composition + typing.
-*Checks:* `tests/orchestrator/test_parse_plan.py`
-**Status: ENFORCED** — (prototype + measured gate: PARSE_EXPERIMENT, 7/7 oracles vs 5/7)
+*Checks:* (none declared) — enforcement retired with era 1 (Brief_Retirement 2026-09-19, "B, reconcile it"); the dead pins are recorded in retired_checks
+**Status: RETIRED** — ENFORCED (prototype + measured gate: PARSE_EXPERIMENT, 7/7 oracles vs 5/7)
 
 **R2 — No question types.**
 
@@ -865,8 +862,8 @@ things thinking may land on.
     P4 casebook ban generalized from prompts to structure.)
 
 *Grounds in the framework:* axm:M4 — no question types.
-*Checks:* `tests/test_methodology.py`
-**Status: ENFORCED** — for the control path
+*Checks:* (none declared) — enforcement retired with era 1 (Brief_Retirement 2026-09-19, "B, reconcile it"); the dead pins are recorded in retired_checks
+**Status: RETIRED** — ENFORCED for the control path
 
 **R3 — Interpretation confirms before it executes.**
 
@@ -877,8 +874,8 @@ things thinking may land on.
     1, RULED: confirm every parse).
 
 *Grounds in the framework:* axm:B4 — irreversible acts confirm - applied to interpretation.
-*Checks:* `tests/webapp/test_app.py`
-**Status: ENFORCED**
+*Checks:* (none declared) — enforcement retired with era 1 (Brief_Retirement 2026-09-19, "B, reconcile it"); the dead pins are recorded in retired_checks
+**Status: RETIRED** — ENFORCED
 
 **R4 — No dead ends.**
 
@@ -888,8 +885,8 @@ things thinking may land on.
     escalation door stands at every round.
 
 *Grounds in the framework:* axm:R3 — no dead ends -> novelty escalates.
-*Checks:* `tests/webapp/test_app.py`
-**Status: ENFORCED**
+*Checks:* (none declared) — enforcement retired with era 1 (Brief_Retirement 2026-09-19, "B, reconcile it"); the dead pins are recorded in retired_checks
+**Status: RETIRED** — ENFORCED
 
 **R5 — Certain answers.**
 
@@ -925,8 +922,8 @@ answers it; the model never touches a patient.*
     sets.
 
 *Grounds in the framework:* axm:B2 — rows never enter model context.
-*Checks:* `tests/test_run_layer.py`
-**Status: ENFORCED**
+*Checks:* (none declared) — enforcement retired with era 1 (Brief_Retirement 2026-09-19, "B, reconcile it"); the dead pins are recorded in retired_checks
+**Status: RETIRED** — ENFORCED
 
 **R7 — Nothing is generated; the confirmed SQL is what runs.**
 
@@ -938,8 +935,8 @@ answers it; the model never touches a patient.*
     typed refusal.
 
 *Grounds in the framework:* axm:B4 — confirmed-only execution.
-*Checks:* `tests/test_run_layer.py`
-**Status: ENFORCED**
+*Checks:* (none declared) — enforcement retired with era 1 (Brief_Retirement 2026-09-19, "B, reconcile it"); the dead pins are recorded in retired_checks
+**Status: RETIRED** — ENFORCED
 
 **R8 — Sampling is machine-labelled.**
 
@@ -950,8 +947,8 @@ answers it; the model never touches a patient.*
     applied to data).
 
 *Grounds in the framework:* axm:B3 — machine-labelled sampling.
-*Checks:* `tests/test_run_layer.py`
-**Status: ENFORCED**
+*Checks:* (none declared) — enforcement retired with era 1 (Brief_Retirement 2026-09-19, "B, reconcile it"); the dead pins are recorded in retired_checks
+**Status: RETIRED** — ENFORCED
 
 
 **Stated gap (listing-blocking, recorded in ADR 0061 §3):** slice 1
@@ -999,8 +996,8 @@ left.
 *Gloss:* §3b's third question, promoted from a review ritual to an axiom: when reality diverges from a declaration, something MECHANICAL fires — a red build, a checklist row, a funnel bar. "Someone would notice" is the definition of a missing feedback loop.
 *Origin:* ADR 0064, closing axm:R2
 *Grounds in the framework:* axm:R2 — every declaration has a firing mechanism.
-*Checks:* `tests/test_spec_gates.py` — ENFORCED by citation (0059 Q3 precedent): the registry closure checks, funnel, reachability
-**Status: ENFORCED** — (by citation — the 0059 Q3 precedent): the seven registry closure checks, the funnel, and reachability ARE the firing mechanisms; stated gap: a NEW declaration acquires its mechanism by review (section 3b), not yet by a mechanical check that one exists
+*Checks:* (none declared) — ENFORCED by citation (0059 Q3 precedent): the registry closure checks, funnel, reachability
+**Status: RETIRED** — (by citation — the 0059 Q3 precedent): the seven registry closure checks, the funnel, and reachability ARE the firing mechanisms; stated gap: a NEW declaration acquires its mechanism by review (section 3b), not yet by a mechanical check that one exists
 
 
 ## 14i. Group W — the twin graph (v0.9, ADR 0077; ratified 2026-09-06)

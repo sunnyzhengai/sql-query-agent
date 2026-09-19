@@ -61,16 +61,20 @@ def test_banned_parsers_are_not_declared_dependencies():
 
 def test_the_native_loader_is_the_single_parse_door():
     """Every module that parses SQL text goes through scriptdom_loader
-    — one initialization home, one parser class, one law."""
-    loader = (REPO / "src" / "parser" / "scriptdom_loader.py").read_text()
+    — one initialization home, one parser class, one law. Re-based to
+    the era-2 door (Brief_Retirement, 2026-09-19: src/parser retired;
+    the engine's loader is aivia/graph/kg2_mapper/scriptdom_loader.py)."""
+    loader = (REPO / "aivia" / "graph" / "kg2_mapper"
+              / "scriptdom_loader.py").read_text()
     assert "TSql160Parser" in loader
     offenders = []
-    for py in (REPO / "src").rglob("*.py"):
-        if py.name in ("scriptdom_loader.py",) or "__pycache__" in str(py):
-            continue
-        text = py.read_text(errors="replace")
-        if "TSql160Parser(" in text:  # instantiation, not docstring mention
-            offenders.append(str(py.relative_to(REPO)))
+    for root in (REPO / "aivia", REPO / "src"):
+        for py in root.rglob("*.py"):
+            if py.name == "scriptdom_loader.py" or "__pycache__" in str(py):
+                continue
+            text = py.read_text(errors="replace")
+            if "TSql160Parser(" in text:  # instantiation, not mention
+                offenders.append(str(py.relative_to(REPO)))
     assert not offenders, (
         f"{offenders} instantiate the parser outside scriptdom_loader"
     )

@@ -1,9 +1,0 @@
-CREATE TABLE [dbo].[DM_REGISTRY] (
-    [REGISTRY_ID]   INT  NULL,
-    [PATIENT_ID]    INT  NULL,
-    [ENROLLED_DATE] DATE NULL
-);
-
-
-GO
-

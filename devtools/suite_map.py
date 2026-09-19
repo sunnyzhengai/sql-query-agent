@@ -26,34 +26,28 @@ from pathlib import Path
 
 # standing laws with mechanical teeth, slug -> what holding means
 KNOWN_LAWS = {
-    "live-probe": "no ops/tools surface ships without the smoke "
-                  "harness passing against the live store (P0.4)",
-    "walk-finds": "corpses from Sunny's live walks are mechanized "
-                  "same-session (Echo Law)",
+    # "live-probe", "boundary-echo", "walk-finds" and
+    # "round4-scorecard" retired with their era-1 surfaces and tests
+    # (Brief_Retirement, 2026-09-19, "B, reconcile it")
     "brand-separation": "the product name is a seam; the core stays "
                         "brand-neutral",
     "endpoint-hygiene": "no tenant endpoint ever lives in this repo",
-    "honesty-floor": "honesty 1.00 is a build-stopper, never a metric",
+    # "honesty-floor" retired with the era-1 eval harness
+    # (Brief_Retirement, 2026-09-19) — the principle stands in the
+    # design law; its mechanical seat returns with the era-2 evals
 }
 
 # executable contracts that are not ADR-born, slug -> what it pins
 KNOWN_CONTRACTS = {
     "toolchain": "every third-party dependency is declared and "
                  "pinned (Sunny's ruling, 2026-08-19)",
-    "suite-integrity": "answer_evals grades describe the engine or "
-                       "the run aborts (INFRA-SKIP contract)",
+    # "suite-integrity" (answer_evals INFRA-SKIP) and "web-surface"
+    # retired with their era-1 surfaces (Brief_Retirement, 2026-09-19)
     "suite-legibility": "the suite explains itself to Sunny — the "
                         "proof ledger and the run transcript "
                         "(morning orders, 2026-08-27)",
     "org-config": "org_config referential integrity, LOCAL and "
                   "TENANT copies together",
-    "round4-scorecard": "the Round-4 record's fact accounting and "
-                        "mitigation verifiers",
-    "boundary-echo": "every tenant-crossing devtool op pairs with an "
-                     "observable postcondition — an acknowledgment "
-                     "is a claim; only the postcondition is a fact "
-                     "(ordered 2026-08-27)",
-    "web-surface": "the served page works AS SERVED",
     "aivia-design-to-code": "aivia code and tests consume the ratified "
                             "registries and fixture answer keys, never "
                             "the doc's prose (Design-to-Code protocol, "

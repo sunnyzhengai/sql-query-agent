@@ -1,6 +1,0 @@
-dependencies:
-  - pip:
-      - azure-identity==1.25.3
-      - pydantic==2.5.0
-      - pyyaml==6.0.1
-      - pythonnet==3.0.1

@@ -40,34 +40,29 @@ def test_dist_ships_exactly_the_pyproject_wheel():
     )
 
 
-def test_frozen_era1_environment_item_is_untouched():
-    """The freeze pin: sql-logic-env keeps exactly its last era-1
-    wheel until the Retirement Brief rules its removal. If this
-    fires because the folder is GONE, the freeze ended by ruling —
-    retire this whole module's ENV_LIBS half in the same act."""
-    wheels = [w.name for w in ENV_LIBS.glob("sql_query_agent-*.whl")]
-    assert wheels == ["sql_query_agent-1.83.0-py3-none-any.whl"], (
-        f"the frozen era-1 Environment item changed: {wheels} — "
-        f"nothing lands there anymore (The Retirement Law, 2026-09-19)."
+def test_era1_environment_item_stays_retired():
+    """Brief_Retirement (RT1 ruled: no workspace git-syncs this
+    repo): the era-1 sql-logic-env item LEFT the tree — the freeze
+    ended by ruling, exactly as the freeze pin's epitaph said. This
+    pin keeps it retired: nothing may recreate the folder."""
+    assert not ENV_LIBS.parent.parent.exists(), (
+        "sql-logic-env.Environment reappeared — it was retired by "
+        "Brief_Retirement (2026-09-19); the wheel in dist/ is the "
+        "only carrier."
     )
 
 
-def test_requirements_match_environment_item_libraries():
-    """Two lists, one truth (2026-08-17 drift find): a customer building
-    from environment/requirements.txt must get the same packages as the
-    git-synced sql-logic-env item's environment.yml."""
-    import re as _re
+def test_devtools_can_never_ship():
+    """Moved here from tests/test_build_deployment_package.py when
+    that module retired with its era-1 subject (Brief_Retirement).
+    The living law: the wheel packages the aivia engine
+    (Brief_Fabric_Resident FR6); devtools stays out of the config."""
+    pyproject = (REPO / "pyproject.toml").read_text()
+    assert 'include = ["aivia", "aivia.*"]' in pyproject
+    assert "devtools" not in pyproject
 
-    yml = (REPO / "sql-logic-env.Environment" / "Libraries" /
-           "PublicLibraries" / "environment.yml").read_text()
-    yml_pins = set(_re.findall(r"-\s*([\w\-]+==[\w\.]+)", yml))
-    req_pins = {
-        line.strip() for line in
-        (REPO / "environment" / "requirements.txt").read_text().splitlines()
-        if line.strip() and not line.startswith("#")
-    }
-    assert yml_pins == req_pins, (
-        f"environment.yml vs requirements.txt drift:\n"
-        f"  only in yml: {sorted(yml_pins - req_pins)}\n"
-        f"  only in requirements: {sorted(req_pins - yml_pins)}"
-    )
+
+# test_requirements_match_environment_item_libraries retired with
+# its subject (Brief_Retirement, 2026-09-19): the era-1 Environment
+# item's environment.yml left the tree; environment/requirements.txt
+# stays as CI's constraint file until the CI-trim slice re-rules it.

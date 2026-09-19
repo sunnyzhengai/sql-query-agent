@@ -26,7 +26,11 @@ Closure checks: tests/test_spec_registry.py.
 from __future__ import annotations
 
 # JUDGED = the human is the judge by construction (L3 stratum, T3).
-STATUSES = ("ENFORCED", "PARTIAL", "GATED", "JUDGED")
+STATUSES = ("ENFORCED", "PARTIAL", "GATED", "JUDGED", "RETIRED")
+# RETIRED (Brief_Retirement 2026-09-19, Sunny: "B, reconcile it"):
+# every check enforcing the axiom retired with era 1; the axiom's
+# law stands as design record, its dead checks kept in
+# retired_checks. Re-enforcement is a future brief's act.
 
 GROUPS = {'A': 'Identity',
           'B': 'Soundness',
@@ -158,8 +162,13 @@ SPEC_REGISTRY = {
         "parents": ['D2'],
         "parent_note":
             'one folding rule, one definition',
-        "checks": ['tests/parser/test_identity.py'],
-        "status": 'ENFORCED',
+        'checks': [],
+        'retired_checks': ['tests/parser/test_identity.py'],
+        'checks_note':
+            'enforcement retired with era 1 (Brief_Retirement '
+            '2026-09-19, "B, reconcile it"); the dead pins are '
+            'recorded in retired_checks',
+        'status': 'RETIRED',
     },
     "A2": {
         "title": 'metric_id is a key',
@@ -174,7 +183,8 @@ SPEC_REGISTRY = {
         "parents": ['D3'],
         "parent_note":
             'identity -> exactly one owner per metric',
-        "checks": ['tests/test_invariants.py', 'tests/test_table_contracts.py'],
+        'checks': ['tests/test_table_contracts.py'],
+        'retired_checks': ['tests/test_invariants.py'],
         "status": 'ENFORCED',
     },
     "A3": {
@@ -191,8 +201,13 @@ SPEC_REGISTRY = {
         "parents": ['D2'],
         "parent_note":
             'one folding rule, one definition',
-        "checks": ['tests/test_invariants.py'],
-        "status": 'ENFORCED',
+        'checks': [],
+        'retired_checks': ['tests/test_invariants.py'],
+        'checks_note':
+            'enforcement retired with era 1 (Brief_Retirement '
+            '2026-09-19, "B, reconcile it"); the dead pins are '
+            'recorded in retired_checks',
+        'status': 'RETIRED',
     },
     "B1": {
         "title": 'witness totality (the anti-fabrication axiom)',
@@ -209,11 +224,12 @@ SPEC_REGISTRY = {
         "parents": ['B1'],
         "parent_note":
             "witness totality IS 'no claim without a witness'",
-        "checks": ['tests/test_invariants.py', 'tests/test_tree_contract.py'],
+        'checks': [],
+        'retired_checks': ['tests/test_invariants.py', 'tests/test_tree_contract.py'],
         "checks_note":
             'PARTIAL by construction in builders; not yet a uniform '
             'declared invariant on every edge table',
-        "status": 'PARTIAL',
+        'status': 'RETIRED',
         "status_note":
             'holds by construction for edges built in 03; not yet a uniform '
             'declared invariant on every edge table. Debt: every edge-table '
@@ -234,8 +250,9 @@ SPEC_REGISTRY = {
         "parents": ['B1', 'J4'],
         "parent_note":
             'provenance closed -> every description judged',
-        "checks": ['tests/test_tree_contract.py'],
-        "status": 'PARTIAL',
+        'checks': [],
+        'retired_checks': ['tests/test_tree_contract.py'],
+        'status': 'RETIRED',
         "status_note":
             'stated gap: provenance PERSISTENCE on stored '
             'descriptions lands with the ADR 0074 D1 build (the '
@@ -264,8 +281,9 @@ SPEC_REGISTRY = {
         "parents": ['D1'],
         "parent_note":
             'the enumerated frontier -> nothing unreachable',
-        "checks": ['tests/test_extraction_registry.py'],
-        "status": 'ENFORCED',
+        'checks': [],
+        'retired_checks': ['tests/test_extraction_registry.py'],
+        'status': 'RETIRED',
         "status_note":
             '`src/extraction_registry.py` + '
             '`tests/test_extraction_registry.py` (functor XOR exclusion per '
@@ -286,8 +304,9 @@ SPEC_REGISTRY = {
         "parents": ['R1'],
         "parent_note":
             'handled + fallout = total (conservation)',
-        "checks": ['tests/test_tree_contract.py', 'tests/mquery/test_mquery.py'],
-        "status": 'PARTIAL',
+        'checks': [],
+        'retired_checks': ['tests/test_tree_contract.py', 'tests/mquery/test_mquery.py'],
+        'status': 'RETIRED',
         "status_note":
             "enforced for trees and M shapes; C1's registry (now ENFORCED) "
             'carries a conservation citation per row and the citations are '
@@ -304,8 +323,13 @@ SPEC_REGISTRY = {
         "parents": ['R1'],
         "parent_note":
             'handled + fallout = total (conservation)',
-        "checks": ['tests/test_invariants.py'],
-        "status": 'PARTIAL',
+        'checks': [],
+        'retired_checks': ['tests/test_invariants.py'],
+        'checks_note':
+            'enforcement retired with era 1 (Brief_Retirement '
+            '2026-09-19, "B, reconcile it"); the dead pins are '
+            'recorded in retired_checks',
+        'status': 'RETIRED',
         "status_note":
             '(same universality note as C2).',
     },
@@ -330,8 +354,13 @@ SPEC_REGISTRY = {
         "parents": ['R1', 'D1'],
         "parent_note":
             'leaf grounding: termination + reachability',
-        "checks": ['tests/governance/test_leaf_grounding.py'],
-        "status": 'ENFORCED',
+        'checks': [],
+        'retired_checks': ['tests/governance/test_leaf_grounding.py'],
+        'checks_note':
+            'enforcement retired with era 1 (Brief_Retirement '
+            '2026-09-19, "B, reconcile it"); the dead pins are '
+            'recorded in retired_checks',
+        'status': 'RETIRED',
         "status_note":
             '`src/governance/leaf_grounding.py` (verdict + fraction + '
             'escalated fallout, stage `500_leaf_grounding`), wired into '
@@ -357,11 +386,12 @@ SPEC_REGISTRY = {
         "parents": ['D4'],
         "parent_note":
             'closure = shape-defined derivation',
-        "checks": ['tests/test_recorded_pipeline.py'],
+        'checks': [],
+        'retired_checks': ['tests/test_recorded_pipeline.py'],
         "checks_note":
             'oracles ENFORCED; the general closure-vs-live diff is UNBOUND '
             '(ADR 0037 stated gap)',
-        "status": 'PARTIAL',
+        'status': 'RETIRED',
         "status_note":
             '(oracles ENFORCED; general diff UNBOUND).',
     },
@@ -379,8 +409,13 @@ SPEC_REGISTRY = {
         "parents": ['J1'],
         "parent_note":
             'count oracles = founder-defined correctness',
-        "checks": ['tests/test_recorded_pipeline.py'],
-        "status": 'ENFORCED',
+        'checks': [],
+        'retired_checks': ['tests/test_recorded_pipeline.py'],
+        'checks_note':
+            'enforcement retired with era 1 (Brief_Retirement '
+            '2026-09-19, "B, reconcile it"); the dead pins are '
+            'recorded in retired_checks',
+        'status': 'RETIRED',
     },
     "D3": {
         "title": 'projections are functions of the record',
@@ -428,8 +463,13 @@ SPEC_REGISTRY = {
         "parents": ['S3'],
         "parent_note":
             'the path space is data-shaped, hence enumerable',
-        "checks": ['tests/test_spec_gates.py'],
-        "status": 'PARTIAL',
+        'checks': [],
+        'retired_checks': ['tests/test_spec_gates.py'],
+        'checks_note':
+            'enforcement retired with era 1 (Brief_Retirement '
+            '2026-09-19, "B, reconcile it"); the dead pins are '
+            'recorded in retired_checks',
+        'status': 'RETIRED',
         "status_note":
             'the deterministic primitive is ENFORCED '
             '(`src/discovery/paths.py` + `tests/test_spec_gates.py`, '
@@ -453,8 +493,13 @@ SPEC_REGISTRY = {
         "parents": ['J2'],
         "parent_note":
             'replay determinism = the computable type',
-        "checks": ['tests/orchestrator/test_core.py'],
-        "status": 'PARTIAL',
+        'checks': [],
+        'retired_checks': ['tests/orchestrator/test_core.py'],
+        'checks_note':
+            'enforcement retired with era 1 (Brief_Retirement '
+            '2026-09-19, "B, reconcile it"); the dead pins are '
+            'recorded in retired_checks',
+        'status': 'RETIRED',
     },
     "E3": {
         "title": 'the decision typing rule (which decider is legal where)',
@@ -472,8 +517,13 @@ SPEC_REGISTRY = {
         "parents": ['M5', 'J2'],
         "parent_note":
             'the decision-typing rule, verbatim',
-        "checks": ['tests/test_methodology.py'],
-        "status": 'ENFORCED',
+        'checks': [],
+        'retired_checks': ['tests/test_methodology.py'],
+        'checks_note':
+            'enforcement retired with era 1 (Brief_Retirement '
+            '2026-09-19, "B, reconcile it"); the dead pins are '
+            'recorded in retired_checks',
+        'status': 'RETIRED',
         "status_note":
             'for the control path; each new component declares its decider '
             'kind at review.',
@@ -518,8 +568,13 @@ SPEC_REGISTRY = {
         "parents": ['B1'],
         "parent_note":
             'filter values need witnesses',
-        "checks": ['tests/test_spec_gates.py'],
-        "status": 'PARTIAL',
+        'checks': [],
+        'retired_checks': ['tests/test_spec_gates.py'],
+        'checks_note':
+            'enforcement retired with era 1 (Brief_Retirement '
+            '2026-09-19, "B, reconcile it"); the dead pins are '
+            'recorded in retired_checks',
+        'status': 'RETIRED',
         "status_note":
             'the deterministic primitive is ENFORCED '
             '(`src/discovery/grounding.py`, 1.33.0: refuse-over-guess on '
@@ -543,8 +598,13 @@ SPEC_REGISTRY = {
         "parents": ['B2', 'B3'],
         "parent_note":
             'boundary honesty + bounded quantified claims',
-        "checks": ['tests/orchestrator/test_core.py', 'tests/orchestrator/test_caption_gate.py'],
-        "status": 'ENFORCED',
+        'checks': [],
+        'retired_checks': ['tests/orchestrator/test_core.py', 'tests/orchestrator/test_caption_gate.py'],
+        'checks_note':
+            'enforcement retired with era 1 (Brief_Retirement '
+            '2026-09-19, "B, reconcile it"); the dead pins are '
+            'recorded in retired_checks',
+        'status': 'RETIRED',
         "status_note":
             '(plan surface) — the STAMPED HEADLINE is rendered by code from '
             "typed metadata (E6 amendment 2026-08-20, stamp don't audit); "
@@ -573,8 +633,13 @@ SPEC_REGISTRY = {
         "parents": ['J4'],
         "parent_note":
             "the round trip is the description's oracle",
-        "checks": ['tests/test_tree_contract.py'],
-        "status": 'ENFORCED',
+        'checks': [],
+        'retired_checks': ['tests/test_tree_contract.py'],
+        'checks_note':
+            'enforcement retired with era 1 (Brief_Retirement '
+            '2026-09-19, "B, reconcile it"); the dead pins are '
+            'recorded in retired_checks',
+        'status': 'RETIRED',
         "status_note":
             'ENFORCED as the MEASUREMENT INSTRUMENT — ADR 0074 '
             'call 1 re-scoped the round trip out of the production '
@@ -593,8 +658,13 @@ SPEC_REGISTRY = {
         "parents": ['D2'],
         "parent_note":
             'one owner per capability, mechanized',
-        "checks": ['tests/test_capability_registry.py'],
-        "status": 'ENFORCED',
+        'checks': [],
+        'retired_checks': ['tests/test_capability_registry.py'],
+        'checks_note':
+            'enforcement retired with era 1 (Brief_Retirement '
+            '2026-09-19, "B, reconcile it"); the dead pins are '
+            'recorded in retired_checks',
+        'status': 'RETIRED',
         "status_note":
             '`src/capability_registry.py` (unique keys, one owner prefix '
             'per row) + `tests/test_capability_registry.py`.',
@@ -613,9 +683,8 @@ SPEC_REGISTRY = {
         "parents": ['D2'],
         "parent_note":
             'one owner per capability, mechanized',
-        "checks": ['tests/test_capability_registry.py',
-                   'tests/test_native_parser_law.py',
-                   'tests/test_notebook_contract.py'],
+        'checks': ['tests/test_native_parser_law.py'],
+        'retired_checks': ['tests/test_capability_registry.py', 'tests/test_notebook_contract.py'],
         "status": 'ENFORCED',
         "status_note":
             'the general registry + whole-`src/` inclusion check shipped at '
@@ -635,8 +704,13 @@ SPEC_REGISTRY = {
         "parents": ['D2'],
         "parent_note":
             'one owner per capability, mechanized',
-        "checks": ['tests/test_capability_registry.py'],
-        "status": 'ENFORCED',
+        'checks': [],
+        'retired_checks': ['tests/test_capability_registry.py'],
+        'checks_note':
+            'enforcement retired with era 1 (Brief_Retirement '
+            '2026-09-19, "B, reconcile it"); the dead pins are '
+            'recorded in retired_checks',
+        'status': 'RETIRED',
         "status_note":
             'same inclusion check (an unowned use fails with the registry '
             'named) + `test_g3_banned_parsers_have_no_owner`.  *Honest '
@@ -666,9 +740,8 @@ SPEC_REGISTRY = {
         "parent_note":
             'coverage matches type; correctness of checks is founder-'
             'defined too',
-        "checks": ['tests/test_check_contract.py',
-                   'tests/test_skeleton_composer.py',
-                   'tests/test_op_frontier.py'],
+        'checks': ['tests/test_check_contract.py'],
+        'retired_checks': ['tests/test_skeleton_composer.py', 'tests/test_op_frontier.py'],
         "status": 'ENFORCED',
         "status_note":
             'by citation for standing instances (G2 inclusion, 0042 '
@@ -703,13 +776,13 @@ SPEC_REGISTRY = {
             'sanctioned-powers doctrine applied to representation: '
             'meaning lives in structure, and discarding structure is '
             'an unsanctioned lowering',
-        "checks": ['tests/test_skeleton_composer.py',
-                   'tests/test_op_frontier.py'],
+        'checks': [],
+        'retired_checks': ['tests/test_skeleton_composer.py', 'tests/test_op_frontier.py'],
         "checks_note":
             'the kind-frontier totality (RENDERED ⊎ UNRENDERED == '
             'EXPR_KINDS) and the compositional-renderer corpses; the '
             'op frontier is the layer-1 instance of the same form',
-        "status": 'ENFORCED',
+        'status': 'RETIRED',
     },
     "H1": {
         "title": 'fallout resolution is total and closed',
@@ -725,8 +798,13 @@ SPEC_REGISTRY = {
         "parents": ['R3'],
         "parent_note":
             'novelty escalates',
-        "checks": ['tests/test_escalation_contract.py'],
-        "status": 'GATED',
+        'checks': [],
+        'retired_checks': ['tests/test_escalation_contract.py'],
+        'checks_note':
+            'enforcement retired with era 1 (Brief_Retirement '
+            '2026-09-19, "B, reconcile it"); the dead pins are '
+            'recorded in retired_checks',
+        'status': 'RETIRED',
         "status_note":
             'strict-xfail skeletons, 4 clauses (status shared with H2)',
     },
@@ -743,8 +821,13 @@ SPEC_REGISTRY = {
         "parents": ['R3'],
         "parent_note":
             'novelty escalates',
-        "checks": ['tests/test_escalation_contract.py'],
-        "status": 'GATED',
+        'checks': [],
+        'retired_checks': ['tests/test_escalation_contract.py'],
+        'checks_note':
+            'enforcement retired with era 1 (Brief_Retirement '
+            '2026-09-19, "B, reconcile it"); the dead pins are '
+            'recorded in retired_checks',
+        'status': 'RETIRED',
     },
     "L1": {
         "title": 'append-only is declared AND obeyed',
@@ -804,11 +887,12 @@ SPEC_REGISTRY = {
         "parents": ['R2'],
         "parent_note":
             'every declaration has a firing mechanism',
-        "checks": ['tests/test_spec_gates.py'],
+        'checks': [],
+        'retired_checks': ['tests/test_spec_gates.py'],
         "checks_note":
             'ENFORCED by citation (0059 Q3 precedent): the registry closure '
             'checks, funnel, reachability',
-        "status": 'ENFORCED',
+        'status': 'RETIRED',
         "status_note":
             '(by citation — the 0059 Q3 precedent): the seven registry '
             'closure checks, the funnel, and reachability ARE the firing '
@@ -824,8 +908,13 @@ SPEC_REGISTRY = {
         "parents": ['M2'],
         "parent_note":
             'one mind, full evidence',
-        "checks": ['tests/orchestrator/test_turn_engine.py'],
-        "status": 'ENFORCED',
+        'checks': [],
+        'retired_checks': ['tests/orchestrator/test_turn_engine.py'],
+        'checks_note':
+            'enforcement retired with era 1 (Brief_Retirement '
+            '2026-09-19, "B, reconcile it"); the dead pins are '
+            'recorded in retired_checks',
+        'status': 'RETIRED',
         "status_note":
             'ENFORCED',
     },
@@ -838,8 +927,13 @@ SPEC_REGISTRY = {
         "parents": ['M2'],
         "parent_note":
             'one mind, full evidence',
-        "checks": ['tests/orchestrator/test_turn_engine.py'],
-        "status": 'ENFORCED',
+        'checks': [],
+        'retired_checks': ['tests/orchestrator/test_turn_engine.py'],
+        'checks_note':
+            'enforcement retired with era 1 (Brief_Retirement '
+            '2026-09-19, "B, reconcile it"); the dead pins are '
+            'recorded in retired_checks',
+        'status': 'RETIRED',
         "status_note":
             'ENFORCED',
     },
@@ -851,8 +945,13 @@ SPEC_REGISTRY = {
         "parents": ['M3'],
         "parent_note":
             'thinking room',
-        "checks": ['tests/orchestrator/test_turn_engine.py'],
-        "status": 'ENFORCED',
+        'checks': [],
+        'retired_checks': ['tests/orchestrator/test_turn_engine.py'],
+        'checks_note':
+            'enforcement retired with era 1 (Brief_Retirement '
+            '2026-09-19, "B, reconcile it"); the dead pins are '
+            'recorded in retired_checks',
+        'status': 'RETIRED',
         "status_note":
             'ENFORCED',
     },
@@ -864,8 +963,13 @@ SPEC_REGISTRY = {
         "parents": ['M4'],
         "parent_note":
             'no question-shaped control flow',
-        "checks": ['tests/orchestrator/test_turn_engine.py', 'tests/test_methodology.py'],
-        "status": 'ENFORCED',
+        'checks': [],
+        'retired_checks': ['tests/orchestrator/test_turn_engine.py', 'tests/test_methodology.py'],
+        'checks_note':
+            'enforcement retired with era 1 (Brief_Retirement '
+            '2026-09-19, "B, reconcile it"); the dead pins are '
+            'recorded in retired_checks',
+        'status': 'RETIRED',
         "status_note":
             'ENFORCED',
     },
@@ -878,8 +982,13 @@ SPEC_REGISTRY = {
         "parents": ['B2'],
         "parent_note":
             'honesty at the boundary, never the interior',
-        "checks": ['tests/orchestrator/test_turn_engine.py'],
-        "status": 'ENFORCED',
+        'checks': [],
+        'retired_checks': ['tests/orchestrator/test_turn_engine.py'],
+        'checks_note':
+            'enforcement retired with era 1 (Brief_Retirement '
+            '2026-09-19, "B, reconcile it"); the dead pins are '
+            'recorded in retired_checks',
+        'status': 'RETIRED',
         "status_note":
             'ENFORCED',
     },
@@ -891,8 +1000,13 @@ SPEC_REGISTRY = {
         "parents": ['M1'],
         "parent_note":
             'failure as observation = loop-shape capability',
-        "checks": ['tests/orchestrator/test_turn_engine.py'],
-        "status": 'ENFORCED',
+        'checks': [],
+        'retired_checks': ['tests/orchestrator/test_turn_engine.py'],
+        'checks_note':
+            'enforcement retired with era 1 (Brief_Retirement '
+            '2026-09-19, "B, reconcile it"); the dead pins are '
+            'recorded in retired_checks',
+        'status': 'RETIRED',
         "status_note":
             'ENFORCED',
     },
@@ -907,8 +1021,13 @@ SPEC_REGISTRY = {
         "parents": ['D1'],
         "parent_note":
             'accounted connectivity -> nothing unreachable',
-        "checks": ['tests/graph/test_topology.py'],
-        "status": 'ENFORCED',
+        'checks': [],
+        'retired_checks': ['tests/graph/test_topology.py'],
+        'checks_note':
+            'enforcement retired with era 1 (Brief_Retirement '
+            '2026-09-19, "B, reconcile it"); the dead pins are '
+            'recorded in retired_checks',
+        'status': 'RETIRED',
         "status_note":
             'ENFORCED',
     },
@@ -921,8 +1040,13 @@ SPEC_REGISTRY = {
         "parents": ['B1'],
         "parent_note":
             'every edge provenance-mapped',
-        "checks": ['tests/graph/test_topology.py'],
-        "status": 'ENFORCED',
+        'checks': [],
+        'retired_checks': ['tests/graph/test_topology.py'],
+        'checks_note':
+            'enforcement retired with era 1 (Brief_Retirement '
+            '2026-09-19, "B, reconcile it"); the dead pins are '
+            'recorded in retired_checks',
+        'status': 'RETIRED',
         "status_note":
             'ENFORCED',
     },
@@ -957,8 +1081,13 @@ SPEC_REGISTRY = {
         "parents": ['M4', 'M5'],
         "parent_note":
             'parse-never-generate: free composition + typing',
-        "checks": ['tests/orchestrator/test_parse_plan.py'],
-        "status": 'ENFORCED',
+        'checks': [],
+        'retired_checks': ['tests/orchestrator/test_parse_plan.py'],
+        'checks_note':
+            'enforcement retired with era 1 (Brief_Retirement '
+            '2026-09-19, "B, reconcile it"); the dead pins are '
+            'recorded in retired_checks',
+        'status': 'RETIRED',
         "status_note":
             'ENFORCED (prototype + measured gate: PARSE_EXPERIMENT, 7/7 '
             'oracles vs 5/7)',
@@ -973,8 +1102,13 @@ SPEC_REGISTRY = {
         "parents": ['M4'],
         "parent_note":
             'no question types',
-        "checks": ['tests/test_methodology.py'],
-        "status": 'ENFORCED',
+        'checks': [],
+        'retired_checks': ['tests/test_methodology.py'],
+        'checks_note':
+            'enforcement retired with era 1 (Brief_Retirement '
+            '2026-09-19, "B, reconcile it"); the dead pins are '
+            'recorded in retired_checks',
+        'status': 'RETIRED',
         "status_note":
             'ENFORCED for the control path',
     },
@@ -989,8 +1123,13 @@ SPEC_REGISTRY = {
         "parents": ['B4'],
         "parent_note":
             'irreversible acts confirm - applied to interpretation',
-        "checks": ['tests/webapp/test_app.py'],
-        "status": 'ENFORCED',
+        'checks': [],
+        'retired_checks': ['tests/webapp/test_app.py'],
+        'checks_note':
+            'enforcement retired with era 1 (Brief_Retirement '
+            '2026-09-19, "B, reconcile it"); the dead pins are '
+            'recorded in retired_checks',
+        'status': 'RETIRED',
         "status_note":
             'ENFORCED',
     },
@@ -1004,8 +1143,13 @@ SPEC_REGISTRY = {
         "parents": ['R3'],
         "parent_note":
             'no dead ends -> novelty escalates',
-        "checks": ['tests/webapp/test_app.py'],
-        "status": 'ENFORCED',
+        'checks': [],
+        'retired_checks': ['tests/webapp/test_app.py'],
+        'checks_note':
+            'enforcement retired with era 1 (Brief_Retirement '
+            '2026-09-19, "B, reconcile it"); the dead pins are '
+            'recorded in retired_checks',
+        'status': 'RETIRED',
         "status_note":
             'ENFORCED',
     },
@@ -1038,8 +1182,13 @@ SPEC_REGISTRY = {
         "parents": ['B2'],
         "parent_note":
             'rows never enter model context',
-        "checks": ['tests/test_run_layer.py'],
-        "status": 'ENFORCED',
+        'checks': [],
+        'retired_checks': ['tests/test_run_layer.py'],
+        'checks_note':
+            'enforcement retired with era 1 (Brief_Retirement '
+            '2026-09-19, "B, reconcile it"); the dead pins are '
+            'recorded in retired_checks',
+        'status': 'RETIRED',
         "status_note":
             'ENFORCED',
     },
@@ -1055,8 +1204,13 @@ SPEC_REGISTRY = {
         "parents": ['B4'],
         "parent_note":
             'confirmed-only execution',
-        "checks": ['tests/test_run_layer.py'],
-        "status": 'ENFORCED',
+        'checks': [],
+        'retired_checks': ['tests/test_run_layer.py'],
+        'checks_note':
+            'enforcement retired with era 1 (Brief_Retirement '
+            '2026-09-19, "B, reconcile it"); the dead pins are '
+            'recorded in retired_checks',
+        'status': 'RETIRED',
         "status_note":
             'ENFORCED',
     },
@@ -1071,8 +1225,13 @@ SPEC_REGISTRY = {
         "parents": ['B3'],
         "parent_note":
             'machine-labelled sampling',
-        "checks": ['tests/test_run_layer.py'],
-        "status": 'ENFORCED',
+        'checks': [],
+        'retired_checks': ['tests/test_run_layer.py'],
+        'checks_note':
+            'enforcement retired with era 1 (Brief_Retirement '
+            '2026-09-19, "B, reconcile it"); the dead pins are '
+            'recorded in retired_checks',
+        'status': 'RETIRED',
         "status_note":
             'ENFORCED',
     },
@@ -1155,8 +1314,13 @@ SPEC_REGISTRY = {
         "parents": ['J4'],
         "parent_note":
             'descriptions - blind verifier + kappa-diff',
-        "checks": ['tests/test_tree_contract.py'],
-        "status": 'ENFORCED',
+        'checks': [],
+        'retired_checks': ['tests/test_tree_contract.py'],
+        'checks_note':
+            'enforcement retired with era 1 (Brief_Retirement '
+            '2026-09-19, "B, reconcile it"); the dead pins are '
+            'recorded in retired_checks',
+        'status': 'RETIRED',
         "status_note":
             'ENFORCED as the measurement instrument (ADR 0074 '
             'call 1); the production judge for descriptions is the '
@@ -1172,11 +1336,13 @@ SPEC_REGISTRY = {
         "parent_note":
             'SQL stitching - parseability round-trips; kappa-diff is the '
             'stated gap',
-        "checks": ['tests/test_run_layer.py'],
+        'checks': [],
+        'retired_checks': ['tests/test_run_layer.py'],
         "checks_note":
             'parseability round-trips; the kappa-equality diff is the '
-            'stated gap, live when stitching ships',
-        "status": 'PARTIAL',
+            'stated gap, live when stitching ships — enforcement '
+            'retired with era 1 (Brief_Retirement 2026-09-19)',
+        'status': 'RETIRED',
         "status_note":
             'PARTIAL — `src/run_layer.py::check_single_select` parses every '
             'executed statement through ScriptDom, so PARSEABILITY round- '

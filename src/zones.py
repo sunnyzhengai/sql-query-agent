@@ -48,21 +48,20 @@ GOVERNED_ENTRIES = frozenset({
     "README.md",
     "pyproject.toml",
     "org_config.example.yaml",
-    "data",
     "devtools",
     "dist",
     "docs",
     "environment",
     "libs",
     "marketplace_host",
-    "notebooks",
     # Declared at Sunny's "add it" (2026-09-19, Brief_Packaging):
     # tracked since the M7 close, ships in the archive — governed.
     "pilots",
     "scripts",
     "src",
     "tests",
-    "website",
+    # data/, notebooks/, website/ retired with era 1
+    # (Brief_Retirement, 2026-09-19 — git history keeps them)
 })
 
 INTERNAL_ZONE = "internal"
