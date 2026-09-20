@@ -122,7 +122,31 @@ def write_intake_result_tables(out_dir, reg, extract_reports,
     for ref in sorted(unresolved, key=lambda r: -unresolved[r]["n"]):
         row = unresolved[ref]
         bare = ref.split(".")[-1].upper()
-        if row["kind"] == "table" and bare in dict_tables:
+        cls = row.get("class")
+        # THE WORDING RULE (Brief_Closed_Shape, proposal 3 ruled
+        # 2026-09-20): a sentence may blame the customer's data ONLY
+        # for a fully-understood class; the reserved class points at
+        # the engine, verbatim
+        if cls == "shape_unrecognized":
+            diagnosis = ("AISQL COULD NOT READ THIS REFERENCE SHAPE "
+                         "— an engine finding, not a data gap; "
+                         "report this to AISQL with the reference "
+                         "text")
+        elif cls == "cross_database":
+            diagnosis = ("CROSS-DATABASE READ — names database "
+                         f"'{row.get('cross_database')}', another "
+                         "database's data; counted, never bound "
+                         "(signal toward multi-source registration)")
+        elif cls == "cross_server":
+            diagnosis = ("CROSS-SERVER READ — names linked server "
+                         f"'{row.get('cross_server')}', another "
+                         "server's data; counted, never bound "
+                         "locally")
+        elif cls == "no_default_schema":
+            diagnosis = ("UNQUALIFIED REFERENCE AND NO default_schema "
+                         "DECLARED — declare default_schema in the "
+                         "estate manifest to bind bare names")
+        elif row["kind"] == "table" and bare in dict_tables:
             diagnosis = ("SCHEMA MISMATCH — table exists in the "
                          "dictionary under schema "
                          f"'{'/'.join(dict_tables[bare])}'; the SQL "

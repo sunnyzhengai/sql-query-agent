@@ -1,10 +1,12 @@
 # Brief_Closed_Shape — the coerced-shape generator dies: the name grammar in writing, failure classes closed, diagnoses honest
 
-**Status: APPROVED** (DRAFT → PRESENTED → APPROVED → BUILT →
-CLOSED) — drafted at Sunny's "i agree with your recommendation,
-draft the brief" (2026-09-20, ruling F12); APPROVED the same day
-at his "agree with F11, approved, and push" — both ambiguities
-now carry his word, none open.
+**Status: BUILT** (DRAFT → PRESENTED → APPROVED → BUILT → CLOSED;
+BUILT 2026-09-20 same day — suite 791/0 (6:45), ruff zero new,
+closing check BALANCED 11==11; CLOSED rides Sunny's next word) —
+drafted at Sunny's "i agree with your recommendation, draft the
+brief" (2026-09-20, ruling F12); APPROVED the same day at his
+"agree with F11, approved, and push" — both ambiguities carry his
+word, none open.
 
 | field | content |
 |---|---|
@@ -16,7 +18,7 @@ now carry his word, none open.
 | retirement (pivots only) | none — the free-text diagnosis strings inside write_intake_result_tables are REPLACED by the enum-driven forms in the same act (no old direction left standing) |
 | does this promote? | at close, at his word |
 | Sunny's approval | "agree with F11, approved, and push" (2026-09-20) — both rulings quoted above |
-| closing check | files changed == files declared (filled at CLOSED) |
+| closing check | BALANCED (2026-09-20): 11 files changed == 11 declared; suite 791 passed / 0 failed (6:45); ruff zero new offenses; 8 RED before code (the 7 binding forms passed from birth — including the 4-part server match, which bound by accident of the drop; the REDs were exactly the new loudness: cross_server named, server_names_seen, the classes, the wording rule); sepsis per-class conservation pinned 127 == 127 reader_writer_drift |
 
 ## The slices, in build order
 
@@ -59,5 +61,6 @@ now carry his word, none open.
     aisql/graph/kg2_mapper/__init__.py
     aisql/flows/inbound.py
     tests/aisql/test_name_grammar.py
+    tests/aisql/test_sepsis_shakedown.py
     AIVIA_Product/estates/sepsis/expected_shakedown.json
     docs/architecture/TEST_MAP.md

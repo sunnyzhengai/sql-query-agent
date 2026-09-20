@@ -1925,3 +1925,35 @@ no load.
   BY MEASUREMENT, story in its _comment; gap_check_report.md (the
   dated 2026-09-06 verdict record) stays verbatim. TEST_MAP
   regenerated (two new test modules).
+
+## 2026-09-20 (same day) — BRIEF_CLOSED_SHAPE BUILT — THE
+## COERCED-SHAPE GENERATOR DIES
+
+Born from Sunny's loud-failure question on F9; his rulings the
+same hour: F12 "i agree with your recommendation, draft the
+brief" · F11 + approval "agree with F11, approved, and push".
+
+- THE NAME GRAMMAR (Contract_Logic_Layer, new section): Microsoft's
+  finite 1–4-part object-name grammar in writing, one ruled bucket
+  per written form; the customer defines nothing.
+- THE CLOSED ENUM: every unresolved ref carries ONE class
+  (schema_not_mapped · table_not_in_dictionary · cross_database ·
+  cross_server · no_default_schema · reader_writer_drift ·
+  shape_unrecognized); census.unresolved_by_class counts per class;
+  conservation (sum == unresolved_refs) pinned in the shakedown —
+  sepsis measures 127 = 127 reader_writer_drift, nothing
+  unclassified; shape_unrecognized on a pinned corpus FAILS THE
+  SUITE, on a customer run COUNTS with honest words (his ruled
+  split).
+- F11 LANDS (the ruling-(8) symmetry): the 4-part server part is
+  examined, never dropped — match binds, mismatch = cross_server_
+  reads WITH THE SERVER NAMED, waived = server_names_seen. RED
+  first: OTHERSRV bound silently before the fix.
+- THE WORDING RULE: write_intake_result_tables blames the
+  customer's data only for fully-understood classes; the reserved
+  class prints "AISQL COULD NOT READ THIS REFERENCE SHAPE — an
+  engine finding … report this to AISQL". The F9 false claim
+  ("the SQL qualifies it differently") can never print again.
+- THE CONFORMANCE PIN (test_name_grammar.py): the generated arity
+  table over F1's ENCOUNTER — 7 binding forms + every failure
+  class asserted; 8 RED before code, all green after.

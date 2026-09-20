@@ -7,7 +7,7 @@
 
 # Test Map — what every test proves
 
-95 modules, 751 tests, every module accounted: claimed by an ADR in the trace registry or declaring a law/contract in its docstring (`Proves:` line).
+96 modules, 760 tests, every module accounted: claimed by an ADR in the trace registry or declaring a law/contract in its docstring (`Proves:` line).
 
 ## By ADR
 
@@ -153,6 +153,7 @@
 - `tests/aisql/test_meaning_smells.py` (18): THE MEANING-SMELL CENSUS + THE PHRASE-CORPUS SWEEP (Sunny's go,
 - `tests/aisql/test_metamodel.py` (7): Slice 0: the registry loader — code consumes ratified registries only.
 - `tests/aisql/test_minimal_registration.py` (6): Brief_Minimal_Registration (Sunny, 2026-09-19: "keep db name and
+- `tests/aisql/test_name_grammar.py` (9): Brief_Closed_Shape (Sunny 2026-09-20: F12 "i agree with your
 - `tests/aisql/test_part_edges.py` (4): STEP 4 of the Connection Ledger build — PART EDGES. The test
 - `tests/aisql/test_pbi_layer.py` (5): PHASE H — THE PBI LAYER (Sunny's ruling 2026-09-08: every proc
 - `tests/aisql/test_person_nodes.py` (7): STEP 3 of the Connection Ledger build — PERSON NODES. The test

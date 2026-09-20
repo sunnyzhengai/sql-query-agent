@@ -85,10 +85,49 @@ structures born from parsing the estate's files.
 | R1–R7 / R10 / R12 | the description fields per grain |
 | inv.verbatim · inv.derivable_never_stored · inv.one_writer | every field above |
 
+## THE NAME GRAMMAR (Brief_Closed_Shape; F12 ruled "i agree with your recommendation" + F11 "agree with F11", 2026-09-20)
+
+Microsoft's documented T-SQL object-name grammar — 1 to 4
+dot-separated parts, `server.database.schema.table`, inner parts
+may be EMPTY — is finite, so this table is exhaustive by
+construction. The customer defines NOTHING; ScriptDom refuses
+arity ≥5 at parse time. Consumer: kg2_mapper.resolve (this
+layer's one resolution writer). THE LAW: every written form lands
+in its RULED bucket below; a shape outside the grammar counts as
+`shape_unrecognized` — NEVER coerced into the nearest known shape
+(the generator find, F12: the ABX corpse and F9's diagnosis were
+this one defect class). Enforcement: test_name_grammar.py (the
+generated arity table) + the shakedown's per-class conservation
+(classes sum to unresolved_refs; shape_unrecognized on a pinned
+corpus FAILS THE SUITE — the internal lane; on a customer run it
+COUNTS with the engine-finding sentence, never blocking their
+boot — the ruled split).
+
+| written form | ruled bucket |
+|---|---|
+| `T` (1 part) | binds via the estate's declared default_schema; none declared → unresolved, class `no_default_schema` (never a guess) |
+| `S.T` (2 parts) | binds via schema_sources; schema unmapped → `schema_not_mapped`; table absent → `table_not_in_dictionary` |
+| `D.S.T` (3 parts) | ruling (8), counted-never-refused: db matches registration (folded) → binds; differs → unresolved, class `cross_database`, census.cross_database_reads names the db; db_name waived → binds + census.db_names_seen |
+| `D..T` / `.T` (empty schema part) | the empty part falls to default_schema (legal T-SQL); then as above |
+| `V.D.S.T` (4 parts) | F11 ruled — the ruling-(8) symmetry one level up: server matches → binds (the match IS the cross-check); differs → unresolved, class `cross_server`, census.cross_server_reads names the server (a linked-server read is another machine's data, never bound locally); server waived (optional, MR1a) → binds + census.server_names_seen |
+| anything else (arity ≥5 · empty table part) | class `shape_unrecognized` — the reserved bucket; the sheet prints the engine-finding sentence verbatim |
+
+THE CLOSED DIAGNOSIS ENUM (one class per unresolved ref; the ONE
+literal lives with the writer): `schema_not_mapped` ·
+`table_not_in_dictionary` · `cross_database` · `cross_server` ·
+`no_default_schema` · `reader_writer_drift` (column refs — the
+silently-failing-report class) · `shape_unrecognized`. THE
+WORDING RULE (proposal 3): the DBA sheet may blame the customer's
+data only for fully-understood classes; the reserved class prints
+"AISQL COULD NOT READ THIS REFERENCE SHAPE — an engine finding …
+report this to AISQL" — a code defect can never again print as
+the customer's problem.
+
 ## TESTS
 
 | test_id | proves |
 |---|---|
+| test_name_grammar (the generated arity table + the wording rule) | THE NAME GRAMMAR — every written form in its ruled bucket; diagnoses honest |
 | test_from_structure (4 pins) | ds.era3_from_structure incl. the ONE invariant |
 | test_ed_sepsis_dev_estate (M2/M3/M4 batteries) | counts vs key · conservation · verbatim · parentage |
 | test_derived_render (19) + test_derived_column | R12 · ds.m4_stay_flat · F2-fixture negatives |

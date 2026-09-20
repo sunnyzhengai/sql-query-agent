@@ -727,8 +727,19 @@ def resolve(tree: Dict[str, Any], store: Store, reg: Dict[str, Any],
     census = {"resolved_refs": 0, "same_tree_refs": 0,
               "unresolved_refs": 0, "unresolved": []}
     # F9 + ruling (8) (Brief_Pilot_Build_1): db parts seen under the
-    # db_name waiver — reported so the risky waiver becomes visible
+    # db_name waiver — reported so the risky waiver becomes visible;
+    # F11 ("agree with F11", 2026-09-20) extends the same pattern to
+    # the server part
     db_names_seen: Set[str] = set()
+    server_names_seen: Set[str] = set()
+
+    def _class_count(cls: str) -> None:
+        # Brief_Closed_Shape: every unresolved ref carries ONE class
+        # from the closed enum (Contract_Logic_Layer, THE NAME
+        # GRAMMAR); the per-class counts make a class failing 100%
+        # visible at a glance
+        by = census.setdefault("unresolved_by_class", {})
+        by[cls] = by.get(cls, 0) + 1
 
     # named scopes' output shape (folded members + star sources), for
     # disambiguation, scope-member binding, and STAR-THROUGH
@@ -781,6 +792,8 @@ def resolve(tree: Dict[str, Any], store: Store, reg: Dict[str, Any],
         census["unresolved_refs"] += 1
         census["unresolved"].append(ref)
         census.setdefault("unresolved_detail", []).append(detail)
+        if "class" in detail:
+            _class_count(detail["class"])
 
     def _bind_column(col, kind, target, colname) -> None:
         if kind == "table":
@@ -793,7 +806,8 @@ def resolve(tree: Dict[str, Any], store: Store, reg: Dict[str, Any],
                 _count_unresolved(col["ref"],
                                   # literal: shape
                                   {"ref": col["ref"], "kind": "column",
-                                   "table": target})
+                                   "table": target,
+                                   "class": "reader_writer_drift"})
         elif kind == "scope":
             col["resolves_to"] = f"SAME-TREE scope {target}"
             census["same_tree_column_refs"] = \
@@ -836,64 +850,90 @@ def resolve(tree: Dict[str, Any], store: Store, reg: Dict[str, Any],
                 census["same_tree_refs"] += 1
                 target = ("scope", key)
             else:
-                db_part = None
+                # F9 (Brief_Pilot_Build_1) + Brief_Closed_Shape: the
+                # name grammar is Microsoft's, FINITE — 1 to 4 dot-
+                # separated parts (server.db.schema.table), inner
+                # parts may be empty. Every arity lands in a RULED
+                # bucket; a shape outside the grammar counts as
+                # shape_unrecognized, NEVER coerced into the nearest
+                # known shape (the ABX/F9 generator find, F12)
+                db_part = server_part = None
+                cause = None
                 if "." in name:
-                    # F9 (Brief_Pilot_Build_1): a db-qualified name
-                    # splits db · schema · table and binds ON SCHEMA
-                    # — the old split-at-the-last-dot made the schema
-                    # key `db.schema`, unresolvable by construction
-                    *rest, schema, table = name.split(".")
-                    if rest:
-                        db_part = rest[-1]
-                    if not schema and default_schema:
-                        # `db..table` — the db's default schema
-                        schema = default_schema
+                    parts = name.split(".")
+                    if len(parts) > 4 or not parts[-1]:
+                        cause = ("shape_unrecognized", None)
+                        schema, table = None, name
+                    else:
+                        *rest, schema, table = parts
+                        if rest:
+                            db_part = rest[-1] or None
+                        if len(rest) == 2:
+                            server_part = rest[0] or None
+                        if not schema and default_schema:
+                            # `db..table` / `.table` — default schema
+                            schema = default_schema
                 elif default_schema:
                     # the estate's declared default schema (real estates
                     # reference unqualified names constantly)
                     schema, table = default_schema, name
                 else:
                     schema, table = None, name
-                # ruling (8), counted-never-refused: a matching
-                # registered db IS the cross-check passing; a foreign
-                # db stays unresolved as a NAMED cross-database read;
-                # no registered db_name -> schema-only binding stands
-                # per the waiver, the names seen reported below
-                registered_db = reg.get("db_name")
-                cross_database = False
-                if db_part:
+                # ruling (8) + F11 ("agree with F11", 2026-09-20):
+                # outer parts are COUNTED-NEVER-REFUSED — a match IS
+                # the cross-check passing; a mismatch is a NAMED
+                # cross-read; an undeclared side binds under the
+                # waiver with the names seen reported in the census
+                if cause is None and server_part:
+                    registered_server = reg.get("server")
+                    if registered_server:
+                        if _fold(server_part) != _fold(registered_server):
+                            cause = ("cross_server", server_part)
+                    else:
+                        server_names_seen.add(server_part)
+                if cause is None and db_part:
+                    registered_db = reg.get("db_name")
                     if registered_db:
-                        cross_database = \
-                            _fold(db_part) != _fold(registered_db)
+                        if _fold(db_part) != _fold(registered_db):
+                            cause = ("cross_database", db_part)
                     else:
                         db_names_seen.add(db_part)
                 identity = None
-                if schema and not cross_database:
+                if cause is None and schema:
                     identity = table_identity(schema, table)
-                if cross_database:
-                    ref["resolves_to"] = None
-                    census["unresolved_refs"] += 1
-                    census["unresolved"].append(name)
-                    census.setdefault("unresolved_detail", []).append(
-                        # literal: shape
-                        {"ref": name, "kind": "table",
-                         "schema": schema or "(unqualified)",
-                         "cross_database": db_part})
-                    census.setdefault("cross_database_reads", []).append(
-                        {"ref": name, "db": db_part})
-                    target = ("unresolved", None)
-                elif identity:
+                if identity:
                     ref["resolves_to"] = identity
                     census["resolved_refs"] += 1
                     target = ("table", identity)
                 else:
+                    if cause is None:
+                        if schema is None:
+                            cause = ("no_default_schema", None)
+                        elif reg["schema_sources"].get(schema) is None:
+                            cause = ("schema_not_mapped", None)
+                        else:
+                            cause = ("table_not_in_dictionary", None)
+                    cls, named = cause
                     ref["resolves_to"] = None
                     census["unresolved_refs"] += 1
                     census["unresolved"].append(name)
-                    census.setdefault("unresolved_detail", []).append(
-                        # literal: shape
-                        {"ref": name, "kind": "table",
-                         "schema": schema or "(unqualified)"})
+                    # literal: shape
+                    detail = {"ref": name, "kind": "table",
+                              "schema": schema or "(unqualified)",
+                              "class": cls}
+                    if cls == "cross_database":
+                        detail["cross_database"] = named
+                        census.setdefault(
+                            "cross_database_reads", []).append(
+                            {"ref": name, "db": named})
+                    elif cls == "cross_server":
+                        detail["cross_server"] = named
+                        census.setdefault(
+                            "cross_server_reads", []).append(
+                            {"ref": name, "server": named})
+                    census.setdefault("unresolved_detail",
+                                      []).append(detail)
+                    _class_count(cls)
                     target = ("unresolved", None)
             if ref.get("alias"):
                 alias_to[_fold(ref["alias"])] = target
@@ -994,7 +1034,8 @@ def resolve(tree: Dict[str, Any], store: Store, reg: Dict[str, Any],
                                       {"ref": col["ref"],
                                        "kind": "column",
                                        "table": "(no source declares "
-                                       "it)"})
+                                       "it)",
+                                       "class": "reader_writer_drift"})
                 else:
                     col["resolves_to"] = None
                     census["ambiguous_unqualified"] = \
@@ -1044,6 +1085,8 @@ def resolve(tree: Dict[str, Any], store: Store, reg: Dict[str, Any],
     walk_params(tree["statements"])
     if db_names_seen:
         census["db_names_seen"] = sorted(db_names_seen)
+    if server_names_seen:
+        census["server_names_seen"] = sorted(server_names_seen)
     tree["resolution_census"] = census
     return tree
 

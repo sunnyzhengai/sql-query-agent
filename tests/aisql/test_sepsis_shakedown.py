@@ -62,6 +62,17 @@ def test_estate_conservation(shaken):
                    for t in estate.trees.values()) == want[key], key
     assert sum(len(t["remainder"]) for t in estate.trees.values()) \
         == want["remainder_total"]
+    # Brief_Closed_Shape (F12 ruled 2026-09-20): the CLOSED class
+    # enum over the corpus — conservation (classes sum to the
+    # unresolved total) means nothing failed unclassified; a
+    # shape_unrecognized here fails the suite (the internal lane)
+    by_class: dict = {}
+    for t in estate.trees.values():
+        for k, v in t["resolution_census"].get(
+                "unresolved_by_class", {}).items():
+            by_class[k] = by_class.get(k, 0) + v
+    assert by_class == want["unresolved_by_class"]
+    assert sum(by_class.values()) == want["unresolved_refs"]
 
 
 def test_twin_conservation(shaken):
