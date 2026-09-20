@@ -12,13 +12,13 @@ placeholder kept speaking, and no test could see it. This file is
 the tripwire: the moment a label's declared source exists on the
 store node, the index MUST speak it.
 
-Proves: contract:aivia-design-to-code
+Proves: contract:aisql-design-to-code
 """
 import pytest
 
-from aivia.console import build_store
-from aivia.flows import ask, speech
-from aivia.graph.read_api import ReadApi
+from aisql.console import build_store
+from aisql.flows import ask, speech
+from aisql.graph.read_api import ReadApi
 
 
 @pytest.fixture(scope="module")

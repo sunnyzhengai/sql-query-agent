@@ -10,6 +10,20 @@ Versioning follows [Semantic Versioning](https://semver.org/).
 
 ---
 
+## [2.2.0] - 2026-09-19
+
+### Changed — the ship surface drops the AIVIA name (Brief_AISQL_Rename)
+- The engine package renamed `aivia` -> `aisql`: notebook cells now read
+  `import aisql.fabric_run`. Env vars follow: `AISQL_FABRIC_WORKSPACE`,
+  `AISQL_FABRIC_GRAPH_MODEL`, `AISQL_FABRIC_TOKEN`, `AISQL_REGISTRY_DIR`,
+  `AISQL_RECORD`, `AISQL_LIVE`. Every shipped brand string (console
+  titles, intake report header, export attribution, Collibra domain)
+  now says AISQL. Design folders keep their names; shipped citations
+  of those real paths stay verbatim.
+- Wheel 2.1.1 retired per the one-current-wheel law.
+
+---
+
 ## [1.58.5] - 2026-08-28
 
 ### Added — RW-7 part 2: the sweep self-describes

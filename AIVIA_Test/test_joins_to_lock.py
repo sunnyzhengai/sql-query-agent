@@ -15,17 +15,17 @@ lives here as physics, not discipline:
    pending (A8: target not yet registered, resolves on arrival)
    + 1 collapsed duplicate.
 
-Proves: contract:aivia-design-to-code
+Proves: contract:aisql-design-to-code
 """
 import json
 import pathlib
 
 import pytest
 
-from aivia.flows import inbound
-from aivia.flows.export_graph import export_tables
-from aivia.graph import kg1_intake
-from aivia.graph.read_api import ReadApi
+from aisql.flows import inbound
+from aisql.flows.export_graph import export_tables
+from aisql.graph import kg1_intake
+from aisql.graph.read_api import ReadApi
 
 BASE = pathlib.Path(__file__).resolve().parents[1] / \
     "AIVIA_Product" / "estates" / "ed_sepsis_dev"

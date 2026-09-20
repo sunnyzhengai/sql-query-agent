@@ -17,7 +17,7 @@ Decisions map **first to an architecture component, and then upward to the axiom
   EXECUTION  docs/decisions/*.md        one component each
 ```
 
-Two citation handles, because the axiom systems are distinct and their group letters (B, D, R) collide: **`axm:M5`** = the framework in `docs/AI_VIA_AXIOMS.md`; **`spec:C1`** = Φ_AIVIA in `docs/architecture/SPEC.md`.
+Two citation handles, because the axiom systems are distinct and their group letters (B, D, R) collide: **`axm:M5`** = the framework in `docs/AI_VIA_AXIOMS.md`; **`spec:C1`** = Φ_AISQL in `docs/architecture/SPEC.md`.
 
 ### The blueprint tier
 
@@ -1014,13 +1014,13 @@ Two citation handles, because the axiom systems are distinct and their group let
 - **Category:** architecture
 - **Component:** `spec` → `docs/architecture/SPEC.md` → axm:S, axm:J, axm:M, axm:B, axm:R
 - **Implemented by:**
-  - `aivia/graph/kg2_mapper/__init__.py`
-  - `aivia/graph/metamodel.py`
+  - `aisql/graph/kg2_mapper/__init__.py`
+  - `aisql/graph/metamodel.py`
   - `AIVIA_Design/registries/convert_from_xlsx.py`
 - **Enforced by:**
-  - `tests/aivia/test_phase_a_projection.py`
-  - `tests/aivia/test_metamodel.py`
-  - `tests/aivia/test_design_validators.py`
+  - `tests/aisql/test_phase_a_projection.py`
+  - `tests/aisql/test_metamodel.py`
+  - `tests/aisql/test_design_validators.py`
 - **Summarized in:**
   - `docs/decisions/0077-twin-graph-kg.md`
   - `docs/architecture/SPEC.md`
@@ -1030,11 +1030,11 @@ Two citation handles, because the axiom systems are distinct and their group let
 - **Category:** architecture
 - **Component:** `architecture` → `docs/architecture/ARCHITECTURE.md` → axm:D, axm:S, axm:J, axm:M, axm:B, axm:R
 - **Implemented by:**
-  - `aivia/lenses/ask_index.py`
-  - `aivia/flows/ask.py`
-  - `aivia/console.py`
+  - `aisql/lenses/ask_index.py`
+  - `aisql/flows/ask.py`
+  - `aisql/console.py`
 - **Enforced by:**
-  - `tests/aivia/test_ask_console.py`
+  - `tests/aisql/test_ask_console.py`
 - **Summarized in:**
   - `docs/decisions/0078-ask-the-graph-console.md`
 
@@ -1043,10 +1043,10 @@ Two citation handles, because the axiom systems are distinct and their group let
 - **Category:** architecture
 - **Component:** `architecture` → `docs/architecture/ARCHITECTURE.md` → axm:D, axm:S, axm:J, axm:M, axm:B, axm:R
 - **Implemented by:**
-  - `aivia/flows/ask.py`
-  - `aivia/console.py`
+  - `aisql/flows/ask.py`
+  - `aisql/console.py`
 - **Enforced by:**
-  - `tests/aivia/test_ask_console.py`
+  - `tests/aisql/test_ask_console.py`
 - **Summarized in:**
   - `docs/decisions/0079-the-interpreter-and-the-speaking-graph.md`
 
@@ -1055,10 +1055,10 @@ Two citation handles, because the axiom systems are distinct and their group let
 - **Category:** architecture
 - **Component:** `architecture` → `docs/architecture/ARCHITECTURE.md` → axm:D, axm:S, axm:J, axm:M, axm:B, axm:R
 - **Implemented by:**
-  - `aivia/flows/grounding.py`
-  - `aivia/flows/ask.py`
+  - `aisql/flows/grounding.py`
+  - `aisql/flows/ask.py`
 - **Enforced by:**
-  - `tests/aivia/test_ask_console.py`
+  - `tests/aisql/test_ask_console.py`
 - **Summarized in:**
   - `docs/decisions/0080-the-center-and-the-three-censuses.md`
 
@@ -1067,9 +1067,9 @@ Two citation handles, because the axiom systems are distinct and their group let
 - **Category:** architecture
 - **Component:** `architecture` → `docs/architecture/ARCHITECTURE.md` → axm:D, axm:S, axm:J, axm:M, axm:B, axm:R
 - **Implemented by:**
-  - `aivia/flows/censuses.py`
-  - `aivia/flows/connect.py`
+  - `aisql/flows/censuses.py`
+  - `aisql/flows/connect.py`
 - **Enforced by:**
-  - `tests/aivia/test_connection_census.py`
+  - `tests/aisql/test_connection_census.py`
 - **Summarized in:**
   - `docs/decisions/0081-the-birth-edge-law.md`

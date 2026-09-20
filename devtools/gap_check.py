@@ -12,11 +12,11 @@ import sys
 
 sys.path.insert(0, str(pathlib.Path(__file__).resolve().parents[1]))
 
-from aivia.flows import inbound, produce  # noqa: E402
-from aivia.graph import kg1_intake  # noqa: E402
-from aivia.graph.read_api import ReadApi  # noqa: E402
-from aivia.graph.store import Store  # noqa: E402
-from aivia.lenses import decisions  # noqa: E402
+from aisql.flows import inbound, produce  # noqa: E402
+from aisql.graph import kg1_intake  # noqa: E402
+from aisql.graph.read_api import ReadApi  # noqa: E402
+from aisql.graph.store import Store  # noqa: E402
+from aisql.lenses import decisions  # noqa: E402
 
 
 def build(base: pathlib.Path) -> ReadApi:
@@ -89,7 +89,7 @@ def render(read: ReadApi) -> str:
               "silently-failing reports, kept counted forever)"]
     # ADR 0080: the three censuses print their equations — the
     # standing report bucket beside the standing tests
-    from aivia.flows import ask, censuses
+    from aisql.flows import ask, censuses
     index = ask.build_index(read)
     lines += ["", censuses.report(read, index)]
     return "\n".join(lines + sections)

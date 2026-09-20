@@ -3,7 +3,7 @@
 **Purpose: no trial and error. Anyone new runs the battery below,
 records what each step said, and the verdict table names the route.
 Every step is a cheap check or a per-user action; nothing here
-installs AIVIA itself. All of it runs on the target machine or
+installs AISQL itself. All of it runs on the target machine or
 tenant — nothing environment-specific (names, URLs, messages with
 internal paths) is ever written back into this repo's tracked
 files. Findings return as rows: step id · good/blocked · the exact

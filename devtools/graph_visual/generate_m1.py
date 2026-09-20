@@ -36,7 +36,7 @@ EDGE_FAMILIES = ("has_part", "joins_to", "left_side", "right_side",
 def build_payload():
     """FS1 (Sunny "a", 2026-09-17, Contract_Surfaces): the
     generator's COUNTING STEP, label-keyed exactly as the answer
-    key's census speaks — tests/aivia/test_visual_counts.py holds
+    key's census speaks — tests/aisql/test_visual_counts.py holds
     this to expected_m_gates.json before every republish. Counts
     the export parquets ON DISK: the same articles the page draws
     and Fabric serves."""

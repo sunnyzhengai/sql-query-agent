@@ -53,9 +53,17 @@ re-running the cell regenerates the scripts.
     AIVIA_Product/source_packs/clarity/README.md
     pilots/work_dryrun/README_Runbook.md
     docs/architecture/TEST_MAP.md
-    dist/sql_query_agent-2.1.0-py3-none-any.whl
+    dist/sql_query_agent-2.1.1-py3-none-any.whl
     .gitignore
     tests/aivia/test_ship_surface.py
+
+(2.1.1 FIELD FIX, his Fabric run 2026-09-19: FileNotFoundError on
+aivia/flows/econ_params.json — the wheel shipped code without its
+subpackage data; pyproject gains "aivia.flows" = ["*.json"], and
+the wheel-carries pin now enumerates EVERY tracked non-.py package
+file from git ls-files (the whole class, never one file; tracked,
+so local junk stays out). 2.1.0 retired unreleased-in-practice —
+his run never booted on it.)
 
 (test_ship_surface.py added at build: the zero-SQL zip pin
 (Brief_Packaging: "i don't need to download any sql files") met

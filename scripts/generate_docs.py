@@ -125,16 +125,16 @@ def build_integration_map() -> str:
     pipeline map answers "how does data flow inside an installation".
     """
     style = {"shipped": "shipped", "planned": "planned", "watchlist": "watchlist"}
-    lines = ["flowchart LR", '  AIVIA(("AIVIA<br/>knowledge graph")):::core']
+    lines = ["flowchart LR", '  AISQL(("AISQL<br/>knowledge graph")):::core']
     for i, row in enumerate(INTEGRATION_REGISTRY):
-        other = row["to_tool"] if row["from_tool"] == "AIVIA" else row["from_tool"]
+        other = row["to_tool"] if row["from_tool"] == "AISQL" else row["from_tool"]
         node = f"T{i}"
         lines.append(f'  {node}["{other}"]:::{style[row["status"]]}')
         label = row["status"] if row["status"] != "shipped" else row["direction"]
-        if row["from_tool"] == "AIVIA":
-            lines.append(f"  AIVIA -->|{label}| {node}")
+        if row["from_tool"] == "AISQL":
+            lines.append(f"  AISQL -->|{label}| {node}")
         else:
-            lines.append(f"  {node} -->|{label}| AIVIA")
+            lines.append(f"  {node} -->|{label}| AISQL")
     lines.append("  classDef core fill:#e8f0fe,stroke:#4285f4,stroke-width:2px")
     lines.append("  classDef shipped fill:#e6f4ea,stroke:#34a853")
     lines.append("  classDef planned fill:#fef7e0,stroke:#f9ab00")
@@ -332,7 +332,7 @@ def build_trace_map() -> str:
         "",
         "Two citation handles, because the axiom systems are distinct and "
         "their group letters (B, D, R) collide: **`axm:M5`** = the "
-        "framework in `docs/AI_VIA_AXIOMS.md`; **`spec:C1`** = Φ_AIVIA in "
+        "framework in `docs/AI_VIA_AXIOMS.md`; **`spec:C1`** = Φ_AISQL in "
         "`docs/architecture/SPEC.md`.",
         "",
         "### The blueprint tier",
@@ -379,7 +379,7 @@ def build_trace_map() -> str:
 
 
 def build_spec() -> str:
-    """SPEC.md — Φ_AIVIA rendered from the axiom ledger (ADR 0073).
+    """SPEC.md — Φ_AISQL rendered from the axiom ledger (ADR 0073).
     Frame prose lives in scripts/spec_frame.md; each {{AXIOMS:...}}
     placeholder expands to uniform per-axiom blocks."""
     import re as _re

@@ -2,14 +2,14 @@
 # proposed, build it", 2026-09-19). git archive — and therefore
 # every GitHub zip download, main and dev alike — carries ONLY the
 # minimum engine. Nothing is deleted from the repo; only the
-# export surface shrinks. Pinned by tests/aivia/test_ship_surface.py.
+# export surface shrinks. Pinned by tests/aisql/test_ship_surface.py.
 # Order matters: last matching line wins.
 
 # default: nothing ships
 /* export-ignore
 
 # the engine
-/aivia -export-ignore
+/aisql -export-ignore
 
 # the parser DLL
 /libs -export-ignore

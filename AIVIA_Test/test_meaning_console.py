@@ -6,7 +6,7 @@ technical adjacency, exact-tier matching, the planner (minimal
 connecting subgraph), the GQL writer's Fabric legality, cache
 seeding, and the honest outcomes (gap · relaxation · zero).
 
-THE LIVE BATTERY (AIVIA_LIVE=1 + OPENAI_API_KEY): 21 questions —
+THE LIVE BATTERY (AISQL_LIVE=1 + OPENAI_API_KEY): 21 questions —
 findability · meaning readback · column search · relationship ·
 absence honesty · enumeration · impact · the join-layer family
 (18 BLESSED by Sunny, "bless them all" 2026-09-11: his six by
@@ -15,7 +15,7 @@ drafted 2026-09-11 night, blessing per the standing path);
 assertions pin laws and expected crowns, never verbatim model
 wording.
 
-Proves: contract:aivia-design-to-code
+Proves: contract:aisql-design-to-code
 """
 import json
 import os
@@ -23,10 +23,10 @@ import pathlib
 
 import pytest
 
-from aivia import meaning_console as mc
-from aivia.console import build_store
-from aivia.flows import ask
-from aivia.graph.read_api import ReadApi
+from aisql import meaning_console as mc
+from aisql.console import build_store
+from aisql.flows import ask
+from aisql.graph.read_api import ReadApi
 
 ADT = "emr|dbo|ADT_EVENTS"
 BED = "emr|dbo|BED_CONFIG"
@@ -34,7 +34,7 @@ BED = "emr|dbo|BED_CONFIG"
 
 @pytest.fixture(scope="module")
 def world():
-    from aivia.flows import glossary
+    from aisql.flows import glossary
     store, base = build_store("ed_sepsis_dev")
     read = ReadApi(store)
     # the store-as-ruled: the glossary ledger's blessed slice loads
@@ -1008,7 +1008,7 @@ def test_edge_kinds_speak_their_own_speech(world):
 
 
 def test_cage_validates_relations():
-    from aivia.flows import ask
+    from aisql.flows import ask
     out = ask.validate_interpretation(
         {"mentions": ["tables", "in", "X"],
          "relations": ["in", "in", "ghost", 7]})
@@ -1035,10 +1035,10 @@ def test_owner_qualify_deepens_only_until_unique():
 
 
 # ---- the glossary chain (the machinery lives in flows/glossary;
-# tests/aivia/test_glossary.py owns it — this proves the CONSOLE
+# tests/aisql/test_glossary.py owns it — this proves the CONSOLE
 # INDEX carries the blessed expansions end-to-end) -------------------
 def test_blessed_acronyms_join_the_console_index(tmp_path):
-    from aivia.flows import glossary
+    from aisql.flows import glossary
     journal = tmp_path / "governance" / "journal.jsonl"
     store, _ = build_store("ed_sepsis_dev", journal_path=journal)
     read = ReadApi(store)
@@ -1058,8 +1058,8 @@ def test_blessed_acronyms_join_the_console_index(tmp_path):
 
 # ---- THE LIVE MEANING BATTERY (BLESSED in full, 2026-09-11) ---------
 live = pytest.mark.skipif(
-    not os.environ.get("AIVIA_LIVE"),
-    reason="the live battery runs with AIVIA_LIVE=1 (live-seat rule)")
+    not os.environ.get("AISQL_LIVE"),
+    reason="the live battery runs with AISQL_LIVE=1 (live-seat rule)")
 
 # family · question · crowns (any-of, real store names — never
 # invented); assertions pin the LAW (crown surfaces in matches or
@@ -1149,8 +1149,8 @@ BATTERY = [
 
 @pytest.fixture(scope="module")
 def live_world(world):
-    from aivia.console import EMBEDDING_MODEL, _env_key, make_embedder, make_interpreter
-    from aivia.flows import grounding
+    from aisql.console import EMBEDDING_MODEL, _env_key, make_embedder, make_interpreter
+    from aisql.flows import grounding
     key = _env_key()
     assert key, "OPENAI_API_KEY missing — the live battery needs it"
     read, entries, _, adj, directed = world

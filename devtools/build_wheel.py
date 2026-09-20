@@ -2,14 +2,14 @@
 
 Copies the source-of-truth registry JSONs (AIVIA_Design/registries
 — the converter's output, the only home) and the ScriptDom DLL
-(libs/) into the package as aivia/_registries and aivia/_libs FOR
+(libs/) into the package as aisql/_registries and aisql/_libs FOR
 THE BUILD ONLY — gitignored, removed in finally; derivable is
 never stored. Then `python -m build --wheel` produces the turn-key
 carrier: sql_query_agent-2.0.0-py3-none-any.whl, everything a
 Fabric Environment or a marketplace customer needs in one file.
 
 Release build (dist/): python3.11 devtools/build_wheel.py
-The FR7 pin (tests/aivia/test_wheel_boot.py) builds into a temp
+The FR7 pin (tests/aisql/test_wheel_boot.py) builds into a temp
 dir and proves the wheel boots with no repo present.
 """
 import pathlib
@@ -24,12 +24,12 @@ DLL = "Microsoft.SqlServer.TransactSql.ScriptDom.dll"
 def build(outdir) -> str:
     if str(ROOT) not in sys.path:  # script mode: repo root on path
         sys.path.insert(0, str(ROOT))
-    from aivia.graph.metamodel import REGISTRY_NAMES
+    from aisql.graph.metamodel import REGISTRY_NAMES
     reg_src = ROOT / "AIVIA_Design" / "registries"
-    reg_dst = ROOT / "aivia" / "_registries"
-    lib_dst = ROOT / "aivia" / "_libs"
+    reg_dst = ROOT / "aisql" / "_registries"
+    lib_dst = ROOT / "aisql" / "_libs"
     pack_src = ROOT / "AIVIA_Product" / "source_packs" / "clarity"
-    pack_dst = ROOT / "aivia" / "_source_packs" / "clarity"
+    pack_dst = ROOT / "aisql" / "_source_packs" / "clarity"
     try:
         reg_dst.mkdir(exist_ok=True)
         lib_dst.mkdir(exist_ok=True)
@@ -50,7 +50,7 @@ def build(outdir) -> str:
     finally:
         shutil.rmtree(reg_dst, ignore_errors=True)
         shutil.rmtree(lib_dst, ignore_errors=True)
-        shutil.rmtree(ROOT / "aivia" / "_source_packs",
+        shutil.rmtree(ROOT / "aisql" / "_source_packs",
                       ignore_errors=True)
     wheels = sorted(pathlib.Path(outdir).glob("*.whl"))
     if not wheels:

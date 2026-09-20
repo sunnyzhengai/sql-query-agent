@@ -17,7 +17,7 @@ twin each run and hold the key to them — the key cannot rot
 silently; a metamodel bump that moves a number fails here by
 name, and the key updates by hand with the bump recorded.
 
-Proves: contract:aivia-design-to-code
+Proves: contract:aisql-design-to-code
 """
 import json
 import pathlib
@@ -26,9 +26,9 @@ from collections import Counter
 
 import pytest
 
-from aivia.console import build_store
-from aivia.flows.export_graph import export_tables
-from aivia.graph.read_api import ReadApi
+from aisql.console import build_store
+from aisql.flows.export_graph import export_tables
+from aisql.graph.read_api import ReadApi
 
 FILE_ID = "repo://sepsis-corpus/reporting/USP_ED_SEPSIS.sql"
 BASE = pathlib.Path(__file__).resolve().parents[1] / \
@@ -176,7 +176,7 @@ def test_m2_store_matches_census(booted, exported):
 
 
 def test_m2_join_conservation_and_verbatim(booted):
-    from aivia.flows.inbound import join_render
+    from aisql.flows.inbound import join_render
     want = DELTA["M2"]["join_conservation"]
     joins = booted.current_nodes("join")
     left = {e.from_id: e.to_id
@@ -390,8 +390,8 @@ def test_m4_cites_recompute_at_store_grain(booted):
     at STORE grain, so heads collapse to their owning NAMED scope:
     three pairs merge, the measured count is 97, and the key
     re-based by measurement (the joins-93→95 precedent)."""
-    from aivia.flows.inbound import _derived_members, _member_cites
-    from aivia.lenses import decisions
+    from aisql.flows.inbound import _derived_members, _member_cites
+    from aisql.lenses import decisions
     read = ReadApi(booted)
     want = DELTA["M4"]
     cites = set()
@@ -427,9 +427,9 @@ def test_m4_store_matches_key(booted):
 def test_m4_descriptions_stored_and_verbatim(booted):
     """156/156 voiced (the description_coverage row) and the
     verbatim law: stored == the R12 recompute."""
-    from aivia.flows import produce
-    from aivia.flows.inbound import _derived_members, _is_derived_node
-    from aivia.lenses import decisions
+    from aisql.flows import produce
+    from aisql.flows.inbound import _derived_members, _is_derived_node
+    from aisql.lenses import decisions
     read = ReadApi(booted)
     nodes = {n.identity: n
              for n in booted.current_nodes("derived_column")}
@@ -611,7 +611,7 @@ def test_m5_descriptions_36_voiced_31_empty_by_rule(booted):
 def test_m5_descriptions_stored_and_verbatim(booted):
     """The verbatim law at statement grain: stored == the R11
     recompute, byte-exact, for every voiced statement."""
-    from aivia.flows import inbound
+    from aisql.flows import inbound
     read = ReadApi(booted)
     recomputed = inbound._render_statement_descriptions(read)
     nodes = {n.identity: n
@@ -694,7 +694,7 @@ def test_m6_two_governance_fields(booted):
     """The two-field design (Sunny's sitting, 2026-09-17):
     technical definition = the R13 catch-all, verbatim-law;
     description = the APPROVED Scribe summary of it."""
-    from aivia.flows import inbound
+    from aisql.flows import inbound
     f = booted.current_nodes("file")[0]
     td = f.properties.get("technical_definition")
     assert td and td.strip()

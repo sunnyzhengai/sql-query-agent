@@ -63,12 +63,12 @@ def test_the_native_loader_is_the_single_parse_door():
     """Every module that parses SQL text goes through scriptdom_loader
     — one initialization home, one parser class, one law. Re-based to
     the era-2 door (Brief_Retirement, 2026-09-19: src/parser retired;
-    the engine's loader is aivia/graph/kg2_mapper/scriptdom_loader.py)."""
-    loader = (REPO / "aivia" / "graph" / "kg2_mapper"
+    the engine's loader is aisql/graph/kg2_mapper/scriptdom_loader.py)."""
+    loader = (REPO / "aisql" / "graph" / "kg2_mapper"
               / "scriptdom_loader.py").read_text()
     assert "TSql160Parser" in loader
     offenders = []
-    for root in (REPO / "aivia", REPO / "src"):
+    for root in (REPO / "aisql", REPO / "src"):
         for py in root.rglob("*.py"):
             if py.name == "scriptdom_loader.py" or "__pycache__" in str(py):
                 continue

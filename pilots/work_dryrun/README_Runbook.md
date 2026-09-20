@@ -10,7 +10,7 @@ Findings come back as words about the engine only.**
 This file contains PLACEHOLDERS only. Fill values at work, in the
 work clone.
 
-## Prerequisites — everything AIVIA needs to run
+## Prerequisites — everything AISQL needs to run
 
 | prerequisite | Windows laptop | Fabric (notebook route) |
 |---|---|---|
@@ -47,7 +47,7 @@ law). In order, after downloading the wheel
    work .sql batch). Estate data lives in the tenant only — the
    wall; dictionary metadata is fine, row-level data never.
 4. Notebook: "+ New item" → Notebook → attach the Environment →
-   cell 1: `import aivia.fabric_run as f`
+   cell 1: `import aisql.fabric_run as f`
    cell 2: `f.extract_scripts("/lakehouse/default/Files/<estate>")`
    Good = it prints "parsed N files · M tables referenced · K
    unparseable" (unparseable files NAMED — findings, not
@@ -86,7 +86,7 @@ there; proceed below only on a LAPTOP-green verdict.
    - the ship zip (no git needed):
      `https://github.com/sunnyzhengai/sql-query-agent/archive/refs/heads/dev.zip`
      (or pin an exact commit: `.../archive/<sha>.zip`); extract.
-     Good = ~7.5 MB, unzips in seconds, contains `aivia/`,
+     Good = ~7.5 MB, unzips in seconds, contains `aisql/`,
      `libs/`, `pilots/`, `devtools/`, `AIVIA_Design/registries/`,
      `AIVIA_Product/` and nothing else.
    - or clone the repo. Good = `git status` clean.
@@ -94,7 +94,7 @@ there; proceed below only on a LAPTOP-green verdict.
    the preflight proves all three. Set `DOTNET_ROOT` to the
    runtime folder (the SOP's P6 shows the per-user form).
 3. Check the parser loads:
-   `python3.11 -c "from aivia.graph.kg2_mapper import scriptdom_loader; scriptdom_loader.load()"`
+   `python3.11 -c "from aisql.graph.kg2_mapper import scriptdom_loader; scriptdom_loader.load()"`
    Good = no output, exit 0. (The ScriptDom DLL ships in `libs/`.)
 4. Put the work OpenAI key in `.env` at the repo root:
    `OPENAI_API_KEY=<work key>`. The engine reads it itself.
@@ -125,7 +125,7 @@ there; proceed below only on a LAPTOP-green verdict.
 
 ## Boot and see the descriptions (W2 — both kinds)
 
-7. `python3.11 -m aivia.console work_pilot`
+7. `python3.11 -m aisql.console work_pilot`
    then open http://localhost:8377. Good = the estate answers;
    technical definitions and scope/statement renders (the
    deterministic descriptions) are already speaking — they land
@@ -145,7 +145,7 @@ there; proceed below only on a LAPTOP-green verdict.
     here). Reboot the console. Good = every approved file
     description speaks, each starting **"AI-generated: "**.
 
-## What comes back to AIVIA
+## What comes back to AISQL
 
 Words only: parse rates, unresolved counts, render quality notes,
 engine gaps — as FINDINGS rows in the brief. Never a file name,

@@ -5,7 +5,7 @@
      Regenerate: python scripts/generate_docs.py
      CI fails if stale (tests/test_spec_registry.py). -->
 
-# Φ_AIVIA — The Shadow Specification
+# Φ_AISQL — The Shadow Specification
 
 <!-- TIER: BLUEPRINT — generated marker, do not remove.
      Component key: spec (src/trace_registry.py ARCHITECTURE_COMPONENTS)
@@ -72,9 +72,9 @@ statuses remain HERE, their one home, until the ratchet retires that
 prose into the ADRs. The invariant: if an agent must obey it, it is a
 record with a check; if a human must understand why, it is an ADR.
 
-**Relationship to the framework (the tier above).** Φ_AIVIA is *this
+**Relationship to the framework (the tier above).** Φ_AISQL is *this
 system's* theory; [AI_VIA_AXIOMS.md](../AI_VIA_AXIOMS.md) is the
-general framework AIVIA is the reference implementation of. This file
+general framework AISQL is the reference implementation of. This file
 translates framework groups **axm:S** (Specification), **axm:J**
 (Judgment), **axm:M** (Mind), **axm:B** (Boundary) and **axm:R**
 (Residue & Ledger) into checkable sentences about this codebase. The
@@ -781,7 +781,7 @@ discover what L2 should have caught.
 
 ## 14e. Group Q — graph topology (v0.6, ADR 0059; ratified 2026-08-26)
 
-The ADR names these G1–G3; Φ_AIVIA already holds a Group G
+The ADR names these G1–G3; Φ_AISQL already holds a Group G
 (mechanism uniqueness), so they join as Q1–Q3 — the correspondence
 is recorded here, never silently renumbered. Measured before
 drafted: 1 component / 0 orphans / 0 dangling at 6,669 nodes /
@@ -1002,7 +1002,7 @@ left.
 
 ## 14i. Group W — the twin graph (v0.9, ADR 0077; ratified 2026-09-06)
 
-The AIVIA engine's meaning layer: KG2b, the stored homomorphic twin
+The AISQL engine's meaning layer: KG2b, the stored homomorphic twin
 of the parsed graph (AIVIA_Design/Ruling_Twin_Graph_KG.md is the
 ratified design record; these axioms are its enforced core, landed
 at the ledger close per the ADR 0073 discipline — each with its
@@ -1016,7 +1016,7 @@ check named).
 *Gloss:* every parsed node has exactly one meaning node — translated or a reason-coded gap, no third bucket; asserted INSIDE translate() on every file, every run (a mismatch raises, never warns). ADR 0044 conservation, generalized from predicates to every grain.
 *Origin:* ADR 0077 (the twin-graph ruling), Phase B.
 *Grounds in the framework:* axm:R1 — handled + fallout = total, at the meaning layer.
-*Checks:* `tests/aivia/test_phase_b_translator.py`, `tests/aivia/test_sepsis_shakedown.py`
+*Checks:* `tests/aisql/test_phase_b_translator.py`, `tests/aisql/test_sepsis_shakedown.py`
 **Status: ENFORCED** — runtime assertion + corpus pins (25,812 nodes, 0 gaps at the ledger close).
 
 **W2 — meaning identity (content_key).**
@@ -1026,7 +1026,7 @@ check named).
 *Gloss:* reformatting, alias renames, AND/join reorder and comments move NO key; any column, operator, literal, join-kind or structural change moves the key and everything above it. The law of when a certification survives (Sunny's T-4 blessing).
 *Origin:* ADR 0077 ruling 2e, Phase B; exercised Phase D.
 *Grounds in the framework:* axm:D2 — one identity rule, one definition.
-*Checks:* `tests/aivia/test_phase_b_translator.py`
+*Checks:* `tests/aisql/test_phase_b_translator.py`
 **Status: ENFORCED**
 
 **W3 — the voicing ledger.**
@@ -1036,7 +1036,7 @@ check named).
 *Gloss:* voicing SELECTS, never compresses: silence is always an itemized policy choice (degenerate, operational, outer match conditions) — silent omission has no constructible path, and "why isn't X mentioned" always has a citable answer.
 *Origin:* ADR 0077 ruling 4a (ADR 0044 clause 5 generalized), Phase C.
 *Grounds in the framework:* axm:R1, axm:B2 — conservation of decisions + absence over fabrication.
-*Checks:* `tests/aivia/test_phase_c_voicing.py`
+*Checks:* `tests/aisql/test_phase_c_voicing.py`
 **Status: ENFORCED**
 
 **W4 — anchors ride meaning.**
@@ -1046,7 +1046,7 @@ check named).
 *Gloss:* same key after regeneration -> the certification survives silently; changed key -> flagged orphan; deleted scope -> orphan with candidates found BY meaning (the rename case resolves itself). Re-attachment stays a human act.
 *Origin:* ADR 0077 ruling 2f, Phase D.
 *Grounds in the framework:* axm:D3 — human judgment binds to exactly one owner-identity.
-*Checks:* `tests/aivia/test_phase_d_anchors.py`
+*Checks:* `tests/aisql/test_phase_d_anchors.py`
 **Status: ENFORCED**
 
 **W5 — the gap taxonomy is total.**
@@ -1056,7 +1056,7 @@ check named).
 *Gloss:* every counted class is ok-forever by ruling or open with an owner; the Gap_Classes registry sheet is the closed assignment and the gap-check report prints the rollup.
 *Origin:* Sunny's Phase-C review ruling (2026-09-06); registry v1.5.0+.
 *Grounds in the framework:* axm:R2 — the remainder aggregates to a human ruling.
-*Checks:* `tests/aivia/test_design_validators.py`
+*Checks:* `tests/aisql/test_design_validators.py`
 **Status: PARTIAL** — the closed sheet exists and the report rolls up by class; "a new counted class joins the sheet at birth" is review discipline, not yet a mechanical check.
 
 

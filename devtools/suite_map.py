@@ -48,11 +48,11 @@ KNOWN_CONTRACTS = {
                         "(morning orders, 2026-08-27)",
     "org-config": "org_config referential integrity, LOCAL and "
                   "TENANT copies together",
-    "aivia-design-to-code": "aivia code and tests consume the ratified "
+    "aisql-design-to-code": "aisql code and tests consume the ratified "
                             "registries and fixture answer keys, never "
                             "the doc's prose (Design-to-Code protocol, "
                             "slices 0-8; claimed per-module 2026-09-06 "
-                            "when the suite-map gate reached the aivia "
+                            "when the suite-map gate reached the aisql "
                             "suite)",
 }
 

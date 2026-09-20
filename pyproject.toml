@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "sql-query-agent"
-version = "2.1.0"
+version = "2.2.0"
 description = "SQL Intelligence Agent for Microsoft Fabric. Extract business logic from SQL, build knowledge graphs, answer questions in plain English."
 readme = "README.md"
 requires-python = ">=3.9"
@@ -14,8 +14,8 @@ authors = [
 ]
 dependencies = [
     # Brief_Fabric_Resident FR6 (2026-09-19): the 2.0.0 wheel packages
-    # the aivia engine, whose ONLY third-party import is pythonnet —
-    # verified against every import in aivia/. pyyaml/pydantic served
+    # the aisql engine, whose ONLY third-party import is pythonnet —
+    # verified against every import in aisql/. pyyaml/pydantic served
     # the retired 1.x src/ tree and moved to the dev extra (the CI
     # suite still exercises src/).
     # Native-parser law (ADR 0001, hardened 2026-08-19): ScriptDom via
@@ -41,7 +41,7 @@ dev = [
     # unpinned ruff produced three lint-only CI failures in one day
     # (2026-08-19; isort grouping changed across versions)
     "ruff==0.16.3",
-    # Slice 0 (2026-09-05): tests/aivia rerun the registry converter to
+    # Slice 0 (2026-09-05): tests/aisql rerun the registry converter to
     # prove determinism; the converter reads the design xlsx workbooks
     "openpyxl==3.1.5",
     # M1 (2026-09-09): the graph export ships PARQUET — Fabric's
@@ -79,16 +79,20 @@ marketplace = [
 Repository = "https://github.com/sunnyzhengai/sql-query-agent"
 
 [tool.setuptools.packages.find]
-# FR6: the wheel ships the aivia engine; the 1.x line packaged the
+# FR6: the wheel ships the aisql engine; the 1.x line packaged the
 # retired src/ tree
-include = ["aivia", "aivia.*"]
+include = ["aisql", "aisql.*"]
 exclude = ["tests", "tests.*", "scripts", "notebooks", "docs", "data", "build"]
 
 [tool.setuptools.package-data]
 # FR1 all-in-one: the 7 registry JSONs + the ScriptDom DLL ride in
 # the wheel (build_wheel.py copies them in at build; never tracked)
-aivia = ["_registries/*.json", "_libs/*.dll",
+aisql = ["_registries/*.json", "_libs/*.dll",
          "_source_packs/clarity/*.sql"]
+# 2.1.1 field fix (Sunny's Fabric run, 2026-09-19): the flows
+# subpackage carries its own data files — code never ships
+# without its data (the wheel pin now enumerates the class)
+"aisql.flows" = ["*.json"]
 
 [tool.pytest.ini_options]
 testpaths = ["tests", "AIVIA_Test"]

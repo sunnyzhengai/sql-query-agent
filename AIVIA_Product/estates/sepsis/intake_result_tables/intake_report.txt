@@ -1,4 +1,4 @@
-AIVIA INTAKE REPORT
+AISQL INTAKE REPORT
 Registered db: aivia_demo_src (server SEPSISSERVER); sources: emr; DBA: role:emr-dba
 
 [extract: emr] loaded 90 tables, 4380 columns; checks: pass

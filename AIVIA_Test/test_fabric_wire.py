@@ -3,12 +3,12 @@
 doubles law): no live HTTP in the suite; the real wire fires only
 by Sunny's hand, one counted capacity spend per query.
 
-Proves: contract:aivia-design-to-code
+Proves: contract:aisql-design-to-code
 """
 import json
 
-from aivia import fabric_wire
-from aivia import meaning_console as mc
+from aisql import fabric_wire
+from aisql import meaning_console as mc
 
 
 def _ok_body(columns, rows, code="00000"):

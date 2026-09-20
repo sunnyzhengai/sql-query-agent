@@ -4,17 +4,17 @@ command, for the work dry run and any estate here.
 
 SHIM since Brief_Fabric_Resident (the turn-key ruling, 2026-09-19:
 "all that can be packaged into .wheel, must be packaged"): the
-driver core lives in aivia.fabric_run.scribe — ONE home; this
+driver core lives in aisql.fabric_run.scribe — ONE home; this
 script keeps the CLI seat and the cheap refusals (no estate arg or
 no key = exit 2 before any boot, spend, or network — the
-AIVIA_RECORD posture). Landing approved text in descriptions.json
+AISQL_RECORD posture). Landing approved text in descriptions.json
 stays a human act everywhere.
 """
 import sys
 
 
 def _env_key() -> str:
-    from aivia.console import _env_key as key
+    from aisql.console import _env_key as key
     return key()
 
 
@@ -31,7 +31,7 @@ def main(argv) -> None:
               "the Scribe is a paid seat and never runs without "
               "the key at hand", file=sys.stderr)
         raise SystemExit(2)
-    from aivia import fabric_run
+    from aisql import fabric_run
     fabric_run.scribe(argv[0], key=key)
 
 

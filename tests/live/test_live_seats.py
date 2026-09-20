@@ -6,7 +6,7 @@ proposals and vectors the pipeline handles lawfully (the 'ED → term'
 over-marking was invisible to every deterministic test and only
 surfaced live).
 
-Run: AIVIA_LIVE=1 pytest tests/live -v   (needs OPENAI_API_KEY in
+Run: AISQL_LIVE=1 pytest tests/live -v   (needs OPENAI_API_KEY in
 .env). CI skips this tier by design — a red build must mean broken
 code, never a flaky seat or a missing key — and the skip is VISIBLE
 in CI output, never silent. I run it locally before any 'done'.
@@ -14,24 +14,24 @@ in CI output, never silent. I run it locally before any 'done'.
 Assertions pin LAWS, not verbatim model output: live models vary in
 wording; they must never vary in lawfulness.
 
-Proves: contract:aivia-design-to-code
+Proves: contract:aisql-design-to-code
 """
 import os
 
 import pytest
 
 pytestmark = pytest.mark.skipif(
-    not os.environ.get("AIVIA_LIVE"),
-    reason="live seat tests run with AIVIA_LIVE=1 (the live-seat rule)")
+    not os.environ.get("AISQL_LIVE"),
+    reason="live seat tests run with AISQL_LIVE=1 (the live-seat rule)")
 
 T0 = "2026-09-09T12:00:00Z"
 
 
 @pytest.fixture(scope="module")
 def live_world(tmp_path_factory):
-    from aivia.console import EMBEDDING_MODEL, _env_key, build_store, make_embedder, make_interpreter
-    from aivia.flows import ask, grounding
-    from aivia.graph.read_api import ReadApi
+    from aisql.console import EMBEDDING_MODEL, _env_key, build_store, make_embedder, make_interpreter
+    from aisql.flows import ask, grounding
+    from aisql.graph.read_api import ReadApi
     key = _env_key()
     assert key, "OPENAI_API_KEY missing — the live tier needs it"
     import pathlib
@@ -53,7 +53,7 @@ def live_world(tmp_path_factory):
 
 
 def _ask(live_world, q):
-    from aivia.flows import ask
+    from aisql.flows import ask
     store, semantic, interpret = live_world
     return ask.ask(store, q, "person:live-test", T0,
                    interpret_fn=interpret, semantic=semantic)
@@ -85,7 +85,7 @@ def test_the_interpreter_contract_shape_live(live_world):
     """The real seat, the registry prompt, one canonical question:
     the caged proposal carries non-empty mentions and no 'kinds'
     (the cage strips what the law killed)."""
-    from aivia.flows import ask
+    from aisql.flows import ask
     _store, _semantic, interpret = live_world
     proposal = ask.validate_interpretation(
         interpret("which tables hold antibiotic orders"))
@@ -97,7 +97,7 @@ def test_blessed_acronyms_expand_live(live_world):
     """The one-vocabulary law with the real seats: a question
     saying only 'ED' searches the blessed expansions too — visible
     in the trace's searched_as."""
-    from aivia.graph.read_api import ReadApi
+    from aisql.graph.read_api import ReadApi
     store, _semantic, _interpret = live_world
     blessed = {n.properties["name"].lower()
                for n in ReadApi(store).nodes("acronym")}

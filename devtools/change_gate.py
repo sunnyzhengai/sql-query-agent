@@ -14,7 +14,7 @@ import re
 import sys
 from pathlib import Path
 
-COVERED_ROOTS = ("aivia/", "src/", "devtools/", "tests/",
+COVERED_ROOTS = ("aisql/", "src/", "devtools/", "tests/",
                  "AIVIA_Test/", "services/", "AIVIA_Product/")
 GATE_FILES = (".claude/settings.json", "devtools/change_gate.py")
 UNLOCKING = ("APPROVED", "BUILT")

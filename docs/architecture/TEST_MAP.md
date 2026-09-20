@@ -78,11 +78,11 @@
 | 0074 | The description architecture, ratified: skeleton floor, gate acceptance, metric-level design |  |
 | 0075 | The check contract: checks are claims (spec:G4) | `tests/test_check_contract.py` (4) |
 | 0076 | Compositional interpretation: capture once, interpret by grammar (spec:G5) |  |
-| 0077 | The twin-graph KG: meaning is a stored homomorphic twin | `tests/aivia/test_design_validators.py` (4), `tests/aivia/test_metamodel.py` (7), `tests/aivia/test_phase_a_projection.py` (6) |
-| 0078 | The ask-the-graph console: free questions, typed paths, self-answering nodes | `tests/aivia/test_ask_console.py` (21) |
-| 0079 | The interpreter and the speaking graph | `tests/aivia/test_ask_console.py` (21) |
-| 0080 | The center and the three censuses | `tests/aivia/test_ask_console.py` (21) |
-| 0081 | The birth-edge law | `tests/aivia/test_connection_census.py` (9) |
+| 0077 | The twin-graph KG: meaning is a stored homomorphic twin | `tests/aisql/test_design_validators.py` (4), `tests/aisql/test_metamodel.py` (7), `tests/aisql/test_phase_a_projection.py` (6) |
+| 0078 | The ask-the-graph console: free questions, typed paths, self-answering nodes | `tests/aisql/test_ask_console.py` (21) |
+| 0079 | The interpreter and the speaking graph | `tests/aisql/test_ask_console.py` (21) |
+| 0080 | The center and the three censuses | `tests/aisql/test_ask_console.py` (21) |
+| 0081 | The birth-edge law | `tests/aisql/test_connection_census.py` (9) |
 
 ## By standing law
 
@@ -111,7 +111,7 @@
 
 - `tests/test_org_config_audit.py` (2): L0 for the org_config referential-integrity audit (ops find 2,
 
-### contract:aivia-design-to-code — aivia code and tests consume the ratified registries and fixture answer keys, never the doc's prose (Design-to-Code protocol, slices 0-8; claimed per-module 2026-09-06 when the suite-map gate reached the aivia suite)
+### contract:aisql-design-to-code — aisql code and tests consume the ratified registries and fixture answer keys, never the doc's prose (Design-to-Code protocol, slices 0-8; claimed per-module 2026-09-06 when the suite-map gate reached the aisql suite)
 
 - `AIVIA_Test/test_clarity_source_pack.py` (3): Brief_Clarity_Source_Pack (Sunny, 2026-09-19: "we need contracts
 - `AIVIA_Test/test_ed_sepsis_dev_estate.py` (30): The one-proc dev estate + THE M-GATE ANSWER KEY (Sunny's
@@ -119,69 +119,69 @@
 - `AIVIA_Test/test_joins_to_lock.py` (6): THE JOINS_TO LOCK (Sunny's directive 2026-09-10, after the
 - `AIVIA_Test/test_meaning_console.py` (60): THE MEANING-TEST CONSOLE's own tests (Design_Chatbot.md ruling,
 - `AIVIA_Test/test_speech_parity.py` (5): THE SPEECH PARITY GATE (Sunny's ruling 2026-09-16, from the
-- `tests/aivia/test_acronym_enrichment.py` (7): PHASE I — ACRONYM ENRICHMENT (the one-vocabulary law, ruled
-- `tests/aivia/test_approve_land.py` (10): Slice 6 exit: the F5 script against the BUILT approve/land flows.
-- `tests/aivia/test_ask_console.py` (21): Tier A exit (ADR 0079): the F10 answer keys go RUNNABLE.
-- `tests/aivia/test_blessings.py` (36): R5.b THE BLESSED NAME, slice 1 (Grammar_Floor v2.8.0, ratified
-- `tests/aivia/test_center_censuses.py` (18): ADR 0080 — the center and the three censuses, red-first.
-- `tests/aivia/test_change_gate.py` (9): THE HARD GATE — Brief_Hard_Gate_Hook (P2 ruled 2026-09-16).
-- `tests/aivia/test_click_reroute.py` (4): STEP A of the search rebuild — CLICKS ARE STEER (gap 12). Suite
-- `tests/aivia/test_connection_census.py` (9): STEP 1 of the Connection Ledger build — THE TEST SUITE, shown to
-- `tests/aivia/test_derived_column.py` (4): M4 THE DERIVED-COLUMN LAYER — structural pins on the F2 fixture
-- `tests/aivia/test_derived_render.py` (19): R12 THE COMPUTED OUTPUT (Grammar v2.10.0, ratified Sunny
-- `tests/aivia/test_design_validators.py` (4): Slice 0: the design validators run in CI — every push re-proves the
-- `tests/aivia/test_doubles.py` (6): THE SCRIPTED-PROPOSALS CONTRACT (Sunny's ruling, 2026-09-09:
-- `tests/aivia/test_extract_autogen.py` (4): Brief_Extract_Autogen (Sunny, 2026-09-19: "this is too manual.
-- `tests/aivia/test_fabric_run.py` (4): Brief_Fabric_Resident FR4+FR5 (Sunny's "all eight as proposed,
-- `tests/aivia/test_file_layer.py` (5): M6 THE FILE LAYER — structural pins on the F2 fixture estate
-- `tests/aivia/test_file_render.py` (6): §R13 THE CATCH-ALL — form pins on the F2 fixture estate
-- `tests/aivia/test_flows_change_quanta.py` (6): The flows' change quanta (CONTRACT_DATALOAD §13 + the flows
-- `tests/aivia/test_from_structure.py` (4): ERA 3 — THE FROM-STRUCTURE NODE FAMILY (Design_Graph_Engine,
-- `tests/aivia/test_full_circle.py` (7): Slice 7: FULL CIRCLE — one run from empty, every family proven.
-- `tests/aivia/test_glossary.py` (11): THE GLOSSARY PROCESS (Ruling_Glossary_Process.md, ruled
-- `tests/aivia/test_governance_journal.py` (4): PHASE E1 — THE GOVERNANCE JOURNAL (Sunny's ruling: all user
-- `tests/aivia/test_graph_export.py` (13): M1 — THE FABRIC GRAPH EXPORT READING (the materialization plan,
-- `tests/aivia/test_kg1_intake.py` (12): Slice 1: KG1 intake vs the F1 answer key — the graph, node by node.
-- `tests/aivia/test_kg2_mapper.py` (8): Slice 2 exit: the F2 answer key against the BUILT trees.
-- `tests/aivia/test_kg3_artifacts.py` (18): Slice 4: the ledger — KG3 artifact layer lifecycle + derived states.
-- `tests/aivia/test_kind_library.py` (4): Slice 2: the kind-library case families (F7) — construct,
-- `tests/aivia/test_label_rename.py` (5): STEP D (promoted) — LABEL, not kind. The industry-standard term
-- `tests/aivia/test_ledger_close.py` (5): The ledger close (Sunny's order, 2026-09-06): the last engine-debt
-- `tests/aivia/test_lenses.py` (11): Slice 3 exit: the F3 answer key against the BUILT lenses.
-- `tests/aivia/test_literal_census.py` (1): E3 LOCK 1 — THE LITERAL CENSUS (the literal law, ratified
-- `tests/aivia/test_meaning_smells.py` (18): THE MEANING-SMELL CENSUS + THE PHRASE-CORPUS SWEEP (Sunny's go,
-- `tests/aivia/test_metamodel.py` (7): Slice 0: the registry loader — code consumes ratified registries only.
-- `tests/aivia/test_minimal_registration.py` (6): Brief_Minimal_Registration (Sunny, 2026-09-19: "keep db name and
-- `tests/aivia/test_part_edges.py` (4): STEP 4 of the Connection Ledger build — PART EDGES. The test
-- `tests/aivia/test_pbi_layer.py` (5): PHASE H — THE PBI LAYER (Sunny's ruling 2026-09-08: every proc
-- `tests/aivia/test_person_nodes.py` (7): STEP 3 of the Connection Ledger build — PERSON NODES. The test
-- `tests/aivia/test_phase_a_projection.py` (6): Phase A exit (ADR 0077): the F8 phase-A answer keys go RUNNABLE.
-- `tests/aivia/test_phase_b_translator.py` (10): Phase B exit (ADR 0077): the F8 phase-B answer keys go RUNNABLE.
-- `tests/aivia/test_phase_c_voicing.py` (5): Phase C exit (ADR 0077): the F8 phase-C answer keys go RUNNABLE.
-- `tests/aivia/test_phase_d_anchors.py` (5): Phase D exit (ADR 0077): the F8 phase-D answer keys go RUNNABLE.
-- `tests/aivia/test_phi_gate.py` (8): Slice 2: the PHI boundary — both doors, fixture-driven.
-- `tests/aivia/test_planks.py` (6): Slice 0: the planks — the import law and banned constructs as physics.
-- `tests/aivia/test_produce.py` (10): Slice 5 exit: produce vs the RATIFIED floor grammar — F4 upgraded
-- `tests/aivia/test_refusals.py` (9): Slice 1: the F6 refusal set — every refusal NAMES its rule.
-- `tests/aivia/test_registry_mirrors.py` (11): E3 LOCK 2 — THE MIRROR-CHECKS (the literal law; the
-- `tests/aivia/test_report_layer.py` (6): M7 THE REPORT LAYER — pins authored FAILING (test-first;
-- `tests/aivia/test_root_edges.py` (4): STEP 5 of the Connection Ledger build — ROOT EDGES. The test
-- `tests/aivia/test_scope_layer.py` (3): M2 (bottom-up re-ruling, 2026-09-10) — THE SCOPE LAYER.
-- `tests/aivia/test_scribe_draft.py` (2): Brief_Work_Dryrun (Sunny's "approved, both proposals stand",
-- `tests/aivia/test_search_is_the_answer.py` (10): STEP B — THE SEARCH IS THE ANSWER (Sunny's pipeline, ruled
-- `tests/aivia/test_seat_prompts.py` (4): STEP C of the search rebuild — THE PROMPT IS REGISTRY DATA.
-- `tests/aivia/test_sepsis_shakedown.py` (10): The sepsis shakedown (round 2) — conservation counters pinned;
-- `tests/aivia/test_shape_census.py` (4): THE SHAPE CENSUS — integrity battery #13 (THE SHAPE CONTRACT,
-- `tests/aivia/test_shapes_shakedown.py` (5): The shapes shakedown — the engine over the 38-file ADR 0055 corpus,
-- `tests/aivia/test_ship_surface.py` (5): Brief_Packaging slice 1 (Sunny's "all four as proposed, build
-- `tests/aivia/test_speech_contract.py` (8): E1 — THE SPEECH CONTRACT build (ruled 2026-09-09, Scribe route).
-- `tests/aivia/test_statement_layer.py` (5): M5 THE STATEMENT LAYER — structural pins on the F2 fixture
-- `tests/aivia/test_statement_render.py` (10): §R11 THE STATEMENT STEP — byte-exact render pins (authored
-- `tests/aivia/test_store.py` (6): Slice 1: the append-only substrate — LC-F2/F3 as structure.
-- `tests/aivia/test_term_origins.py` (6): STEP 2 of the Connection Ledger build — TERM ORIGINS. The test
-- `tests/aivia/test_verbatim_census.py` (3): E2 — THE VERBATIM CENSUS (integrity battery #8, ratified in
-- `tests/aivia/test_visual_counts.py` (1): FS1 — the graph visual's counts-vs-key re-verify (ruled by
-- `tests/aivia/test_wheel_boot.py` (3): Brief_Fabric_Resident FR7 (Sunny's "all eight as proposed,
+- `tests/aisql/test_acronym_enrichment.py` (7): PHASE I — ACRONYM ENRICHMENT (the one-vocabulary law, ruled
+- `tests/aisql/test_approve_land.py` (10): Slice 6 exit: the F5 script against the BUILT approve/land flows.
+- `tests/aisql/test_ask_console.py` (21): Tier A exit (ADR 0079): the F10 answer keys go RUNNABLE.
+- `tests/aisql/test_blessings.py` (36): R5.b THE BLESSED NAME, slice 1 (Grammar_Floor v2.8.0, ratified
+- `tests/aisql/test_center_censuses.py` (18): ADR 0080 — the center and the three censuses, red-first.
+- `tests/aisql/test_change_gate.py` (9): THE HARD GATE — Brief_Hard_Gate_Hook (P2 ruled 2026-09-16).
+- `tests/aisql/test_click_reroute.py` (4): STEP A of the search rebuild — CLICKS ARE STEER (gap 12). Suite
+- `tests/aisql/test_connection_census.py` (9): STEP 1 of the Connection Ledger build — THE TEST SUITE, shown to
+- `tests/aisql/test_derived_column.py` (4): M4 THE DERIVED-COLUMN LAYER — structural pins on the F2 fixture
+- `tests/aisql/test_derived_render.py` (19): R12 THE COMPUTED OUTPUT (Grammar v2.10.0, ratified Sunny
+- `tests/aisql/test_design_validators.py` (4): Slice 0: the design validators run in CI — every push re-proves the
+- `tests/aisql/test_doubles.py` (6): THE SCRIPTED-PROPOSALS CONTRACT (Sunny's ruling, 2026-09-09:
+- `tests/aisql/test_extract_autogen.py` (4): Brief_Extract_Autogen (Sunny, 2026-09-19: "this is too manual.
+- `tests/aisql/test_fabric_run.py` (4): Brief_Fabric_Resident FR4+FR5 (Sunny's "all eight as proposed,
+- `tests/aisql/test_file_layer.py` (5): M6 THE FILE LAYER — structural pins on the F2 fixture estate
+- `tests/aisql/test_file_render.py` (6): §R13 THE CATCH-ALL — form pins on the F2 fixture estate
+- `tests/aisql/test_flows_change_quanta.py` (6): The flows' change quanta (CONTRACT_DATALOAD §13 + the flows
+- `tests/aisql/test_from_structure.py` (4): ERA 3 — THE FROM-STRUCTURE NODE FAMILY (Design_Graph_Engine,
+- `tests/aisql/test_full_circle.py` (7): Slice 7: FULL CIRCLE — one run from empty, every family proven.
+- `tests/aisql/test_glossary.py` (11): THE GLOSSARY PROCESS (Ruling_Glossary_Process.md, ruled
+- `tests/aisql/test_governance_journal.py` (4): PHASE E1 — THE GOVERNANCE JOURNAL (Sunny's ruling: all user
+- `tests/aisql/test_graph_export.py` (13): M1 — THE FABRIC GRAPH EXPORT READING (the materialization plan,
+- `tests/aisql/test_kg1_intake.py` (12): Slice 1: KG1 intake vs the F1 answer key — the graph, node by node.
+- `tests/aisql/test_kg2_mapper.py` (8): Slice 2 exit: the F2 answer key against the BUILT trees.
+- `tests/aisql/test_kg3_artifacts.py` (18): Slice 4: the ledger — KG3 artifact layer lifecycle + derived states.
+- `tests/aisql/test_kind_library.py` (4): Slice 2: the kind-library case families (F7) — construct,
+- `tests/aisql/test_label_rename.py` (5): STEP D (promoted) — LABEL, not kind. The industry-standard term
+- `tests/aisql/test_ledger_close.py` (5): The ledger close (Sunny's order, 2026-09-06): the last engine-debt
+- `tests/aisql/test_lenses.py` (11): Slice 3 exit: the F3 answer key against the BUILT lenses.
+- `tests/aisql/test_literal_census.py` (1): E3 LOCK 1 — THE LITERAL CENSUS (the literal law, ratified
+- `tests/aisql/test_meaning_smells.py` (18): THE MEANING-SMELL CENSUS + THE PHRASE-CORPUS SWEEP (Sunny's go,
+- `tests/aisql/test_metamodel.py` (7): Slice 0: the registry loader — code consumes ratified registries only.
+- `tests/aisql/test_minimal_registration.py` (6): Brief_Minimal_Registration (Sunny, 2026-09-19: "keep db name and
+- `tests/aisql/test_part_edges.py` (4): STEP 4 of the Connection Ledger build — PART EDGES. The test
+- `tests/aisql/test_pbi_layer.py` (5): PHASE H — THE PBI LAYER (Sunny's ruling 2026-09-08: every proc
+- `tests/aisql/test_person_nodes.py` (7): STEP 3 of the Connection Ledger build — PERSON NODES. The test
+- `tests/aisql/test_phase_a_projection.py` (6): Phase A exit (ADR 0077): the F8 phase-A answer keys go RUNNABLE.
+- `tests/aisql/test_phase_b_translator.py` (10): Phase B exit (ADR 0077): the F8 phase-B answer keys go RUNNABLE.
+- `tests/aisql/test_phase_c_voicing.py` (5): Phase C exit (ADR 0077): the F8 phase-C answer keys go RUNNABLE.
+- `tests/aisql/test_phase_d_anchors.py` (5): Phase D exit (ADR 0077): the F8 phase-D answer keys go RUNNABLE.
+- `tests/aisql/test_phi_gate.py` (8): Slice 2: the PHI boundary — both doors, fixture-driven.
+- `tests/aisql/test_planks.py` (6): Slice 0: the planks — the import law and banned constructs as physics.
+- `tests/aisql/test_produce.py` (10): Slice 5 exit: produce vs the RATIFIED floor grammar — F4 upgraded
+- `tests/aisql/test_refusals.py` (9): Slice 1: the F6 refusal set — every refusal NAMES its rule.
+- `tests/aisql/test_registry_mirrors.py` (11): E3 LOCK 2 — THE MIRROR-CHECKS (the literal law; the
+- `tests/aisql/test_report_layer.py` (6): M7 THE REPORT LAYER — pins authored FAILING (test-first;
+- `tests/aisql/test_root_edges.py` (4): STEP 5 of the Connection Ledger build — ROOT EDGES. The test
+- `tests/aisql/test_scope_layer.py` (3): M2 (bottom-up re-ruling, 2026-09-10) — THE SCOPE LAYER.
+- `tests/aisql/test_scribe_draft.py` (2): Brief_Work_Dryrun (Sunny's "approved, both proposals stand",
+- `tests/aisql/test_search_is_the_answer.py` (10): STEP B — THE SEARCH IS THE ANSWER (Sunny's pipeline, ruled
+- `tests/aisql/test_seat_prompts.py` (4): STEP C of the search rebuild — THE PROMPT IS REGISTRY DATA.
+- `tests/aisql/test_sepsis_shakedown.py` (10): The sepsis shakedown (round 2) — conservation counters pinned;
+- `tests/aisql/test_shape_census.py` (4): THE SHAPE CENSUS — integrity battery #13 (THE SHAPE CONTRACT,
+- `tests/aisql/test_shapes_shakedown.py` (5): The shapes shakedown — the engine over the 38-file ADR 0055 corpus,
+- `tests/aisql/test_ship_surface.py` (5): Brief_Packaging slice 1 (Sunny's "all four as proposed, build
+- `tests/aisql/test_speech_contract.py` (8): E1 — THE SPEECH CONTRACT build (ruled 2026-09-09, Scribe route).
+- `tests/aisql/test_statement_layer.py` (5): M5 THE STATEMENT LAYER — structural pins on the F2 fixture
+- `tests/aisql/test_statement_render.py` (10): §R11 THE STATEMENT STEP — byte-exact render pins (authored
+- `tests/aisql/test_store.py` (6): Slice 1: the append-only substrate — LC-F2/F3 as structure.
+- `tests/aisql/test_term_origins.py` (6): STEP 2 of the Connection Ledger build — TERM ORIGINS. The test
+- `tests/aisql/test_verbatim_census.py` (3): E2 — THE VERBATIM CENSUS (integrity battery #8, ratified in
+- `tests/aisql/test_visual_counts.py` (1): FS1 — the graph visual's counts-vs-key re-verify (ruled by
+- `tests/aisql/test_wheel_boot.py` (3): Brief_Fabric_Resident FR7 (Sunny's "all eight as proposed,
 - `tests/live/test_live_seats.py` (4): THE LIVE TIER — the live-seat rule (Sunny's ruling, 2026-09-09):
 
 ## By spec axiom

@@ -12,7 +12,7 @@ Nothing to download.
 
 Where it runs:
 
-- Laptop: the loader (`aivia/graph/kg2_mapper/scriptdom_loader.py`)
+- Laptop: the loader (`aisql/graph/kg2_mapper/scriptdom_loader.py`)
   finds it in this folder automatically.
 - Fabric: this same file, uploaded once to the lakehouse Files.
 

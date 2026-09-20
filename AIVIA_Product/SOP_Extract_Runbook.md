@@ -1,4 +1,4 @@
-# AIVIA Data Extract — DBA Runbook
+# AISQL Data Extract — DBA Runbook
 
 *This runbook is vendor-neutral and ships with the product. The
 scripts it references are your source system's SOURCE PACK, shipped
@@ -13,7 +13,7 @@ only your system's own data dictionary.*
 - [ ] You can run read-only queries against the source system's
       metadata/dictionary tables
 - [ ] You received the source pack for your system (a small set of
-      SQL scripts) from your AIVIA engagement contact
+      SQL scripts) from your AISQL engagement contact
 - [ ] You know which database the source system's dictionary
       lives in
 
@@ -57,7 +57,7 @@ only your system's own data dictionary.*
 
 ## What happens next
 
-AIVIA validates your extract and produces an **intake report** in
+AISQL validates your extract and produces an **intake report** in
 your organization's environment: what loaded, what was counted as
 missing (for example, tables with no declared primary key), and
 anything quarantined for review. If the extract is refused, the

@@ -28,7 +28,7 @@ GOVERNED_SUFFIXES = (
 
 # Every non-Fabric top-level entry must be declared here to be governed.
 GOVERNED_ENTRIES = frozenset({
-    # The AIVIA line (declared 2026-09-06 when the zone gate reached
+    # The AISQL line (declared 2026-09-06 when the zone gate reached
     # them — tracked since the design workspace landed, never
     # classified): design law + registries, product assets + fixture
     # answer keys, and the clean-room engine package.
@@ -38,7 +38,7 @@ GOVERNED_ENTRIES = frozenset({
     # the export law itself is governed
     ".gitattributes",
     "AIVIA_Test",
-    "aivia",
+    "aisql",
     ".claude",
     ".github",
     ".gitignore",

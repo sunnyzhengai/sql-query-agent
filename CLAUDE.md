@@ -54,7 +54,7 @@ Full process: `AIVIA_Design/Ruling_Change_Process.md`. Contracts:
   fail, then green.
 - **No Fabric/capacity operation without Sunny's explicit go** —
   one refresh per batch, his hand or his word. Same for any
-  paid API call (embedding recording: `AIVIA_RECORD=1`, his run).
+  paid API call (embedding recording: `AISQL_RECORD=1`, his run).
 - **Verdicts land immediately**: a ruling made in conversation is
   written to the ledger/registries/docs the moment it's made.
 - **Findings are rows**: anything discovered while populating or
@@ -98,7 +98,7 @@ Full process: `AIVIA_Design/Ruling_Change_Process.md`. Contracts:
 - Tests replay RECORDED embedding vectors
   (AIVIA_Product/fixtures/embeddings/…json.gz). New searchable
   sentences → RecordingGap errors → Sunny runs
-  `AIVIA_RECORD=1 python3.11 -m pytest tests AIVIA_Test -q`.
+  `AISQL_RECORD=1 python3.11 -m pytest tests AIVIA_Test -q`.
 - The graph visual republishes to the SAME artifact URL each
   ladder step (devtools/graph_visual/generate_m1.py).
 - Branch: work on `dev`. Commit/push only at Sunny's word.

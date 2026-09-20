@@ -22,7 +22,7 @@
   "ReadMe": [
    {
     "Item": "Status",
-    "Statement": "DRAFT v0.1 — the technical layer's METAMODEL REGISTRY: the executable twin of 'Content Descriptions Level 1' in the AIVIA Design Document. The DOC is the design authority; this registry is what code and tests will consume. Protocol rule: any doc change to L1 updates this registry in the same breath."
+    "Statement": "DRAFT v0.1 — the technical layer's METAMODEL REGISTRY: the executable twin of 'Content Descriptions Level 1' in the AISQL Design Document. The DOC is the design authority; this registry is what code and tests will consume. Protocol rule: any doc change to L1 updates this registry in the same breath."
    },
    {
     "Item": "Ratified by",

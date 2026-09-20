@@ -17,45 +17,45 @@ standing doctrine follows below.
 
 ```mermaid
 flowchart LR
-  AIVIA(("AIVIA<br/>knowledge graph")):::core
+  AISQL(("AISQL<br/>knowledge graph")):::core
   T0["SQL Server (on-prem)"]:::shipped
-  T0 -->|ingest| AIVIA
+  T0 -->|ingest| AISQL
   T1["Azure SQL / Managed Instance"]:::shipped
-  T1 -->|ingest| AIVIA
+  T1 -->|ingest| AISQL
   T2["Fabric Warehouse / SQL DB / mirrored DB"]:::shipped
-  T2 -->|ingest| AIVIA
+  T2 -->|ingest| AISQL
   T3["Power BI (DevOps git repos)"]:::shipped
-  T3 -->|ingest| AIVIA
+  T3 -->|ingest| AISQL
   T4["Power BI (Fabric workspace, git or not)"]:::shipped
-  T4 -->|ingest| AIVIA
+  T4 -->|ingest| AISQL
   T5["core"]:::shipped
-  T5 -->|publish| AIVIA
+  T5 -->|publish| AISQL
   T6["core"]:::shipped
-  T6 -->|publish| AIVIA
+  T6 -->|publish| AISQL
   T7["core"]:::shipped
-  T7 -->|publish| AIVIA
+  T7 -->|publish| AISQL
   T8["dbt"]:::planned
-  T8 -->|planned| AIVIA
+  T8 -->|planned| AISQL
   T9["Databricks"]:::watchlist
-  T9 -->|watchlist| AIVIA
+  T9 -->|watchlist| AISQL
   T10["Snowflake"]:::watchlist
-  T10 -->|watchlist| AIVIA
+  T10 -->|watchlist| AISQL
   T11["Synapse dedicated SQL pool"]:::planned
-  T11 -->|planned| AIVIA
+  T11 -->|planned| AISQL
   T12["Power BI paginated reports (RDL)"]:::planned
-  T12 -->|planned| AIVIA
+  T12 -->|planned| AISQL
   T13["Power BI dataflows (Gen1/Gen2)"]:::planned
-  T13 -->|planned| AIVIA
+  T13 -->|planned| AISQL
   T14["Power BI (non-git tenants, XMLA)"]:::planned
-  T14 -->|planned| AIVIA
+  T14 -->|planned| AISQL
   T15["Fabric Data Factory / ADF pipelines"]:::planned
-  T15 -->|planned| AIVIA
+  T15 -->|planned| AISQL
   T16["SSIS packages (.dtsx)"]:::watchlist
-  T16 -->|watchlist| AIVIA
+  T16 -->|watchlist| AISQL
   T17["Power BI pure-M transformations"]:::watchlist
-  T17 -->|watchlist| AIVIA
+  T17 -->|watchlist| AISQL
   T18["Oracle (PL/SQL)"]:::watchlist
-  T18 -->|watchlist| AIVIA
+  T18 -->|watchlist| AISQL
   classDef core fill:#e8f0fe,stroke:#4285f4,stroke-width:2px
   classDef shipped fill:#e6f4ea,stroke:#34a853
   classDef planned fill:#fef7e0,stroke:#f9ab00

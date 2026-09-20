@@ -23,9 +23,9 @@ from pathlib import Path
 PROJECT_ROOT = Path(__file__).resolve().parent.parent
 CROSSWALK_PATH = PROJECT_ROOT / "data" / "synthetic" / "crosswalk.json"
 # Raw vendor dictionary lives OUTSIDE the repo (wall rule, relocated
-# 2026-08-16). Override with AIVIA_RAW_SQL_DIR.
+# 2026-08-16). Override with AISQL_RAW_SQL_DIR.
 _RAW_ROOT = Path(os.environ.get(
-    "AIVIA_RAW_SQL_DIR", str(Path.home() / "aivia-private" / "sepsis_sql")))
+    "AISQL_RAW_SQL_DIR", str(Path.home() / "aisql-private" / "sepsis_sql")))
 INPUT_TABLES = _RAW_ROOT / "sepsis_clarity_tables.csv"
 INPUT_COLUMNS = _RAW_ROOT / "sepsis_clarity_columns.csv"
 OUTPUT_TABLES = PROJECT_ROOT / "data" / "synthetic" / "dict_tables.csv"

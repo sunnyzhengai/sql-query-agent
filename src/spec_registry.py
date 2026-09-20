@@ -64,8 +64,8 @@ SPEC_REGISTRY = {
         "parents": ['R1'],
         "parent_note":
             'handled + fallout = total, at the meaning layer',
-        "checks": ['tests/aivia/test_phase_b_translator.py',
-                   'tests/aivia/test_sepsis_shakedown.py'],
+        "checks": ['tests/aisql/test_phase_b_translator.py',
+                   'tests/aisql/test_sepsis_shakedown.py'],
         "status": 'ENFORCED',
         "status_note":
             'runtime assertion + corpus pins (25,812 nodes, 0 gaps at '
@@ -87,7 +87,7 @@ SPEC_REGISTRY = {
         "parents": ['D2'],
         "parent_note":
             'one identity rule, one definition',
-        "checks": ['tests/aivia/test_phase_b_translator.py'],
+        "checks": ['tests/aisql/test_phase_b_translator.py'],
         "status": 'ENFORCED',
     },
     "W3": {
@@ -107,7 +107,7 @@ SPEC_REGISTRY = {
         "parents": ['R1', 'B2'],
         "parent_note":
             'conservation of decisions + absence over fabrication',
-        "checks": ['tests/aivia/test_phase_c_voicing.py'],
+        "checks": ['tests/aisql/test_phase_c_voicing.py'],
         "status": 'ENFORCED',
     },
     "W4": {
@@ -125,7 +125,7 @@ SPEC_REGISTRY = {
         "parents": ['D3'],
         "parent_note":
             'human judgment binds to exactly one owner-identity',
-        "checks": ['tests/aivia/test_phase_d_anchors.py'],
+        "checks": ['tests/aisql/test_phase_d_anchors.py'],
         "status": 'ENFORCED',
     },
     "W5": {
@@ -143,7 +143,7 @@ SPEC_REGISTRY = {
         "parents": ['R2'],
         "parent_note":
             'the remainder aggregates to a human ruling',
-        "checks": ['tests/aivia/test_design_validators.py'],
+        "checks": ['tests/aisql/test_design_validators.py'],
         "status": 'PARTIAL',
         "status_note":
             'the closed sheet exists and the report rolls up by class; '

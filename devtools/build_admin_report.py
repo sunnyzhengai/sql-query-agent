@@ -1,4 +1,4 @@
-"""Generate + deploy the AIVIA admin telemetry report (PBIR-Legacy).
+"""Generate + deploy the AISQL admin telemetry report (PBIR-Legacy).
 
 Also injects the health MEASURES into the semantic model's TMDL
 (updateDefinition), so the funnel/verdict visuals ship with every

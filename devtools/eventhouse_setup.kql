@@ -8,11 +8,11 @@
 // selection). Queries (section 4 checks) run as single statements.
 //
 // PREREQS (once per environment — same as the probe):
-//   a. Eventhouse item exists (reuse semantic_catalog or create "aivia-eh")
+//   a. Eventhouse item exists (reuse semantic_catalog or create "aisql-eh")
 //   b. Every ASKING user holds "Cognitive Services OpenAI User" on the
 //      customer's Azure OpenAI resource (group assignment recommended)
 //   c. Callout policy allows the endpoint:
-//      .alter-merge cluster policy callout @'[{"CalloutType":"azure_openai","CalloutUriRegex":"aivia\\.openai\\.azure\\.com","CanCall":true}]'
+//      .alter-merge cluster policy callout @'[{"CalloutType":"azure_openai","CalloutUriRegex":"aisql\\.openai\\.azure\\.com","CanCall":true}]'
 //
 // REFRESH FLOW (each pipeline run, after 05) — verified 2026-08-09:
 //   0. One-time: create a OneLake SHORTCUT in this KQL database pointing
@@ -58,7 +58,7 @@
     let done = semantic_catalog | where isnotnull(emb) and array_length(emb) > 0;
     let embedded = todo
         | evaluate ai_embeddings(search_text,
-            'https://aivia.openai.azure.com/openai/deployments/text-embedding-3-small/embeddings?api-version=2024-06-01;impersonate')
+            'https://aisql.openai.azure.com/openai/deployments/text-embedding-3-small/embeddings?api-version=2024-06-01;impersonate')
         | project node_id, ['kind'], ['ref'], name, business_name,
                   search_text, display_text, emb = search_text_embeddings;
     union done, embedded
@@ -73,12 +73,12 @@
 // composition changes.
 .create-or-alter function with (
     docstring = "Semantic resolution over the certified catalog: returns the closest metrics/steps/terms for a topic phrase. total_matches on every row discloses how many cleared the threshold; closeness is relative similarity, never a probability.",
-    folder = "aivia"
+    folder = "aisql"
 ) semantic_search(phrase:string, top_k:int = 10, threshold:real = 0.35) {
     let q = toscalar(
         print t = phrase
         | evaluate ai_embeddings(t,
-            'https://aivia.openai.azure.com/openai/deployments/text-embedding-3-small/embeddings?api-version=2024-06-01;impersonate')
+            'https://aisql.openai.azure.com/openai/deployments/text-embedding-3-small/embeddings?api-version=2024-06-01;impersonate')
         | project t_embeddings);
     let scored = semantic_catalog
         | extend closeness = series_cosine_similarity(q, emb)
@@ -113,7 +113,7 @@ semantic_search("unicorn readmission velocity")
 
 .create-or-alter function with (
     docstring = "Certified metrics that READ a table, from parsed SQL lineage edges (transform_to_technical) - never name mentions. Exact table-name match first; whole-token fallback only when no exact table exists (the matched column discloses which). One row per table+metric: table_name, ref, business_name, matched. Use for: which metrics use / read / depend on table X. The distinct ref count IS the exact reader count.",
-    folder = "aivia"
+    folder = "aisql"
 ) readers_of_table(p_table:string) {
     let pairs = graph_nodes
         | where node_id startswith 'tech:'
@@ -137,7 +137,7 @@ semantic_search("unicorn readmission velocity")
 
 .create-or-alter function with (
     docstring = "Certified metrics that FILTER on a column (WHERE/CASE decision sites, relation='filters') or SELECT it (projection, relation='selects'), from parsed SQL lineage edges - never name mentions. Exact column-name match first; whole-token fallback only when no exact column exists (matched column discloses which). Rows: column_name, relation, ref, business_name, matched. Use for: which metrics filter on / select / touch column Y.",
-    folder = "aivia"
+    folder = "aisql"
 ) column_usage(p_column:string) {
     let cols = graph_nodes
         | where node_id startswith 'tech:'
@@ -175,7 +175,7 @@ semantic_search("unicorn readmission velocity")
 // ===== 5. Data Agent wiring (portal) ===================================
 // a. Add this KQL database as a SOURCE on the agents (alongside their
 //    existing source); in schema selection tick semantic_catalog AND
-//    the aivia/semantic_search function.
+//    the aisql/semantic_search function.
 // b. Source instructions (paste):
 //      To resolve a user's topic or metric reference, call
 //      semantic_search('<core concept phrase>') FIRST. Use the returned

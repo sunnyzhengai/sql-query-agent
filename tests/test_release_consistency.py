@@ -55,10 +55,10 @@ def test_era1_environment_item_stays_retired():
 def test_devtools_can_never_ship():
     """Moved here from tests/test_build_deployment_package.py when
     that module retired with its era-1 subject (Brief_Retirement).
-    The living law: the wheel packages the aivia engine
+    The living law: the wheel packages the aisql engine
     (Brief_Fabric_Resident FR6); devtools stays out of the config."""
     pyproject = (REPO / "pyproject.toml").read_text()
-    assert 'include = ["aivia", "aivia.*"]' in pyproject
+    assert 'include = ["aisql", "aisql.*"]' in pyproject
     assert "devtools" not in pyproject
 
 

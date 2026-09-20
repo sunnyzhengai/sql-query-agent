@@ -21,14 +21,14 @@
 // ===== 0. Portal prereqs (before any KQL) ============================
 // a. Workspace -> + New item -> Eventhouse (name: "semantic_catalog"). A KQL
 //    database is created inside it automatically.
-// b. Azure portal -> the aivia resource -> Access control (IAM) ->
+// b. Azure portal -> the aisql resource -> Access control (IAM) ->
 //    Add role assignment -> role "Cognitive Services OpenAI User" ->
 //    assign to founder@aiviaapp.com. (The plugin calls Azure OpenAI AS
 //    YOU — "impersonation" — so YOUR account needs permission on the
 //    resource. No key is used anywhere in this probe.)
 // c. Callout policy — Eventhouse must be allowed to call Azure OpenAI.
 //    In the KQL database query editor, run:
-//      .alter-merge cluster policy callout @'[{"CalloutType":"azure_openai","CalloutUriRegex":"aivia\\.openai\\.azure\\.com","CanCall":true}]'
+//      .alter-merge cluster policy callout @'[{"CalloutType":"azure_openai","CalloutUriRegex":"aisql\\.openai\\.azure\\.com","CanCall":true}]'
 //    If that errors on permissions, look for the callout setting in the
 //    Eventhouse item's settings UI — this is the step most likely to
 //    need iteration; capture any error verbatim.
@@ -52,7 +52,7 @@ canonical:reporting.USP_IP_SepsisDates,reporting.USP_IP_SepsisDates,Sepsis Repor
     semantic_catalog
     | extend combined = strcat(name, " | ", coalesce(business_name, ""), " | ", description)
     | evaluate ai_embeddings(combined,
-        'https://aivia.openai.azure.com/openai/deployments/text-embedding-3-small/embeddings?api-version=2024-06-01;impersonate')
+        'https://aisql.openai.azure.com/openai/deployments/text-embedding-3-small/embeddings?api-version=2024-06-01;impersonate')
     | project node_id, name, business_name, description, emb = combined_embeddings
 
 // Storage optimization (optional but documented best practice):
@@ -64,7 +64,7 @@ canonical:reporting.USP_IP_SepsisDates,reporting.USP_IP_SepsisDates,Sepsis Repor
 let q = toscalar(
     print t = "patients who came back to the ER"
     | evaluate ai_embeddings(t,
-        'https://aivia.openai.azure.com/openai/deployments/text-embedding-3-small/embeddings?api-version=2024-06-01;impersonate')
+        'https://aisql.openai.azure.com/openai/deployments/text-embedding-3-small/embeddings?api-version=2024-06-01;impersonate')
     | project t_embeddings);
 semantic_catalog
 | extend similarity = series_cosine_similarity(q, emb)
@@ -78,7 +78,7 @@ semantic_catalog
 // b. Agent instructions (paste):
 //      To find catalog entries matching a user's topic, embed the CORE
 //      CONCEPT of their question (short noun phrase) using the
-//      ai_embeddings plugin with the aivia connection string, then rank
+//      ai_embeddings plugin with the aisql connection string, then rank
 //      by series_cosine_similarity descending. Report how many rows
 //      score above 0.45 before listing the top matches. Similarity is
 //      relative closeness, never a probability. If nothing scores above
@@ -87,7 +87,7 @@ semantic_catalog
 //    Q: "what do we have about cancelled appointments?"
 //    KQL:
 //      let q = toscalar(print t = "cancelled appointments"
-//        | evaluate ai_embeddings(t, 'https://aivia.openai.azure.com/openai/deployments/text-embedding-3-small/embeddings?api-version=2024-06-01;impersonate')
+//        | evaluate ai_embeddings(t, 'https://aisql.openai.azure.com/openai/deployments/text-embedding-3-small/embeddings?api-version=2024-06-01;impersonate')
 //        | project t_embeddings);
 //      semantic_catalog
 //      | extend similarity = series_cosine_similarity(q, emb)

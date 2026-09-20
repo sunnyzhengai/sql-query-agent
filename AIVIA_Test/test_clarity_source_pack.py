@@ -9,14 +9,14 @@ placeholder law's tripwire: 04_joins ships as the catalog interim
 until his findings row names Epic's joins dictionary; the script's
 marker and the contract's F-CP1 OPEN row flip in the same act.
 
-Proves: contract:aivia-design-to-code
+Proves: contract:aisql-design-to-code
 """
 import pathlib
 import re
 
 import pytest
 
-from aivia.graph.kg2_mapper.scriptdom_loader import ScriptDomUnavailable, parse_tsql
+from aisql.graph.kg2_mapper.scriptdom_loader import ScriptDomUnavailable, parse_tsql
 
 ROOT = pathlib.Path(__file__).resolve().parents[1]
 PACK = ROOT / "AIVIA_Product" / "source_packs" / "clarity"

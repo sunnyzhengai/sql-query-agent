@@ -5,7 +5,7 @@
      Regenerate: python scripts/generate_docs.py
      CI fails if stale (tests/test_spec_registry.py). -->
 
-# Φ_AIVIA — The Shadow Specification
+# Φ_AISQL — The Shadow Specification
 
 <!-- TIER: BLUEPRINT — generated marker, do not remove.
      Component key: spec (src/trace_registry.py ARCHITECTURE_COMPONENTS)
@@ -72,9 +72,9 @@ statuses remain HERE, their one home, until the ratchet retires that
 prose into the ADRs. The invariant: if an agent must obey it, it is a
 record with a check; if a human must understand why, it is an ADR.
 
-**Relationship to the framework (the tier above).** Φ_AIVIA is *this
+**Relationship to the framework (the tier above).** Φ_AISQL is *this
 system's* theory; [AI_VIA_AXIOMS.md](../AI_VIA_AXIOMS.md) is the
-general framework AIVIA is the reference implementation of. This file
+general framework AISQL is the reference implementation of. This file
 translates framework groups **axm:S** (Specification), **axm:J**
 (Judgment), **axm:M** (Mind), **axm:B** (Boundary) and **axm:R**
 (Residue & Ledger) into checkable sentences about this codebase. The
@@ -420,7 +420,7 @@ discover what L2 should have caught.
 
 ## 14e. Group Q — graph topology (v0.6, ADR 0059; ratified 2026-08-26)
 
-The ADR names these G1–G3; Φ_AIVIA already holds a Group G
+The ADR names these G1–G3; Φ_AISQL already holds a Group G
 (mechanism uniqueness), so they join as Q1–Q3 — the correspondence
 is recorded here, never silently renumbered. Measured before
 drafted: 1 component / 0 orphans / 0 dangling at 6,669 nodes /
@@ -487,7 +487,7 @@ left.
 
 ## 14i. Group W — the twin graph (v0.9, ADR 0077; ratified 2026-09-06)
 
-The AIVIA engine's meaning layer: KG2b, the stored homomorphic twin
+The AISQL engine's meaning layer: KG2b, the stored homomorphic twin
 of the parsed graph (AIVIA_Design/Ruling_Twin_Graph_KG.md is the
 ratified design record; these axioms are its enforced core, landed
 at the ledger close per the ADR 0073 discipline — each with its

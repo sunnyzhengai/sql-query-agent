@@ -3,24 +3,24 @@
 -- semantic catalog architecture is viable. ~10 min of T-SQL, then the
 -- Data Agent part (bottom of file).
 --
--- Replace <AIVIA-KEY-1> with the aivia resource's Key 1 before running
+-- Replace <AISQL-KEY-1> with the aisql resource's Key 1 before running
 -- section 1. NEVER commit this file with a real key in it.
 
 -- ===== 1. Credential + external model (one-time setup) ================
 -- Credential name MUST match protocol+FQDN of the endpoint URL.
 CREATE MASTER KEY;
 
-CREATE DATABASE SCOPED CREDENTIAL [https://aivia.openai.azure.com]
+CREATE DATABASE SCOPED CREDENTIAL [https://aisql.openai.azure.com]
 WITH IDENTITY = 'HTTPEndpointHeaders',
-     SECRET = '{"api-key":"<AIVIA-KEY-1>"}';
+     SECRET = '{"api-key":"<AISQL-KEY-1>"}';
 
 CREATE EXTERNAL MODEL aivia_embeddings
 WITH (
-    LOCATION = 'https://aivia.openai.azure.com/openai/deployments/text-embedding-3-small/embeddings?api-version=2024-06-01',
+    LOCATION = 'https://aisql.openai.azure.com/openai/deployments/text-embedding-3-small/embeddings?api-version=2024-06-01',
     API_FORMAT = 'Azure OpenAI',
     MODEL_TYPE = EMBEDDINGS,
     MODEL = 'text-embedding-3-small',
-    CREDENTIAL = [https://aivia.openai.azure.com]
+    CREDENTIAL = [https://aisql.openai.azure.com]
 );
 
 -- Smoke the model binding BEFORE anything else (should return a vector):
