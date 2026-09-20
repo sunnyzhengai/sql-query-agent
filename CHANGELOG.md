@@ -10,6 +10,19 @@ Versioning follows [Semantic Versioning](https://semver.org/).
 
 ---
 
+## [2.3.1] - 2026-09-20
+
+### Changed — dry_run speaks the composed texts first (Brief_Dryrun_Order)
+- `f.dry_run(...)` now prints the file, scope, and statement
+  descriptions FIRST, then every remaining label (the table/column
+  dictionary flood) grouped under counted `=== label (n) ===`
+  headers — the operator's own request from the work pilot: the
+  composed texts were buried under thousands of dictionary rows.
+  Same bytes, new order; no stored data changes.
+- Wheel 2.3.0 retired per the one-current-wheel law.
+
+---
+
 ## [2.3.0] - 2026-09-20
 
 ### Fixed — the pilot findings, ship-unit 1 (Brief_Pilot_Build_1)

@@ -83,3 +83,38 @@ def test_scribe_refuses_without_key_before_any_boot(
     with pytest.raises(SystemExit) as err:
         fabric_run.scribe(str(base))
     assert err.value.code == 2
+
+
+def test_dry_run_speaks_composed_texts_first(monkeypatch, tmp_path,
+                                             capsys):
+    """Brief_Dryrun_Order (Sunny, 2026-09-20, from the work pilot:
+    "i can't find the scope descriptions or statement or sql
+    file's. can you update to show these descriptions first?"):
+    file -> scope -> statement speak BEFORE the dictionary flood,
+    each label under a counted header so the flood is skippable."""
+    base = _estate(tmp_path)
+    store = _Store([
+        _Node("db.dbo.c9::column", "column",
+              {"description": "COLUMN-SENTINEL"}),
+        _Node("db.dbo.t9::table", "table",
+              {"description": "TABLE-SENTINEL"}),
+        _Node("f1.sql::stmt/1", "statement",
+              {"description": "STATEMENT-SENTINEL"}),
+        _Node("f1.sql::scope/a", "scope",
+              {"description": "SCOPE-SENTINEL"}),
+        _Node("db.dbo.f1.sql::file", "file",
+              {"technical_definition": "FILE-SENTINEL"}),
+    ])
+    monkeypatch.setattr(
+        console, "build_store",
+        lambda estate, journal_path=None, descriptions=True:
+        (store, base))
+    fabric_run.dry_run(str(base))
+    out = capsys.readouterr().out
+    order = [out.index(s) for s in (
+        "FILE-SENTINEL", "SCOPE-SENTINEL", "STATEMENT-SENTINEL",
+        "COLUMN-SENTINEL")]
+    assert order == sorted(order), out
+    assert out.index("=== file (1) ===") < out.index(
+        "=== scope (1) ===") < out.index("=== statement (1) ===")
+    assert "=== column (1) ===" in out and "=== table (1) ===" in out

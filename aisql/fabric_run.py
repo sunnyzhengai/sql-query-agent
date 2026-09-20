@@ -150,18 +150,34 @@ def dry_run(estate: str):
         census[n.label] = census.get(n.label, 0) + 1
     print("node census: " + " · ".join(
         f"{label} {census[label]}" for label in sorted(census)))
+    # Brief_Dryrun_Order (Sunny, 2026-09-20: "i can't find the scope
+    # descriptions or statement or sql file's … show these
+    # descriptions first"): the COMPOSED texts speak first — file,
+    # scope, statement — then every remaining label under its own
+    # counted header, so the dictionary flood is skippable
+    speaking = [n for n in nodes
+                if n.properties.get("technical_definition")
+                or n.properties.get("description")]
+    # literal: frame — the ruled speaking order (Brief_Dryrun_Order)
+    first = ("file", "scope", "statement")
+    labels = list(first) + sorted(
+        {n.label for n in speaking} - set(first))
     spoken = 0
-    for n in sorted(nodes, key=lambda n: n.identity):
-        td = n.properties.get("technical_definition")
-        desc = n.properties.get("description")
-        if not td and not desc:
+    for label in labels:
+        group = sorted((n for n in speaking if n.label == label),
+                       key=lambda n: n.identity)
+        if not group:
             continue
-        spoken += 1
-        print(f"\n— {n.identity}")
-        if td:
-            print(f"  technical definition: {td}")
-        if desc:
-            print(f"  description: {desc}")
+        print(f"\n=== {label} ({len(group)}) ===")
+        for n in group:
+            spoken += 1
+            print(f"\n— {n.identity}")
+            td = n.properties.get("technical_definition")
+            desc = n.properties.get("description")
+            if td:
+                print(f"  technical definition: {td}")
+            if desc:
+                print(f"  description: {desc}")
     print(f"\n{spoken} node(s) carry governance text · "
           f"{len(nodes)} nodes total")
     return store

@@ -7,7 +7,7 @@
 
 # Test Map — what every test proves
 
-96 modules, 760 tests, every module accounted: claimed by an ADR in the trace registry or declaring a law/contract in its docstring (`Proves:` line).
+96 modules, 761 tests, every module accounted: claimed by an ADR in the trace registry or declaring a law/contract in its docstring (`Proves:` line).
 
 ## By ADR
 
@@ -132,7 +132,7 @@
 - `tests/aisql/test_design_validators.py` (4): Slice 0: the design validators run in CI — every push re-proves the
 - `tests/aisql/test_doubles.py` (6): THE SCRIPTED-PROPOSALS CONTRACT (Sunny's ruling, 2026-09-09:
 - `tests/aisql/test_extract_autogen.py` (4): Brief_Extract_Autogen (Sunny, 2026-09-19: "this is too manual.
-- `tests/aisql/test_fabric_run.py` (4): Brief_Fabric_Resident FR4+FR5 (Sunny's "all eight as proposed,
+- `tests/aisql/test_fabric_run.py` (5): Brief_Fabric_Resident FR4+FR5 (Sunny's "all eight as proposed,
 - `tests/aisql/test_file_layer.py` (5): M6 THE FILE LAYER — structural pins on the F2 fixture estate
 - `tests/aisql/test_file_render.py` (6): §R13 THE CATCH-ALL — form pins on the F2 fixture estate
 - `tests/aisql/test_flows_change_quanta.py` (6): The flows' change quanta (CONTRACT_DATALOAD §13 + the flows

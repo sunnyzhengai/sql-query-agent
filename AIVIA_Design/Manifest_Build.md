@@ -1957,3 +1957,17 @@ brief" · F11 + approval "agree with F11, approved, and push".
 - THE CONFORMANCE PIN (test_name_grammar.py): the generated arity
   table over F1's ENCOUNTER — 7 binding forms + every failure
   class asserted; 8 RED before code, all green after.
+
+## 2026-09-20 (same day) — BRIEF_DRYRUN_ORDER BUILT — the composed
+## texts speak first
+
+His ask from the live work pilot: "the dry run output a lot of
+texts, but i can't find the scope descriptions or statement or
+sql file's. can you update to show these descriptions first?" —
+the directive is the ruling (FR5's speaking order amended).
+dry_run now prints file → scope → statement first, then every
+remaining label under a counted `=== label (n) ===` header;
+identical bytes, new order, no stored data change. RED-first pin
+in test_fabric_run (sentinel order + headers). THE WHEEL 2.3.1
+(sha256 f8517085…, 2.3.0 retired, runbook URL + step-6 "Good"
+line follow).
