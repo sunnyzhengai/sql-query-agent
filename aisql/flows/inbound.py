@@ -6,7 +6,6 @@ conservation (E5): acquired u counted-excluded = every file in scope —
 an unsupported dialect lands as a counted exclusion, never parsed,
 never silent.
 """
-import json
 import pathlib
 import re
 from dataclasses import dataclass, field
@@ -214,7 +213,23 @@ class EstateReport:
 def receive_estate(store, reg: Dict[str, Any], estate_dir,
                    kg1_changed=None) -> EstateReport:
     estate_dir = pathlib.Path(estate_dir)
-    manifest = json.loads((estate_dir / "manifest.json").read_text())
+    manifest_path = estate_dir / "manifest.json"
+    if not manifest_path.is_file():
+        # F8 (Brief_Pilot_Build_1): the operator hit a raw
+        # FileNotFoundError mid-boot; extract_scripts writes the
+        # template (ruling (5)) and this refusal is its companion
+        raise kg1_intake.Refusal(
+            "INTAKE-16", f"{manifest_path}: the estate SQL folder "
+            "needs its manifest.json (location · as_of · "
+            "default_schema) — extract_scripts writes the template; "
+            "only as_of is yours to fill")
+    manifest = kg1_intake.read_json(manifest_path)
+    if not str(manifest.get("as_of") or "").strip():
+        # ruling (5): the empty as_of IS the template's tripwire —
+        # the placeholder never ships naked
+        raise kg1_intake.Refusal(
+            "INTAKE-17", f"{manifest_path}: fill in the date this "
+            "estate SQL was captured (as_of is empty)")
     location = manifest["location"]
     report = EstateReport()
     for path in sorted(estate_dir.rglob("*")):
@@ -232,7 +247,8 @@ def receive_estate(store, reg: Dict[str, Any], estate_dir,
         try:
             tree = kg2_mapper.apply_file(
                 store, reg, file_id=f"{location}{name}",
-                file_name=name, text=path.read_text(),
+                file_name=name,
+                text=path.read_text(encoding="utf-8-sig"),
                 as_of=manifest["as_of"],
                 default_schema=manifest.get("default_schema"),
                 kg1_changed=kg1_changed)
@@ -1211,15 +1227,14 @@ def receive_pbi(store, pbi_dir) -> int:
     mappings; DISPLAYS are composed from the executed procs' twins
     (delivery projection members: what the report actually shows,
     derived, never invented)."""
-    import json as _json
     import pathlib as _pl
 
     from aisql.graph.read_api import ReadApi
     pbi_dir = _pl.Path(pbi_dir)
     if not (pbi_dir / "reports.json").is_file():
         return 0
-    manifest = _json.loads((pbi_dir / "manifest.json").read_text())
-    rows = _json.loads((pbi_dir / "reports.json").read_text())
+    manifest = kg1_intake.read_json(pbi_dir / "manifest.json")
+    rows = kg1_intake.read_json(pbi_dir / "reports.json")
     read = ReadApi(store)
     trees = read.trees()
     rel_to_key = {}
@@ -1371,14 +1386,13 @@ def receive_descriptions(store, path) -> int:
     machine-authored, 'drafted', basis-stamped. Estate data, not a
     journal act: every boot (test or prod) speaks the same
     aboutness; blessing is a later human act in the journal."""
-    import json as _json
     import pathlib as _pl
 
     from aisql.flows import describe as _describe
     path = _pl.Path(path)
     if not path.is_file():
         return 0
-    data = _json.loads(path.read_text())
+    data = kg1_intake.read_json(path)
     # M7: a batch may carry MIXED statuses (per-identity
     # "statuses" overrides the file-level "status") — the carried
     # approval rides beside fresh drafts

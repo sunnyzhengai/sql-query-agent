@@ -10,6 +10,29 @@ Versioning follows [Semantic Versioning](https://semver.org/).
 
 ---
 
+## [2.3.0] - 2026-09-20
+
+### Fixed — the pilot findings, ship-unit 1 (Brief_Pilot_Build_1)
+- Intake hardening (F6/F7): every intake text read decodes
+  utf-8-sig — a Windows editor's byte-order mark no longer breaks
+  the manifest or poisons a CSV's first header; a file that exists
+  but does not parse refuses by name (INTAKE-14, path + parse
+  error), and CSV headers are checked per file against the
+  contract (INTAKE-15, expected vs found).
+- Three-part name resolution (F9): `db.schema.table` references
+  now bind on schema. The db part is counted, never refused — a
+  matching registered db binds, a foreign db lands in the census
+  as a named cross-database read, and with db_name waived the
+  census reports the distinct db names seen.
+- The estate manifest step (F8): `f.extract_scripts(...)` writes
+  the `estate_snapshot/manifest.json` template (location +
+  default_schema from the pack's new `pack.json`; `as_of` empty —
+  the one human field); a missing manifest (INTAKE-16) or empty
+  as_of (INTAKE-17) is a named refusal, not a traceback.
+- Wheel 2.2.0 retired per the one-current-wheel law.
+
+---
+
 ## [2.2.0] - 2026-09-19
 
 ### Changed — the ship surface drops the AIVIA name (Brief_AISQL_Rename)

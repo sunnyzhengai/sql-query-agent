@@ -1,0 +1,4 @@
+{
+  "_comment": "Vendor facts the engine reads mechanically (Brief_Pilot_Build_1, ruling (5): default_schema fills the estate manifest template FROM THE PACK — vendor knowledge lives in the pack, never in the engine). Clarity tables live in dbo on every Epic system.",
+  "default_schema": "dbo"
+}

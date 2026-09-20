@@ -16,7 +16,7 @@ keys file::delivery (A11), unnamed scopes take no name_key (A4).
 """
 import bisect
 from dataclasses import dataclass, field
-from typing import Any, Dict, List, Optional
+from typing import Any, Dict, List, Optional, Set
 
 from aisql.graph import metamodel, phi_gate
 from aisql.graph.kg2_mapper.scriptdom_loader import parse_tsql
@@ -726,6 +726,9 @@ def resolve(tree: Dict[str, Any], store: Store, reg: Dict[str, Any],
     # literal: shape
     census = {"resolved_refs": 0, "same_tree_refs": 0,
               "unresolved_refs": 0, "unresolved": []}
+    # F9 + ruling (8) (Brief_Pilot_Build_1): db parts seen under the
+    # db_name waiver — reported so the risky waiver becomes visible
+    db_names_seen: Set[str] = set()
 
     # named scopes' output shape (folded members + star sources), for
     # disambiguation, scope-member binding, and STAR-THROUGH
@@ -833,16 +836,53 @@ def resolve(tree: Dict[str, Any], store: Store, reg: Dict[str, Any],
                 census["same_tree_refs"] += 1
                 target = ("scope", key)
             else:
+                db_part = None
                 if "." in name:
-                    schema, table = name.rsplit(".", 1)
+                    # F9 (Brief_Pilot_Build_1): a db-qualified name
+                    # splits db · schema · table and binds ON SCHEMA
+                    # — the old split-at-the-last-dot made the schema
+                    # key `db.schema`, unresolvable by construction
+                    *rest, schema, table = name.split(".")
+                    if rest:
+                        db_part = rest[-1]
+                    if not schema and default_schema:
+                        # `db..table` — the db's default schema
+                        schema = default_schema
                 elif default_schema:
                     # the estate's declared default schema (real estates
                     # reference unqualified names constantly)
                     schema, table = default_schema, name
                 else:
                     schema, table = None, name
-                identity = table_identity(schema, table) if schema else None
-                if identity:
+                # ruling (8), counted-never-refused: a matching
+                # registered db IS the cross-check passing; a foreign
+                # db stays unresolved as a NAMED cross-database read;
+                # no registered db_name -> schema-only binding stands
+                # per the waiver, the names seen reported below
+                registered_db = reg.get("db_name")
+                cross_database = False
+                if db_part:
+                    if registered_db:
+                        cross_database = \
+                            _fold(db_part) != _fold(registered_db)
+                    else:
+                        db_names_seen.add(db_part)
+                identity = None
+                if schema and not cross_database:
+                    identity = table_identity(schema, table)
+                if cross_database:
+                    ref["resolves_to"] = None
+                    census["unresolved_refs"] += 1
+                    census["unresolved"].append(name)
+                    census.setdefault("unresolved_detail", []).append(
+                        # literal: shape
+                        {"ref": name, "kind": "table",
+                         "schema": schema or "(unqualified)",
+                         "cross_database": db_part})
+                    census.setdefault("cross_database_reads", []).append(
+                        {"ref": name, "db": db_part})
+                    target = ("unresolved", None)
+                elif identity:
                     ref["resolves_to"] = identity
                     census["resolved_refs"] += 1
                     target = ("table", identity)
@@ -1002,6 +1042,8 @@ def resolve(tree: Dict[str, Any], store: Store, reg: Dict[str, Any],
         if stmt.get("scope"):
             resolve_scope(stmt["scope"])
     walk_params(tree["statements"])
+    if db_names_seen:
+        census["db_names_seen"] = sorted(db_names_seen)
     tree["resolution_census"] = census
     return tree
 

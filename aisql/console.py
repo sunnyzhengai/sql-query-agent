@@ -349,12 +349,12 @@ def _estate_base(estate: str) -> pathlib.Path:
 def build_store(estate: str, journal_path=None, descriptions=True):
     base = _estate_base(estate)
     store = kg1_intake.new_store()
-    reg = json.loads((base / "registration.json").read_text())
+    reg = kg1_intake.read_json(base / "registration.json")
     kg1_intake.apply_registration(store, reg)
     for snap in sorted(base.glob("*_snapshot")):
         if snap.name in ("estate_snapshot", "pbi_snapshot"):
             continue
-        pack = json.loads((snap / "manifest.json").read_text()) \
+        pack = kg1_intake.read_json(snap / "manifest.json") \
             .get("source_pack_version", "")
         inbound.receive_extract(store, reg,
                                 kg1_intake.load_snapshot(snap),

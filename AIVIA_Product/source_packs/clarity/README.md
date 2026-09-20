@@ -16,6 +16,7 @@ exactly the intake headers).
 | 04_joins.sql | joins.csv | CLARITY_TBL_FK + CLARITY_TBL + CLARITY_COL |
 | 05_values.sql | values.csv | GENERATOR: one SELECT per ZC_* table (code = first column, meaning = NAME) |
 | 06_manifest.sql | manifest.json values | DB_NAME(), @@SERVERNAME |
+| pack.json | vendor facts the engine reads mechanically (default_schema fills the estate manifest template — Brief_Pilot_Build_1, ruling (5)) | Epic convention: Clarity tables live in dbo |
 
 How to run (any SQL client, read-only, dictionary metadata only —
 never row-level business data):

@@ -191,6 +191,28 @@ self-serviceable by the customer's DBA without a support call).
 - INTAKE-10 pk integrity (added 2026-09-05, Sunny's ruling): every
   table in the extract has >=1 declared pk row; violation is a
   named refusal listing the keyless tables
+- INTAKE-14 parse integrity (added 2026-09-20, Brief_Pilot_Build_1,
+  ruling (4) "i agree, new ids"): a file that exists but whose
+  content does not parse refuses by name — path + the parser's own
+  error; and EVERY intake text read decodes utf-8-sig (a Windows
+  editor's BOM is not an error — F6)
+- INTAKE-15 header contract (added 2026-09-20, same ruling): each
+  CSV's headers are checked against the per-file contract
+  (kg1_intake.CSV_HEADERS) at load; mismatch refuses naming the
+  file, expected vs found; REQUIRED headers only — extras
+  tolerated, data_type opportunistic (rider (c))
+- INTAKE-16 estate manifest presence (added 2026-09-20, ruling
+  (5)): estate_snapshot/ without its manifest.json is a named
+  refusal — extract_scripts writes the template (location +
+  default_schema from the pack's vendor facts, as_of EMPTY)
+- INTAKE-17 estate capture date (added 2026-09-20, ruling (5)):
+  an empty as_of refuses with "fill in the date this estate SQL
+  was captured" — the template's tripwire per the placeholder law;
+  the one human field
+- NOTE (F10, Contract_Technical_Layer, 2026-09-20): the id
+  INTAKE-10 is ALSO used by the MR1a no-anchor refusal in
+  registered_db_name — an id collision awaiting Sunny's call; this
+  list's INTAKE-10 (pk integrity) is the elder
 
 ## 8. The intake report
 

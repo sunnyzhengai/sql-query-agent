@@ -14,7 +14,7 @@ work clone.
 
 | prerequisite | Windows laptop | Fabric (notebook route) |
 |---|---|---|
-| the engine files | the GitHub ship zip (~7.5 MB), extracted | ONE wheel — `dist/sql_query_agent-2.0.0-py3-none-any.whl` from GitHub; engine + registries + DLL all inside (Brief_Fabric_Resident) |
+| the engine files | the GitHub ship zip (~7.5 MB), extracted | ONE wheel — `dist/sql_query_agent-2.3.0-py3-none-any.whl` from GitHub; engine + registries + DLL all inside (Brief_Fabric_Resident) |
 | Python 3.11 (3.10–3.12 fine; dev = 3.11.15) | per-user install, no admin (P3) | comes WITH the runtime — pick the Environment runtime whose Python is 3.11 (Runtime 1.3 today); never a library install |
 | pythonnet — 3.0.1 exact (Fabric-proven 2026-08; floor ≥3.0.1; dev = 3.1.0) | `pip install pythonnet` (P4) | already in the built-in libraries; pin 3.0.1 under Public libraries only if absent |
 | .NET runtime 8 (6+ works) | often preinstalled; else per-user (P6) | built into the Fabric runtime — the SOP's F8 probe proves it |
@@ -32,7 +32,7 @@ work clone.
 The deployment stays the FIVE-STEP CENSUS (FR8 — any step beyond
 these is a defect); the extract writes itself (the derived-list
 law). In order, after downloading the wheel
-(`https://github.com/sunnyzhengai/sql-query-agent/raw/dev/dist/sql_query_agent-2.1.0-py3-none-any.whl`):
+(`https://github.com/sunnyzhengai/sql-query-agent/raw/dev/dist/sql_query_agent-2.3.0-py3-none-any.whl`):
 
 1. Environment: "+ New item" → Environment → runtime with Python
    3.11 → Custom libraries → upload the wheel → Publish → attach
@@ -51,8 +51,13 @@ law). In order, after downloading the wheel
    cell 2: `f.extract_scripts("/lakehouse/default/Files/<estate>")`
    Good = it prints "parsed N files · M tables referenced · K
    unparseable" (unparseable files NAMED — findings, not
-   failures) and `<estate>/extract_scripts/01..06.sql` appear
-   with the table list already filled.
+   failures), `<estate>/extract_scripts/01..06.sql` appear
+   with the table list already filled, and
+   `<estate>/estate_snapshot/manifest.json` appears as a template
+   (location + default_schema filled from the pack). YOUR ONE
+   FIELD: type the date the estate SQL was captured into its
+   empty `as_of` — dry_run refuses by name (INTAKE-17) until
+   it is filled.
 5. The extract, in your SQL client (read-only, metadata only):
    run 01–04, save each grid as its CSV (headers on); 05 is the
    two-step generator — run it, paste its output into a new
@@ -120,6 +125,8 @@ there; proceed below only on a LAPTOP-green verdict.
                                           graph roots at db:<your single source>)
             <source>_snapshot/         <- the step-5 extract (folder name = "<source>_snapshot", e.g. clarity_snapshot)
             estate_snapshot/           <- the small batch of work .sql files
+                manifest.json          <- written as a template by f.extract_scripts (or copy the shape:
+                                          location · as_of · default_schema); as_of = the capture date, your ONE field
 
    Good = `git status` shows NOTHING (the work_* guard holds).
 

@@ -21,6 +21,7 @@ import pathlib
 from typing import Dict, List, Tuple
 
 from aisql.flows import enrich, gates
+from aisql.graph import kg1_intake
 from aisql.lenses.ask_index import _tokens
 
 DICTIONARY = "abbreviation_dictionary.json"
@@ -96,14 +97,14 @@ def load_dictionary(glossary_dir: pathlib.Path) -> Dict[str, Dict]:
     f = glossary_dir / DICTIONARY
     if not f.is_file():
         return {}
-    return json.loads(f.read_text()).get("entries", {})
+    return kg1_intake.read_json(f).get("entries", {})
 
 
 def load_ledger(glossary_dir: pathlib.Path) -> Dict[str, Dict]:
     f = glossary_dir / LEDGER
     if not f.is_file():
         return {}
-    return json.loads(f.read_text())
+    return kg1_intake.read_json(f)
 
 
 def ledger_refresh(read, glossary_dir: pathlib.Path) -> Dict[str, int]:
@@ -183,7 +184,7 @@ def load_blessed_subjects(glossary_dir: pathlib.Path
     f = glossary_dir / BLESSED_SUBJECTS
     if not f.is_file():
         return {}
-    return json.loads(f.read_text())
+    return kg1_intake.read_json(f)
 
 
 def save_blessed_subjects(glossary_dir: pathlib.Path,

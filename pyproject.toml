@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "sql-query-agent"
-version = "2.2.0"
+version = "2.3.0"
 description = "SQL Intelligence Agent for Microsoft Fabric. Extract business logic from SQL, build knowledge graphs, answer questions in plain English."
 readme = "README.md"
 requires-python = ">=3.9"
@@ -88,7 +88,10 @@ exclude = ["tests", "tests.*", "scripts", "notebooks", "docs", "data", "build"]
 # FR1 all-in-one: the 7 registry JSONs + the ScriptDom DLL ride in
 # the wheel (build_wheel.py copies them in at build; never tracked)
 aisql = ["_registries/*.json", "_libs/*.dll",
-         "_source_packs/clarity/*.sql"]
+         "_source_packs/clarity/*.sql",
+         # Brief_Pilot_Build_1 ruling (5): the pack's vendor facts
+         # (default_schema -> the estate manifest template)
+         "_source_packs/clarity/pack.json"]
 # 2.1.1 field fix (Sunny's Fabric run, 2026-09-19): the flows
 # subpackage carries its own data files — code never ships
 # without its data (the wheel pin now enumerates the class)

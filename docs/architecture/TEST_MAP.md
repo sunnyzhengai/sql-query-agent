@@ -7,7 +7,7 @@
 
 # Test Map — what every test proves
 
-93 modules, 736 tests, every module accounted: claimed by an ADR in the trace registry or declaring a law/contract in its docstring (`Proves:` line).
+95 modules, 751 tests, every module accounted: claimed by an ADR in the trace registry or declaring a law/contract in its docstring (`Proves:` line).
 
 ## By ADR
 
@@ -141,6 +141,7 @@
 - `tests/aisql/test_glossary.py` (11): THE GLOSSARY PROCESS (Ruling_Glossary_Process.md, ruled
 - `tests/aisql/test_governance_journal.py` (4): PHASE E1 — THE GOVERNANCE JOURNAL (Sunny's ruling: all user
 - `tests/aisql/test_graph_export.py` (13): M1 — THE FABRIC GRAPH EXPORT READING (the materialization plan,
+- `tests/aisql/test_intake_hardening.py` (10): Brief_Pilot_Build_1 slices A + B (Brief_Pilot_Findings_R1 F6/F7/F8,
 - `tests/aisql/test_kg1_intake.py` (12): Slice 1: KG1 intake vs the F1 answer key — the graph, node by node.
 - `tests/aisql/test_kg2_mapper.py` (8): Slice 2 exit: the F2 answer key against the BUILT trees.
 - `tests/aisql/test_kg3_artifacts.py` (18): Slice 4: the ledger — KG3 artifact layer lifecycle + derived states.
@@ -179,6 +180,7 @@
 - `tests/aisql/test_statement_render.py` (10): §R11 THE STATEMENT STEP — byte-exact render pins (authored
 - `tests/aisql/test_store.py` (6): Slice 1: the append-only substrate — LC-F2/F3 as structure.
 - `tests/aisql/test_term_origins.py` (6): STEP 2 of the Connection Ledger build — TERM ORIGINS. The test
+- `tests/aisql/test_three_part_resolution.py` (5): Brief_Pilot_Build_1 slice A2 (Brief_Pilot_Findings_R1 F9, ruling
 - `tests/aisql/test_verbatim_census.py` (3): E2 — THE VERBATIM CENSUS (integrity battery #8, ratified in
 - `tests/aisql/test_visual_counts.py` (1): FS1 — the graph visual's counts-vs-key re-verify (ruled by
 - `tests/aisql/test_wheel_boot.py` (3): Brief_Fabric_Resident FR7 (Sunny's "all eight as proposed,

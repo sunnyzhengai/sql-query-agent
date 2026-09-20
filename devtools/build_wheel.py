@@ -38,8 +38,11 @@ def build(outdir) -> str:
             shutil.copy2(reg_src / f"{name}.json",
                          reg_dst / f"{name}.json")
         shutil.copy2(ROOT / "libs" / DLL, lib_dst / DLL)
-        for script in pack_src.glob("*.sql"):
-            shutil.copy2(script, pack_dst / script.name)
+        # the pack rides whole: scripts + pack.json (the vendor
+        # facts the engine reads — Brief_Pilot_Build_1 ruling (5))
+        for part in sorted(pack_src.glob("*.sql")) + \
+                [pack_src / "pack.json"]:
+            shutil.copy2(part, pack_dst / part.name)
         proc = subprocess.run(
             [sys.executable, "-m", "build", "--wheel",
              "--no-isolation", "--outdir", str(outdir)],

@@ -1875,3 +1875,53 @@ authorized spend, two runs). REMAINS: the final suite (running)
 → BUILT → his gap-checks of the two contracts → the commit →
 HIS TWO LOADS (the dev M7 delta + THE FULL SEPSIS RELOAD, one
 refresh each) → §M7 gates → the republish → CLOSED.
+
+## 2026-09-20 — BRIEF_PILOT_BUILD_1 (ship-unit 1 of ruling (7)):
+## the pilot fixes ship
+
+His go: "can you fix the findings" (2026-09-20) — the first of the
+three build briefs the parent (Brief_Pilot_Findings_R1, APPROVED,
+all ten rulings quoted) ordered. All fixes, no stored-text change,
+no load.
+
+- SLICE A (F6/F7, ruling (4) "i agree, new ids"): every intake
+  text read decodes utf-8-sig — kg1_intake.read_json is the ONE
+  intake JSON door (inbound estate/pbi/descriptions, console,
+  glossary, fabric_run re-pointed); INTAKE-14 exists-but-does-not-
+  parse (path + parser words) · INTAKE-15 CSV headers vs the
+  contract (kg1_intake.CSV_HEADERS; expected vs found; extras
+  tolerated, data_type opportunistic).
+- SLICE A2 (F9, ruling (8) "i agree with option b"): resolve_scope
+  splits db · schema · table, binds on schema; db match = the
+  cross-check passing; foreign db = census.cross_database_reads
+  with the db NAMED; waived db_name = census.db_names_seen. The
+  cascade (raw join fallback, bare name words, silent value maps)
+  recovers downstream; FL12's fragment voice stays for brief 2.
+- SLICE B (F8, ruling (5) "i agree with option c"):
+  extract_scripts writes the estate_snapshot/manifest.json
+  TEMPLATE — location from the folder, default_schema from the
+  pack's NEW pack.json (vendor facts live IN the pack), as_of
+  EMPTY; never clobbers a present manifest; INTAKE-16 missing
+  manifest · INTAKE-17 empty as_of ("fill in the date this estate
+  SQL was captured") — the template's tripwires; the runbook step
+  shrank to typing one date.
+- Tests RED-first: tests/aisql/test_intake_hardening.py (10) +
+  test_three_part_resolution.py (5) — 12 RED before code, all
+  green after. F10 BORN (Contract_Technical_Layer): INTAKE-10
+  names two remedies (pk integrity vs the MR1a no-anchor) — id
+  collision, Sunny's call.
+- THE WHEEL 2.3.0 (one-current-wheel law: 2.2.0 retires;
+  build_wheel now carries pack.json with the scripts; wheel pins
+  re-based).
+- BUILD FIND (the F9 class, wider than reported): the corpus holds
+  ELIDED-SCHEMA reads — `FROM .HOSPITAL_ENCOUNTERS` (empty schema
+  part = default schema, legal T-SQL) — five in
+  USP_RPTS_IP_SEPSIS.sql that the old splitter left unresolvable
+  by construction. The rewrite recovers them; verified ref-by-ref
+  (old vs new bindings diffed): +25 resolved = 5 tables + their 20
+  alias-qualified columns, unresolved 132→127, ambiguous 37→17,
+  twin coverage_gaps 700→680, working_set +1 (BED_CONFIG — read
+  ONLY through the elided ref). expected_shakedown.json re-based
+  BY MEASUREMENT, story in its _comment; gap_check_report.md (the
+  dated 2026-09-06 verdict record) stays verbatim. TEST_MAP
+  regenerated (two new test modules).

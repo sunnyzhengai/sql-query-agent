@@ -86,7 +86,8 @@ def extract_scripts(estate: str):
     tables, unparseable = set(), []
     for f in files:
         try:
-            tree = map_tree(f.name, f.read_text(errors="replace"))
+            tree = map_tree(f.name, f.read_text(encoding="utf-8-sig",
+                                                errors="replace"))
         except Exception as err:  # noqa: BLE001 — EA2: counted, named
             unparseable.append(f"{f.name} ({type(err).__name__})")
             continue
@@ -97,6 +98,7 @@ def extract_scripts(estate: str):
           f"{len(unparseable)} unparseable")
     for line in unparseable:
         print(f"  unparseable: {line}")
+    _write_manifest_template(base, sql_dir)
     quoted = ",\n    ".join(f"'{n}'" for n in names)
     out_dir = base / "extract_scripts"
     out_dir.mkdir(exist_ok=True)
@@ -108,6 +110,30 @@ def extract_scripts(estate: str):
     print("copy each script into your SQL client, run, save the "
           "grids as the six extract files")
     return names
+
+
+def _write_manifest_template(base, sql_dir):
+    """Ruling (5) (Brief_Pilot_Findings_R1, "i agree with option c"):
+    the wheel writes estate_snapshot/manifest.json with location
+    (from the folder) and default_schema (from the source pack — a
+    vendor fact, pack.json) filled and as_of EMPTY; intake refuses
+    by name on the empty as_of (INTAKE-17) — the template's tripwire
+    per the placeholder law. A manifest already present is the
+    human's data: NEVER overwritten."""
+    path = sql_dir / "manifest.json"
+    if path.is_file():
+        return
+    # literal: shape — the estate manifest's three ruled fields
+    template = {"location": f"estate://{base.name}/",
+                "as_of": "", "default_schema": ""}
+    pack_facts = _pack_dir() / "pack.json"
+    if pack_facts.is_file():
+        template["default_schema"] = json.loads(
+            pack_facts.read_text(encoding="utf-8-sig")
+        ).get("default_schema", "")
+    path.write_text(json.dumps(template, indent=1) + "\n")
+    print(f"  -> {path} (template — fill in as_of: the date this "
+          "estate SQL was captured)")
 
 
 def dry_run(estate: str):

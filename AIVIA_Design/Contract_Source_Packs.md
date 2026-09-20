@@ -23,6 +23,7 @@ extract-file key.
 | 04_joins.sql | joins.csv | CLARITY_TBL_FK ⋈ CLARITY_TBL ×2 ⋈ CLARITY_COL ×2 (LINE enumerates; SOURCE_COLUMN_ID / DESTNATN_TABLE_ID / DESTNATN_COLUMN_ID — Epic's spelling) | fk_num,ordinal,src_schema,src_table,src_column,dest_schema,dest_table,dest_column | SOLID (pack 1.1) |
 | 05_values.sql | values.csv | GENERATOR over every ZC_* table: code = the table's first column, meaning = NAME (his law: "the 'NAME' column is always the value column"); only NAME-carrying tables qualify | table,code,meaning | SOLID (generator, pack 1.1) |
 | 06_manifest.sql | manifest.json | DB_NAME(), @@SERVERNAME, SYSUTCDATETIME() | db_name,server,as_of | SOLID |
+| pack.json | the estate manifest TEMPLATE (`extract_scripts` fills default_schema from it — Brief_Pilot_Build_1, ruling (5)) | vendor fact: Clarity tables live in dbo on every Epic system | n/a (JSON facts, not a script) | SOLID (2026-09-20; rides the wheel with the scripts) |
 
 ## LAWS (Sunny's rulings, 2026-09-19, quoted in Brief_Clarity_Source_Pack)
 

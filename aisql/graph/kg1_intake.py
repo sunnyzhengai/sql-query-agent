@@ -22,6 +22,20 @@ REQUIRED_FILES = ("manifest.json", "tables.csv", "columns.csv",
 # literal: shape L1_KG1_CONTRACT_DATALOAD
 MANIFEST_FIELDS = ("source", "operator", "as_of",
                    "source_pack_version")
+# INTAKE-15 (Brief_Pilot_Build_1, ruling (4)): the per-file header
+# contract — REQUIRED headers only; extras tolerated (the pack's
+# extras-tolerated law; data_type stays opportunistic, rider (c))
+# literal: shape L1_KG1_CONTRACT_DATALOAD
+CSV_HEADERS = {
+    "tables.csv": ("schema", "table", "description"),  # literal: shape
+    "columns.csv": ("schema", "table", "column",  # literal: shape
+                    "description"),
+    "pk.csv": ("schema", "table", "column", "ordinal"),  # literal: shape
+    "joins.csv": ("fk_num", "ordinal", "src_schema",  # literal: shape
+                  "src_table", "src_column", "dest_schema",
+                  "dest_table", "dest_column"),
+    "values.csv": ("table", "code", "meaning"),  # literal: shape
+}
 # db_name and server are OPTIONAL (Brief_Minimal_Registration,
 # Sunny 2026-09-19: "keep db name and server names optional");
 # naming the db on BOTH sides arms the wrong-database cross-check
@@ -74,6 +88,21 @@ class IntakeReport:
     retired_objects: List[str] = field(default_factory=list)
 
 
+def read_json(path) -> Any:
+    """THE ONE intake JSON read (F6, Brief_Pilot_Build_1): decodes
+    utf-8-sig — a Windows editor's byte-order mark is not an error —
+    and a file that exists but does not parse refuses BY NAME with
+    the path and the parser's own words (INTAKE-14, ruling (4)),
+    never a raw traceback."""
+    path = Path(path)
+    try:
+        return json.loads(path.read_text(encoding="utf-8-sig"))
+    except json.JSONDecodeError as err:
+        raise Refusal(
+            "INTAKE-14", f"{path}: content does not parse as JSON "
+            f"— {err}") from err
+
+
 def load_snapshot(snap_dir) -> ExtractSnapshot:
     snap_dir = Path(snap_dir)
     missing = [f for f in REQUIRED_FILES if not (snap_dir / f).is_file()]
@@ -86,9 +115,20 @@ def load_snapshot(snap_dir) -> ExtractSnapshot:
         path = snap_dir / name
         if not path.is_file():
             return []
-        return list(csv.DictReader(open(path)))
+        with open(path, encoding="utf-8-sig", newline="") as f:
+            reader = csv.DictReader(f)
+            found = reader.fieldnames or []
+            absent = [h for h in CSV_HEADERS.get(name, ())
+                      if h not in found]
+            if absent:
+                raise Refusal(
+                    "INTAKE-15", f"{name}: headers mismatch the "
+                    f"contract — expected {list(CSV_HEADERS[name])}, "
+                    f"found {list(found)} (was the grid saved with "
+                    "headers on?)")
+            return list(reader)
     return ExtractSnapshot(
-        manifest=json.loads((snap_dir / "manifest.json").read_text()),
+        manifest=read_json(snap_dir / "manifest.json"),
         tables=rows("tables.csv"), columns=rows("columns.csv"),
         pks=rows("pk.csv"), joins=rows("joins.csv"),
         values=rows("values.csv"))
