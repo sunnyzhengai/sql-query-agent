@@ -279,9 +279,13 @@ algorithm · evidence returned with the query as artifact).
 
 ## The laws carried forward from v1 (storage-independent, all kept)
 
-[registry stamps: kg1_technical v1.49.0 · kg2_logic v1.49.0 ·
-kg2_kind_library v1.49.0 · kg3_artifacts v1.49.0 ·
-kg4_concepts v1.49.0 · flows v1.49.0 · lenses v1.49.0]
+[registry stamps: kg1_technical v1.50.0 · kg2_logic v1.50.0 ·
+kg2_kind_library v1.50.0 · kg3_artifacts v1.50.0 ·
+kg4_concepts v1.50.0 · flows v1.50.0 · lenses v1.50.0]
+(1.50.0 = Brief_Pilot_Build_3 2026-09-20, THE GRAIN-SOURCE
+CAPTURE: GROUP BY refs + DISTINCT + OVER contents + the IF THEN
+kind — Structure_Kinds_Grain; ROW_NUMBER slots close; the
+guard-idiom Statement_Voicings row.)
 (stamp block restored 2026-09-10 — the ratification rename dropped
 v1's per-section stamps; RG-A2 caught it same day. One block here,
 the same-breath rule mechanical again; registries carry their own

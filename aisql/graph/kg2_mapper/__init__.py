@@ -99,10 +99,12 @@ def _map_expression(ctx, expr) -> Dict[str, Any]:
         return _node(ctx, "expression", "function", expr,
                      name=expr.FunctionName.Value,
                      args=[_map_expression(ctx, p) for p in expr.Parameters],
-                     # Phase A: an OVER clause marks a window function —
-                     # a property, not a new expression kind (the
-                     # Expression_Kinds set stays closed; RG-C3)
-                     over=(True if expr.OverClause is not None else None))
+                     # Phase A marked the OVER clause as a flag; slice E
+                     # (Brief_Pilot_Build_3, metamodel 1.50.0) captures
+                     # its CONTENTS — still a property, not a new kind
+                     # (Expression_Kinds stays closed; RG-C3), and still
+                     # truthy wherever the old flag was read
+                     over=_map_over(ctx, expr.OverClause))
     if t == "BinaryExpression":
         # R12 (v2.10.0): the operator is meaning — a property, not
         # a new kind (Expression_Kinds stays closed; RG-C3). The
@@ -166,6 +168,29 @@ def _map_expression(ctx, expr) -> Dict[str, Any]:
     ctx.remainder.append({"type": t, **_evidence(ctx, expr),
                           "reason": "unmapped expression construct"})
     return _node(ctx, "expression", "remainder_ref", expr)
+
+
+def _map_over(ctx, over) -> Optional[Dict[str, Any]]:
+    """SLICE E (Brief_Pilot_Build_3, Sunny 'approved, build brief 3'
+    2026-09-20): the window's PARTITION BY / ORDER BY contents —
+    FL17's recorded deferral closes at its echo, widened by FL21 to
+    the grain-source family. Registry: Structure_Kinds_Grain. Window
+    frame clauses stay uncaptured (outside the ruled family)."""
+    if over is None:
+        return None
+    contents: Dict[str, Any] = {
+        "partition_by": [_map_expression(ctx, p)
+                         for p in over.Partitions],
+        "order_by": []}
+    if over.OrderByClause is not None:
+        for el in over.OrderByClause.OrderByElements:
+            # literal: shape
+            item: Dict[str, Any] = {
+                "expr": _map_expression(ctx, el.Expression)}
+            if str(el.SortOrder) == "Descending":
+                item["descending"] = True
+            contents["order_by"].append(item)
+    return contents
 
 
 def _wrap_not(ctx, frag, inner, negated) -> Dict[str, Any]:
@@ -427,16 +452,33 @@ def _map_query(ctx, query) -> Dict[str, Any]:
         structures.append("JOIN")
     if where is not None:
         structures.append("WHERE")
+    group_by = []
     if query.GroupByClause:
         structures.append("GROUP BY")
+        # SLICE E (Brief_Pilot_Build_3): the grouping COLUMNS — grain's
+        # first definitional source (FL21: only the string survived
+        # before). Non-expression specifications -> counted remainder.
+        for spec in query.GroupByClause.GroupingSpecifications:
+            if _type_name(spec) == "ExpressionGroupingSpecification":
+                group_by.append(_map_expression(ctx, spec.Expression))
+            else:
+                ctx.remainder.append(
+                    {"type": _type_name(spec), **_evidence(ctx, spec),
+                     "reason": "unmapped grouping specification"})
     if query.OrderByClause:
         structures.append("ORDER BY")
     if projection:
         structures.append("PROJECTION")
     # literal: shape
-    return {"node": "scope", "structures": structures, "from_refs": refs,
-            "join_on": join_on, "where": where, "select_refs": select_refs,
-            "projection": projection, "evidence": _evidence(ctx, query)}
+    scope = {"node": "scope", "structures": structures, "from_refs": refs,
+             "join_on": join_on, "where": where, "select_refs": select_refs,
+             "projection": projection, "evidence": _evidence(ctx, query)}
+    if group_by:
+        scope["group_by"] = group_by
+    if str(query.UniqueRowFilter) == "Distinct":
+        # SLICE E: grain's second definitional source (FL21)
+        scope["distinct"] = True
+    return scope
 
 
 # ---- statements & the file tree ----
@@ -494,6 +536,15 @@ def map_tree(file_name: str, text: str, dialect: str = "tsql"
         if t == "IfStatement":
             entry["statement_kind"] = "IF"
             entry["predicate"] = _map_predicate(ctx, stmt.Predicate)
+            # SLICE E (Brief_Pilot_Build_3): the THEN kind — the guard
+            # idiom's evidence (R11 speaks 'A cleanup step' ONLY when
+            # the tree shows predicate AND drop both)
+            then = stmt.ThenStatement
+            if then is not None:
+                entry["then_kind"] = _type_name(then)
+                if entry["then_kind"] == "DropTableStatement":
+                    entry["then_drops"] = [_table_name(o)
+                                           for o in then.Objects]
             param = _param_default(ctx, stmt)
             if param:
                 parameters[param["name"]] = param
@@ -982,7 +1033,8 @@ def resolve(tree: Dict[str, Any], store: Store, reg: Dict[str, Any],
                 targets.append(kt)
         for col in _column_refs_in([scope.get("where"),
                                     scope.get("join_on"),
-                                    scope.get("select_refs")]):
+                                    scope.get("select_refs"),
+                                    scope.get("group_by")]):
             if col.get("resolves_to") is not None:
                 continue  # bound while resolving a subquery pass
             parts = col["ref"].split(".")

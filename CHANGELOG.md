@@ -8,6 +8,68 @@ Versioning follows [Semantic Versioning](https://semver.org/).
 
 ## [Unreleased]
 
+### Fixed — the honest pure-anaphor clarify returns; the connection filter filters again (Brief_Anaphor_Clarify)
+- THE ESTATE-VOCABULARY GATE (ruled 2026-09-20, "agree with all
+  four, build it"): a reference-marked mention with an empty
+  context table is searched as text only if one of its tokens is
+  an estate word — a name token, a label token, or a blessed
+  acronym, never speech text. A bare "it"/"those" with nothing on
+  the table now clarifies ("nothing to refer back to") instead of
+  answering about whichever short scope name its vector lands
+  near ('it' vs the name card 'ett' scored 0.6322 — no threshold
+  separates a pronoun from a three-letter name). The 22:27
+  over-mark corpse rule stands untouched: estate words still
+  search as text.
+- The Law-4 connection filter's anchor set now applies the RULED
+  band (SET FORMATION, 2026-09-11): cards >= MATCH_SCORE AND
+  within UNIQUE_MARGIN of the best non-table card. Under real
+  vectors one file-path mention made 409 anchors at the bare 0.5
+  bar and the filter could not exclude anything; banded, 31.
+- Both surfaced by the 4 red pins in the 2026-09-20 AISQL_RECORD
+  run — the Build_3 store's first measurement (findings FL23 and
+  FL24, Contract_Logic_Layer).
+
+---
+
+## [2.4.0] - 2026-09-20
+
+### Changed — the three description levels get their ruled shapes (Brief_Pilot_Build_3, slices D+E)
+- SCOPE descriptions are now ONE Business Term sentence (Grammar
+  Floor R14, v2.14.0): grain-or-base lead ("One record per
+  <grain>: …" / "<Base source> records: …"), membership from
+  inner joins with their ON value-conditions in parentheses,
+  every WHERE condition (join keys and 1=1 idioms excluded; long
+  value lists compress to a count; identical betweens merge),
+  then "carrying <the computed outputs>, and N carried-through
+  columns". Replaces the "Drawn from …" from-structure lead for
+  scopes only.
+- FILE technical definitions re-shape to three levels (R13 v2):
+  a "Delivers …" headline (the delivery selection's own
+  sentence), a numbered Pipeline (each "Builds the <x>
+  selection" step showing the built selection's head in
+  parentheses — computed at display, stored once on the scope),
+  and the appendix (Presents + per-selection filters AND
+  per-selection inner joins). A file with NO delivery statement
+  now speaks instead of storing nothing: the last built
+  selection's sentence + "Builds N working selections; delivers
+  nothing."
+- STATEMENT lines: the temp-table guard (IF OBJECT_ID(…) …
+  DROP TABLE #x) now stores "A cleanup step: removes the
+  previous #x when it already exists." — the raw object_id
+  fragment can never print again. dry_run statement lines wear
+  their scope's head clause.
+- ROW_NUMBER columns name their window: "the record's position
+  within each <partition>, ordered by <order>" — the recorded
+  partition/order deferral closes at its echo (FL17).
+
+### Added — the grain-source capture (slice E, metamodel 1.50.0)
+- The parser tree now carries GROUP BY column refs, the DISTINCT
+  flag, OVER (PARTITION BY / ORDER BY) contents, and the IF
+  guard's THEN kind — one capture act (FL21); the new refs bind
+  through the one resolver walk (sepsis corpus: +115 resolved,
+  +4 drift, +9 ambiguous — measured, conservation holds).
+- Wheel 2.3.1 retired per the one-current-wheel law.
+
 ---
 
 ## [2.3.1] - 2026-09-20

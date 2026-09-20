@@ -193,7 +193,16 @@ SOURCES = {
 # deliveries lead, spine voiced, intermediates counted, census
 # closes; the file's ask-index words = the delivery lead, so file
 # embeddings embed meaning, never name-noise).
-STAMP_VERSION = "1.49.0"
+# v1.50.0 (2026-09-20): BRIEF_PILOT_BUILD_3 (Sunny "approved, build
+# brief 3") — THE GRAIN-SOURCE CAPTURE (slice E, FL17's echo widened
+# by FL21): the mapper captures GROUP BY column refs, the DISTINCT
+# flag, the window's PARTITION BY / ORDER BY contents, and the IF
+# guard's THEN kind — one capture act; the bump IS the re-parse
+# trigger. ROW_NUMBER's partition/order deferral CLOSES (the slotted
+# template lands beside the slotless fallback); Statement_Voicings
+# gains the temp-table-existence guard idiom row (FL10 family);
+# Structure_Kinds_Grain documents the captured family.
+STAMP_VERSION = "1.50.0"
 RATIFIED = True
 DOC_STAMP = ("v1.0.0 (ratified 2026-09-05, Sunny); v1.1.0 twin-graph "
              "ruling ADR 0077; v1.2.0 Phase A metamodel bump; v1.3.0 "
@@ -754,6 +763,21 @@ TWIN_SHEETS = {
              "home per meaning)",
              "Source": "authored 2026-09-17",
              "Estate count (measured 2026-09-17)": "1"},
+            {"Statement kind": "IF (temp-table-existence guard)",
+             "Voicing template (DRAFT — Sunny gap-checks the 36)":
+             "A cleanup step: removes the previous <#name> when "
+             "it already exists. (THE GUARD IDIOM, FL10 family — "
+             "Brief_Pilot_Build_3: fires ONLY when BOTH hold in "
+             "the tree: the predicate is NOT(NULL_CHECK("
+             "OBJECT_ID(…))) and the THEN statement is DROP "
+             "TABLE (then_kind, captured at map time); <#name> = "
+             "the dropped table's own name, verbatim. Anything "
+             "else keeps the decision-step voice — the idiom "
+             "never guesses)",
+             "Source": "Brief_Pilot_Build_3, Sunny 'approved, "
+             "build brief 3' 2026-09-20; the object_id raw "
+             "fragment corpse from the work pilot",
+             "Estate count (measured 2026-09-17)": "-"},
         ],
         "Function_Voicings": [
             {"Operation": "_ruling", "Kind": "-", "Slots": "-",
@@ -782,17 +806,22 @@ TWIN_SHEETS = {
              "Source": "authored 2026-09-16",
              "Estate count (measured 2026-09-16)": "56"},
             {"Operation": "ROW_NUMBER", "Kind": "function (window)",
-             "Slots": "(none — see deferral)",
+             "Slots": "partition, order (captured contents; "
+             "slotless fallback when only the flag survives)",
              "Voicing template (DRAFT — Sunny gap-checks phrasing)":
-             "the record's position in its ordered sequence — "
-             "partition/order slots DEFERRED with a recorded "
-             "reason (Echo Law): the mapper captures `over` as a "
-             "FLAG, not contents; capture is a twin-structure "
-             "act beyond M4's sealed scope. An echo (a future "
-             "estate where these renders matter) makes the build "
-             "mandatory",
+             "with captured over contents: the record's position "
+             "within each <partition>, ordered by <order> "
+             "(descending elements marked '(descending)'); "
+             "flag-only fallback: the record's position in its "
+             "ordered sequence — THE DEFERRAL CLOSES "
+             "(Brief_Pilot_Build_3, Sunny 'approved, build brief "
+             "3' 2026-09-20): FL17 was the recorded deferral's "
+             "echo, and FL21 widened the capture to the whole "
+             "grain-source family (GROUP BY refs + DISTINCT + "
+             "PARTITION BY/ORDER BY), one capture act",
              "Source": "authored 2026-09-16; slots deferral "
-             "recorded at the M4 build",
+             "recorded at the M4 build; CLOSED at "
+             "Brief_Pilot_Build_3 (2026-09-20)",
              "Estate count (measured 2026-09-16)": "26"},
             {"Operation": "DATEADD", "Kind": "function",
              "Slots": "unit, n, base",
@@ -912,6 +941,57 @@ TWIN_SHEETS = {
              "metamodel bump + re-parse. Lives beside Structure_Kinds "
              "(sheet-add keeps the xlsx untouched; merge at next "
              "draft-workbook revision)."},
+        ],
+        "Structure_Kinds_Grain": [
+            {"Kind": "_ruling",
+             "Meaning": "THE GRAIN-SOURCE CAPTURE (slice E, "
+             "Brief_Pilot_Build_3, Sunny 'approved, build brief 3' "
+             "2026-09-20): ruling (1) named grain's definitional "
+             "sources — GROUP BY and DISTINCT — and NEITHER was "
+             "graph-held (FL21); the window OVER was a flag (FL17, "
+             "a recorded deferral whose echo arrived). ONE capture "
+             "act lands all three + the IF guard's THEN kind. The "
+             "twin walk and parsed_census stay symmetric (both "
+             "read the same keys); the metamodel bump 1.50.0 is "
+             "the re-parse trigger.",
+             "T-SQL sources": "-", "Notes": "-"},
+            {"Kind": "GROUP BY contents",
+             "Meaning": "scope.group_by = the grouping columns as "
+             "mapped expressions (resolver-bound like every ref) — "
+             "grain's first definitional source",
+             "T-SQL sources": "GroupByClause."
+             "GroupingSpecifications (ExpressionGrouping"
+             "Specification.Expression); other specification "
+             "kinds -> counted remainder",
+             "Notes": "the string 'GROUP BY' stays in "
+             "scope.structures (unchanged consumers)"},
+            {"Kind": "DISTINCT",
+             "Meaning": "scope.distinct = True — grain's second "
+             "definitional source (one record per distinct "
+             "combination of the outputs)",
+             "T-SQL sources": "QuerySpecification.UniqueRowFilter "
+             "== Distinct",
+             "Notes": "absent when not distinct (no empty keys)"},
+            {"Kind": "OVER contents",
+             "Meaning": "function.over = {partition_by: [exprs], "
+             "order_by: [{expr, descending}]} — the window's "
+             "per-what and by-what; rank-filter partition grain "
+             "and the R12 slotted ROW_NUMBER phrase stand on it",
+             "T-SQL sources": "OverClause.Partitions + OverClause."
+             "OrderByClause.OrderByElements (SortOrder Descending "
+             "-> descending: true)",
+             "Notes": "truthiness preserved (a dict is truthy) — "
+             "every over-as-flag consumer unchanged; window frame "
+             "clauses stay uncaptured (outside the ruled family)"},
+            {"Kind": "IF THEN kind",
+             "Meaning": "statement.then_kind = the THEN "
+             "statement's ScriptDom type; then_drops = dropped "
+             "object names when it is DROP TABLE — the guard "
+             "idiom's evidence (R11 amendment)",
+             "T-SQL sources": "IfStatement.ThenStatement "
+             "(DropTableStatement.Objects)",
+             "Notes": "captured for IF only; the ELSE branch "
+             "stays uncaptured (no ruled consumer)"},
         ],
         "Meaning_Node_Kinds": [
             {"Kind": "_ruling", "Definition": _TG + " 2d: the closed "

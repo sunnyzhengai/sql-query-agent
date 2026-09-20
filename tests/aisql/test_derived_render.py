@@ -109,8 +109,9 @@ def test_arithmetic_speaks_operator_words():
 # ---- the library rows ----
 
 def test_row_number_renders_slotless():
-    # over contents are a mapper flag, not contents — the slotted
-    # template is DEFERRED with its recorded reason (registry row)
+    # a flag-only `over` (legacy shape / empty capture) keeps the
+    # ratified slotless phrase — the slotted template (v2.14.0,
+    # the deferral's close) pins in test_grain_capture.py
     m = member("FIRST_TIME_LINE", fn("ROW_NUMBER", over=True))
     assert produce.derived_phrase(m, _voice()) == (
         "First time line: the record's position in its ordered "
@@ -236,10 +237,13 @@ def test_skeletons_mirror_the_registry():
     for op_name, skeleton in produce.FN_SKELETONS.items():
         row = rows.get(op_name) or rows.get("STUFF + FOR XML PATH('')")
         assert skeleton in row[tmpl_col], (op_name, skeleton)
+    # v2.14.0: the slotted ROW_NUMBER (the deferral's close) mirrors
+    # the same registry row as the slotless fallback
+    assert produce.ROW_NUMBER_SLOTTED in rows["ROW_NUMBER"][tmpl_col]
     for op_name in closed:
         assert op_name in produce.FN_SKELETONS or op_name == "STUFF", \
             f"registry op {op_name} has no code fill"
 
 
 def test_grammar_version_bumped():
-    assert produce.FLOOR_GRAMMAR_VERSION == "2.13.0"
+    assert produce.FLOOR_GRAMMAR_VERSION == "2.14.0"

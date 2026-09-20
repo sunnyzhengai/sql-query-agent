@@ -116,6 +116,24 @@ def test_lens_counters_and_produce_drains(shaken):
         assert d.properties["description"].strip()
 
 
+def test_no_delivery_file_stores_a_counted_headline(shaken):
+    """THE FIND (Brief_Pilot_Build_3, landed in Contract_Logic_
+    Layer at PRESENTED): a file with NO delivery statement stored
+    NO technical_definition at all — silently.
+    USP_IP_SepsisShiftCompliance proved it. The headline now falls
+    back to the LAST built scope's sentence + the counted words —
+    counted, never empty-silent."""
+    from aisql.graph.read_api import ReadApi
+    store, _, _ = shaken
+    read = ReadApi(store)
+    td = inbound._render_technical_definition(
+        read, "repo://sepsis-corpus/reporting/"
+              "USP_IP_SepsisShiftCompliance.sql")
+    assert td, "the no-delivery file speaks now"
+    assert "Builds 12 working selections; delivers nothing." in td
+    assert td.startswith("The main adm details selection")
+
+
 def test_two_alias_corpse_voices_both_filters(shaken):
     """Sunny's ED-sepsis gap-check, finding 2 (grammar v1.1.0): the
     same table read under two aliases, each filtered EVENT_SUBTYPE_CODE

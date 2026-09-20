@@ -1054,6 +1054,34 @@ exactly the four carriers (ADT_EVENTS · ED_EVENT_INFO ·
 ED_PATIENT_INFO · V_PATIENT_LOCATION_HISTORY) as rows with the
 enumerating GQL.
 
+► RULED (Sunny "agree with all four, build it", 2026-09-20 —
+Brief_Anaphor_Clarify, from the 4 red pins in his AISQL_RECORD
+run; the honest pure-anaphor clarify's SECOND death on the
+2026-09-09 beat, so this is the Echo Law's generator-level build):
+- **THE ESTATE-VOCABULARY GATE (Law 3 × Law 4, the collision
+  resolved)**: a reference-marked mention with an EMPTY context
+  table searches as text (the 22:27 corpse rule, standing) ONLY
+  if at least one of its tokens is an estate word — a NAME token,
+  a LABEL token, or a blessed acronym name of the ask index.
+  Speech/description text is NEVER vocabulary (stored English
+  sentences contain 'it'). A reference-marked mention with no
+  estate token and no table contributes NO search; if nothing
+  else answers strongly, the hard "nothing to refer back to"
+  clarify fires. Deterministic — the estate's own names decide;
+  no new threshold, no hand-authored word list. Measured
+  separation (sepsis, recorded vectors): 'it'/'those'/'that'/
+  'them' are in no estate name or label; 'ed'/'iv'/'ett'/'sepsis'
+  are. WHY: a pronoun's vector separates from short scope names
+  by no threshold ('it' vs the name card 'ett' = 0.6322), and
+  band membership shifts whenever any stored speech re-voices —
+  the honest clarify must not be hostage to unrelated voicing.
+- **THE ANCHOR SET IS THE RULED BAND (a fix)**: the SET-FORMATION
+  band above ("≥ MATCH_SCORE and within UNIQUE_MARGIN of the
+  best") GOVERNS the Law-4 connection filter's anchors in ask();
+  the best is taken over the NON-TABLE hits (a table entry's 1.0
+  card is context, never the anchor bar). Measured: the fu1
+  mention's anchors fall 409 → 31 and the filter filters again.
+
 ► RULED (Sunny, 2026-09-11 — THE SECOND TARGET: the join layer,
 M2, per the batch-earns-the-console law): the console's scope
 extends to M2's accepted grains.

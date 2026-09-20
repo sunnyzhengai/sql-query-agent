@@ -118,3 +118,27 @@ def test_dry_run_speaks_composed_texts_first(monkeypatch, tmp_path,
     assert out.index("=== file (1) ===") < out.index(
         "=== scope (1) ===") < out.index("=== statement (1) ===")
     assert "=== column (1) ===" in out and "=== table (1) ===" in out
+
+
+def test_dry_run_statement_lines_wear_the_scope_head(
+        monkeypatch, tmp_path, capsys):
+    """Q5 (Brief_Pilot_Build_3, "agree with all five"): dry_run's
+    statement lines borrow the built scope's head clause at
+    render — a derivable display join; the stored text is
+    untouched."""
+    base = _estate(tmp_path)
+    store = _Store([
+        _Node("f1.sql::#Base_Pop", "scope", {
+            "description": "Events records: The seq is 1; "
+                           "carrying the a."}),
+        _Node("f1.sql::stmt/2", "statement", {
+            "description": "Builds the base pop selection."}),
+    ])
+    monkeypatch.setattr(
+        console, "build_store",
+        lambda estate, journal_path=None, descriptions=True:
+        (store, base))
+    fabric_run.dry_run(str(base))
+    out = capsys.readouterr().out
+    assert ("Builds the base pop selection (events records)."
+            in out)

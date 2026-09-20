@@ -344,6 +344,38 @@ def render_kind_list(read, index, kind: str,
 # on demand (a set-pool beside strong hits filters by connection).
 
 
+def _estate_vocabulary(index, blessed_names) -> set:
+    """The estate's own words: the ask index's NAME tokens + LABEL
+    tokens + blessed acronym names — NEVER speech/description text
+    (stored English contains 'it'). Ruled 2026-09-20
+    (Brief_Anaphor_Clarify, "agree with all four"): a
+    reference-marked mention with an empty context table searches
+    as text only if one of its tokens is in this set."""
+    words = set(blessed_names)
+    for e in index:
+        words.update(ask_index._tokens(e.get("name") or ""))
+        words.update(ask_index._tokens(e.get("label") or ""))
+    return words
+
+
+def _anchor_band(hits) -> list:
+    """The ruled band (SET FORMATION 2026-09-11, landed on the
+    Law-4 connection filter 2026-09-20 as a FIX): anchors are the
+    non-table hits with a card >= MATCH_SCORE AND within
+    UNIQUE_MARGIN of the best such card — the best over NON-TABLE
+    hits only (a table entry's 1.0 card is context, never the
+    anchor bar; all-cards->0.5 made 409 anchors of one mention and
+    the filter could not filter)."""
+    t = grounding.thresholds()
+    cand = [h for h in hits if h.get("via_card") != "table"
+            and h.get("best_card_score", 0) >= t["MATCH_SCORE"]]
+    if not cand:
+        return []
+    best = max(h["best_card_score"] for h in cand)
+    return [h["identity"] for h in cand
+            if h["best_card_score"] >= best - t["UNIQUE_MARGIN"]]
+
+
 def _connected(member_id: str, anchor_ids, adj) -> bool:
     nbrs = {n for n, _ in adj.get(member_id, [])}
     for a in anchor_ids:
@@ -523,6 +555,7 @@ def ask(store, question: str, author: str, occurred_at: str,
     blessed = {n.properties["name"].lower():
                n.properties["expansions"]
                for n in read.nodes("acronym")}
+    estate_words = None
     for m in interpretation["mentions"]:
         role = references.get(m)
         if role is not None:
@@ -537,6 +570,26 @@ def ask(store, question: str, author: str, occurred_at: str,
                 references = dict(references)
                 references.pop(m, None)
                 empty_table_marks = True
+                # THE ESTATE-VOCABULARY GATE (ruled 2026-09-20,
+                # Brief_Anaphor_Clarify): text search is for words
+                # that could NAME something here — name/label
+                # tokens + blessed acronyms, never speech ('it' vs
+                # the name card 'ett' scored 0.6322; a pronoun and
+                # a short name separate by no threshold)
+                if estate_words is None:
+                    estate_words = _estate_vocabulary(index, blessed)
+                if not any(t in estate_words
+                           for t in ask_index._tokens(m)):
+                    # literal: shape
+                    trace.append({"mention": m, "tier": "gate",
+                                  "outcome": "no-estate-word",
+                                  "searched_as": m, "hits": 0,
+                                  "note": "reference-marked, the "
+                                          "table is empty, and no "
+                                          "token names anything in "
+                                          "this estate — not "
+                                          "searched"})
+                    continue
         if role is not None:
             pool = stack_entities[0]
             if role.startswith("ordinal:"):
@@ -629,10 +682,7 @@ def ask(store, question: str, author: str, occurred_at: str,
     # on-demand connection: a set-pool beside strong searched hits
     # filters by connection (Law 4's follow-up filtering, preserved)
     if pools:
-        anchors = [i for i, h in merged.items()
-                   if h["via_card"] != "table"
-                   and h.get("best_card_score", 0)
-                   >= grounding.thresholds()["MATCH_SCORE"]]
+        anchors = _anchor_band(list(merged.values()))
         if anchors:
             pool_ids = {e["identity"] for p in pools for e in p}
             for pid in list(merged):

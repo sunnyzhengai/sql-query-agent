@@ -579,8 +579,9 @@ def test_scopes_speak_in_the_index(world):
     _, entries, _, _, _ = world
     sc = next(e for e in entries if e["identity"] == SCOPE_BASE_POP)
     assert sc["label"] == "scope"
-    # grammar 2.4.0: the floor opens with the composition sentence
-    assert sc["words"].startswith("drawn from")
+    # grammar 2.14.0 (R14, Brief_Pilot_Build_3): the Business Term
+    # sentence leads — #Base_Pop's grain source is its DISTINCT
+    assert sc["words"].startswith("one record per distinct")
 
 
 def test_join_layer_adjacency_walks_scope_join_table(world):
@@ -687,10 +688,13 @@ def test_scope_neighborhood_cites_join_evidence(world):
     # floor's logic, not just its first sentence
     anchor_line = next(line for line in r["evidence"]
                        if line.startswith("[scope] #Base_Pop"))
-    assert "drawn from" in anchor_line
-    assert "locations records" in anchor_line   # the FULL list,
-    # not the first sentence; the WHERE conditions are condition
-    # grains — counted out until §D by the standing ruling
+    # grammar 2.14.0 (R14): the ONE sentence carries grain,
+    # membership, population AND payload — still in full, never
+    # truncated to a first sentence; outer-join lookups (the old
+    # 'locations records' read) left the membership by ruling (2)
+    assert "one record per distinct" in anchor_line
+    assert "matched in hospital encounters records" in anchor_line
+    assert "carrying the age in days" in anchor_line
     # same-named joins carry their owner
     assert all("::join#" in line for line in r["evidence"]
                if line.startswith("[join]"))

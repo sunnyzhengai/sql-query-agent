@@ -1971,3 +1971,89 @@ identical bytes, new order, no stored data change. RED-first pin
 in test_fabric_run (sentinel order + headers). THE WHEEL 2.3.1
 (sha256 f8517085…, 2.3.0 retired, runbook URL + step-6 "Good"
 line follow).
+
+## 2026-09-20 (same day) — BRIEF_PILOT_BUILD_3 BUILT — the three
+## description levels get their ruled shapes (slices D+E)
+
+His "approved, build brief 3" on the PRESENTED worked examples
+(the prototype's real output over the stored sepsis graph);
+ship-unit 3 of Brief_Pilot_Findings_R1 ruling (7). What built:
+
+- **R14 THE BUSINESS TERM SENTENCE (grammar 2.14.0)** — every
+  scope's stored description is ONE sentence composed from the
+  tree: grain-or-base lead · membership (inner joins, ON residues
+  parenthetical) · population (every WHERE; join keys +
+  degenerates out; >6-member lists compress to a count; identical
+  betweens merge) · payload (dcol names + the carried-through
+  count). Replaces "Drawn from …" FOR SCOPES ONLY. Verify:
+  test_scope_sentence.py (25 pins, RED first) +
+  test_scope_layer's verbatim law over both corpora.
+- **SLICE E — THE GRAIN-SOURCE CAPTURE (metamodel 1.50.0,
+  registries 1.50.0)**: GROUP BY column refs + DISTINCT flag +
+  OVER partition/order contents + the IF guard's THEN kind — one
+  capture act (FL17's echo, FL21's widening); the new refs bind
+  through the one resolver walk. FL17 acceptance GREEN: "Time
+  line: the record's position within each encounter id, ordered
+  by the abx admin time." Verify: test_grain_capture.py.
+- **R11 riders**: the temp-table guard idiom ("A cleanup step:
+  removes the previous #x when it already exists." — both halves
+  read from the tree) + the Q5 render-join (statement_display;
+  dry_run statement lines wear the built scope's head; derivable,
+  stored never).
+- **R13 v2 — THE THREE LEVELS**: file technical_definition =
+  "Delivers …" headline · numbered Pipeline · appendix (Presents
+  kept for the M7 cherry-pick + per-selection filters AND joins,
+  FL20). FL22 (the brief's FIND): a no-delivery file now speaks
+  "<last scope sentence> Builds N working selections; delivers
+  nothing." — USP_IP_SepsisShiftCompliance spoke for the first
+  time. Byte pin re-based 16195→20255 chars (measured).
+- **Re-bases, all by measurement**: sepsis shakedown resolved
+  +115 / drift +4 / ambiguous +9 (conservation holds 131==131,
+  twin untouched); ed_sepsis_dev cites 97→98; expected_m_gates
+  basis 1.50.0; graph_export parquet regenerated both estates
+  (scope · file · derived_column · pbi_report · cites — HIS LOAD
+  pending, his hand).
+- **THE WHEEL 2.4.0** (sha256 a36727e4…; 2.3.1 retired per the
+  one-current-wheel law; runbook wheel refs + the step-6 "Good"
+  line describe the new text shapes).
+- **Suite**: 758 green, ZERO non-RecordingGap failures · ruff
+  zero new (the two pre-existing E501s stand) · TEST_MAP regen.
+  OPEN, his hand: 62 tests raise RecordingGap — 450 new spoken sentences need recorded vectors;
+  the ruled remedy is HIS run: `AISQL_RECORD=1 python3.11 -m
+  pytest tests AIVIA_Test -q` (paid embeddings, never ours to
+  trigger). CLOSED at his eye on the re-voiced corpus + that run
+  + his Fabric load.
+
+## 2026-09-20 (same day) — BRIEF_ANAPHOR_CLARIFY BUILT — the honest
+## clarify returns; the connection filter filters again
+
+- **Born from his AISQL_RECORD run** (4 failed / 816 passed — the
+  Build_3 store's first measurement): findings FL23 + FL24 landed
+  as rows, brief drafted at "draft the brief", ALL FOUR ambiguities
+  ruled at "agree with all four, build it" (same day).
+- **FL23 — the Echo Law's generator build** (the pure-anaphor
+  clarify's SECOND death on the 2026-09-09 beat): THE
+  ESTATE-VOCABULARY GATE — a reference-marked mention with an
+  empty context table searches as text only if a token of it is an
+  estate word (name/label tokens + blessed acronyms, NEVER speech).
+  'it' vs the name card 'ett' measured 0.6322 — no threshold
+  separates a pronoun from a 3-letter scope name; the estate's own
+  words decide instead. The 22:27 corpse rule stands (pinned
+  unchanged).
+- **FL24 — a FIX**: ask()'s connection-filter anchors get the
+  RULED band (SET FORMATION 2026-09-11): >= MATCH_SCORE AND within
+  UNIQUE_MARGIN of the best non-table card. Measured: one
+  file-path mention's anchors 409 -> 31; the fu1 pool filters
+  correctly again.
+- **Pins**: the 4 red tests ARE the acceptance pins (reality
+  authored the RED) + 3 new (vocabulary boundary · the 'ED'-in /
+  'it'-out distinction · the anchor-band unit shape).
+- **No stored field changes** — no export regen, no load; the
+  wheel rides the NEXT release (ruling 4, no churn before his
+  2.4.0 re-run).
+- **Suite**: 823 passed / 0 failed / 25 skipped / 3 xfailed
+  (11:23) — the 4 red pins green + the 3 new · ruff: touched
+  files clean, the 18 remaining pre-exist · TEST_MAP regen ·
+  closing check BALANCED (9 changed == 9 declared-and-touched +
+  1 declared no-op reasoned: test_ask_console.py, pins already
+  existed). CLOSED at his word.

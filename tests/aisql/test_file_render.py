@@ -1,11 +1,12 @@
-"""§R13 THE CATCH-ALL — form pins on the F2 fixture estate
-(authored with the DRAFT rule; Brief_M6_File_Layer approved
-2026-09-17; the byte-exact USP_ED_SEPSIS pin joins at the
-checkpoint after Sunny's gap-check, the answer-key precedent).
-
-The form: "Presents: …. Population filters: …. Inner joins: …."
-— sections in that order (M6-5), "; "-joined items (the
-one-separator idiom), composed from the graph's OWN stored rows.
+"""§R13 v2 — THE THREE LEVELS (Brief_Pilot_Build_3, Sunny
+"approved, build brief 3" 2026-09-20, amending the ratified
+v2.12.0 form): headline ("Delivers …", the delivery scope's R14
+sentence) → Pipeline (the statement chain wearing scope heads,
+the Q5 render-join) → appendix (Presents — the M7 cherry-pick's
+source, kept — then Population filters and Inner joins BOTH
+grouped per selection, FL20). Form pins on the F2 fixture; the
+byte-exact USP_ED_SEPSIS pin re-based by measurement (the
+answer-key precedent — Sunny's gap-check eye closes the brief).
 
 Proves: contract:aisql-design-to-code
 """
@@ -50,14 +51,26 @@ def _tds(read):
 def test_sections_appear_in_the_ruled_order(read):
     tds = _tds(read)
     assert any(tds.values()), "F2 renders at least one definition"
-    order = ["Presents: ", "Population filters: ", "Inner joins: "]
+    order = ["Pipeline: ", "Presents: ", "Population filters: ",
+             "Inner joins: "]
     for fid, td in tds.items():
         if not td:
             continue
         positions = [td.find(s) for s in order]
         present = [p for p in positions if p >= 0]
         assert present == sorted(present), fid
-        assert td.startswith("Presents: "), fid
+        assert td.startswith("Delivers ") \
+            or "delivers nothing." in td, fid
+
+
+def test_inner_joins_group_per_selection(read):
+    """FL20: joins carry their selection's address, the same shape
+    the filters half already owned."""
+    for td in _tds(read).values():
+        if "Inner joins: " not in td:
+            continue
+        section = td.split("Inner joins: ", 1)[1]
+        assert section.startswith("In the "), section
 
 
 def test_items_join_with_the_one_separator(read):
@@ -99,8 +112,11 @@ def test_the_ratified_estate_definition_byte_exact():
     td = inbound._render_technical_definition(
         r, "repo://sepsis-corpus/reporting/USP_ED_SEPSIS.sql")
     assert td.startswith(
-        "Presents: every column of the final selection; "
-        "first ip department; ")
+        "Delivers the final selection, carrying the last bp to "
+        "first positive score time, ")
+    assert "Pipeline: (5) A decision step, taken when " in td
+    assert ("Presents: every column of the final selection; "
+            "first ip department; ") in td
     window = ("In the base pop selection: the arrival date is "
               "between the d start date parameter and the d end "
               "date parameter (inclusive).")
@@ -109,9 +125,12 @@ def test_the_ratified_estate_definition_byte_exact():
     assert hashlib.sha256(td.encode()).hexdigest() == RATIFIED_SHA
 
 
-RATIFIED_LEN = 16195  # pinned at the checkpoint (ratified)
-RATIFIED_SHA = ("fa03a7912ca553962229d6a5eb3bbb1c"
-                "1a3940cb42270eef22bedb06312451ff")
+# re-based BY MEASUREMENT at Brief_Pilot_Build_3 (R13 v2 — the
+# three levels; was 16195/fa03a791… at the v2.12.0 checkpoint);
+# Sunny's gap-check eye closes the brief
+RATIFIED_LEN = 20255
+RATIFIED_SHA = ("6c5867a8cb3e13994be207e2e8a5e793"
+                "6bfb3bf2beeb5f69507fd5b59fefea92")
 
 
 def test_definition_is_deterministic(read):

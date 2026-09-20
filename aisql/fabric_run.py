@@ -158,6 +158,17 @@ def dry_run(estate: str):
     speaking = [n for n in nodes
                 if n.properties.get("technical_definition")
                 or n.properties.get("description")]
+    # Q5 (Brief_Pilot_Build_3): statement lines borrow the built
+    # scope's head clause at RENDER — derivable, stored never
+    from aisql.flows import produce
+    heads = {}
+    for n in speaking:
+        if n.label != "scope" or "::" not in n.identity:
+            continue
+        head = produce.scope_head(n.properties.get("description"))
+        if head:
+            fid, name = n.identity.rsplit("::", 1)
+            heads.setdefault(fid, {})[produce._squash(name)] = head
     # literal: frame — the ruled speaking order (Brief_Dryrun_Order)
     first = ("file", "scope", "statement")
     labels = list(first) + sorted(
@@ -177,6 +188,10 @@ def dry_run(estate: str):
             if td:
                 print(f"  technical definition: {td}")
             if desc:
+                if label == "statement" and "::" in n.identity:
+                    fid = n.identity.rsplit("::", 1)[0]
+                    desc = produce.statement_display(
+                        desc, heads.get(fid, {}))
                 print(f"  description: {desc}")
     print(f"\n{spoken} node(s) carry governance text · "
           f"{len(nodes)} nodes total")

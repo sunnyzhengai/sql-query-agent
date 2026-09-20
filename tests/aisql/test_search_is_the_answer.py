@@ -218,3 +218,62 @@ def test_pure_anaphor_with_empty_table_still_clarifies(world):
                      interpret_fn=interp, semantic=semantic)
     assert result["status"] == "clarify"
     assert "refer back" in result["reason"]
+
+
+# ---- Brief_Anaphor_Clarify (2026-09-20, "agree with all four,
+# build it"): the estate-vocabulary gate + the ruled anchor band
+def test_estate_vocabulary_is_names_labels_blessed_never_speech(world):
+    """Ruling (2): vocabulary = the ask index's NAME tokens + LABEL
+    tokens + blessed acronym names — NEVER speech text (stored
+    English contains 'it'; speech in the vocabulary would re-kill
+    the honest clarify)."""
+    _store, read, index, _semantic = world
+    blessed = {n.properties["name"].lower()
+               for n in read.nodes("acronym")}
+    words = ask._estate_vocabulary(index, blessed)
+    for w in ("it", "those", "that", "them"):
+        assert w not in words, w
+    for w in ("ed", "sepsis", "ett", "iv"):
+        assert w in words, w
+    # 'carrying' is an R14 sentence word — speech never leaks in
+    assert "carrying" not in words
+
+
+def test_estate_vocabulary_gate_distinguishes(world):
+    """Ruling (1), Option A: 'it' (no estate token) is gated — never
+    searched as text, the honest clarify fires; 'ED' (an estate
+    word) passes the gate and searches as text — the 22:27 corpse
+    rule stands untouched."""
+    store, _read, _index, semantic = world
+    interp = scripted_proposals({"it": {
+        "mentions": ["it"], "references": {"it": "singular"}}})
+    r = ask.ask(store, "it", "person:test", T0,
+                interpret_fn=interp, semantic=semantic)
+    assert r["status"] == "clarify"
+    row = next(t for t in r["trace"] if t["mention"] == "it")
+    assert row["outcome"] == "no-estate-word"
+    q = "what reports are about ED"
+    interp2 = scripted_proposals({q.lower(): {
+        "mentions": ["reports", "ED"],
+        "references": {"ED": "singular"},   # over-marked
+        "expansions": {"ED": ["emergency department"]}}})
+    r2 = ask.ask(store, q, "person:test", T0,
+                 interpret_fn=interp2, semantic=semantic)
+    ed = next(t for t in r2["trace"] if t["mention"] == "ED")
+    assert ed.get("tier") == "search"
+
+
+def test_anchor_band_is_margin_of_best_never_all_strong():
+    """Ruling (3), the fix: anchors = non-table hits >= MATCH_SCORE
+    AND within UNIQUE_MARGIN of the best NON-TABLE card (a table
+    entry's 1.0 card is context, never the anchor bar). Shape pin —
+    thresholds are registry data (0.5 / 0.1 today)."""
+    hits = [
+        {"identity": "a", "via_card": "name", "best_card_score": 0.77},
+        {"identity": "b", "via_card": "name", "best_card_score": 0.70},
+        {"identity": "c", "via_card": "name", "best_card_score": 0.55},
+        {"identity": "d", "via_card": "name", "best_card_score": 0.45},
+        {"identity": "t", "via_card": "table", "best_card_score": 1.0},
+    ]
+    assert ask._anchor_band(hits) == ["a", "b"]
+    assert ask._anchor_band([]) == []

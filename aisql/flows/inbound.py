@@ -322,9 +322,11 @@ def receive_estate(store, reg: Dict[str, Any], estate_dir,
 
 def _store_scope_descriptions(store, as_of) -> None:
     """THE SHAPE CONTRACT, M2 (Sunny's bottom-up ruling,
-    2026-09-10): every scope node carries its description STORED —
-    the lead render, composed from KG1 words. The verbatim law is a
-    standing test: stored == recomputed (test_scope_layer)."""
+    2026-09-10) — the stored text is R14's BUSINESS TERM SENTENCE
+    since v2.14.0 (Brief_Pilot_Build_3, "approved, build brief 3"
+    2026-09-20; replaces the from-structure lead FOR SCOPES ONLY).
+    The verbatim law is a standing test: stored == recomputed
+    (test_scope_layer)."""
     from aisql.flows import produce
     from aisql.graph.read_api import ReadApi
     from aisql.lenses import decisions
@@ -335,7 +337,7 @@ def _store_scope_descriptions(store, as_of) -> None:
             node = by_id.get(scope["name_key"])
             if node is None:
                 continue
-            lead = produce._scope_lead(read, tree, scope)
+            lead = produce.scope_sentence(read, tree, scope)
             if node.properties.get("description") == lead:
                 continue
             store.append_node(
@@ -630,16 +632,19 @@ def _composed_condition(pred, voice) -> str:
 
 
 def _render_technical_definition(read, file_id: str) -> str:
-    """R13 THE CATCH-ALL (DRAFT, Brief_M6_File_Layer — Sunny
-    gap-checks the real render before ratification). The file's
-    technical definition, composed FROM THE GRAPH'S OWN ROWS:
-    Presents (the delivery's output list — passthroughs by folded
-    name, computed outputs by their stored R12 phrases) +
-    Population filters (the delivery chain's WHERE-rooted
-    condition phrases; CASE whens excluded — projection logic,
-    not population) + Inner joins (joinType Inner on the chain;
-    outer joins excluded — they do not restrict the population).
-    Deterministic; verbatim law: stored == recomputed."""
+    """R13 v2 — THE THREE LEVELS (Brief_Pilot_Build_3, Sunny
+    "approved, build brief 3" 2026-09-20, amending the ratified
+    v2.12.0 shape): (1) HEADLINE — the delivery scope's R14
+    sentence wearing "Delivers"; a NO-DELIVERY file speaks the
+    LAST built scope's sentence + the counted words, never
+    empty-silent (the brief's FIND — USP_IP_SepsisShiftCompliance
+    proved the silence). (2) PIPELINE — the statement chain in
+    build order, one line per voiced step, each wearing its
+    scope's head clause (the Q5 render-join, derivable). (3) THE
+    APPENDIX — Presents (unchanged content; the M7 report
+    cherry-pick's source stays), then Population filters and
+    Inner joins BOTH grouped per selection (FL20). Deterministic;
+    verbatim law: stored == recomputed."""
     from aisql.flows import produce
     from aisql.lenses import decisions
     tree = read.trees().get(file_id)
@@ -652,6 +657,39 @@ def _render_technical_definition(read, file_id: str) -> str:
                   if st.get("emits") and st.get("scope")
                   and st["scope"].get("name_key")]
     voice = produce._Voice(read, tree)
+
+    # level 1 — the headline (+ the head map the pipeline borrows)
+    sentences = {nk: produce.scope_sentence(read, tree, sc)
+                 for nk, sc in scopes.items()}
+    heads = {}
+    for nk, sc in scopes.items():
+        head = produce.scope_head(sentences[nk])
+        if head:
+            key = produce._squash(sc.get("name")
+                                  or nk.rsplit("::", 1)[-1])
+            heads[key] = head
+    parts: List[str] = []
+    for d in deliveries:
+        s = sentences.get(d["name_key"]) \
+            or produce.scope_sentence(read, tree, d)
+        parts.append("Delivers " + s[0].lower() + s[1:])
+    if not deliveries and scopes:
+        last_key = list(scopes)[-1]
+        parts.append(f"{sentences[last_key]} Builds {len(scopes)} "
+                     "working selections; delivers nothing.")
+
+    # level 2 — the pipeline (build order; the Q5 render-join)
+    lines: List[str] = []
+    for i, st in enumerate(tree["statements"]):
+        phrase = None
+        if st.get("predicate") is not None:
+            phrase = _composed_condition(st["predicate"], voice)
+        text = produce.statement_phrase(st, predicate_phrase=phrase)
+        if text:
+            lines.append(f"({i + 1}) "
+                         + produce.statement_display(text, heads))
+    if lines:
+        parts.append("Pipeline: " + " ".join(lines))
 
     # section 1 — Presents: the delivery's TOP-LEVEL output list
     # (nested subquery members are interior machinery, not
@@ -707,6 +745,10 @@ def _render_technical_definition(read, file_id: str) -> str:
     for d in deliveries:
         walk(d)
     chain = [d["name_key"] for d in deliveries] + on_chain
+    if not deliveries:
+        # the no-delivery FIND: the appendix covers every named
+        # selection (there is no delivery chain to walk)
+        chain = list(scopes)
 
     # section 2a — Population filters, GROUPED by selection
     # (checkpoint ruling C3, "all three"): each chain scope's
@@ -737,26 +779,33 @@ def _render_technical_definition(read, file_id: str) -> str:
             filters.append(f"In the {spoken} selection: "
                            + "; ".join(items) + ".")
 
-    # section 2b — Inner joins on the chain (stored phrases)
+    # section 2b — Inner joins on the chain, GROUPED per selection
+    # (FL20: a flat list lost each join's context; the conditions
+    # half already owned the solved shape)
     joins = {n.identity: n for n in store.current_nodes("join")}
-    inner: List[str] = []
+    join_groups: List[str] = []
     for sk in chain:
         jids = sorted(
             (j for j in joins if j.startswith(f"{sk}::join#")),
             key=lambda j: int(j.rsplit("#", 1)[-1]))
-        for jid in jids:
-            n = joins[jid]
-            if str(n.properties.get("joinType") or "") == "Inner":
-                inner.append(str(n.properties.get("description")
-                                 or "").rstrip("."))
+        phrases = [str(joins[jid].properties.get("description")
+                       or "").rstrip(".")
+                   for jid in jids
+                   if str(joins[jid].properties.get("joinType")
+                          or "") == "Inner"]
+        phrases = [p for p in phrases if p]
+        if phrases:
+            spoken = produce._spoken_selection(
+                sk.rsplit("::", 1)[-1])
+            join_groups.append(f"In the {spoken} selection: "
+                               + "; ".join(phrases) + ".")
 
-    parts: List[str] = []
     if presents:
         parts.append("Presents: " + "; ".join(presents) + ".")
     if filters:
         parts.append("Population filters: " + " ".join(filters))
-    if inner:
-        parts.append("Inner joins: " + "; ".join(inner) + ".")
+    if join_groups:
+        parts.append("Inner joins: " + " ".join(join_groups))
     return " ".join(parts)
 
 

@@ -102,9 +102,15 @@ def test_every_loaded_registry_is_ratified_v1():
     # the 31-statement debt retires) — after 1.46.0 = M5 (Sunny's "approved" +
     # "ratified", 2026-09-17): statement PRESENT, Statement_
     # Voicings library, the (b) 36/31 split, the F2+F4 export fix
+    # 1.50.0 = THE GRAIN-SOURCE CAPTURE (Brief_Pilot_Build_3,
+    # Sunny "approved, build brief 3" 2026-09-20): GROUP BY refs +
+    # DISTINCT + OVER contents + the IF guard's THEN kind, one
+    # capture act (FL17's echo + FL21); ROW_NUMBER's slot deferral
+    # closes; the Statement_Voicings guard-idiom row; the bump IS
+    # the corpus re-parse trigger — after
     for reg in metamodel.load_all().values():
         assert reg.ratified is True
-        assert reg.version == "1.49.0"
+        assert reg.version == "1.50.0"
 
 
 def test_load_single_exposes_sheets_and_stamp():

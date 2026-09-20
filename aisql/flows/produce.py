@@ -96,7 +96,22 @@ ECON = json.loads((pathlib.Path(__file__).parent / "econ_params.json")
 # inbound._render_technical_definition — Presents (top-level) +
 # grouped Population filters (degenerates pruned, recursion
 # full) + Inner joins; the file grain's governance field.
-FLOOR_GRAMMAR_VERSION = "2.13.0"
+# 2.14.0: R14 THE BUSINESS TERM SENTENCE (Brief_Pilot_Build_3,
+# Sunny "approved, build brief 3" 2026-09-20; rulings (1)-(3),
+# (10) + Q1-Q5 "agree with all five"): the scope's stored
+# description becomes ONE sentence — grain-or-base lead (GROUP
+# BY / DISTINCT / the rank-filter partition, slice E's capture),
+# membership (inner joins, ON residues riding parenthetically),
+# population (every WHERE; join keys and degenerates excluded;
+# long value lists compress to a count — the full list stays on
+# the condition rows; identical-subject betweens merge), payload
+# (the dcols by name, then the carried-through count). Replaces
+# the from-structure lead FOR SCOPES ONLY. RIDERS: R11 gains the
+# temp-table-existence guard idiom (then_kind evidence) + the Q5
+# render-join (statement_display — derivable, stored never);
+# R12's ROW_NUMBER partition/order deferral CLOSES (the slotted
+# phrase, FL17's echo-mandated acceptance).
+FLOOR_GRAMMAR_VERSION = "2.14.0"
 # literal: grammar Grammar_Floor R1
 _PREPOSITIONS = ("of", "on", "per", "for", "in", "at", "by", "with")
 # rider (c) amended (Sunny 2026-09-13): the dictionary's declared
@@ -216,6 +231,11 @@ FN_SKELETONS = {
 _ARITH_WORDS = {"Add": "plus", "Subtract": "minus",
                 "Multiply": "times", "Divide": "divided by",
                 "Modulo": "modulo"}
+# R12 v2.14.0 — the slotted ROW_NUMBER (the deferral closes;
+# FL17's acceptance: partition AND ordering named)
+# literal: schema-mirror kg2_kind_library Function_Voicings
+ROW_NUMBER_SLOTTED = ("the record's position within each "
+                      "<partition>, ordered by <order>")
 
 
 def _readable_name(name: str) -> str:
@@ -266,7 +286,23 @@ def _part_word(expr) -> str:
     return _UNIT_WORDS.get(token.upper(), token.lower())
 
 
-def _fill_library(name, args, voice, sub) -> Optional[str]:
+def _partition_words(expr, voice) -> str:
+    if expr.get("kind") == "column_ref":
+        return voice.name_words(expr)
+    return _bare(_defining_phrase(expr, voice))
+
+
+def _order_words(element, voice) -> str:
+    e = element.get("expr") or {}
+    if e.get("kind") == "column_ref":
+        words = "the " + voice.name_words(e)
+    else:
+        words = _defining_phrase(e, voice)
+    return words + (" (descending)" if element.get("descending")
+                    else "")
+
+
+def _fill_library(name, args, voice, sub, expr=None) -> Optional[str]:
     """The named-function rows beyond the absorbed overlays. None =
     no row or a guard failed — the caller counts the remainder."""
     skel = FN_SKELETONS.get(name)
@@ -277,9 +313,23 @@ def _fill_library(name, args, voice, sub) -> Optional[str]:
                 .replace("<from>", sub(args[1]))
                 .replace("<to>", sub(args[2])))
     if name == "ROW_NUMBER":
-        # partition/order slots DEFERRED with the recorded reason
-        # (registry row): the mapper's `over` is a flag, not
-        # contents — capture is a twin-structure act
+        # THE DEFERRAL CLOSES (v2.14.0, Brief_Pilot_Build_3 — FL17's
+        # echo): captured over contents fill the slots; a flag-only
+        # `over` (or empty contents) keeps the ratified slotless
+        # phrase — never an empty slot in prose
+        over = (expr or {}).get("over")
+        if isinstance(over, dict):
+            parts = " and ".join(_partition_words(p, voice)
+                                 for p in over.get("partition_by")
+                                 or [])
+            order = ", ".join(_order_words(o, voice)
+                              for o in over.get("order_by") or [])
+            if parts and order:
+                return (ROW_NUMBER_SLOTTED
+                        .replace("<partition>", parts)
+                        .replace("<order>", order))
+            if order:
+                return f"the record's position, ordered by {order}"
         return skel
     if name == "MIN" and args:
         phrase = sub(args[0])
@@ -349,7 +399,7 @@ def _defining_phrase(expr, voice) -> str:
             return _defining_phrase(a, voice)
         got = _fill_overlay(name, args, sub)
         if got is None:
-            got = _fill_library(name, args, voice, sub)
+            got = _fill_library(name, args, voice, sub, expr)
         if got is not None:
             return got
         voice.function_remainders[name] = \
@@ -813,13 +863,40 @@ def statement_phrase(stmt, predicate_phrase: Optional[str] = None
             return (f"Builds the {sel} selection, preparing "
                     f"{listed} first.")
         return f"Builds the {sel} selection."
-    if kind == "IF" and predicate_phrase:
-        p = predicate_phrase.strip().rstrip(".")
-        return (f"A decision step, taken when "
-                f"{p[0].lower()}{p[1:]}.")
+    if kind == "IF":
+        # THE GUARD IDIOM (R11 amendment, v2.14.0 — FL10 family,
+        # Brief_Pilot_Build_3): the OBJECT_ID/DROP dance speaks as
+        # the idiom it is — ONLY when the tree shows BOTH halves
+        # (the recordedness guard AND the drop); anything else
+        # keeps the decision-step voice, never a guess
+        if stmt.get("then_kind") == "DropTableStatement" \
+                and stmt.get("then_drops") \
+                and _is_objectid_guard(stmt.get("predicate")):
+            return (f"A cleanup step: removes the previous "
+                    f"{stmt['then_drops'][0]} when it already "
+                    "exists.")
+        if predicate_phrase:
+            p = predicate_phrase.strip().rstrip(".")
+            return (f"A decision step, taken when "
+                    f"{p[0].lower()}{p[1:]}.")
+        return None
     if kind == "SELECT" and stmt.get("emits"):
         return "Delivers the procedure's result set."
     return None
+
+
+def _is_objectid_guard(pred) -> bool:
+    """The temp-table-existence guard's predicate half:
+    NOT(NULL_CHECK(OBJECT_ID(...))) — read from the tree, never
+    from rendered text."""
+    if not pred or pred.get("kind") != "NOT":
+        return False
+    kids = pred.get("children") or []
+    if len(kids) != 1 or kids[0].get("kind") != "NULL_CHECK":
+        return False
+    subject = kids[0].get("subject") or {}
+    return (subject.get("kind") == "function"
+            and str(subject.get("name") or "").upper() == "OBJECT_ID")
 
 
 def _source_phrase(name: str, resolved, depth2_counter: List[int],
@@ -901,6 +978,449 @@ def _composition_sentence(read: ReadApi, tree, scope,
     for p in phrases[1:]:
         sentence += connector + p
     return sentence + "."
+
+
+# ---- R14: THE BUSINESS TERM SENTENCE (v2.14.0) ----
+# Brief_Pilot_Build_3 (Sunny "approved, build brief 3" 2026-09-20;
+# rulings (1)-(3), (10) + Q1-Q5 "agree with all five"). One sentence
+# per scope, composed from the TREE at compose time (ruling (10) —
+# no new nodes; the verbatim law holds because the recompute walks
+# the same tree). Replaces the from-structure lead FOR SCOPES ONLY.
+
+# literal: grammar Grammar_Floor R14 (ruling (3) list compression)
+_LIST_COMPRESS_OVER = 6
+
+
+def _squash(name) -> str:
+    """The name-matching fold shared by the render-join and the
+    head map: separators dropped, lowered, leading # stripped."""
+    return re.sub(r"[\s_\W]+", "", str(name or "")).lower()
+
+
+def _bt_target_phrase(target, blessed) -> str:
+    """The R14 source register: a same-tree scope speaks 'the
+    <author words> selection' (no 'defined earlier' tail — the
+    sentence IS the definition, not a narration); a table speaks
+    '<words> records', blessed name first."""
+    t = str(target or "")
+    if "::" in t:
+        # the readable fold (camel split — the worked examples'
+        # register: 'the main adm details selection'), not R11's
+        # spoken fold; the render-join matches through _squash so
+        # the two registers never collide
+        words = _readable_name(t.rsplit("::", 1)[-1].lstrip("#"))
+        return f"the {words} selection"
+    if blessed and t in blessed:
+        words = blessed[t]
+    else:
+        raw = t.rsplit("|", 1)[-1] if "|" in t else t.split(".")[-1]
+        words = re.sub(r"[_\W]+", " ",
+                       raw.lstrip("#")).strip().lower()
+    if not words:
+        return "an inline selection"
+    return words if words.endswith("records") else f"{words} records"
+
+
+def _bt_base(shape):
+    """The base source: from_refs[0], resolved THROUGH derived
+    scopes (ruling (10) — the composer reads the tree; the
+    prototype's 'An inline selection' limit closes here). Returns
+    a target: a table identity, a same-tree scope key, a raw
+    table_ref name, or None."""
+    refs = shape.get("from_refs") or []
+    if not refs:
+        return None
+    ref = refs[0]
+    for _ in range(5):
+        if "derived_scope" not in ref:
+            break
+        inner = ref["derived_scope"]
+        if "combination_arms" in inner:
+            inner = inner["combination_arms"][0]
+        inner_refs = inner.get("from_refs") or []
+        if not inner_refs:
+            return None
+        ref = inner_refs[0]
+    if "derived_scope" in ref:
+        return None
+    resolved = ref.get("resolves_to")
+    if resolved and str(resolved).startswith("SAME-TREE"):
+        return str(resolved).replace("SAME-TREE scope ", "")
+    return resolved or ref.get("table_ref")
+
+
+def _bt_membership(shape, base_target, voice):
+    """Ruling (2): inner joins spoken as MEMBERSHIP, their non-key
+    ON residues riding the member parenthetically; a residue whose
+    sides are all already spoken falls to the population items —
+    counted into the sentence, never dropped. Outer joins and
+    outer-apply lookups never enter (they do not restrict)."""
+    from aisql.flows import inbound
+    known = {str(base_target)} if base_target else set()
+    members: List[str] = []
+    loose: List[str] = []
+    joined_targets = set()
+    for pred in inbound._join_entries(shape):
+        targets = inbound._join_targets(pred)
+        joined_targets.update(str(t) for t in targets)
+        if str(pred.get("join_type") or "Inner") != "Inner":
+            continue
+        vals = []
+        for leaf in decisions.flatten_where(pred):
+            if decisions.is_join_key(leaf) \
+                    or decisions.is_degenerate(leaf):
+                continue
+            txt = _bt_condition(leaf, voice)
+            if txt:
+                vals.append(txt[0].lower() + txt[1:])
+        placed = False
+        for target in targets:
+            t = str(target)
+            if t in known:
+                continue
+            known.add(t)
+            phrase = _bt_target_phrase(target, voice.blessed)
+            if vals and not placed:
+                phrase += " (" + "; ".join(vals) + ")"
+                placed = True
+            members.append(phrase)
+        if vals and not placed:
+            loose.extend(v[0].upper() + v[1:] for v in vals)
+    # leftover FROM sources (comma joins): linked sources join the
+    # membership; linkless ones voice neutrally (the v1.3.0 posture)
+    linked = any(decisions.is_join_key(leaf)
+                 for leaf in decisions.flatten_where(
+                     shape.get("where")))
+    combined: List[str] = []
+    for ref in (shape.get("from_refs") or [])[1:]:
+        if ref.get("outer_apply") or "derived_scope" in ref:
+            continue
+        resolved = ref.get("resolves_to")
+        if resolved and str(resolved).startswith("SAME-TREE"):
+            t = str(resolved).replace("SAME-TREE scope ", "")
+        else:
+            t = str(resolved or ref.get("table_ref") or "")
+        if not t or t in known or t in joined_targets:
+            continue
+        known.add(t)
+        phrase = _bt_target_phrase(t, voice.blessed)
+        (members if linked else combined).append(phrase)
+    return members, combined, loose
+
+
+def _compressed_list(pred, voice, negated=False) -> Optional[str]:
+    """Ruling (3): value lists longer than the threshold speak a
+    COUNT in the sentence; the full list stays on the condition
+    row (condition_render is untouched — derivable, never lost)."""
+    if pred.get("kind") != "IN_LIST":
+        return None
+    n = len(pred.get("comparand_list") or [])
+    if n <= _LIST_COMPRESS_OVER:
+        return None
+    subj = voice.subject(pred.get("subject", {}))
+    word = "none" if negated else "one"
+    return f"The {subj} is {word} of {n} values"
+
+
+def _bt_condition(pred, voice) -> str:
+    """The R14 condition voice: the ratified renders (one home —
+    condition_render), fully recursive, degenerates pruned, long
+    lists compressed at compose time only."""
+    from aisql.flows import inbound
+
+    def phrase(p, top):
+        kind = p.get("kind", "")
+        kids = p.get("children") or []
+        if kind == "NOT" and kids:
+            compressed = _compressed_list(kids[0], voice,
+                                          negated=True)
+            if compressed:
+                return compressed
+        if p.get("node") == "predicate":
+            if decisions.is_degenerate(p):
+                return ""
+            compressed = _compressed_list(p, voice)
+            if compressed:
+                return compressed
+            return inbound.condition_render(p, voice).rstrip(".")
+        if kind not in ("OR", "AND") or not kids:
+            return inbound.condition_render(p, voice).rstrip(".")
+        sub = [phrase(k, False) for k in kids]
+        sub = [s for s in sub if s]
+        if not sub:
+            return ""
+        if len(sub) == 1:
+            return sub[0]
+        lowered = [s[0].lower() + s[1:] for s in sub]
+        if kind == "AND":
+            return " and ".join(lowered)
+        joined = " or ".join(lowered)
+        return joined if top else "either " + joined
+
+    return phrase(pred, True)
+
+
+_BETWEEN = re.compile(r"^(The .*?) is between (.*)$")
+
+
+def _merge_betweens(texts: List[str]) -> List[str]:
+    """Q3 RULED: identical subjects' betweens join with 'or between'
+    — pure structure, no invention."""
+    rest: List[str] = []
+    by_subject: Dict[str, List[str]] = {}
+    order: List[str] = []
+    for t in texts:
+        m = _BETWEEN.match(t)
+        if m:
+            if m.group(1) not in by_subject:
+                order.append(m.group(1))
+            by_subject.setdefault(m.group(1), []).append(m.group(2))
+        else:
+            rest.append(t)
+    merged = [f"{s} is between " + " or between ".join(
+        dict.fromkeys(by_subject[s])) for s in order]
+    return merged + rest
+
+
+def _bt_rank_member(shape, scopes_by_key, colname):
+    """Ruling (1): the rank filter's ROW_NUMBER member, found in the
+    scope's SOURCES (the computing scope) — the partition speaks at
+    the scope that APPLIES the filter, never where it is computed."""
+    fold = str(colname).upper()
+    sources = []
+    for ref in shape.get("from_refs") or []:
+        if "derived_scope" in ref:
+            inner = ref["derived_scope"]
+            if "combination_arms" in inner:
+                inner = inner["combination_arms"][0]
+            sources.append(inner)
+            continue
+        r = str(ref.get("resolves_to") or "")
+        if r.startswith("SAME-TREE"):
+            sc = scopes_by_key.get(r.replace("SAME-TREE scope ", ""))
+            if sc is not None:
+                arms = sc.get("combination_arms")
+                sources.append(arms[0] if arms else sc)
+    for src in sources:
+        for m in src.get("projection") or []:
+            if str(m.get("name") or "").upper() != fold:
+                continue
+            e = m.get("expression") or {}
+            if e.get("kind") == "function" \
+                    and str(e.get("name") or "").upper() \
+                    == "ROW_NUMBER":
+                return m
+    return None
+
+
+def _bt_rank_match(pred, shape, scopes_by_key):
+    """A leaf of the form <ranking column> = 1 whose column IS a
+    source's ROW_NUMBER member — structure, not population."""
+    if pred.get("node") != "predicate" \
+            or pred.get("kind") != "COMPARE_EQ":
+        return None
+    subject = pred.get("subject") or {}
+    comparand = pred.get("comparand") or {}
+    if subject.get("kind") != "column_ref" \
+            or comparand.get("kind") != "literal" \
+            or str(comparand.get("value")) != "1":
+        return None
+    colname = str(subject.get("ref") or "").rsplit(".", 1)[-1]
+    return _bt_rank_member(shape, scopes_by_key, colname)
+
+
+def _bt_where_items(shape, voice, scopes_by_key, rank) -> List[str]:
+    where = shape.get("where")
+    if where is None:
+        tops = []
+    elif where.get("kind") == "AND":
+        tops = list(where.get("children") or [])
+    else:
+        tops = [where]
+    items: List[str] = []
+    for t in tops:
+        if t.get("node") == "predicate":
+            if decisions.is_degenerate(t) or decisions.is_join_key(t):
+                continue
+            member = _bt_rank_match(t, shape, scopes_by_key)
+            if member is not None:
+                rank["kept"] = True
+                if rank["member"] is None:
+                    rank["member"] = member
+                continue
+        txt = _bt_condition(t, voice)
+        if txt:
+            items.append(txt[0].upper() + txt[1:])
+    return _merge_betweens(list(dict.fromkeys(items)))
+
+
+def _bt_grain_words(expr, voice) -> str:
+    if expr.get("kind") == "column_ref":
+        return voice.name_words(expr)
+    return _bare(_defining_phrase(expr, voice))
+
+
+def _bt_grain(shape, voice, rank_member):
+    """Ruling (1): grain speaks from definitional sources ONLY —
+    GROUP BY, DISTINCT, the rank-filter partition (slice E's
+    capture); no source -> no grain clause, never an invention.
+    Returns (grain clause, partition_spoken)."""
+    group_by = shape.get("group_by")
+    if group_by:
+        words = " and ".join(_bt_grain_words(g, voice)
+                             for g in group_by)
+        return f"One record per {words}", False
+    if shape.get("distinct"):
+        names = [m.get("name") for m in shape.get("projection") or []
+                 if m.get("name")]
+        if names and len(names) <= 4:
+            listed = " and ".join(_readable_name(n) for n in names)
+            return f"One record per distinct {listed}", False
+        return "One record per distinct combination of its columns", \
+            False
+    if rank_member is not None:
+        over = (rank_member.get("expression") or {}).get("over")
+        if isinstance(over, dict) and over.get("partition_by"):
+            words = " and ".join(_bt_grain_words(p, voice)
+                                 for p in over["partition_by"])
+            return f"One record per {words}", True
+    return None, False
+
+
+def _bt_payload(shape, voice) -> str:
+    """Q1 RULED: named business outputs first (the dcols, by name),
+    then the carried-through count; the full list stays on the
+    nodes (derivable)."""
+    from aisql.flows import inbound
+    projection = [m for m in shape.get("projection") or []
+                  if isinstance(m, dict)]
+    named = list(dict.fromkeys(
+        _readable_name(m["name"]) for m in projection
+        if inbound._is_derived_node(m) and m.get("name")))
+    if named:
+        carried = max(0, len(projection) - len(named))
+        head = ", ".join(f"the {w}" for w in named[:8])
+        more = (f" and {len(named) - 8} more computed columns"
+                if len(named) > 8 else "")
+        tail = ""
+        if carried:
+            word = "column" if carried == 1 else "columns"
+            tail = f", and {carried} carried-through {word}"
+        return f"carrying {head}{more}{tail}"
+    cols = [m.get("name") for m in projection if m.get("name")][:6]
+    if not cols:
+        return ""
+    more = (f" and {len(projection) - len(cols)} more columns"
+            if len(projection) > len(cols) else "")
+    return ("carrying "
+            + ", ".join(f"the {_readable_name(c)}" for c in cols)
+            + more)
+
+
+def scope_sentence(read: ReadApi, tree, scope) -> str:
+    """R14 — the scope's ONE stored sentence (the Business Term
+    shape, ruling (3)): grain-or-base lead · membership ·
+    population · payload. Out-of-class scopes keep their ruled
+    sentences (delete = removal; unmapped = the honest counted
+    state)."""
+    if scope.get("unmapped_shape"):
+        return ("The logic of this selection is not yet modeled "
+                f"(unmapped query shape: {scope['unmapped_shape']}); "
+                "its contents are counted for engineering review, "
+                "never described by guess.")
+    voice = _Voice(read, tree)
+    if scope.get("operation") == "delete":
+        ref = scope["from_refs"][0]
+        phrase = _source_phrase(ref.get("table_ref"),
+                                ref.get("resolves_to"), [],
+                                blessed=voice.blessed)
+        return f"This step removes records from {phrase}."
+    arms = scope.get("combination_arms")
+    shape = arms[0] if arms else scope
+    scopes_by_key = {s["name_key"]: s
+                     for s in decisions.named_scopes(tree)
+                     if s.get("name_key")}
+    base_target = _bt_base(shape)
+    members, combined, loose = _bt_membership(shape, base_target,
+                                              voice)
+    rank = {"member": None, "kept": False}
+    if arms:
+        per_arm = [set(_bt_where_items(a, voice, scopes_by_key,
+                                       rank))
+                   for a in arms]
+        shared = set.intersection(*per_arm) if per_arm else set()
+        texts = sorted(shared)
+        diffs = [sorted(p - shared) for p in per_arm]
+        if any(diffs):
+            alt = "; ".join(
+                (f"({i + 1}) " + "; ".join(d)) if d
+                else f"({i + 1}) —"
+                for i, d in enumerate(diffs))
+            texts.append(f"in {len(arms)} alternatives: {alt}")
+    else:
+        texts = _bt_where_items(shape, voice, scopes_by_key, rank)
+    texts = loose + texts
+    grain, partition_spoken = _bt_grain(shape, voice, rank["member"])
+    if grain:
+        lead = grain
+    elif base_target:
+        lead = _bt_target_phrase(base_target, voice.blessed)
+    elif shape.get("from_refs"):
+        lead = "an inline selection"
+    else:
+        # the no-source scope (the 2.4.0 restoration's class) —
+        # the ruled words wear the sentence's lead slot
+        lead = "derived values (no source records are read)"
+    sentence = lead[0].upper() + lead[1:]
+    if members:
+        sentence += ", matched in " + " and in ".join(members)
+    if combined:
+        sentence += ", combined with " + " and ".join(combined)
+    population = "; ".join(texts)
+    if population:
+        sentence += ": " + population
+    kept = rank["kept"] and not partition_spoken
+    if kept:
+        sentence += "; the first record in its ordered sequence kept"
+    payload = _bt_payload(shape, voice)
+    if payload:
+        sentence += (("; " if population or kept else ", ")
+                     + payload)
+    return sentence + "."
+
+
+def scope_head(sentence) -> Optional[str]:
+    """The sentence's grain-or-base HEAD CLAUSE — what the Q5
+    render-join borrows. Derivable from the stored sentence; None
+    when the head says nothing ('An inline selection')."""
+    head = str(sentence or "").split(":")[0].split(";")[0]
+    head = head.split(", matched in")[0]
+    head = head.split(", combined with")[0]
+    head = head.split(", carrying")[0]
+    head = head.rstrip(".").strip()
+    if not head or head.lower() == "an inline selection":
+        return None
+    return head
+
+
+_BUILDS_LINE = re.compile(r"^Builds the ([\w ]+) selection")
+
+
+def statement_display(text, heads) -> str:
+    """Q5 RULED ("agree with all five"): at RENDER the statement
+    borrows the built scope's head clause — a derivable display
+    join; NOTHING new stored (the clause lives once, on the
+    scope). `heads` maps _squash(scope name) -> head clause."""
+    m = _BUILDS_LINE.match(text or "")
+    if not m:
+        return text
+    head = (heads or {}).get(_squash(m.group(1)))
+    if not head:
+        return text
+    borrowed = head[0].lower() + head[1:]
+    return text.replace(
+        f"Builds the {m.group(1)} selection",
+        f"Builds the {m.group(1)} selection ({borrowed})", 1)
 
 
 def voicing_ledger(read: ReadApi, target: str) -> Dict[str, int]:

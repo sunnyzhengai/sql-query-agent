@@ -35,6 +35,8 @@ def test_every_scope_stores_a_description(world):
 
 
 def test_stored_equals_recomputed_the_verbatim_law(world):
+    """R14 (v2.14.0, Brief_Pilot_Build_3): the stored text is the
+    Business Term sentence — stored == recomputed, byte-exact."""
     _store, read = world
     trees = read.trees()
     by_id = {n.identity: n for n in read.nodes("scope")}
@@ -44,8 +46,8 @@ def test_stored_equals_recomputed_the_verbatim_law(world):
             node = by_id.get(scope["name_key"])
             if node is None:
                 continue
-            lead = produce._scope_lead(read, tree, scope)
-            assert node.properties["description"] == lead, \
+            sentence = produce.scope_sentence(read, tree, scope)
+            assert node.properties["description"] == sentence, \
                 scope["name_key"]
             checked += 1
     assert checked == len(by_id)
@@ -59,6 +61,6 @@ def test_speech_reads_the_stored_property(world):
     node = next(n for n in read.nodes("scope")
                 if n.identity == ED_SCOPE)
     assert text == node.properties["description"].lower()
-    # grammar 2.4.0: the composition sentence LEADS — the constant
-    # no-grain opener is dead (Sunny's ruling 2026-09-11)
-    assert text.startswith("drawn from")
+    # grammar 2.14.0 (R14): the Business Term sentence leads —
+    # #Base_Pop's grain source is its DISTINCT (slice E capture)
+    assert text.startswith("one record per distinct")

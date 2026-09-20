@@ -7,7 +7,7 @@
 
 # Test Map — what every test proves
 
-96 modules, 761 tests, every module accounted: claimed by an ADR in the trace registry or declaring a law/contract in its docstring (`Proves:` line).
+98 modules, 792 tests, every module accounted: claimed by an ADR in the trace registry or declaring a law/contract in its docstring (`Proves:` line).
 
 ## By ADR
 
@@ -132,14 +132,15 @@
 - `tests/aisql/test_design_validators.py` (4): Slice 0: the design validators run in CI — every push re-proves the
 - `tests/aisql/test_doubles.py` (6): THE SCRIPTED-PROPOSALS CONTRACT (Sunny's ruling, 2026-09-09:
 - `tests/aisql/test_extract_autogen.py` (4): Brief_Extract_Autogen (Sunny, 2026-09-19: "this is too manual.
-- `tests/aisql/test_fabric_run.py` (5): Brief_Fabric_Resident FR4+FR5 (Sunny's "all eight as proposed,
+- `tests/aisql/test_fabric_run.py` (6): Brief_Fabric_Resident FR4+FR5 (Sunny's "all eight as proposed,
 - `tests/aisql/test_file_layer.py` (5): M6 THE FILE LAYER — structural pins on the F2 fixture estate
-- `tests/aisql/test_file_render.py` (6): §R13 THE CATCH-ALL — form pins on the F2 fixture estate
+- `tests/aisql/test_file_render.py` (7): §R13 v2 — THE THREE LEVELS (Brief_Pilot_Build_3, Sunny
 - `tests/aisql/test_flows_change_quanta.py` (6): The flows' change quanta (CONTRACT_DATALOAD §13 + the flows
 - `tests/aisql/test_from_structure.py` (4): ERA 3 — THE FROM-STRUCTURE NODE FAMILY (Design_Graph_Engine,
 - `tests/aisql/test_full_circle.py` (7): Slice 7: FULL CIRCLE — one run from empty, every family proven.
 - `tests/aisql/test_glossary.py` (11): THE GLOSSARY PROCESS (Ruling_Glossary_Process.md, ruled
 - `tests/aisql/test_governance_journal.py` (4): PHASE E1 — THE GOVERNANCE JOURNAL (Sunny's ruling: all user
+- `tests/aisql/test_grain_capture.py` (7): SLICE E — THE GRAIN-SOURCE CAPTURE (Brief_Pilot_Build_3,
 - `tests/aisql/test_graph_export.py` (13): M1 — THE FABRIC GRAPH EXPORT READING (the materialization plan,
 - `tests/aisql/test_intake_hardening.py` (10): Brief_Pilot_Build_1 slices A + B (Brief_Pilot_Findings_R1 F6/F7/F8,
 - `tests/aisql/test_kg1_intake.py` (12): Slice 1: KG1 intake vs the F1 answer key — the graph, node by node.
@@ -169,10 +170,11 @@
 - `tests/aisql/test_report_layer.py` (6): M7 THE REPORT LAYER — pins authored FAILING (test-first;
 - `tests/aisql/test_root_edges.py` (4): STEP 5 of the Connection Ledger build — ROOT EDGES. The test
 - `tests/aisql/test_scope_layer.py` (3): M2 (bottom-up re-ruling, 2026-09-10) — THE SCOPE LAYER.
+- `tests/aisql/test_scope_sentence.py` (18): R14 — THE BUSINESS TERM SENTENCE (Brief_Pilot_Build_3, Sunny
 - `tests/aisql/test_scribe_draft.py` (2): Brief_Work_Dryrun (Sunny's "approved, both proposals stand",
-- `tests/aisql/test_search_is_the_answer.py` (10): STEP B — THE SEARCH IS THE ANSWER (Sunny's pipeline, ruled
+- `tests/aisql/test_search_is_the_answer.py` (13): STEP B — THE SEARCH IS THE ANSWER (Sunny's pipeline, ruled
 - `tests/aisql/test_seat_prompts.py` (4): STEP C of the search rebuild — THE PROMPT IS REGISTRY DATA.
-- `tests/aisql/test_sepsis_shakedown.py` (10): The sepsis shakedown (round 2) — conservation counters pinned;
+- `tests/aisql/test_sepsis_shakedown.py` (11): The sepsis shakedown (round 2) — conservation counters pinned;
 - `tests/aisql/test_shape_census.py` (4): THE SHAPE CENSUS — integrity battery #13 (THE SHAPE CONTRACT,
 - `tests/aisql/test_shapes_shakedown.py` (5): The shapes shakedown — the engine over the 38-file ADR 0055 corpus,
 - `tests/aisql/test_ship_surface.py` (5): Brief_Packaging slice 1 (Sunny's "all four as proposed, build

@@ -1,5 +1,8 @@
-# The Floor Grammar — v2.13.0 (THE REPORT GRAIN rider ratified
-# 2026-09-18; v2.12.0 THE CATCH-ALL 2026-09-17; v2.11.0 THE STATEMENT STEP same day; v2.10.0 THE COMPUTED OUTPUT
+# The Floor Grammar — v2.14.0 (§R14 THE BUSINESS TERM SENTENCE
+# 2026-09-20, Brief_Pilot_Build_3 "approved, build brief 3";
+# v2.13.0 THE REPORT GRAIN rider 2026-09-18; v2.12.0 THE
+# CATCH-ALL 2026-09-17; v2.11.0 THE STATEMENT STEP same day;
+# v2.10.0 THE COMPUTED OUTPUT
 # 2026-09-16; v2.9.0 THE OWNER-POSSESSIVE 2026-09-14; v2.8.0 THE
 # BLESSED NAME 2026-09-12; v2.7.0 the relation rule + v2.6.0
 # recordedness identifies + v2.5.0 NOT folds same day; v2.4.0
@@ -7,8 +10,33 @@
 # v2.0.0 POLICY-WALK major 2026-09-06; v1.3.1 RATIFIED Sunny
 # 2026-09-05)
 
-**Status: RATIFIED v2.13.0 (§R13 + the report-grain rider, 2026-09-18).**
+**Status: RATIFIED v2.14.0 (§R14 + the R11/R12/R13 riders,
+2026-09-20 — Sunny's "approved, build brief 3" approved the
+PRESENTED worked examples; his eye on the re-voiced corpus closes
+the brief).**
 (Header line added 2026-09-17, audit CI-C3.)
+
+*v2.14.0 (Brief_Pilot_Build_3, Sunny "approved, build brief 3"
+2026-09-20; the shapes ruled in Brief_Pilot_Findings_R1 rulings
+(1)-(3) + (10) and the brief's Q1-Q5 "agree with all five"): §R14
+THE BUSINESS TERM SENTENCE — the scope's stored description is
+ONE sentence composed from the TREE at compose time: grain-or-base
+lead · membership · population · payload; replaces the
+from-structure lead FOR SCOPES ONLY (the from-structure family
+stays for tables/files — R10 untouched). RIDERS: R11 gains the
+temp-table-existence GUARD IDIOM (the OBJECT_ID/DROP dance
+speaks "A cleanup step: removes the previous #x when it already
+exists." — both halves verified from the tree, then_kind captured
+at map time) and the Q5 RENDER-JOIN (statement_display — the
+statement line borrows the built scope's head clause AT RENDER;
+derivable, stored never); R12's ROW_NUMBER partition/order
+deferral CLOSES on slice E's capture (FL17's echo — the slotted
+phrase "the record's position within each <partition>, ordered by
+<order>"); R13 re-shapes to THE THREE LEVELS (headline · pipeline
+· appendix — see §R13's v2 note). Slice E (metamodel 1.50.0)
+captures the whole grain-source family in one act: GROUP BY
+column refs + the DISTINCT flag + OVER contents + the IF guard's
+THEN kind (FL21). Full spec: §R14 below.*
 
 *v2.10.0 (RATIFIED Sunny 2026-09-16, "ratified — go on M4";
 authored same day at his "author the grammar rule + function
@@ -1070,3 +1098,133 @@ RULED same day at Sunny's word:
   stays for non-idiom uses (0 in this estate). Meaning over
   syntax — the same principle that made cast transparent and
   ruled the token-link reduction.
+
+## R14 — THE BUSINESS TERM SENTENCE (**RATIFIED v2.14.0, Sunny
+## "approved, build brief 3" 2026-09-20 — the PRESENTED worked
+## examples (the prototype's real output over the stored sepsis
+## graph) were his approval's object; his eye on the re-voiced
+## corpus closes Brief_Pilot_Build_3**)
+
+The scope grain's stored description — ONE sentence, the Business
+Term shape (Brief_Pilot_Findings_R1 ruling (3)), composed from
+the TREE at compose time (ruling (10): no new nodes; the verbatim
+law holds because the recompute walks the same tree). Replaces
+the from-structure lead FOR SCOPES ONLY; the from-structure
+family (R10's file floors, `_scope_lead`) stands for files.
+
+### The two shapes (ruling (3))
+
+> One record per \<grain\>: \<population\>, carrying \<payload\>.
+
+> \<Base source\> records: \<population\>, carrying \<payload\>.
+
+An empty population drops its clause. Items join with "; ".
+The payload separator is ";" after a population or rank clause,
+"," straight after the lead.
+
+### The slots
+
+- **grain (ruling (1))** — definitional sources ONLY, no steward
+  gate, nothing inferred: GROUP BY words (the captured column
+  refs, name-words register) · DISTINCT ("One record per
+  distinct \<names\>", or "…distinct combination of its columns"
+  past 4 names) · the rank-filter PARTITION — spoken at the
+  scope that APPLIES `rank = 1`, never at the computing scope;
+  the rank condition leaves the population (it is structure). A
+  rank filter with NO captured partition keeps Q4's honest
+  structural clause: "; the first record in its ordered sequence
+  kept". No grain source → the sentence opens with the base,
+  never an invention.
+- **base** — from_refs[0], resolved THROUGH derived scopes
+  (ruling (10)); a same-tree scope speaks "the \<readable words\>
+  selection" (camel split — the worked examples' register; no
+  "defined earlier" tail), a table speaks "\<words\> records"
+  (blessed name first). Grain present → the base drops (that IS
+  ruling (3)'s two-shape split). A no-source scope leads
+  "Derived values (no source records are read)".
+- **membership (ruling (2))** — inner joins spoken as
+  membership: ", matched in X and in Y"; non-key ON residues
+  ride the member parenthetically ("clinical alerts records (the
+  bpa locator id is 900400001)"); a residue whose sides are all
+  already spoken falls to the population items — never dropped.
+  EXCLUDED: pure join-key equalities (the FL9 noise) and
+  outer-join/outer-apply predicates and sources (a lookup never
+  restricts). Linkless comma-join leftovers voice ", combined
+  with" (the v1.3.0 posture).
+- **population (ruling (2))** — EVERY WHERE condition regardless
+  of source table, the ratified condition renders (one home:
+  condition_render), fully recursive, degenerates pruned.
+  Q3: identical subjects' betweens merge with "or between".
+  Ruling (3) compression: IN-lists longer than 6 members speak
+  "The \<subject\> is one/none of \<N\> values" — the FULL list
+  stays on the condition row.
+- **payload (Q1 + ruling (10))** — the named computed outputs
+  (dcols) by readable name, first 8, then "and N more computed
+  columns", then ", and N carried-through column(s)"; no dcols →
+  up to 6 output names. The full list stays on the nodes.
+- **union scopes (Q2)** — once, arm order kept: the shared items
+  speak plainly; the differing items per arm as "in N
+  alternatives: (1) …; (2) …".
+
+### The out-of-class scopes
+
+DELETE scopes keep the removal sentence ("This step removes
+records from \<phrase\>."); unmapped shapes keep the honest
+counted sentence. Both out of the Business-Term class.
+
+### The riders (same version)
+
+- **R11 THE GUARD IDIOM (FL10 family):** an IF whose predicate
+  is NOT(NULL_CHECK(OBJECT_ID(…))) AND whose THEN is DROP TABLE
+  (`then_kind`, captured at map time — slice E) stores "A
+  cleanup step: removes the previous \<#name\> when it already
+  exists." — the author's dropped name verbatim; anything else
+  keeps the decision-step voice. The object_id raw fragment can
+  never print again.
+- **R11 THE RENDER-JOIN (Q5 ruled):** at RENDER a "Builds the
+  \<x\> selection…" line borrows the built scope's head clause —
+  "Builds the base poptemp selection (the main adm details
+  selection), preparing…". Derivable (produce.statement_display);
+  the clause lives ONCE, on the scope; the stored R11 text is
+  untouched. Surfaces: dry_run's statement lines + R13's
+  pipeline.
+- **R12 THE SLOTS CLOSE (FL17's echo):** ROW_NUMBER with
+  captured over contents voices "the record's position within
+  each \<partition\>, ordered by \<order\>" (descending elements
+  marked "(descending)"; order-only windows: "the record's
+  position, ordered by \<order\>"); a flag-only `over` keeps the
+  slotless phrase — never an empty slot in prose.
+- **R13 v2 — THE THREE LEVELS:** the file technical definition
+  re-shapes to (1) HEADLINE — the delivery scope's R14 sentence
+  wearing "Delivers"; a NO-DELIVERY file speaks the LAST built
+  scope's sentence + "Builds N working selections; delivers
+  nothing." (the brief's FIND — counted, never empty-silent);
+  (2) PIPELINE — the statement chain in build order, each voiced
+  line wearing its scope's head clause; (3) THE APPENDIX —
+  Presents (content unchanged; the M7 report cherry-pick's
+  source stays), then Population filters AND Inner joins BOTH
+  grouped per selection (FL20). Byte pins re-based by
+  measurement (the answer-key precedent).
+
+### What R14 does NOT touch
+
+- R10's file floors and `_scope_lead` — the from-structure
+  family stays for file-grain voicing (compose_file_floor,
+  file_words).
+- Condition nodes' stored phrases (R1–R7) — the sentence CITES
+  the same renders; compression exists at compose time only.
+- The kg3 description artifacts (produce.run's floors) — a
+  separate surface, unchanged.
+
+### The capture it stands on (slice E, metamodel 1.50.0)
+
+ONE capture act (FL17 echo-mandated, FL21 widened): GROUP BY
+column refs (`scope.group_by`, resolver-bound) + the DISTINCT
+flag (`scope.distinct`) + OVER contents (`function.over` =
+partition_by/order_by, truthy wherever the old flag was read) +
+the IF guard's THEN kind (`then_kind`/`then_drops`). Registry:
+kg2_kind_library `Structure_Kinds_Grain` (registries 1.50.0).
+The twin walk and parsed_census stay symmetric over the new keys
+— the homomorphism holds untouched; the acceptance test is the
+partitioned ROW_NUMBER dcol whose stored phrase names its
+partition and its ordering (test_grain_capture.py).

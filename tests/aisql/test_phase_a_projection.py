@@ -42,10 +42,14 @@ def test_pa1_derived_column_member_captured():
     assert first["expression"]["kind"] == "column_ref"
     assert second["name"] == "FIRST_TIME_LINE"
     # "window function" in the answer key = function + over marker;
-    # Expression_Kinds stays closed (RG-C3), OVER is a property
+    # Expression_Kinds stays closed (RG-C3), OVER is a property —
+    # slice E (Brief_Pilot_Build_3, metamodel 1.50.0): the property
+    # carries CONTENTS now, truthy wherever the old flag was read
     assert second["expression"]["kind"] == "function"
     assert second["expression"]["name"] == "ROW_NUMBER"
-    assert second["expression"].get("over") is True
+    over = second["expression"].get("over")
+    assert isinstance(over, dict) and bool(over)
+    assert "partition_by" in over and "order_by" in over
     assert tree["remainder"] == []
 
 
