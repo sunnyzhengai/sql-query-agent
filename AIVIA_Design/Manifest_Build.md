@@ -2497,3 +2497,41 @@ ship-unit 3 of Brief_Pilot_Findings_R1 ruling (7). What built:
   touched (#Cultures re-voiced). Projected residue at his next
   batch: ~1 row (the repair-prompt word leak — one-word hand fix
   or a fresh proposal).
+
+## 2026-09-21 — F15 CLOSED — CI'S TEST STEP CAN BUILD THE WHEEL
+## (born watching the "commit and push" run — the FIRST CI
+## test-step run since F13's lint fix; his ruling: "agree, fix
+## it")
+
+- **The find**: the three test_wheel_boot pins ERRORED on CI
+  ("Missing dependencies: wheel") — build_wheel.py builds with
+  `--no-isolation`, which demands the [build-system] requires
+  (setuptools + wheel) pre-installed; the [dev] extras pinned
+  `build` but never `wheel`. Local machines had wheel by
+  accident, so every local suite was green — the F13 family:
+  CI-env drift a green local suite cannot report. F13's lint
+  red had masked the test step entirely, so whether these pins
+  ever ran on CI before is unverifiable.
+- **The fix**: the [dev] extras carry EVERY [build-system]
+  require, pinned exactly per the F13 rule — wheel==0.47.0
+  (single pin, floor >=3.9) + setuptools dual-pinned (83.0.0 on
+  >=3.10 · 80.9.0 on the 3.9 Fabric-floor leg; 81+ dropped 3.9).
+  setuptools joined by enumerate-all-cases: same class one
+  require over, present on today's CI image only by accident.
+  No requirements.txt change (dev tools pin in the extras — the
+  build/pytest/ruff precedent). The dist/ 2.5.0 wheel stands:
+  dev-extras metadata is not shipped behavior; the METADATA
+  delta rides the next cut (the Brief_Anaphor_Clarify
+  precedent).
+- **The pin, RED first**: test_build_requires_ride_the_dev_extras
+  (test_wheel_boot.py) parses pyproject and asserts every
+  [build-system] require has an exact-pinned dev-extras carrier
+  — a future require added without its carrier fails the suite
+  EVERYWHERE, not only on CI. RED on the bare extras, green
+  after the two pins; wheel-boot module 7/7.
+- **The run's other red is NOT a finding**: the known 406-text
+  RecordingGap class, awaiting his ruled closing sequence
+  (AISQL_RECORD · ONE load · his gap-check eye).
+- **Queue unchanged**: HIS CLOSING SEQUENCE (closes THREE
+  briefs) · statement-rung slice · proc-rung slice · FL30 · F10 ·
+  F14 · Brief_Collibra · docs-untangle · M8 · CI-B · FL1.

@@ -7,7 +7,7 @@
 
 # Test Map — what every test proves
 
-100 modules, 871 tests, every module accounted: claimed by an ADR in the trace registry or declaring a law/contract in its docstring (`Proves:` line).
+100 modules, 872 tests, every module accounted: claimed by an ADR in the trace registry or declaring a law/contract in its docstring (`Proves:` line).
 
 ## By ADR
 
@@ -187,7 +187,7 @@
 - `tests/aisql/test_three_part_resolution.py` (5): Brief_Pilot_Build_1 slice A2 (Brief_Pilot_Findings_R1 F9, ruling
 - `tests/aisql/test_verbatim_census.py` (3): E2 — THE VERBATIM CENSUS (integrity battery #8, ratified in
 - `tests/aisql/test_visual_counts.py` (1): FS1 — the graph visual's counts-vs-key re-verify (ruled by
-- `tests/aisql/test_wheel_boot.py` (3): Brief_Fabric_Resident FR7 (Sunny's "all eight as proposed,
+- `tests/aisql/test_wheel_boot.py` (4): Brief_Fabric_Resident FR7 (Sunny's "all eight as proposed,
 - `tests/live/test_live_seats.py` (4): THE LIVE TIER — the live-seat rule (Sunny's ruling, 2026-09-09):
 - `tests/test_ci_lint_paths.py` (2): THE CI-LINT PATH TRIPWIRE (Brief_CI_Lint, ruled 2026-09-20
 

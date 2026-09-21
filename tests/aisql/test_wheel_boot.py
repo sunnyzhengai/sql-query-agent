@@ -88,3 +88,34 @@ def test_wheel_boots_with_no_repo_present(wheel, tmp_path):
                           capture_output=True, text=True, timeout=120)
     assert proc.returncode == 0 and "WHEEL-BOOT-OK" in proc.stdout, (
         f"no-repo boot failed:\n{proc.stderr[-1500:]}")
+
+
+def test_build_requires_ride_the_dev_extras():
+    # F15 (Sunny "agree, fix it", 2026-09-21): build_wheel builds
+    # with --no-isolation, so every [build-system] require must
+    # already sit in the running env. The test env is exactly
+    # `pip install -e ".[dev]"` (ci.yml), so each require must
+    # ride the dev extras — and pinned EXACTLY, the F13 rule (CI
+    # resolves fresh; floors drift). CI's first test-step run
+    # after F13's fix errored all three pins above on a missing
+    # `wheel`; this pin makes the gap a suite failure everywhere.
+    try:
+        import tomllib
+    except ModuleNotFoundError:  # the 3.9/3.10 CI legs
+        import tomli as tomllib
+    from packaging.requirements import Requirement
+    from packaging.utils import canonicalize_name
+    data = tomllib.loads((ROOT / "pyproject.toml").read_text())
+    dev = [Requirement(r)
+           for r in data["project"]["optional-dependencies"]["dev"]]
+    for req in data["build-system"]["requires"]:
+        name = canonicalize_name(Requirement(req).name)
+        carriers = [d for d in dev
+                    if canonicalize_name(d.name) == name]
+        assert carriers, (
+            f"[build-system] requires {name!r} but the dev extras "
+            f"never install it — `build --no-isolation` fails on "
+            f"any fresh `pip install -e .[dev]` env (F15)")
+        for d in carriers:
+            assert any(s.operator == "==" for s in d.specifier), (
+                f"dev extra {str(d)!r} must pin {name!r} exactly")

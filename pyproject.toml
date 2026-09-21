@@ -52,6 +52,18 @@ dev = [
     "pyarrow==17.0.0; python_version < '3.10'",
     "build==1.5.0; python_version >= '3.10'",
     "build==1.4.4; python_version < '3.10'",
+    # F15 (2026-09-21): build_wheel runs `python -m build
+    # --no-isolation`, so the [build-system] requires above must
+    # PRE-EXIST in the env — CI's fresh `pip install -e .[dev]`
+    # had no `wheel` and all three wheel-boot pins errored
+    # ("Missing dependencies: wheel"); local machines had it by
+    # accident. Both requires ride here, pinned exactly; the
+    # wheel-boot pin test_build_requires_ride_the_dev_extras
+    # keeps the set complete. setuptools 81+ needs >=3.10, so
+    # the 3.9 Fabric-floor leg gets its own exact pin.
+    "wheel==0.47.0",
+    "setuptools==83.0.0; python_version >= '3.10'",
+    "setuptools==80.9.0; python_version < '3.10'",
     # FR6: the old-era src/ tree left the wheel but its tests still
     # run in CI — its two imports ride here now, not in the product
     "pyyaml>=6.0.1",

@@ -8,6 +8,22 @@ Versioning follows [Semantic Versioning](https://semver.org/).
 
 ## [Unreleased]
 
+### Fixed — CI's test step can build the wheel (F15)
+- The three test_wheel_boot pins errored on CI with "Missing
+  dependencies: wheel": build_wheel builds with `--no-isolation`,
+  which demands the [build-system] requires pre-installed, and
+  the [dev] extras pinned `build` but never `wheel` — local
+  machines had it by accident, CI's fresh env did not. Surfaced
+  by the FIRST CI test-step run since Brief_CI_Lint's fix let
+  tests execute at all.
+- The [dev] extras now carry every [build-system] require, pinned
+  exactly: wheel==0.47.0, setuptools 83.0.0/80.9.0 (dual pin —
+  81+ dropped the 3.9 Fabric floor).
+- Pinned RED-first: test_build_requires_ride_the_dev_extras
+  asserts every [build-system] require has an exact-pinned dev
+  carrier, so the class fails the suite everywhere, not only on
+  CI.
+
 ### Fixed — CI's lint step returns to the retired reality (Brief_CI_Lint)
 - The ci.yml lint line drops `notebooks/` (untracked, local-only)
   and `./*.Notebook/` (folders retired 2026-09-19) — both E902'd
