@@ -2535,3 +2535,26 @@ ship-unit 3 of Brief_Pilot_Findings_R1 ruling (7). What built:
 - **Queue unchanged**: HIS CLOSING SEQUENCE (closes THREE
   briefs) · statement-rung slice · proc-rung slice · FL30 · F10 ·
   F14 · Brief_Collibra · docs-untangle · M8 · CI-B · FL1.
+
+## 2026-09-21 (same sitting) — F15 RIDER — THE FIX'S OWN CI RUN
+## CAUGHT ITS LAST LOOSE END
+
+- **The F15 push's CI run**: the four wheel-boot pins PASSED on
+  CI (the fix verified where it failed) — and the declaration
+  tripwire (test_every_thirdparty_import_is_declared) went RED
+  on the pin test's own imports: packaging + tomli arrived only
+  as pytest/build's transitive dependencies, undeclared. The
+  targeted local run had not included that tripwire — the F13
+  lesson restated: targeted runs are not the suite.
+- **The fix**: both declared exact in the [dev] extras —
+  packaging==26.3 (floor >=3.9, single pin) · tomli==2.4.1 on
+  python_version < '3.11' (3.11+ uses stdlib tomllib). Local
+  repro RED → green; tripwire + wheel-boot + release-consistency
+  + suite-map + ci-lint-paths 19/19; ruff --no-cache zero new.
+- **The full suite deliberately NOT run here**: Sunny's paid
+  closing commands (run_sentence_proposals + AISQL_RECORD) may
+  be writing the estate registries and the embeddings fixture
+  this hour; a concurrent 11-minute replay run could read
+  mid-write and manufacture phantom reds. CI runs the suite on
+  the push; the expected remaining red is ONLY the 406-text
+  RecordingGap until his recording run lands.

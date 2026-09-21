@@ -1730,7 +1730,7 @@
  "reporting/USP_IP_SepsisEncountersDetails.sql::delivery": {
   "status": "rejected",
   "basis_hash": "dab9adf0711c671b2237cb61c5671ca7654221c6a8d16636cfc00cae82699602",
-  "proposed_at": "2026-09-21T22:30:04Z",
+  "proposed_at": "2026-09-21T23:06:08Z",
   "proposer": {
    "model": "gpt-4o-mini",
    "prompt_version": "bv1",
@@ -1925,7 +1925,7 @@
  "reporting/USP_IP_SepsisScreeningAudit.sql::#FlwshtLstSepsisAudit": {
   "status": "rejected",
   "basis_hash": "d1cd17c6068ffaf94fe5a90f16c1478915e62a872f1da6cf1eb732a5520000c9",
-  "proposed_at": "2026-09-21T22:30:04Z",
+  "proposed_at": "2026-09-21T23:06:08Z",
   "proposer": {
    "model": "gpt-4o-mini",
    "prompt_version": "bv1",
@@ -2380,25 +2380,26 @@
  },
  "reports/USP_RPTS_ED_Sepsis.sql::#BloodCultureValue": {
   "status": "proposed",
-  "basis_hash": "b789394442c46138847e756bca2556559873e1e551c85b177ca3f706be0974ad",
-  "proposed_at": "2026-09-21T22:30:04Z",
+  "basis_hash": "dc3d51f5869b8a7d37937ac5b2a096fac21f7b4c80e8afd361901c471c3fa7a1",
+  "proposed_at": "2026-09-21T23:06:08Z",
   "proposer": {
    "model": "gpt-4o-mini",
    "prompt_version": "bv1",
-   "runs": 2
+   "runs": 1
   },
-  "sentence": "The positive cultures selection includes one record per encounter id, carrying the mborder time, the collection time, the organism list, and 1 carried-through column."
+  "sentence": "The positive cultures selection includes one record per encounter id, carrying the mborder time, the collection time, the organism list, and 9 carried-through columns, where the unique identifier for the procedure record is one of the values 600005, 600006, or 600002, the source category of the procedure order is 304, and the result flag code indicates abnormal or critical results."
  },
  "reports/USP_RPTS_ED_Sepsis.sql::#CsfCultureValue": {
   "status": "proposed",
-  "basis_hash": "b789394442c46138847e756bca2556559873e1e551c85b177ca3f706be0974ad",
+  "basis_hash": "dc3d51f5869b8a7d37937ac5b2a096fac21f7b4c80e8afd361901c471c3fa7a1",
   "proposed_at": "2026-09-21T22:30:04Z",
   "proposer": {
    "model": "gpt-4o-mini",
    "prompt_version": "bv1",
    "runs": 2
   },
-  "sentence": "The positive cultures selection carries one record per encounter id, including the mborder time, the collection time, and the organism list."
+  "sentence": "The positive cultures selection carries one record per encounter id, including the mborder time, the collection time, and the organism list.",
+  "re_anchored_at": "2026-09-06T00:00:00Z"
  },
  "reports/USP_RPTS_ED_Sepsis.sql::#ED2GEN": {
   "status": "proposed",
@@ -2476,7 +2477,7 @@
  },
  "reports/USP_RPTS_ED_Sepsis.sql::#FirstABXAdminTimeDetails": {
   "status": "proposed",
-  "basis_hash": "3344c451e3295814786787a336382be5bc472d1d8ccd9aa1179e7cd209f0126d",
+  "basis_hash": "963fec4073f21b417ed6f81c064fe178162e8a01cd8b0f17787ccb10439e8748",
   "proposed_at": "2026-09-21T22:30:04Z",
   "proposer": {
    "model": "gpt-4o-mini",
@@ -2485,11 +2486,12 @@
   },
   "repair_spent": true,
   "sentence": "The base population of antibiotic selections, matched in v pharmacy order records, includes encounters where the myline is 1, the action instant is below the base population antibiotic selection's abx admin time, looking for first antibiotic administration only, carrying the encounter id, the order id, the order date and time, the in verify queue time, the verified in queue time, the queue verified by, and three more columns, with the condition that the dispense is verified; also: The action instant is below the basepopabx selection's abx admin time (noted 'MAKE SURE WE ARE LOOKING AT THE RIGHT MEDICATION ADMINT TIME').",
-  "spliced": true
+  "spliced": true,
+  "re_anchored_at": "2026-09-06T00:00:00Z"
  },
  "reports/USP_RPTS_ED_Sepsis.sql::#FirstPositiveOD_To_ABXAdminTime": {
   "status": "proposed",
-  "basis_hash": "3451bab5b2fa84a1adad360d950f75a91f8c174121363009bcfa7d1ad95a7efa",
+  "basis_hash": "faf6468b8d56fb41afc266d187f53586dbaf0822f1588aea5272df8842313481",
   "proposed_at": "2026-09-21T19:55:02Z",
   "proposer": {
    "model": "gpt-4o-mini",
@@ -2611,14 +2613,14 @@
  },
  "reports/USP_RPTS_ED_Sepsis.sql::#UrineCultureValue": {
   "status": "proposed",
-  "basis_hash": "b789394442c46138847e756bca2556559873e1e551c85b177ca3f706be0974ad",
-  "proposed_at": "2026-09-21T22:30:04Z",
+  "basis_hash": "dc3d51f5869b8a7d37937ac5b2a096fac21f7b4c80e8afd361901c471c3fa7a1",
+  "proposed_at": "2026-09-21T23:06:08Z",
   "proposer": {
    "model": "gpt-4o-mini",
    "prompt_version": "bv1",
-   "runs": 2
+   "runs": 1
   },
-  "sentence": "The positive cultures selection includes one record per encounter id, carrying the mborder time, the collection time, the organism list, and 1 carried-through column."
+  "sentence": "The positive cultures selection includes one record per encounter id, carrying the mborder time, the collection time, the organism list, and 9 carried-through columns, where the unique identifier for the procedure record is one of the values 600005, 600006, or 600002, the source category of the procedure order is 304, and the result flag code indicates abnormal or critical results."
  },
  "reports/USP_RPTS_ED_Sepsis.sql::ABX": {
   "status": "proposed",
@@ -2749,7 +2751,7 @@
  },
  "reports/USP_RPTS_ED_Sepsis.sql::delivery": {
   "status": "proposed",
-  "basis_hash": "94909fe4a2ba2bac35f2dc80cd30e2d6ee61534cc2ee4b5e337a497107858071",
+  "basis_hash": "16e464f6c02aa32bc5ef8bfc1c26fca2616c9d965c011d8df1c61d8d71cd5b2b",
   "proposed_at": "2026-09-21T18:58:34Z",
   "proposer": {
    "model": "gpt-4o-mini",

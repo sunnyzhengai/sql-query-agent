@@ -23,6 +23,11 @@ Versioning follows [Semantic Versioning](https://semver.org/).
   asserts every [build-system] require has an exact-pinned dev
   carrier, so the class fails the suite everywhere, not only on
   CI.
+- Rider (caught by CI's declaration tripwire on the fix's own
+  push): the pin test's imports — packaging==26.3 and
+  tomli==2.4.1 on the <3.11 legs — are now declared in the [dev]
+  extras instead of arriving as pytest/build's transitive
+  dependencies.
 
 ### Fixed — CI's lint step returns to the retired reality (Brief_CI_Lint)
 - The ci.yml lint line drops `notebooks/` (untracked, local-only)
