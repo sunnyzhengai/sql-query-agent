@@ -60,6 +60,13 @@ GOVERNED_ENTRIES = frozenset({
     "scripts",
     "src",
     "tests",
+    # Declared at Sunny's "Amend all seven" (2026-09-20,
+    # Brief_Pilot_Build_2): his repo-root gap-check outputs —
+    # untracked scratch he reads by eye (the dry_run capture + the
+    # descriptions loop file, "so i'm in the loop"); declared so
+    # the zone gate names every top-level path, never committed
+    "sepsis_descriptions.txt",
+    "USP_ED_SEPSIS_descriptions.txt",
     # data/, notebooks/, website/ retired with era 1
     # (Brief_Retirement, 2026-09-19 — git history keeps them)
 })

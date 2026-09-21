@@ -77,3 +77,25 @@ def test_placeholder_04_is_tripwired():
     assert marker == f_cp1_open, (
         "04_joins.sql's PLACEHOLDER-04 marker and Contract_Source_"
         "Packs.md's F-CP1 OPEN row must flip in the same act")
+
+
+# ---- clarity-pack-1.2 (Brief_Pilot_Build_2, ruling (6) "i agree
+# with option a"): the naming-conventions table lives IN the pack.
+# RED before the pack bump. ----
+
+def test_pack_version_is_1_2_everywhere():
+    for name in list(HEADERS) + ["06_manifest.sql", "README.md"]:
+        text = (PACK / name).read_text(encoding="utf-8")
+        assert "clarity-pack-1.2" in text, name
+        assert "clarity-pack-1.1" not in text, name
+
+
+def test_pack_json_carries_the_naming_conventions():
+    import json
+    facts = json.loads((PACK / "pack.json").read_text(encoding="utf-8"))
+    conv = facts.get("naming_conventions")
+    assert isinstance(conv, list) and conv, "naming_conventions missing"
+    suffixes = {c["suffix"] for c in conv}
+    assert {"_C", "_YN", "_DTTM", "_DATE_REAL"} <= suffixes
+    for c in conv:
+        assert c.get("suffix") and c.get("rule"), c

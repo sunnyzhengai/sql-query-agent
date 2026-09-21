@@ -100,27 +100,27 @@ numbers; the pre-era-3 rows stand in git history.)*
 |---|---|---|
 | M1 | db 1 · db_schema 3 · table 90 · column 4554 | **4648** |
 | M2 ✅ | + scope 44 · join 95 (+ direct_read 6 at ERA 3) | **4793** |
-| M3 ✅ | + condition 1141 · param 2 | **5936** |
-| M4 ✅✅ | + derived_column 156 (measured at build; SERVED gate passed 2026-09-16) | **6092** |
-| M5 | + statement 67 · condition→1147 · param→4 (holdovers twin-authored) | **6167** |
-| M6 | + file 1 | **6168** |
-| M7 | + pbi_report 1 (RE-SCOPED 2026-09-18: consumption ONLY — the governance labels moved to M8, per Sunny's "make governance M8") | **6169** |
+| M3 ✅ | + condition 629 · param 2 (re-based at Brief_Pilot_Build_2, slice C: the NOT fold −123 children · the FL13 select_refs skip −389 duplicate CASE rows; was 1141) | **5424** |
+| M4 ✅✅ | + derived_column 156 (measured at build; SERVED gate passed 2026-09-16) | **5580** |
+| M5 | + statement 67 · condition→635 · param→4 (holdovers twin-authored) | **5655** |
+| M6 | + file 1 | **5656** |
+| M7 | + pbi_report 1 (RE-SCOPED 2026-09-18: consumption ONLY — the governance labels moved to M8, per Sunny's "make governance M8") | **5657** |
 | M8 | governance — DESIGN FIRST (the 2026-09-18 ruling); numbers authored at the M8 brief, after its design sitting | — |
 
 | after | Q3 edges by type | total |
 |---|---|---|
 | M1 | has_part 4647 · joins_to 65 | **4712** |
 | M2 ✅ | + left_side 101 · right_side 87 · has_part→4748 (ERA 3: reads RETIRED, direct_read sided) | **5001** |
-| M3 ✅ | has_part 5889 · resolves_to 165 · uses_param 2 · rest same | **6309** |
+| M3 ✅ | has_part 5377 · resolves_to 153 · uses_param 2 · rest same | **5785** |
 | M4 ✅✅ | has_part 6045 · + cites 97 (measured at build — 100→97 store grain; SERVED gate passed 2026-09-16) | **6562** |
-| M5 | has_part 6095 · resolves_to 169 · uses_param 4 | **6618** |
+| M5 | has_part 5583 · resolves_to 157 · uses_param 4 | **6094** |
 | M6 | has_part 6166 | **6689** |
-| M7 | + executes 1 (RE-SCOPED 2026-09-18: describes moved to M8 with the governance labels) | **6690** |
+| M7 | + executes 1 (RE-SCOPED 2026-09-18: describes moved to M8 with the governance labels) | **6166** |
 | M8 | governance edges — authored at the M8 brief | — |
 
 (✅ = measured from the built store; unmarked = twin-authored,
 reconciled against the tree at build — precedent: joins 93→95,
-conditions 748→1141, cites 100→97.)
+conditions 748→1141→629 at slice C, cites 100→97.)
 
 Any label or edge type not in the row = a gate failure; any
 declared count off by one = a gate failure. The machine copy of
@@ -244,9 +244,11 @@ comparand 44 · lower_bound 1 · upper_bound 1 — THE SHEET IS 100%.
 
 ### M3 gate — THE CONDITION LAYER [BUILT 2026-09-10,
 store-verified; numbers MEASURED; your GQL on the dev estate
-closes it. NOTE: the tree out-counts the twin — 1141 conditions,
-not the authored 748 (IS NOT NULL parses as a NOT+NULL_CHECK
-pair, etc.); same verdict as joins 95 vs 93]
+closes it. NOTE: the tree out-counted the twin — 1141 at M3,
+not the authored 748 (IS NOT NULL then parsed as a NOT+
+NULL_CHECK pair); re-based to 629 at Brief_Pilot_Build_2 slice C
+(ruling (9) folds the NOT — the pair is ONE row now — and the
+FL13 select_refs skip retired the duplicate CASE-subtree rows)]
 
 Load: upload the new parquets (graph_condition, graph_param,
 graph_has_part_joinCondition / scopeCondition /
@@ -265,18 +267,18 @@ The full census:
 MATCH (n) RETURN labels(n) AS nodeType, count(*) AS cnt GROUP BY nodeType
 ```
 Expected exactly: db 1 · db_schema 3 · table 90 · column 4554 ·
-scope 44 · join 95 · condition **1141** · param **2** — total 5930.
+scope 44 · join 95 · condition **629** · param **2** — total 5418.
 
 The edge battery (one count per type, then the total):
-has_part → **5883** · joins_to → 65 · left_side → 95 ·
-right_side → 87 · reads → 6 · resolves_to → **165** ·
+has_part → **5371** · joins_to → 65 · left_side → 95 ·
+right_side → 87 · reads → 6 · resolves_to → **153** ·
 uses_param → **2** (each via
 `MATCH ()-[r:<type>]->() RETURN count(r) AS cnt`), then:
 
 ```gql
 MATCH ()-[r]->() RETURN count(r) AS totalEdges
 ```
-→ **6303** — the seven counts sum to 6303, closing the census
+→ **5779** — the seven counts sum to 5779, closing the census
 with no undeclared type.
 
 THE PER-KIND CENSUS (one label, kind as property — an unlisted
@@ -285,13 +287,13 @@ kind or moved count = failure):
 ```gql
 MATCH (c:condition) RETURN c.kind AS kind, count(*) AS cnt GROUP BY kind
 ```
-Expected: NULL_CHECK 333 · NOT 238 · COMPARE_EQ 220 · AND 191 ·
-IN_LIST 47 · COMPARE_LTE 33 · COMPARE_LT 24 · RANGE 22 · OR 12 ·
-COMPARE_GT 8 · EXISTS_SELECTION 7 · COMPARE_GTE 3 ·
+Expected: COMPARE_EQ 212 · AND 133 · NOT 123 · NULL_CHECK 48 ·
+IN_LIST 33 · RANGE 22 · COMPARE_LTE 18 · COMPARE_LT 15 · OR 9 ·
+COMPARE_GT 7 · EXISTS_SELECTION 4 · COMPARE_GTE 2 ·
 COMPARE_NEQ 2 · IN_SELECTION 1.
 
-Conservation by parent (95 join-rooted + 229 scope-rooted + 817
-nested == 1141):
+Conservation by parent (95 join-rooted + 139 scope-rooted + 395
+nested == 629):
 
 ```gql
 MATCH (j:join)-[:has_part]->(c:condition) RETURN count(c) AS cnt
@@ -420,21 +422,21 @@ The node census:
 MATCH (n) RETURN labels(n) AS nodeType, count(*) AS cnt GROUP BY nodeType
 ```
 Expected exactly: db 1 · db_schema 3 · table 90 · column 4554 ·
-scope 44 · join 95 · direct_read **6** · condition 1141 ·
-param 2 — total **5936**, nothing else (and NO reads-shaped
+scope 44 · join 95 · direct_read **6** · condition 629 ·
+param 2 — total **5424**, nothing else (and NO reads-shaped
 label).
 
 The edge battery (one count per type via
 `MATCH ()-[r:<type>]->() RETURN count(r) AS cnt`):
-has_part → **5889** · joins_to → 65 · left_side → **101** ·
-right_side → 87 · resolves_to → 165 · uses_param → 2 · `reads`
+has_part → **5377** · joins_to → 65 · left_side → **101** ·
+right_side → 87 · resolves_to → 153 · uses_param → 2 · `reads`
 → GONE (unmapped type — its 6 edges retired into the 6
 direct_read nodes). Then:
 
 ```gql
 MATCH ()-[r]->() RETURN count(r) AS totalEdges
 ```
-→ **6309** — the six counts sum to 6309, closing the census
+→ **5785** — the six counts sum to 5785, closing the census
 with no undeclared type.
 
 THE ONE INVARIANT (COVERING alone — DISJOINT vacuous, one
@@ -469,7 +471,7 @@ MATCH (d:direct_read) RETURN d.name AS readName, d.description AS descr ORDER BY
 ### M4 gate — derived_column [CLOSED ON THE SERVED GRAPH —
 ### Sunny's hand, 2026-09-16: load + ONE refresh + the full
 ### battery below, "all passed" (a pass = the stated count, by
-### this sheet's own law: node census 6092 · edge battery summing
+### this sheet's own law: node census 5580 · edge battery summing
 ### 6562 · by-derivation 154/2 · the spot check). BUILT same day,
 ### store-verified; cites RE-BASED 100→97 at build (store grain:
 ### three twin-path heads collapse into named scopes — the
@@ -480,7 +482,7 @@ MATCH (d:direct_read) RETURN d.name AS readName, d.description AS descr ORDER BY
 | new nodes | derived_column 156 (154 operation + 2 named_literal; 312 passthrough projections and 5 anonymous EXISTS-SELECTs are NOT nodes — counted at build, never minted) |
 | new edges | has_part +156 (scope→derived_column, ::dcol# grain) · cites 97 (scope→column at STORE grain) |
 | descriptions | 156/156 R12-voiced (Grammar v2.10.0, THE FUNCTION-VOICING LIBRARY), stored == recomputed (verbatim law) |
-| special check | case_when conditions STAY parented to scope/condition (condition census 1141 unchanged; no condition under a derived_column) — the stay-flat ruling |
+| special check | case_when conditions STAY parented to scope/condition (condition census 629 unchanged; no condition under a derived_column) — the stay-flat ruling |
 | remainder | function_remainders {} — every practiced operation has its library row |
 
 The node census (full, both directions):
@@ -489,15 +491,15 @@ The node census (full, both directions):
 MATCH (n) RETURN labels(n) AS nodeType, count(*) AS cnt GROUP BY nodeType
 ```
 → db 1 · db_schema 3 · table 90 · column 4554 · scope 44 ·
-join 95 · direct_read 6 · condition 1141 · param 2 ·
-derived_column **156** — total **6092**, nothing else.
+join 95 · direct_read 6 · condition 629 · param 2 ·
+derived_column **156** — total **5580**, nothing else.
 
 The edge battery (one count per type, then the closing total):
 
 ```gql
 MATCH ()-[r:has_part]->() RETURN count(r) AS cnt
 ```
-→ **6045** (5889 + 156)
+→ **5533** (5377 + 156)
 ```gql
 MATCH ()-[r:cites]->() RETURN count(r) AS cnt
 ```
@@ -549,17 +551,17 @@ steward act, never a code fix.
 ### M5 gate — statement (+ the M3 holdovers) [BUILT + LOADED +
 ### GATED GREEN 2026-09-17 — Sunny's load ("loaded."), the six
 ### queries Q1–Q6 run on the served graph, his verdict verbatim:
-### "ALL GOOD" — statement 67 · 36/31 · 6167/6618 · the two IF
+### "ALL GOOD" — statement 67 · 36/31 · 5655/6094 · the two IF
 ### sentences byte-identical served; the visual republished to
 ### the standing URL (M1–M5), FS1 counts test green first]
 
 | expect | value |
 |---|---|
-| new nodes | statement 67 (operational subkind 31, voiced never) · condition +6 (the IF predicates: total→1147, the measured M3 re-base 1141 + 6) · param +2 (@StartDate @EndDate: total→4) |
+| new nodes | statement 67 (operational subkind 31, voiced never) · condition +6 (the IF predicates: total→635, the slice C re-base 629 + 6) · param +2 (@StartDate @EndDate: total→4) |
 | new edges | has_part +50 (statement→scope 44 · statement→condition 2 · condition→condition 4) · resolves_to +4 (→param; total resolves_to 169) · uses_param +2 (statement→param; total 4) |
 | descriptions | **36 R11-rendered non-empty + 31 EMPTY-BY-RULE (the (b) ruling, Sunny "b" 2026-09-17: operational statements store NOTHING — a fixed phrase would restate the kind field); the split is the check, corrected from the pre-ruling 67/67 draft** |
 | counted debt | 31 operational statements have NO downward edge — DECLARED Connection_Ledger counted-missing, landing step named M6 (file→statement). Not silent, not a failure: a counted row |
-| census after | nodes 6167 (statement 67) · edges 6618 (has_part 6095 · resolves_to 169 · uses_param 4) — census_after.M5 in the key |
+| census after | nodes 5655 (statement 67) · edges 6094 (has_part 5583 · resolves_to 157 · uses_param 4) — census_after.M5 in the key |
 
 **The M5 gate queries (paste one at a time; the expected value
 follows each):**
@@ -570,10 +572,10 @@ Q1 — the full node census (every label counted, exact):
 MATCH (n) RETURN labels(n) AS nodeType, count(*) AS cnt GROUP BY nodeType
 ```
 
-→ statement 67 · condition 1147 · param 4 · scope 44 · join 95 ·
+→ statement 67 · condition 635 · param 4 · scope 44 · join 95 ·
 direct_read 6 · derived_column 156 · table 90 · column 4554 ·
 db_schema 3 · db 1 (+ file/meaning_twin per the standing census);
-the ladder labels sum to 6167.
+the ladder labels sum to 5655.
 
 Q2 — the edge battery (run per type):
 
@@ -581,13 +583,13 @@ Q2 — the edge battery (run per type):
 MATCH ()-[r:has_part]->() RETURN count(r) AS cnt
 ```
 
-→ 6095. Then `uses_param` → 4 · `resolves_to` → 169; the total:
+→ 5583. Then `uses_param` → 4 · `resolves_to` → 157; the total:
 
 ```
 MATCH ()-[r]->() RETURN count(r) AS totalEdges
 ```
 
-→ 6618.
+→ 6094.
 
 Q3 — the subkind split (the (b) ruling as a served query):
 
@@ -644,7 +646,7 @@ and the end-date twin — byte-identical to the ratified 36.
    Refresh now (ONE — the capacity law).
 3. Run the gate queries (answer key: expected_m_gates.json,
    basis 1.46.0). Good looks like: statement 67 · the 36/31
-   description split · node total 6167 · edge total 6618.
+   description split · node total 5655 · edge total 6094.
 4. Republish the graph visual (devtools/graph_visual/
    generate_m1.py — the FS1 counts test is GREEN first, the
    standing rule).
@@ -663,8 +665,8 @@ Q1 — the full node census:
 MATCH (n) RETURN labels(n) AS nodeType, count(*) AS cnt GROUP BY nodeType
 ```
 
-→ file 1 · statement 67 · condition 1147 · param 4 · the rest
-unchanged; total 6168.
+→ file 1 · statement 67 · condition 635 · param 4 · the rest
+unchanged; total 5656.
 
 Q2 — the edge battery:
 
@@ -771,13 +773,13 @@ any count off by one = a gate failure):
 | scope | 44 |
 | join | 95 |
 | direct_read | 6 |
-| condition | 1147 |
+| condition | 635 |
 | param | 4 |
 | derived_column | 156 |
 | statement | 67 |
 | file | 1 |
 | pbi_report | 1 |
-| **total** | **6169** |
+| **total** | **5657** |
 
 Q2 — the full edge census (the per-type form every prior gate
 ran green; `type(r)` is REJECTED by Fabric GQL — 'type' is a
@@ -804,15 +806,15 @@ MATCH ()-[r]->() RETURN count(r) AS totalEdges
 
 | edge type | count |
 |---|---|
-| has_part | 6166 |
+| has_part | 5654 |
 | joins_to | 65 |
 | left_side | 101 |
 | right_side | 87 |
-| resolves_to | 169 |
+| resolves_to | 157 |
 | uses_param | 4 |
 | cites | 97 |
 | executes | 1 |
-| **total** | **6690** |
+| **total** | **6166** |
 
 (executes = the one resolved proc; the two unresolved EXEC names
 are a COUNTED list on the report node — Sunny's "not same" ruling

@@ -220,7 +220,10 @@ def test_abx_corpse_union_cte_voices_both_arms(shaken):
     # allmeds selection…" joins the two per-arm references
     assert floor.count("allmeds selection defined earlier") == 3
     assert "The thera class code is 11 (annotated 'Antibiotics'" in floor
-    assert "The taken time is before the ed departure time" in floor
+    # re-based at v2.15.0 (R15.a, Brief_Pilot_Build_2): the
+    # column-to-column comparison names the resolved side's owner
+    assert ("taken time is before the allmeds selection's ed "
+            "departure time") in floor
     # grammar 2.2.0 (the first-leg find): the value-set pointer gained
     # its content — reads + restrictive-spine conditions; the OUTER
     # APPLY's interior (TYPE_CODE = 3) stays excluded: an optional

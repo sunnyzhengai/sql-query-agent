@@ -112,3 +112,39 @@ def test_unlisted_data_producing_kind_is_none_never_invented():
     statement_remainders; the renderer never invents a phrase."""
     assert produce.statement_phrase(
         _stmt("MERGE", scope="#X")) is None
+
+
+# ---- Brief_Description_Levels Q3 (b) (built 2026-09-20): the
+# END-USER statement form — the line wears the scope's sentence
+# minus the payload tail, colon-joined; render-time, the stored
+# R11 text untouched. RED before the mechanism. ----
+
+def test_scope_meaning_strips_the_payload_tail():
+    s = ("Events records, matched in plans records: The seq is 1; "
+         "carrying the a, the b, and 2 carried-through columns.")
+    assert produce.scope_meaning(s) == (
+        "Events records, matched in plans records: The seq is 1")
+
+
+def test_scope_meaning_payload_only_keeps_the_lead():
+    assert produce.scope_meaning(
+        "Events records, carrying the a.") == "Events records"
+
+
+def test_scope_meaning_none_for_the_inline_lead():
+    assert produce.scope_meaning("An inline selection.") is None
+
+
+def test_statement_enduser_wears_the_meaning():
+    got = produce.statement_enduser(
+        "Builds the base pop selection, preparing the abx "
+        "selection first.",
+        {"basepop": "Events records: The seq is 1"})
+    assert got == ("Builds the base pop selection: events records: "
+                   "The seq is 1, preparing the abx selection "
+                   "first.")
+
+
+def test_statement_enduser_without_a_meaning_stands():
+    text = "Builds the base pop selection."
+    assert produce.statement_enduser(text, {}) == text

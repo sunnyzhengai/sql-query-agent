@@ -1,4 +1,4 @@
-# Clarity source pack — clarity-pack-1.1
+# Clarity source pack — clarity-pack-1.2
 
 Six scripts, one per extract file, for ANY Epic Clarity system —
 the dictionary schema is Epic's, not any one hospital's, so every

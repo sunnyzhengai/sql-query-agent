@@ -15,7 +15,7 @@
   "estate": "ed_sepsis_dev",
   "file": "reporting/USP_ED_SEPSIS.sql",
   "translator_version": "1.3.0",
-  "metamodel_version": "1.50.0",
+  "metamodel_version": "1.52.0",
   "authored": "2026-09-10",
   "_bump_record": "authored at metamodel 1.36.0; re-based 1.37.0 (join-node ruling) then 1.38.0 (M2 join layer lands: ledger flips PRESENT) — every derived count verified by the recompute tests at each bump; re-based 1.39.0 (M3 condition layer lands); re-based 1.40.0 (structure-word claim + relation-word seat, 2026-09-12: prompts and speech rows only — zero twin-structure effect, every derived count re-verified by the recompute tests); re-based 1.41.0 (the namer seat, 2026-09-12: one Seat_Prompts row only — zero twin-structure effect, every derived count re-verified by the recompute tests); re-based at THE BLESSING (2026-09-13, Sunny's delegated curation): +105 blessed_name kg3 nodes (NO person mint — the registry is the act's record; journal self-containment) — governance truth in the STORE census, never in the Fabric export (EXPORT_LABELS); condition census 1141 and all structural counts unchanged, A2 delta = 130 description texts; re-based at THE SECOND BLESSING (2026-09-14, Sunny's hand): +4 blessed_name — the REF_* held rows re-proposed off the AUTHORED descriptions after the sentinel-origin fix and blessed same night (109 total, node_total 6276); zero edge effect, every structural count unchanged; re-based 1.42.0 (the reads relation speaks, 2026-09-14: one Speech_Sources _edge reads row only — zero twin-structure effect, every derived count re-verified by the recompute tests); re-based 1.43.0 at ERA 3 THE FROM-STRUCTURE FAMILY (2026-09-14, ratified): the reads remainder RETIRES into 6 direct_read nodes — the first STRUCTURAL re-base (+6 nodes, +12 edges, -6 reads; every census gate updated both directions); recompute tests verify; re-based at THE RECORDS-RECORDS SITTING (2026-09-15, Sunny's hand): +4 blessed_name (MED_ADMIN_RECORDS, FLOWSHEET_MEASUREMENTS, FLOWSHEET_RECORDS, GROUPER_MED_RECORDS — 113 total, M7 node_total 6286); zero edge effect, structural counts unchanged, texts moved in graph_condition + graph_scope only; re-based 1.44.0 (THE FUNCTION-VOICING LIBRARY, Sunny 2026-09-16: Function_Voicings sheet + Closed_Sets row only — zero twin-structure effect, every derived count re-verified by the recompute tests); re-based 1.45.0 (M4 THE DERIVED-COLUMN LAYER BUILT, 2026-09-16: derived_column PRESENT, cites 100->97 by measurement at store grain, grammar 2.10.0, mapper op property - every derived count re-verified by the recompute tests + the new store-vs-key battery); re-based 1.49.0 (THE M7 RE-SCOPE, Sunny 2026-09-18: SERVED_LABELS to consumption-only, governance serves at M8 after its design sitting - a registry Closed_Sets row only, zero twin-structure effect; the M7 batch delta and census re-based same breath: 6169 nodes / 6690 edges, every derived count re-verified by the recompute tests); re-based 1.50.0 (BRIEF_PILOT_BUILD_3, Sunny 'approved, build brief 3' 2026-09-20 — THE GRAIN-SOURCE CAPTURE, slice E: GROUP BY refs + DISTINCT + OVER contents + the IF THEN kind, one capture act; twin walk and parsed_census stay symmetric so every twin count holds; cites 97->98 BY MEASUREMENT — the ABX agent-order window's partition/order columns are read by the output now that the contents are captured, and _member_cites sees them; grammar 2.14.0 re-voices scope descriptions (R14), the file technical_definition (R13 v2 three levels) and the ROW_NUMBER dcol phrases (slots close) — text moves, structure +1 edge only)"
  },
@@ -62,20 +62,20 @@
     "column": 4554,
     "scope": 44,
     "join": 95,
-    "condition": 1141,
+    "condition": 629,
     "param": 2,
     "direct_read": 6
    },
-   "node_total": 5936,
+   "node_total": 5424,
    "edges": {
-    "has_part": 5889,
+    "has_part": 5377,
     "joins_to": 65,
     "left_side": 101,
     "right_side": 87,
-    "resolves_to": 165,
+    "resolves_to": 153,
     "uses_param": 2
    },
-   "edge_total": 6309
+   "edge_total": 5785
   },
   "M4": {
    "nodes": {
@@ -85,22 +85,22 @@
     "column": 4554,
     "scope": 44,
     "join": 95,
-    "condition": 1141,
+    "condition": 629,
     "param": 2,
     "derived_column": 156,
     "direct_read": 6
    },
-   "node_total": 6092,
+   "node_total": 5580,
    "edges": {
-    "has_part": 6045,
+    "has_part": 5533,
     "joins_to": 65,
     "left_side": 101,
     "right_side": 87,
-    "resolves_to": 165,
+    "resolves_to": 153,
     "uses_param": 2,
     "cites": 98
    },
-   "edge_total": 6563
+   "edge_total": 6039
   },
   "M5": {
    "nodes": {
@@ -110,23 +110,23 @@
     "column": 4554,
     "scope": 44,
     "join": 95,
-    "condition": 1147,
+    "condition": 635,
     "param": 4,
     "derived_column": 156,
     "statement": 67,
     "direct_read": 6
    },
-   "node_total": 6167,
+   "node_total": 5655,
    "edges": {
-    "has_part": 6095,
+    "has_part": 5583,
     "joins_to": 65,
     "left_side": 101,
     "right_side": 87,
-    "resolves_to": 169,
+    "resolves_to": 157,
     "uses_param": 4,
     "cites": 98
    },
-   "edge_total": 6619
+   "edge_total": 6095
   },
   "M6": {
    "nodes": {
@@ -136,24 +136,24 @@
     "column": 4554,
     "scope": 44,
     "join": 95,
-    "condition": 1147,
+    "condition": 635,
     "param": 4,
     "derived_column": 156,
     "statement": 67,
     "file": 1,
     "direct_read": 6
    },
-   "node_total": 6168,
+   "node_total": 5656,
    "edges": {
-    "has_part": 6166,
+    "has_part": 5654,
     "joins_to": 65,
     "left_side": 101,
     "right_side": 87,
-    "resolves_to": 169,
+    "resolves_to": 157,
     "uses_param": 4,
     "cites": 98
    },
-   "edge_total": 6690
+   "edge_total": 6166
   },
   "M7": {
    "nodes": {
@@ -163,7 +163,7 @@
     "column": 4554,
     "scope": 44,
     "join": 95,
-    "condition": 1147,
+    "condition": 635,
     "param": 4,
     "derived_column": 156,
     "statement": 67,
@@ -171,18 +171,18 @@
     "pbi_report": 1,
     "direct_read": 6
    },
-   "node_total": 6169,
+   "node_total": 5657,
    "edges": {
-    "has_part": 6166,
+    "has_part": 5654,
     "joins_to": 65,
     "left_side": 101,
     "right_side": 87,
-    "resolves_to": 169,
+    "resolves_to": 157,
     "uses_param": 4,
     "cites": 98,
     "executes": 1
    },
-   "edge_total": 6691
+   "edge_total": 6167
   }
  },
  "description_coverage": {
@@ -252,42 +252,42 @@
   "M3": {
    "status": "BUILT 2026-09-10 — store-verified; Sunny's GQL gate on the dev estate closes it",
    "new_nodes": {
-    "condition": 1141,
+    "condition": 629,
     "param": 2
    },
    "new_edges": {
     "has_part_joinCondition": 95,
-    "has_part_scopeCondition": 229,
-    "has_part_conditionCondition": 817,
-    "resolves_to_conditionColumn": 163,
+    "has_part_scopeCondition": 139,
+    "has_part_conditionCondition": 395,
+    "resolves_to_conditionColumn": 151,
     "resolves_to_conditionParam": 2,
     "uses_param_scopeParam": 2
    },
    "condition_conservation": {
-    "conditions": 1141,
+    "conditions": 629,
     "roots_join": 95,
-    "roots_scope": 229,
-    "nested": 817
+    "roots_scope": 139,
+    "nested": 395
    },
    "condition_by_kind": {
-    "NULL_CHECK": 333,
-    "NOT": 238,
-    "COMPARE_EQ": 220,
-    "AND": 191,
-    "IN_LIST": 47,
-    "COMPARE_LTE": 33,
-    "COMPARE_LT": 24,
+    "COMPARE_EQ": 212,
+    "AND": 133,
+    "NOT": 123,
+    "NULL_CHECK": 48,
+    "IN_LIST": 33,
     "RANGE": 22,
-    "OR": 12,
-    "COMPARE_GT": 8,
-    "EXISTS_SELECTION": 7,
-    "COMPARE_GTE": 3,
+    "COMPARE_LTE": 18,
+    "COMPARE_LT": 15,
+    "OR": 9,
+    "COMPARE_GT": 7,
+    "EXISTS_SELECTION": 4,
+    "COMPARE_GTE": 2,
     "COMPARE_NEQ": 2,
     "IN_SELECTION": 1
    },
    "condition_degenerate": 25,
    "resolves_to_roles": {
-    "subject": 119,
+    "subject": 107,
     "comparand": 44,
     "lower_bound": 1,
     "upper_bound": 1
@@ -301,11 +301,12 @@
     "LeftOuter": 56
    },
    "checks": {
-    "descriptions_nonempty": "condition 1141/1141 · param 2/2 (the ratified grammar voices leaves; containers get structural sentences; fragment fallback)",
+    "descriptions_nonempty": "condition 629/629 · param 2/2 (the ratified grammar voices leaves; containers get structural sentences; fragment fallback)",
     "held_for_M5": "IF-statement predicates + @StartDate/@EndDate (parents are statements)",
     "_condition_ruling": "ONE store label `condition` for every predicate — kind is a PROPERTY from the closed library (kind-vs-label standard); per-predicate structure lives in ROLE-tagged resolves_to edges; composite AND/OR/NOT are condition nodes (nested has_part).",
     "spot": "All_LDAs RANGE condition voices the ED-stay window through dictionary words"
-   }
+   },
+   "_rebase_2026_09_20": "re-based BY MEASUREMENT at Brief_Pilot_Build_2 (slice C): ruling (9) THE NOT FOLD removed 123 child rows and FL13's select_refs skip removed 389 duplicate CASE-subtree rows (1147 = 635 + 389 + 123, conservation exact, decomposed by simulation); was 1141/1147 since the M3 re-base"
   },
   "M4": {
    "new_nodes": {

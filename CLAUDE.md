@@ -91,8 +91,10 @@ Full process: `AIVIA_Design/Ruling_Change_Process.md`. Contracts:
 - Tests + anything touching ScriptDom: `/opt/homebrew/bin/python3.11`
   (never .venv or system python). Full suite ≈ 11 min:
   `python3.11 -m pytest tests AIVIA_Test -q`.
-- Ruff before any push (`python3.11 -m ruff check`); pytest green
-  ≠ CI green. Two E501s in convert_from_xlsx.py pre-exist.
+- Ruff before any push, ALWAYS UNCACHED (`python3.11 -m ruff
+  check --no-cache`) — a stale cache said "all passed" on files
+  CI failed (F13, 2026-09-20); pytest green ≠ CI green. Two
+  E501s in convert_from_xlsx.py pre-exist.
 - `OPENAI_API_KEY` lives in `.env` at repo root — `_env_key()`
   reads it automatically; never tell Sunny to "set his key".
 - Tests replay RECORDED embedding vectors

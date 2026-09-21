@@ -202,7 +202,29 @@ SOURCES = {
 # template lands beside the slotless fallback); Statement_Voicings
 # gains the temp-table-existence guard idiom row (FL10 family);
 # Structure_Kinds_Grain documents the captured family.
-STAMP_VERSION = "1.50.0"
+# v1.51.0 (2026-09-20): BRIEF_PILOT_BUILD_2, slice C (Sunny "agree
+# with all seven recommendations, build it") — THE FUNCTION LIBRARY
+# GROWS + THE ONE-LIBRARY-TWO-READERS LAW (FL10 C3): GETDATE, LAG,
+# LEAD join Function_Voicings (LAG/LEAD in the R12 slot form, C5);
+# DATEADD's row gains the negative-offset voice ("<n> <unit>s
+# before <base>" — the unary-minus guard reads through the wrapper)
+# and the GETDATE-relative comparison idiom's pointer (the idiom's
+# law lives in Grammar_Floor: "within the last/next N <unit>s");
+# ISNULL's row gains the far-future-sentinel rider ("treating a
+# missing <date words> as open-ended"). The WHERE path now fills
+# from the SAME library rows the derived path reads — one library,
+# two readers; CONVERT needs no row: it maps as the cast kind,
+# whose TRANSPARENT rule now holds on both paths.
+# v1.52.0 (2026-09-20): BRIEF_DESCRIPTION_LEVELS Q2 (a) (Sunny
+# "agree with all seven recommendations", built at "build it") —
+# THE SCRIBE GROWS: Seat_Prompts scribe -> 1.2.0; a FILE's
+# description becomes purpose + 'Reports: <3-6 themed groups>'
+# (evidence-only, under 60 words); every other grain keeps the
+# v1.1.0 single phrase. The themes' ONE home is the caged,
+# approved-only description field — the deterministic surfaces
+# carry no themes (the end-user block renders headline · window ·
+# reads at display time, derivable, stored never).
+STAMP_VERSION = "1.52.0"
 RATIFIED = True
 DOC_STAMP = ("v1.0.0 (ratified 2026-09-05, Sunny); v1.1.0 twin-graph "
              "ruling ADR 0077; v1.2.0 Phase A metamodel bump; v1.3.0 "
@@ -716,7 +738,7 @@ TWIN_SHEETS = {
             {"Set": "FUNCTION_VOICING_OPS",
              "Members": "DATEDIFF|ROW_NUMBER|DATEADD|CHARINDEX|"
              "LEFT|MIN|FLOOR|COALESCE|DATENAME|DATEPART|STUFF|"
-             "ISNULL|ROUND|STRING_AGG|RIGHT",
+             "ISNULL|ROUND|STRING_AGG|RIGHT|GETDATE|LAG|LEAD",
              "Cites": "Function_Voicings sheet (v1.44.0; the "
              "closed named-function set — composite kinds voice "
              "by rule, Grammar_Floor §R12)"},
@@ -826,8 +848,18 @@ TWIN_SHEETS = {
             {"Operation": "DATEADD", "Kind": "function",
              "Slots": "unit, n, base",
              "Voicing template (DRAFT — Sunny gap-checks phrasing)":
-             "<n> <unit>s after <base>",
-             "Source": "ADR 0076 overlay ABSORBED verbatim",
+             "<n> <unit>s after <base>; NEGATIVE n (v1.51.0, FL10 "
+             "C3): <n> <unit>s before <base> — the guard reads "
+             "through the unary-minus wrapper, the raw fragment "
+             "can never print for a negative offset again; "
+             "GETDATE-relative COMPARISON idiom (law in "
+             "Grammar_Floor R15): subject >= DATEADD(unit, -N, "
+             "now) speaks 'is within the last N <unit>s', <= +N "
+             "'within the next N <unit>s'",
+             "Source": "ADR 0076 overlay ABSORBED verbatim; "
+             "negative-offset + idiom riders Brief_Pilot_Build_2 "
+             "(Sunny 'agree with all seven recommendations, build "
+             "it' 2026-09-20)",
              "Estate count (measured 2026-09-16)": "13"},
             {"Operation": "CHARINDEX", "Kind": "function",
              "Slots": "find, in",
@@ -903,8 +935,13 @@ TWIN_SHEETS = {
             {"Operation": "ISNULL", "Kind": "function",
              "Slots": "a, b",
              "Voicing template (DRAFT — Sunny gap-checks phrasing)":
-             "<a>, or <b> when <a> is not recorded",
-             "Source": "authored 2026-09-16",
+             "<a>, or <b> when <a> is not recorded; FAR-FUTURE "
+             "SENTINEL rider (v1.51.0, FL10 C3): <b> a date "
+             "literal with year 2900+ speaks '<a>, treating a "
+             "missing date as open-ended' — the sentinel is the "
+             "author's open-ended idiom, never a real date",
+             "Source": "authored 2026-09-16; sentinel rider "
+             "Brief_Pilot_Build_2 (2026-09-20)",
              "Estate count (measured 2026-09-16)": "1"},
             {"Operation": "ROUND", "Kind": "function",
              "Slots": "a, n",
@@ -925,6 +962,40 @@ TWIN_SHEETS = {
              "Source": "ADR 0076 overlay ABSORBED verbatim (rides "
              "its LEFT pair)",
              "Estate count (measured 2026-09-16)": "0"},
+            {"Operation": "GETDATE", "Kind": "function",
+             "Slots": "(none)",
+             "Voicing template (DRAFT — Sunny gap-checks phrasing)":
+             "the current date and time (the R12 remainder row "
+             "lands — FL10 named CONVERT and GETDATE rowless; "
+             "CONVERT needs none, it maps as the cast kind and "
+             "cast is TRANSPARENT on both paths since v1.51.0)",
+             "Source": "Brief_Pilot_Build_2 C3 (Sunny 'agree with "
+             "all seven recommendations, build it' 2026-09-20)",
+             "Estate count (measured 2026-09-16)": "-"},
+            {"Operation": "LAG", "Kind": "function (window)",
+             "Slots": "x, partition, order (captured contents; "
+             "slotless fallback)",
+             "Voicing template (DRAFT — Sunny gap-checks phrasing)":
+             "with captured over contents: the previous record's "
+             "<x> within each <partition>, ordered by <order>; "
+             "order-only: the previous record's <x>, ordered by "
+             "<order>; flag-only fallback: the previous record's "
+             "<x> in its ordered sequence — the R12 slot form "
+             "(C5 (a): slice E's capture predates this row; never "
+             "an empty slot in prose)",
+             "Source": "Brief_Pilot_Build_2 C5 (FL14; 2026-09-20)",
+             "Estate count (measured 2026-09-16)": "-"},
+            {"Operation": "LEAD", "Kind": "function (window)",
+             "Slots": "x, partition, order (captured contents; "
+             "slotless fallback)",
+             "Voicing template (DRAFT — Sunny gap-checks phrasing)":
+             "with captured over contents: the next record's <x> "
+             "within each <partition>, ordered by <order>; "
+             "order-only: the next record's <x>, ordered by "
+             "<order>; flag-only fallback: the next record's <x> "
+             "in its ordered sequence (rides its LAG pair)",
+             "Source": "Brief_Pilot_Build_2 C5 (FL14; 2026-09-20)",
+             "Estate count (measured 2026-09-16)": "-"},
         ],
         "Structure_Kinds_Phase_A": [
             {"Kind": "PROJECTION",
@@ -1455,26 +1526,36 @@ TWIN_SHEETS = {
              "underscore token, a digit, a leading article, or a "
              "trailing preposition. If the object is a date or "
              "time, keep its temporal noun among the words."},
-            {"Seat": "scribe", "Version": "1.1.0", "Prompt":
-             "You write ONE short aboutness phrase for a "
-             "database object, from the structural evidence "
-             "given. Return ONLY JSON: {\"description\": "
-             "\"...\"}. RULES. Say what the object is ABOUT — "
-             "the business meaning of what it selects or shows. "
-             "Write a NOUN PHRASE naming the content, shaped "
-             "like: <clinical or business topic>, <its key "
-             "aspects>, for <purpose>. NEVER start with 'This' "
-             "or any opener. NEVER use filler like 'provides "
-             "insights into'. Never repeat the object's name. "
-             "Never name its type (no 'procedure', 'report', "
-             "'dashboard', 'table', 'file', 'selection', 'power "
-             "bi'). Never recite its source tables' "
-             "documentation. Under 25 words. Plain words a "
+            {"Seat": "scribe", "Version": "1.2.0", "Prompt":
+             "You write the description for a database object, "
+             "from the structural evidence given. Return ONLY "
+             "JSON: {\"description\": \"...\"}. RULES. Say what "
+             "the object is ABOUT — the business meaning of what "
+             "it selects or shows. Write a NOUN PHRASE naming "
+             "the content, shaped like: <clinical or business "
+             "topic>, <its key aspects>, for <purpose>. FOR A "
+             "FILE (a whole procedure): after the phrase, add "
+             "one sentence 'Reports: <3 to 6 themed groups of "
+             "what it delivers, comma-separated, each 2-4 plain "
+             "words>.' — the themes come ONLY from the evidence, "
+             "never invented; under 60 words total. Every other "
+             "object keeps the single phrase, under 25 words. "
+             "NEVER start with 'This' or any opener. NEVER use "
+             "filler like 'provides insights into'. Never repeat "
+             "the object's name. Never name its type (no "
+             "'procedure', 'report', 'dashboard', 'table', "
+             "'file', 'selection', 'power bi'). Never recite its "
+             "source tables' documentation. Plain words a "
              "business user would say. Never invent facts the "
-             "evidence does not show. (v1.1.0: the v1.0.0 live "
-             "run opened every draft with 'This <type> provides "
-             "insights into' — both bans broken; the shape "
-             "requirement is the fix.)"},
+             "evidence does not show. (v1.2.0, "
+             "Brief_Description_Levels Q2 (a) 'agree with all "
+             "seven recommendations' 2026-09-20: the file "
+             "description grows purpose + themed outputs — the "
+             "themes' ONE home is this caged, approved-only "
+             "field, never the deterministic surfaces. v1.1.0: "
+             "the v1.0.0 live run opened every draft with 'This "
+             "<type> provides insights into' — both bans broken; "
+             "the shape requirement was the fix.)"},
         ],
         "Shape_Ledger": [
             {"Kind": "_ruling", "Name": "-", "Status": "-",

@@ -931,8 +931,11 @@ def test_condition_tree_delivers_whole(world):
     r = _allmeds_filters_round(world)
     by_tail = {row["a_id"].rsplit("::", 1)[-1]: row
                for row in r["rows"]}
-    assert set(by_tail) == {"cond#6", "cond#8", "cond#9",
-                            "cond#10"}
+    # re-based at v2.15.0 (Brief_Pilot_Build_2 slice C, ruling
+    # (9)): the NOT's child row is never minted, so the ids after
+    # cond#6 shift down by one
+    assert set(by_tail) == {"cond#6", "cond#7", "cond#8",
+                            "cond#9"}
     # NOT folded into its child — the positive fact spoken with
     # the name-words subject (grammar 2.5.0 + 2.6.0), and since
     # the records-records sitting blessed MED_ADMIN_RECORDS
@@ -944,15 +947,19 @@ def test_condition_tree_delivers_whole(world):
         "the medication administration's taken time is recorded."
     # 2.7.0 THE RELATION RULE: name words BOTH sides + the SQL
     # author's noted intent riding (Sunny's "still not fixed" round)
-    assert by_tail["cond#8"]["words"] == ("the taken time is before "
-                                          "the ed departure time "
-                                          "(noted 'while in ed').")
+    # R15.a (v2.15.0): the relation names BOTH owners — blessed
+    # words on the blessed side, the selection's on the same-tree
+    # side
+    assert by_tail["cond#7"]["words"] == (
+        "the medication administration's taken time is before the "
+        "base pop selection's ed departure time (noted "
+        "'while in ed').")
     # R5.b blessed vocabulary (Sunny's delegated curation,
     # 2026-09-13): MED_ROUTE_CODE speaks "medication route"
-    assert by_tail["cond#9"]["words"] == ("the medication route is "
+    assert by_tail["cond#8"]["words"] == ("the medication route is "
                                           "11 (noted "
                                           "'intravenous').")
-    assert "is one of the values" in by_tail["cond#10"]["words"]
+    assert "is one of the values" in by_tail["cond#9"]["words"]
     # the conjunction semantics FRAME the list
     assert r["frames"] and "AND" in r["frames"][0]
     # the frame line speaks — frame-descent rows cite NOTHING
@@ -963,10 +970,13 @@ def test_condition_tree_delivers_whole(world):
     assert all("a.kind <> 'AND'" in g
                and "a.degenerate <> 'true'" in g
                for g in r["gql"])
-    # literal: shape — Sunny's ruled exclusion classes, exact
+    # literal: shape — Sunny's ruled exclusion classes, exact.
+    # "folded into NOT" RETIRED at v2.15.0 (Brief_Pilot_Build_2,
+    # ruling (9)): the store never mints the NOT's child row, so
+    # the console has nothing to exclude — the fold moved from
+    # answer time to store time
     assert r["counted_out"] == {"join structure": 3, "frame": 1,
-                                "degenerate": 1,
-                                "folded into NOT": 1}
+                                "degenerate": 1}
     out = mc.render_round(r)
     assert "frame:" in out and "not rows, counted:" in out
 

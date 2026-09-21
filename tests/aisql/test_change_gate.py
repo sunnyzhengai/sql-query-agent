@@ -142,3 +142,67 @@ def test_fails_closed_on_garbage_input(project):
     )
     assert r.returncode == 2
     assert r.stderr  # it says why, never a silent block
+
+
+# ---- THE WELL-FORMEDNESS RIDER (Brief_Business_Voice enforcement
+# section, ruled with the build 2026-09-20): a malformed APPROVAL is
+# itself a breach — an unlocking brief may not carry an OPEN
+# ambiguity marker and must declare at least one line of files.
+
+OPEN_AMBIGUITY_BRIEF = """# Brief_Open — approved with an open hole
+
+**Status: APPROVED**
+
+| field | content |
+|---|---|
+| ambiguities | **(2) OPEN — a question Sunny never ruled** |
+
+## Files declared
+
+    aisql/flows/open.py
+"""
+
+EMPTY_FILES_BRIEF = """# Brief_Empty — approved declaring nothing
+
+**Status: APPROVED**
+
+## Files declared
+
+"""
+
+
+def _malformed_project(tmp_path, brief_text, name):
+    briefs = tmp_path / "AIVIA_Design" / "briefs"
+    briefs.mkdir(parents=True)
+    (briefs / "Brief_A.md").write_text(APPROVED_BRIEF)
+    (briefs / name).write_text(brief_text)
+    return tmp_path
+
+
+def test_open_ambiguity_approved_brief_breaches(tmp_path):
+    root = _malformed_project(tmp_path, OPEN_AMBIGUITY_BRIEF,
+                              "Brief_Open.md")
+    r = edit(root, "aisql/flows/foo.py")  # declared by the SANE brief
+    assert r.returncode == 2
+    assert "Brief_Open.md" in r.stderr
+    assert "OPEN" in r.stderr
+
+
+def test_empty_files_declared_approved_brief_breaches(tmp_path):
+    root = _malformed_project(tmp_path, EMPTY_FILES_BRIEF,
+                              "Brief_Empty.md")
+    r = edit(root, "aisql/flows/foo.py")
+    assert r.returncode == 2
+    assert "Brief_Empty.md" in r.stderr
+
+
+def test_live_briefs_are_well_formed():
+    """The rider run against the REAL briefs folder — a malformed
+    approval in the repo is a suite breach, not only an edit-time
+    block."""
+    import importlib.util
+    spec = importlib.util.spec_from_file_location("change_gate", GATE)
+    mod = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(mod)
+    assert mod.malformed_briefs(
+        REPO / "AIVIA_Design" / "briefs") == []

@@ -12,6 +12,7 @@ never adds a fact; on gate failure or no model THE FLOOR SHIPS
 (skeleton_floor — plain but true). Per-artifact atomicity (OPS-2):
 one append or a counted absence, never a half-write.
 """
+import functools
 import json
 import pathlib
 import re
@@ -111,7 +112,15 @@ ECON = json.loads((pathlib.Path(__file__).parent / "econ_params.json")
 # render-join (statement_display — derivable, stored never);
 # R12's ROW_NUMBER partition/order deferral CLOSES (the slotted
 # phrase, FL17's echo-mandated acceptance).
-FLOOR_GRAMMAR_VERSION = "2.14.0"
+# v2.15.0 (Brief_Pilot_Build_2 slice C, Sunny "agree with all
+# seven recommendations, build it" 2026-09-20): R15 THE VOICING
+# REPAIRS — the two-sided relation names both owners (FL9); the
+# temporal-window idiom + one-library-two-readers (FL10); the
+# pack ladder's convention rung (FL11, ruling (6)); LAG/LEAD slot
+# forms (FL14); the pair words (FL18); the noun-phrase gate
+# (FL19). The NOT fold and the select_refs skip land in the
+# inbound walkers (ruling (9), FL13).
+FLOOR_GRAMMAR_VERSION = "2.15.0"
 # literal: grammar Grammar_Floor R1
 _PREPOSITIONS = ("of", "on", "per", "for", "in", "at", "by", "with")
 # rider (c) amended (Sunny 2026-09-13): the dictionary's declared
@@ -130,6 +139,33 @@ _BOILERPLATE = re.compile(
     r"(?:\s+details|\s+information)?(?:\s+about)?\s+")
 # literal: grammar Grammar_Floor R5
 _TOKEN_HEADS = {"id", "code", "number", "identifier", "key", "nbr"}
+# R15.g THE NOUN-PHRASE GATE (v2.15.0, FL19 C1): a description
+# leading with one of these is not a noun phrase — it falls to
+# the identifier tier (through the R15.c ladder), never a broken
+# pass-through. Growing this list is a grammar amendment.
+# literal: grammar Grammar_Floor R15.g
+_NON_NOUN_LEADS = frozenset((
+    "stores", "contains", "indicates", "captures", "specifies",
+    "denotes", "determines", "identifies", "defines", "describes",
+    "displays", "shows", "lists", "links", "holds", "provides",
+    "tracks", "records", "flags", "marks", "represents",
+    "references", "returns", "reflects", "gives", "allows",
+    "enables", "includes", "applies", "associates",
+    "you", "your", "this", "these", "it", "if", "whether", "when",
+    "used", "use"))
+
+
+def _cut_outside_parens(s: str) -> str:
+    """R15.g: the comma cut never lands inside an open paren."""
+    depth = 0
+    for i, ch in enumerate(s):
+        if ch == "(":
+            depth += 1
+        elif ch == ")":
+            depth = max(0, depth - 1)
+        elif ch == "," and depth == 0:
+            return s[:i]
+    return s
 
 
 def _noun_phrase(description: str, column: str) -> str:
@@ -150,7 +186,14 @@ def _noun_phrase(description: str, column: str) -> str:
     if not first:
         return re.sub(r"[_\W]+", " ", column).strip().lower()
     phrase = _BOILERPLATE.sub("", first)
-    phrase = phrase.split(",")[0].strip()
+    # R15.g (v2.15.0, FL19): the gate — a lead outside noun
+    # territory falls to the identifier tier, never a broken
+    # pass-through ("the stores the unique category identifier
+    # ... is 0" can never print again)
+    lead = re.sub(r"^(the|a|an)\s+", "", phrase, flags=re.I)
+    if lead.split() and lead.split()[0].lower() in _NON_NOUN_LEADS:
+        return re.sub(r"[_\W]+", " ", column).strip().lower()
+    phrase = _cut_outside_parens(phrase).strip()
     phrase = re.sub(r"^(the|a|an)\s+", "", phrase, flags=re.I)
     m = re.match(r"(?i)^(.*?)\s+(?:of|for)\s+the\s+(.+)$", phrase)
     if m:
@@ -226,7 +269,15 @@ FN_SKELETONS = {
     "ROUND": "<a> rounded to <n> decimal places",
     "STRING_AGG": "every <a> joined into one list",
     "STUFF + FOR XML PATH('')": "every <a> joined into one list",
+    # v2.15.0 (Brief_Pilot_Build_2 slice C, registries 1.51.0)
+    "GETDATE": "the current date and time",
+    "LAG": "the previous record's <x> in its ordered sequence",
+    "LEAD": "the next record's <x> in its ordered sequence",
 }
+# R15.b (v2.15.0): the far-future ISNULL sentinel — a date literal
+# at or past this year is the author's open-ended idiom
+# literal: grammar Grammar_Floor R15.b
+_OPEN_ENDED_YEAR = 2900
 # literal: grammar Grammar_Floor R12 (arithmetic operator words)
 _ARITH_WORDS = {"Add": "plus", "Subtract": "minus",
                 "Multiply": "times", "Divide": "divided by",
@@ -270,14 +321,33 @@ def _fill_overlay(name, args, sub) -> Optional[str]:
         first = args[0]
         unit = str(first.get("value") or first.get("ref", "")
                    ).split(".")[-1].upper()
-        n = args[1].get("value")
+        n, neg = _offset_value(args[1])
         if unit in _UNIT_WORDS and n is not None:
             word = _UNIT_WORDS[unit] + ("" if str(n) == "1" else "s")
+            if neg:
+                # R15.b (v2.15.0, FL10 C3): the guard reads THROUGH
+                # the unary-minus wrapper — a negative offset voices
+                # "before"; the raw fragment can never print again
+                return f"{n} {word} before {sub(args[2])}"
             return (FN_SKELETONS["DATEADD"]
                     .replace("<n>", str(n))
                     .replace("<unit>s", word)
                     .replace("<base>", sub(args[2])))
     return None
+
+
+def _offset_value(expr):
+    """The DATEADD offset through its wrapper: a unary minus (the
+    ScriptDom shape for -60) or a minus-signed literal both read as
+    a negative offset. Returns (magnitude, is_negative)."""
+    if expr.get("kind") == "unary" and expr.get("op") == "Negative":
+        inner = (expr.get("args") or [{}])[0]
+        v = inner.get("value")
+        return (v, True) if v is not None else (None, False)
+    v = expr.get("value")
+    if v is not None and str(v).startswith("-"):
+        return str(v)[1:], True
+    return v, False
 
 
 def _part_word(expr) -> str:
@@ -347,8 +417,34 @@ def _fill_library(name, args, voice, sub, expr=None) -> Optional[str]:
         return (skel.replace("<part>", _part_word(args[0]))
                 .replace("<d>", sub(args[1])))
     if name == "ISNULL" and len(args) == 2:
+        # R15.b (v2.15.0, FL10 C3): the far-future sentinel is the
+        # author's open-ended idiom, never a real date
+        if _is_open_ended_sentinel(args[1]):
+            return (f"{sub(args[0])} (treating a missing date as "
+                    "open-ended)")
         return (skel.replace("<a>", sub(args[0]))
                 .replace("<b>", sub(args[1])))
+    if name == "GETDATE":
+        return skel
+    if name in ("LAG", "LEAD") and args:
+        # R15.f (v2.15.0, FL14 C5 (a)): the R12 slot form — slice
+        # E's captured over contents fill the slots; never an
+        # empty slot in prose
+        who = "previous" if name == "LAG" else "next"
+        x = _bare(sub(args[0]))
+        over = (expr or {}).get("over")
+        if isinstance(over, dict):
+            parts = " and ".join(_partition_words(p, voice)
+                                 for p in over.get("partition_by")
+                                 or [])
+            order = ", ".join(_order_words(o, voice)
+                              for o in over.get("order_by") or [])
+            if parts and order:
+                return (f"the {who} record's {x} within each "
+                        f"{parts}, ordered by {order}")
+            if order:
+                return f"the {who} record's {x}, ordered by {order}"
+        return skel.replace("<x>", x)
     if name == "ROUND" and len(args) >= 2:
         n = args[1].get("value")
         return (skel.replace("<a>", sub(args[0]))
@@ -362,6 +458,14 @@ def _fill_library(name, args, voice, sub, expr=None) -> Optional[str]:
                 .replace("<r>", str(r) if r is not None
                          else sub(args[3])))
     return None
+
+
+def _is_open_ended_sentinel(expr) -> bool:
+    """R15.b: a date literal whose year is 2900+ ('2999-12-31')."""
+    if expr.get("kind") != "literal":
+        return False
+    m = re.match(r"^'?(\d{4})-\d{2}-\d{2}", str(expr.get("value", "")))
+    return bool(m) and int(m.group(1)) >= _OPEN_ENDED_YEAR
 
 
 def _stuff_idiom(subq, voice) -> str:
@@ -451,12 +555,50 @@ def derived_phrase(member, voice) -> str:
     return f"{phrase[:1].upper()}{phrase[1:]}."
 
 
+@functools.lru_cache(maxsize=None)
+def _pack_conventions(vendor: str) -> tuple:
+    """R15.c (v2.15.0, ruling (6)): the packaged pack.json's
+    naming_conventions for one vendor — (suffix, rule) pairs,
+    longest suffix first. The wheel's aisql/_source_packs/<vendor>
+    wins; the repo's AIVIA_Product/source_packs/<vendor> is the
+    dev fallback (the fabric_run._pack_dir pattern). No pack, no
+    conventions — estates without one stay untouched."""
+    if not vendor:
+        return ()
+    here = pathlib.Path(__file__).resolve()
+    for base in (here.parents[1] / "_source_packs",
+                 here.parents[2] / "AIVIA_Product" / "source_packs"):
+        path = base / vendor / "pack.json"
+        if path.is_file():
+            try:
+                rows = json.loads(path.read_text(encoding="utf-8-sig")
+                                  ).get("naming_conventions") or []
+            except (OSError, json.JSONDecodeError):
+                return ()
+            pairs = [(str(r.get("suffix") or ""), str(r.get("rule")
+                                                      or ""))
+                     for r in rows if r.get("suffix")]
+            return tuple(sorted(pairs, key=lambda t: -len(t[0])))
+    return ()
+
+
 class _Voice:
     """Graph-backed voicing context for one scope."""
 
     def __init__(self, read: ReadApi, tree: Dict[str, Any]):
         self._columns = {n.identity: n.properties
                          for n in read.nodes("column")}
+        # R15.c (v2.15.0, ruling (6)): each column's VENDOR from
+        # its dictionary extract's pack id ("emr@…#clarity-pack-1.2"
+        # → "clarity"); the packaged pack.json's naming_conventions
+        # are the ladder's middle rung — estates with no pack get
+        # an empty tuple and stay untouched
+        self._vendor_of = {}
+        for n in read.nodes("column"):
+            x = getattr(n, "extract_id", "") or ""
+            pack = x.split("#")[-1] if "#" in x else ""
+            self._vendor_of[n.identity] = (
+                pack.split("-pack-")[0] if "-pack-" in pack else "")
         self._tables = {n.identity: n.properties
                         for n in read.nodes("table")}
         self._params = {p["name"]: p for p in tree.get("parameters", [])}
@@ -474,19 +616,50 @@ class _Voice:
             col_id = expr.get("resolves_to") or ""
             if col_id in self.blessed:  # R5.b tier 1
                 return self.blessed[col_id]
+            col_name = expr["ref"].split(".")[-1]
             desc = self._columns.get(col_id, {}).get("description", "")
-            return _noun_phrase(desc, expr["ref"].split(".")[-1])
+            if desc:
+                phrase = _noun_phrase(desc, col_name)
+                fold = re.sub(r"[_\W]+", " ", col_name).strip().lower()
+                if phrase != fold:
+                    return phrase  # the dictionary tier spoke
+            # R15.c: the identifier tier walks the ladder — pack
+            # convention before the readable fold
+            return (self._convention_words(expr)
+                    or _noun_phrase("", col_name))
         # a computed subject voices through the value path (DATEADD
         # overlay, steward words) — raw tokens never face the steward
         phrase = self.value(expr, expr)
         return phrase[4:] if phrase.startswith("the ") else phrase
 
+    def _convention_words(self, expr) -> Optional[str]:
+        """R15.c (v2.15.0, ruling (6)): the pack-convention rung —
+        vendor suffix rules from the packaged pack.json, longest
+        suffix first; None when no pack or no suffix matches."""
+        target = expr.get("resolves_to") or ""
+        vendor = self._vendor_of.get(target, "")
+        ident = str(expr.get("ref", "")).split(".")[-1]
+        for suffix, rule in _pack_conventions(vendor):
+            if len(ident) > len(suffix) \
+                    and ident.upper().endswith(suffix.upper()):
+                stem = _noun_phrase("", ident[:-len(suffix)])
+                # literal: shape (pack.json naming_conventions rules)
+                if rule == "yes_no_flag":
+                    return stem + " yes/no flag"
+                if rule == "datetime_words":
+                    return stem + " date and time"
+                if rule == "internal_date":
+                    return stem + " date (internal decimal form)"
+                return stem  # category_code: the suffix drops
+        return None
+
     def name_words(self, expr) -> str:
         """The name-words register (v2.6.0/v2.7.0 subjects), R5.b
-        tier ladder: blessed name → readable identifier form. No
-        heuristic middle tier exists for names."""
+        tier ladder since v2.15.0 (ruling (6)): blessed name → pack
+        convention → readable identifier form."""
         target = expr.get("resolves_to") or ""
-        return self.blessed.get(target) or _name_words(expr)
+        return (self.blessed.get(target)
+                or self._convention_words(expr) or _name_words(expr))
 
     def owner_words(self, expr) -> str:
         """R5.c (v2.9.0): the blessed OWNER name for a column_ref's
@@ -528,6 +701,11 @@ class _Voice:
         declared = self._columns.get(target, {}).get("data_type", "")
         if declared.split("(")[0].strip().lower() in _TEMPORAL_TYPES:
             return True
+        # R15.b corollary (v2.15.0): a count phrase — "the number
+        # of minutes between …" — is a NUMBER, never a moment; the
+        # word "time" inside its slots is not temporal evidence
+        if spoken.lstrip().startswith(("number of", "the number of")):
+            return False
         ev = self.temporal_evidence(expr, spoken)
         return "date" in ev or "time" in ev
 
@@ -563,12 +741,26 @@ class _Voice:
             return f"the {self.subject(expr)}"
         if kind == "case":
             return "a value derived by rule"
+        if kind == "cast":
+            # R15.b (v2.15.0): TRANSPARENT on the WHERE path too —
+            # CONVERT(numeric, sig) never prints raw again; the
+            # cast kind's R12 rule, now one rule on both paths
+            args = expr.get("args") or []
+            if args:
+                return self.value(args[0], subject_expr)
         if kind == "function":
             # the ADR 0076 overlays, ABSORBED into the shared fills
             # (R12 v2.10.0) — guards identical, phrases byte-exact
             got = _fill_overlay((expr.get("name") or "").upper(),
                                 expr.get("args") or [],
                                 lambda a: self.value(a, a))
+            if got is None:
+                # R15.b ONE LIBRARY, TWO READERS (v2.15.0, FL10 C3):
+                # the WHERE path fills from the same Function_
+                # Voicings rows the derived path reads
+                got = _fill_library((expr.get("name") or "").upper(),
+                                    expr.get("args") or [], self,
+                                    lambda a: self.value(a, a), expr)
             if got is not None:
                 return got
         return decisions.render_expr(expr).lower()
@@ -627,6 +819,43 @@ def _name_words(expr) -> str:
     return _noun_phrase("", str(expr.get("ref", "")).split(".")[-1])
 
 
+# literal: shape (inbound.SAME_TREE — the resolver's same-tree
+# scope marker; one spelling, two readers)
+_SAME_TREE_MARK = "SAME-TREE scope "
+
+
+def _relation_owner(expr, voice: _Voice) -> str:
+    """R15.a (v2.15.0, FL9 C2 (a)): the owner's possessive for one
+    side of a column-to-column relation. A table side speaks its
+    BLESSED name, else '<readable table words> record's' (C2 ruled
+    the readable fallback INTO this position; R5.c's blessed-only
+    law stands for the recordedness pointer). A SAME-TREE side
+    speaks 'the <words> selection's'. Unresolved → '' (bare name
+    words — honesty over invention)."""
+    r = expr.get("resolves_to") or ""
+    if not isinstance(r, str):
+        return ""
+    if r.count("|") == 3:
+        table_id = r.rsplit("|", 1)[0]
+        words = voice.blessed.get(table_id)
+        if words:
+            return f"{words}'s "
+        t = _readable_name(table_id.rsplit("|", 1)[-1])
+        if not t:
+            return ""
+        if t.endswith("records"):
+            # the records-records guard (the 2026-09-15 class,
+            # echo-mandated): MED_ADMIN_RECORDS speaks "the med
+            # admin record's", never "records record's"
+            return f"{t[:-1]}'s "
+        return f"{t} record's "
+    if r.startswith(_SAME_TREE_MARK):
+        key = r[len(_SAME_TREE_MARK):]
+        sel = _spoken_selection(key.rsplit("::", 1)[-1])
+        return f"{sel} selection's " if sel else ""
+    return ""
+
+
 def _compare_terms(pred, voice: _Voice) -> Tuple[str, str]:
     """GRAMMAR 2.7.0 — THE RELATION RULE (Sunny, 2026-09-12: the
     mixed-register corpse 'the time designated by the user when
@@ -634,16 +863,66 @@ def _compare_terms(pred, voice: _Voice) -> Tuple[str, str]:
     comparison BETWEEN TWO COLUMNS is a relation between two named
     things — both sides speak NAME WORDS; a comparison against a
     VALUE keeps the dictionary-definition subject, because there
-    the meaning IS the sentence."""
+    the meaning IS the sentence. R15.a (v2.15.0, FL9 C2 (a)):
+    both sides carry their OWNERS — 'The x is the x' can never
+    print again for resolved sides."""
     subj_expr = pred.get("subject", {})
     comp_expr = pred.get("comparand")
     if subj_expr.get("kind") == "column_ref" \
             and isinstance(comp_expr, dict) \
             and comp_expr.get("kind") == "column_ref":
-        return (voice.name_words(subj_expr),
-                "the " + voice.name_words(comp_expr))
+        return (_relation_owner(subj_expr, voice)
+                + voice.name_words(subj_expr),
+                "the " + _relation_owner(comp_expr, voice)
+                + voice.name_words(comp_expr))
     return (voice.subject(subj_expr),
             voice.value(comp_expr, subj_expr))
+
+
+def _temporal_window(pred, voice: _Voice) -> Optional[str]:
+    """R15.b (v2.15.0, FL10 C3) — THE TEMPORAL-WINDOW IDIOM: a
+    comparison against DATEADD(unit, ±N, now) speaks the window —
+    subject >= now-minus-N is 'within the last N <unit>s',
+    subject <= now-plus-N is 'within the next N <unit>s'; n==1
+    drops the count ('within the last year'). Every other DATEADD
+    keeps the compositional voice."""
+    comp = pred.get("comparand")
+    if not isinstance(comp, dict) or comp.get("kind") != "function" \
+            or (comp.get("name") or "").upper() != "DATEADD":
+        return None
+    args = comp.get("args") or []
+    if len(args) != 3 or not _is_now(args[2]):
+        return None
+    unit = str(args[0].get("value") or args[0].get("ref", "")
+               ).split(".")[-1].upper()
+    if unit not in _UNIT_WORDS:
+        return None
+    n, neg = _offset_value(args[1])
+    if n is None:
+        return None
+    kind = pred["kind"]
+    if neg and kind in ("COMPARE_GTE", "COMPARE_GT"):
+        way = "last"
+    elif not neg and kind in ("COMPARE_LTE", "COMPARE_LT"):
+        way = "next"
+    else:
+        return None
+    subj = voice.subject(pred.get("subject", {}))
+    word = _UNIT_WORDS[unit]
+    if str(n) == "1":
+        return f"The {subj} is within the {way} {word}."
+    return f"The {subj} is within the {way} {n} {word}s."
+
+
+def _is_now(expr) -> bool:
+    """GETDATE(), or a cast of it (CONVERT(date, GETDATE()))."""
+    if expr.get("kind") == "function" \
+            and (expr.get("name") or "").upper() == "GETDATE":
+        return True
+    if expr.get("kind") == "cast":
+        args = expr.get("args") or []
+        return bool(args) and _is_now(args[0])
+    return False
 
 
 def _voice_predicate(pred, voice: _Voice) -> str:
@@ -652,6 +931,9 @@ def _voice_predicate(pred, voice: _Voice) -> str:
     subj = voice.subject(subj_expr)
     # literal: schema-mirror kg2_kind_library
     if kind in ("COMPARE_GTE", "COMPARE_GT", "COMPARE_LTE", "COMPARE_LT"):
+        window = _temporal_window(pred, voice)
+        if window:
+            return window
         subj, comp = _compare_terms(pred, voice)
         # rider (c): declared type first, then the temporal union
         # — evidence only adds; unblessed untyped columns test
@@ -989,6 +1271,11 @@ def _composition_sentence(read: ReadApi, tree, scope,
 
 # literal: grammar Grammar_Floor R14 (ruling (3) list compression)
 _LIST_COMPRESS_OVER = 6
+# Q4 (a) (Brief_Description_Levels, "agree with all seven
+# recommendations" 2026-09-20; FL27): a list whose members carry
+# noted labels compresses past 3 — the harm is rendered length
+# literal: grammar Grammar_Floor R14 (the amended compression)
+_NOTED_COMPRESS_OVER = 3
 
 
 def _squash(name) -> str:
@@ -1114,12 +1401,26 @@ def _compressed_list(pred, voice, negated=False) -> Optional[str]:
     row (condition_render is untouched — derivable, never lost)."""
     if pred.get("kind") != "IN_LIST":
         return None
-    n = len(pred.get("comparand_list") or [])
-    if n <= _LIST_COMPRESS_OVER:
+    members = pred.get("comparand_list") or []
+    n = len(members)
+    subj_expr = pred.get("subject", {})
+    # Q4 (a): noted-label members (an annotation or a values-map
+    # meaning) compress sooner — their labels are the length
+    noted = any(_member_noted(m, subj_expr, voice) for m in members)
+    over = _NOTED_COMPRESS_OVER if noted else _LIST_COMPRESS_OVER
+    if n <= over:
         return None
-    subj = voice.subject(pred.get("subject", {}))
+    subj = voice.subject(subj_expr)
     word = "none" if negated else "one"
     return f"The {subj} is {word} of {n} values"
+
+
+def _member_noted(m, subj_expr, voice) -> bool:
+    if m.get("annotation"):
+        return True
+    col_id = subj_expr.get("resolves_to") or ""
+    values = voice._columns.get(col_id, {}).get("values") or {}
+    return str(m.get("value", "")).strip("'") in values
 
 
 def _bt_condition(pred, voice) -> str:
@@ -1403,6 +1704,23 @@ def scope_head(sentence) -> Optional[str]:
     return head
 
 
+def scope_meaning(sentence) -> Optional[str]:
+    """Q3 (b) (Brief_Description_Levels, built 2026-09-20): the
+    scope's sentence MINUS the payload tail — what the END-USER
+    statement line wears. Derivable from the stored sentence;
+    None when nothing meaningful remains (scope_head's rule)."""
+    s = str(sentence or "").rstrip(".")
+    for sep in ("; carrying ", ", carrying "):
+        i = s.find(sep)
+        if i >= 0:
+            s = s[:i]
+            break
+    s = s.strip().rstrip(";").strip()
+    if not s or s.lower() == "an inline selection":
+        return None
+    return s
+
+
 _BUILDS_LINE = re.compile(r"^Builds the ([\w ]+) selection")
 
 
@@ -1421,6 +1739,26 @@ def statement_display(text, heads) -> str:
     return text.replace(
         f"Builds the {m.group(1)} selection",
         f"Builds the {m.group(1)} selection ({borrowed})", 1)
+
+
+def statement_enduser(text, meanings) -> str:
+    """Q3 (b) (Brief_Description_Levels, built 2026-09-20): the
+    END-USER statement line — 'Builds the <x> selection: <what
+    belongs in it>', the scope's sentence minus the payload tail,
+    colon-joined. Render-time only (dry_run); R13's pipeline keeps
+    statement_display's head clause so the stored TD stands
+    byte-identical (Q1 (b)). `meanings` maps _squash(scope name)
+    -> scope_meaning(sentence)."""
+    m = _BUILDS_LINE.match(text or "")
+    if not m:
+        return text
+    meaning = (meanings or {}).get(_squash(m.group(1)))
+    if not meaning:
+        return text
+    lowered = meaning[0].lower() + meaning[1:]
+    return text.replace(
+        f"Builds the {m.group(1)} selection",
+        f"Builds the {m.group(1)} selection: {lowered}", 1)
 
 
 def voicing_ledger(read: ReadApi, target: str) -> Dict[str, int]:

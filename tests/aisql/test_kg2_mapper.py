@@ -239,3 +239,113 @@ def test_estate_reapply_is_idempotent(built):
     stamp = store.state_stamp()
     inbound.receive_estate(store, reg, F2 / "estate_snapshot")
     assert store.state_stamp() == stamp
+
+
+# ---- Brief_Pilot_Build_2 slice C (Sunny "agree with all seven
+# recommendations, build it" 2026-09-20): the walker laws (ruling
+# (9) THE NOT FOLD · FL13 the select_refs double-visit) + R15.d
+# the join fragment's voice. RED before the mechanisms. ----
+
+def test_join_fragment_normalizes_and_notes_comments():
+    """R15.d (FL12, C4): whitespace collapses, -- comments leave
+    the fragment and speak as '(noted ...)'."""
+    got = inbound.join_render(
+        ["d|s|A", "d|s|B"],
+        "x = y\n\t\t\tAND a = b\t-- match on visit")
+    assert got == ("Joins A with B on x = y AND a = b "
+                   "(noted 'match on visit').")
+
+
+def test_join_fragment_without_comment_just_collapses():
+    got = inbound.join_render(["d|s|A", "d|s|B"],
+                              "x = y\r\n   AND  a = b")
+    assert got == "Joins A with B on x = y AND a = b."
+
+
+def test_folded_refs_absorb_the_child_subtree():
+    """Ruling (9): the folded NOT row carries the child's column
+    links — the child row is never minted, its meaning is not
+    lost."""
+    inner = {"node": "predicate", "kind": "IN_LIST",
+             "subject": {"kind": "column_ref", "ref": "E.PLAN_CODE",
+                         "resolves_to": "d|s|PLANS|PLAN_CODE"},
+             "comparand_list": [{"kind": "literal", "value": "'A'"}]}
+    not_pred = {"node": "predicate", "kind": "NOT",
+                "children": [inner]}
+    assert inbound._folded_refs(not_pred) == [
+        ("subject", "d|s|PLANS|PLAN_CODE")]
+
+
+def _mini_estate(tmp_path, sql):
+    import json as _json
+
+    from aisql.graph.store import Store as _Store
+    reg = {"registered_sources": ["simemr"],
+           "schema_sources": {"dbo": "simemr"},
+           "dba_team": "role:t", "registered_at": "2026-01-01"}
+    est = tmp_path / "estate_snapshot"
+    est.mkdir()
+    (est / "manifest.json").write_text(_json.dumps({
+        "source_kind": "estate", "org": "t",
+        "location": "repo://t/", "declared_dialects": ["tsql"],
+        "as_of": "2026-01-01T00:00:00Z", "operator": "t",
+        "default_schema": "dbo"}))
+    (est / "probe.sql").write_text(sql)
+    store = _Store()
+    kg1_intake.apply_registration(store, reg)
+    inbound.receive_estate(store, reg, est)
+    return store
+
+
+def _conditions(store):
+    return [n for n in store.current_nodes("condition")]
+
+
+def test_not_fold_mints_one_row(tmp_path):
+    """Ruling (9) 'i agree, fold entirely': one NOT predicate, ONE
+    condition row speaking the folded voice; the positive child
+    sentence can never sit beside it again."""
+    store = _mini_estate(tmp_path, """
+CREATE PROCEDURE dbo.USP_T AS
+BEGIN
+SELECT E.PLAN_CODE INTO #S FROM dbo.PLANS E
+WHERE NOT (E.PLAN_CODE IN ('A','B'));
+SELECT * FROM #S;
+END
+""")
+    conds = _conditions(store)
+    descriptions = [c.properties.get("description", "")
+                    for c in conds]
+    folded = [d for d in descriptions
+              if d == "The plan code is none of the values 'A', 'B'."]
+    positive = [d for d in descriptions
+                if d == "The plan code is one of the values 'A', 'B'."]
+    assert len(folded) == 1
+    assert positive == []
+
+
+def test_case_whens_mint_once(tmp_path):
+    """FL13 (C6, investigated): scope.select_refs ALIASES the
+    projection expressions (kg2_mapper's documented shape), so the
+    condition walker must carry the same skip _derived_members
+    already has — each WHEN mints exactly one row."""
+    store = _mini_estate(tmp_path, """
+CREATE PROCEDURE dbo.USP_T AS
+BEGIN
+SELECT E.ENC_ID,
+    CASE WHEN E.SCORE > 4 THEN 'HIGH'
+         WHEN E.SCORE > 2 THEN 'MID'
+         WHEN E.SCORE > 1 THEN 'LOW'
+         WHEN E.SCORE > 0 THEN 'MIN'
+         ELSE 'NONE' END AS BAND
+INTO #Banded
+FROM dbo.ENCOUNTERS E
+WHERE E.ENC_ID IS NOT NULL;
+SELECT * FROM #Banded;
+END
+""")
+    frags = [c.properties.get("fragment", "")
+             for c in _conditions(store)]
+    for probe in ("E.SCORE > 4", "E.SCORE > 2",
+                  "E.SCORE > 1", "E.SCORE > 0"):
+        assert frags.count(probe) == 1, (probe, frags)

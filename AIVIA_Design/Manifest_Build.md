@@ -2057,3 +2057,443 @@ ship-unit 3 of Brief_Pilot_Findings_R1 ruling (7). What built:
   closing check BALANCED (9 changed == 9 declared-and-touched +
   1 declared no-op reasoned: test_ask_console.py, pins already
   existed). CLOSED at his word.
+
+## 2026-09-20 (same day) — BRIEF_CI_LINT BUILT — CI's lint step
+## returns to the retired reality
+
+- **Born at the push-and-promote CI watch** (F13: dev red since
+  c346120 that morning, main inherits at the promotion — all 4
+  lint errors PRE-DATE the push); his ruling pre-draft: "agree
+  with all three, build it".
+- **The three moves**: (1) ci.yml lint line -> `ruff check src/
+  tests/ scripts/ devtools/` (notebooks/ is untracked local
+  scratch; *.Notebook/ retired 2026-09-19 — each E902'd every
+  run); (2) devtools/answer_evals.py + grounding_evals.py +
+  local_llm.py RETIRED in the act — the evals import the retired
+  src.orchestrator/src.parser and cannot run, local_llm was
+  theirs alone; (3) the ruff-before-push habit is `--no-cache`
+  (CLAUDE.md) — the stale cache said "all passed" on the exact
+  files CI failed.
+- **The tripwire** (test_ci_lint_paths, RED first): every path
+  the CI lint line names is TRACKED and glob-free; the three
+  corpses stay gone. CI's exact lint command passes uncached
+  locally.
+- **F14 born, OPEN** (same class, deeper): src/agent_backend.py
+  imports the retired src.parser.identity (a runtime corpse ruff
+  cannot see); src/trace_registry.py:561 names a test file that
+  does not exist. The leftover sweep awaits his word.
+
+## 2026-09-20 (same day) — THE LEVEL DESIGN AGREED —
+## Brief_Description_Levels PRESENTED
+
+- **Born at his end-user read** of the dryrun_sepsis output
+  (sepsis_descriptions.txt), USP_ED_SEPSIS the ruled focus
+  ("please use USP_ED_SEPSIS only going forward"). His ask: is
+  the technical description what we expected to show an end
+  user, at scope, statement and proc level? The verdict: no at
+  the file level (the full ~6,500-word catch-all meets the end
+  user first), no at the statement level ("Builds the allmeds
+  selection." carries no meaning), close at the scope level.
+- **The direction ruling**: "i agree with the level design,
+  draft the brief. make sure we record it in the design doc" —
+  each level answers ONE question (file "what does this give
+  me" · statement "what does this step contribute" · scope
+  "exactly what is in this selection"), drill-down replaces
+  repetition. Recorded in Grammar_Floor.md THE DRILL-PATH
+  DIRECTION, same breath; law lands when Q1–Q7 rule.
+- **FL25–FL29 born** (Contract_Logic_Layer): the altitude
+  finding · the thin statement line · the compression bar's
+  noted-label gap (#BasePopBolus's ~450-char list vs #ADT's
+  compressed 17) · the appendix's uncounted 4× repeats · THE
+  SOURCE-DEFECT CATCH — the TD's verbatim voicing exposed the
+  customer's own bug (USP_ED_SEPSIS.sql:3179/3187: both
+  "negative" columns computed from the POSITIVE score time),
+  verified against the source. FL9/FL12 stay slice C's rows —
+  cited, not re-claimed.
+- **Q1–Q7 OPEN, code blocked**: the stored TD's fate (rec: it
+  stands for governance, end-user surfaces render short — the
+  Brief_Dryrun_Order precedent) · the themes' home (rec: the
+  Scribe description grows, approved-only) · the statement
+  borrow's size (rec: the scope sentence minus the payload
+  tail, render-time) · the compression bar (rec: noted-label
+  lists past 3) · appendix repeats (rec: ruled completeness
+  stands) · the FL29 finding class (rec: queued feature) ·
+  sequencing (rec: after slice C, one load).
+
+## 2026-09-20 (same day) — ALL SEVEN RULED —
+## Brief_Description_Levels APPROVED
+
+- **His words**: "agree with all seven recommendations" — every
+  recommendation becomes the ruling, quoted in the brief.
+- **The rulings**: (Q1 b) the stored technical_definition STANDS
+  byte-identical for Collibra governance; end-user surfaces
+  render the short block (headline · window · main sources) at
+  display time — derivable, never stored twice, no load for it.
+  (Q2 a) purpose + themed outputs live in the Scribe description
+  (LLM cage, approved-only; his re-approval at build). (Q3 b)
+  the statement line wears the scope's sentence minus the
+  payload tail — render-time, stored R11 text untouched. (Q4 a)
+  noted-label lists compress past 3 members, bare lists keep 6;
+  full lists stay on the condition rows. (Q5 b) the appendix's
+  ruled completeness stands — FL28 CLOSED same breath. (Q6 b)
+  the contradiction-detector queues as its own feature brief
+  (declared debt, Echo Law first-occurrence deferral). (Q7 a)
+  the build lands AFTER slice C — one regen, ONE load, his
+  AISQL_RECORD run once.
+- **Files declared narrowed at the rulings** (the brief's own
+  drafted clause): test_file_render.py out (the TD untouched),
+  convert_from_xlsx.py out (no registry row moves);
+  describe.py stays (the Scribe prompt grows).
+- **Queue**: slice C (ruling (7)'s brief 2 — FL9/FL12/FL16/
+  FL18/FL19, to be drafted) → Brief_Description_Levels build.
+
+## 2026-09-20 (same day) — BRIEF_PILOT_BUILD_2 DRAFTED —
+## slice C, the voicing repairs, PRESENTED
+
+- **Drafted at his "draft the slice C brief"** — ship-unit 2 of
+  ruling (7) ("brief 2: C (voicing — stored descriptions
+  change, one Grammar_Floor bump, one regen, ONE load)").
+- **Carries**: FL9 · FL10 · FL11 · FL12 · FL13 · FL14 · FL16 ·
+  FL18, plus FL19 pending C1. Two builds arrive ALREADY RULED
+  from the parent brief: ruling (9) the NOT fold (child row
+  never minted, links absorbed, census re-base reaches every
+  coverage string) and ruling (6) the pack naming ladder
+  (clarity-pack-1.2, blessed name → pack convention → readable
+  identifier).
+- **Seven questions C1–C7 OPEN**: FL19 joins? (rec yes) · the
+  two-sided phrase (rec: every column-to-column predicate names
+  both owners) · the function phrases + two mechanism fixes
+  (rec: ratify all five) · the join fallback's voice (rec: as
+  refined, measured post-F9) · LAG/LEAD form (rec: the R12 slot
+  form — slice E's over capture now exists) · FL13 disposition
+  (rec: investigate inside the brief, generator clause) · the
+  pair words including the OR twin (rec: "Both …"/"Either …").
+- **The sequencing law recorded** (Brief_Description_Levels Q7):
+  slice C code → Description_Levels code → ONE shared closing
+  run: one export regen · one wheel cut · his one AISQL_RECORD
+  run · his ONE Fabric load.
+
+## 2026-09-20 (same day) — ALL SEVEN RULED, BUILD GO —
+## Brief_Pilot_Build_2 APPROVED at "agree with all seven
+## recommendations, build it"
+
+- **The rulings**: C1 FL19 joins (the noun-phrase gate) · C2 (a)
+  every column-to-column predicate names both owners · C3 all
+  five (the two phrases · CONVERT/GETDATE rows · the WHERE-path
+  fill · the unary-minus guard) · C4 the fallback names both
+  sides, whitespace normalized, comments "(noted …)", measured
+  post-F9 · C5 (a) the R12 slot form for LAG/LEAD · C6 the FL13
+  investigation runs inside · C7 "Both of its parts hold." /
+  "Either of its parts holds.". Rulings (6) and (9) build as
+  quoted. FL rows flipped RULED/BUILDING same breath.
+- **Build begins** in the fixed order: registry/pack rows →
+  Grammar_Floor 2.15.0 → RED pins → code → FL13 investigation →
+  census re-base by measurement → full suite + ruff. The shared
+  closing run (one regen · one wheel · his AISQL_RECORD · his
+  ONE load) waits for Brief_Description_Levels' build per Q7.
+
+## 2026-09-20 (same day) — BRIEF_PILOT_BUILD_2 BUILT — SLICE C,
+## THE VOICING REPAIRS SHIP
+
+- **One sitting, draft → rulings → BUILT** ("draft the slice C
+  brief" · "agree with all seven recommendations, build it" ·
+  two files-declared amendments at his word).
+- **The seven landed**: R15.a two-sided owners (the tautology
+  died on the corpus: "The ed encounters fact record's encounter
+  is the hospital encounters record's encounter."; +the
+  records-records guard, echo-built mid-session when
+  MED_ADMIN_RECORDS spoke "records record's") · R15.b the
+  temporal-window idiom + one-library-two-readers + the
+  unary-minus guard + the open-ended sentinel + cast transparent
+  in WHERE + GETDATE's row · R15.c the pack ladder
+  (clarity-pack-1.2: _C · _YN · _DTTM · _DATE_REAL; blessed →
+  convention → readable; no-pack estates untouched) · R15.d the
+  join fragment normalized + "(noted …)" (measured: the
+  embedded-newline class 724→0 on sepsis; 12 joins now carry
+  notes; 1 no-side residual) · R15.e "Both/Either of its parts
+  hold(s)." · R15.f LAG/LEAD slot forms · R15.g the noun-phrase
+  gate + paren-safe truncation. Rulings (6)+(9) as quoted law.
+- **FL13 INVESTIGATED + FIXED**: the generator = the mapper's
+  documented select_refs ALIASING (select_refs[i] IS
+  projection[i].expression); _derived_members already carried
+  the skip, collect() never got it — now it does. 389 duplicate
+  CASE-subtree rows died.
+- **THE CENSUS RE-BASE, decomposed exactly**: 1147 = 635 + 389
+  (FL13 dups) + 123 (ruling (9) NOT children) — verified by
+  walker simulation; every coverage string moved
+  (expected_m_gates.json · GQL_Gates.md · the TD pin 21411/73f6…
+  · the console round · visual counts via the LOCAL export regen
+  — sepsis conditions 6018→3891). Registries 1.51.0 (GETDATE ·
+  LAG · LEAD + the DATEADD/ISNULL riders), grammar 2.15.0.
+- **FL30 born, OPEN**: is_join_key calls a SAME-TABLE col=col a
+  join key — a real filter can drop from the scope sentence's
+  population; Sunny's call.
+- **FULL SUITE 793/0 non-gap** (5:19); the one red class = 64
+  tests on 174 unrecorded sentences → his AISQL_RECORD run at
+  the shared closing. Ruff --no-cache zero new. TEST_MAP regen.
+  Closing check BALANCED subject to ONE flagged line: the
+  "Proves:" docstring test_ci_lint_paths.py always lacked
+  (Brief_CI_Lint's close miss — red on the suite-map gate since
+  birth) — the field fix rides here, HIS WORD ratifies it.
+- **THE LOOP FILE born at his word** ("so i'm in the loop"):
+  USP_ED_SEPSIS_descriptions.txt at repo root, regenerated at
+  every stored-text-changing build; declared in zones with his
+  dry_run capture. His mid-build reads answered: the two-shape
+  grain lead is ruling (3) working; the proc-level length is the
+  ruled R13 governance catch-all (mechanical, no LLM) and the
+  remaining raw SQL is the join ON fragments — full English
+  join voicing offered as a follow-up ruling.
+- **Queue**: Brief_Description_Levels build (next, per its Q7) →
+  the shared closing run (one regen · one wheel · his
+  AISQL_RECORD · his ONE load · his gap-check eye closes BOTH
+  briefs) · FL30 · the contradiction-detector feature brief ·
+  F10 · F14 · Brief_Collibra · docs-untangle · M8 · CI-B · FL1.
+
+## 2026-09-20 (night) — BRIEF_BUSINESS_VOICE BUILT — THE FIRST
+## BUSINESS SENTENCE SPEAKS (the scope rung; R16 ratified;
+## his words in order: the meaning-ladder directive · "i confirm
+## strict layering, and statement should compose from scope
+## sentences" · "i agree with all remaining open items, use your
+## recommendations. make sure we lock these in contracts" ·
+## B1–B3 each "agree with (a)" · "build it")
+
+- **THE MEANING LADDER + THE BUSINESS VOICE ruled in full**
+  (Grammar_Floor v2.16.0 §R16; the whole ruling record, his words
+  quoted, in Brief_Business_Voice): dictionary rows → scope
+  sentences → statement descriptions → the proc description; strict
+  layering; every rung composes; store only the business voice,
+  derive the technical; hybrid = LLM proposes · mechanical gate
+  (nothing dropped / nothing invented) · sentence stored as
+  basis-hashed INPUT DATA · STALE counted, the R14 floor voices.
+  Findings FL31–FL35 born and RULED (EXISTS-as-membership echo ·
+  grain-vs-base slot collision · the membership-list case · the
+  one-value plural frame · the never-read table descriptions,
+  produce.py self._tables confirmed dead).
+- **BUILT, slice 1 = the scope rung** (B2): aisql/flows/
+  business_voice.py (materials/basis_hash/check_sentence/
+  effective_sentence/propose_sentences — the R5.b seat widened,
+  double-run + cache + seat-down + field law); the ONE DOOR wired
+  into inbound._store_scope_descriptions (tier: blessed >
+  gate-passed proposed > floor); console.run_sentence_proposals
+  (his hand, paid); the change-gate WELL-FORMEDNESS RIDER (a
+  malformed approval is a breach: no OPEN ambiguity under
+  APPROVED/BUILT, no empty Files declared — live briefs scanned
+  by the suite).
+- **THE SEED**: #ED_BORDER (sepsis) carries the FIRST blessed
+  business sentence — the brief's worked example, gate-clean,
+  basis-hashed, blessed_by Sunny (his "good." + the approval):
+  "The base population's ED encounters that had an 'ED BOARDER
+  PATIENTS' event — one row per encounter, carrying only its
+  encounter id; a membership list." graph_scope.parquet regen
+  (targeted); USP_ED_SEPSIS_descriptions.txt refreshed (scope
+  block + stmt/63 borrow + header).
+- **Pins RED-first**: test_business_voice.py BV1–BV6 + gate-pass
+  + tier order + seat field-law (9; BV1 red until the seed, 3
+  rider pins red until the gate code) — all green after; the
+  verbatim pin re-pointed to THE ONE DOOR (test_scope_layer).
+  Build-level readings, recorded not asked: the sentence seat's
+  prompt is DYNAMIC (assembled from materials) so it lives in
+  code under PROMPT_VERSION (Seat_Prompts registry row offered
+  for the statement-rung slice); the pins ride
+  contract:aisql-design-to-code (a dedicated slug needs
+  suite_map.py, undeclared).
+- **FULL SUITE 814 passed** (5:23); the one red class = the
+  SAME pre-existing 179-sentence RecordingGap (1 failed + 63
+  errors, all one cause) → per B1 his ONE closing sequence:
+  run_sentence_proposals (paid, optional now or later) → his
+  AISQL_RECORD run → his ONE load — closes Brief_Pilot_Build_2 +
+  Brief_Description_Levels + this brief. Ruff --no-cache zero
+  new (18 pre-exist). TEST_MAP via generate_docs.py.
+- **Closing check BALANCED**: 16 touched == 16 declared-and-
+  touched; 2 declared no-ops with reason (expected_shakedown.json
+  + test_sepsis_shakedown.py — the description change moved no
+  structural counts; the suite proved it).
+- **Queue**: HIS CLOSING SEQUENCE (sentence batch his call ·
+  AISQL_RECORD · ONE load · his gap-check eye — closes THREE
+  briefs) · the statement-rung slice (composes from scope
+  sentences) · the proc-rung slice (B3: the approval flow carries
+  the ladder's sentence; final wording re-presents) · FL30 ·
+  the contradiction-detector brief · F10 · F14 · Brief_Collibra ·
+  docs-untangle · M8 · CI-B · FL1.
+
+## 2026-09-21 — TWO RIDERS ON BRIEF_BUSINESS_VOICE: THE SEAT GOES
+## SINGLE-RUN AND THE ANCHOR LEARNS TO FOLLOW THE GATE (his
+## words: "ok, agreed" · "approve re-anchor-when-gate-clean,
+## build it"; his FIRST sentence batch between them: 312 scopes,
+## 622 calls, 85 proposed · 156 disputed · 70 rejected · 1
+## blessed_kept — the field law held)
+
+- **B4 SINGLE-RUN, GATE-FIRST** ("ok, agreed"): his batch
+  MEASURED the double-run law at sentence length — 156/312
+  disputed on wording variance, zero fact disputes caught that
+  the gate would have missed. The sentence seat drops to ONE run;
+  the gate carries honesty; `disputed` retired wholesale; prior
+  disputed rows are never 'kept' — the first cached candidate
+  re-lands through the gate, ZERO new paid calls for the 156.
+  His question answered with rows: same-name CTEs across files
+  never merge (scope identity = file::name; #ALLCVLTime = 4 keys
+  in 4 files; 74 names repeat, all separate) — the "multiple
+  sentences" were the disputes.
+- **FL36 BORN at the rider's suite pass, reality-authored** (BV1
+  red): his proposal wave voiced #Base_Pop's gate-passed sentence
+  → #ED_BORDER's material moved → the strict hash staled the
+  BLESSED row though its words stayed GATE-CLEAN (verified) — at
+  estate scale blessing could never converge; bless order would
+  matter forever.
+- **B5 RE-ANCHOR-WHEN-GATE-CLEAN** ("approve … build it"): at
+  voice time a stale row still gate-clean against the NEW basis
+  voices with status carried and re-anchors; the writer persists,
+  each row stamped re_anchored_at (counted never silent);
+  gate-dirty stale falls to the floor unchanged. FIRST LIVE
+  FIRING: 27 sepsis rows re-anchored in one boot (the wave's
+  sibling drift absorbed), BV1 green. Pins RED first both riders
+  (single-call count · no disputed verdict · the 156-row
+  migration replay · re-anchor path · gate-dirty path · the
+  committed registry self-anchors); 15/15 green after; ruff zero
+  new; TEST_MAP regen.
+- **Queue**: HIS REVIEW of 85+ proposed sentences (bless by hand,
+  any order — convergence now holds) · his optional re-batch
+  (the 156 resolve FREE from cache) · AISQL_RECORD · ONE load ·
+  his gap-check eye (closes THREE briefs) · statement-rung slice
+  · proc-rung slice · FL30 · F10 · F14 · Brief_Collibra ·
+  docs-untangle · M8 · CI-B · FL1.
+
+## 2026-09-21 (same sitting) — B6 + B7: THE GATE LEARNS ENGLISH
+## GLUE AND THE REJECTION EARNS ITS REPAIR (his words: "agree
+## with your fix to class 1" · "for class 2, can you either
+## propose to the llm to fix the error or propose to me so i can
+## manually fix it?" — BOTH, layered)
+
+- **THE MEASUREMENT** (his re-run + the registry): 157 rejected
+  rows — 111 died on connective English ALONE ('where' 98 ·
+  'includes'/'include' 59 · 'additional' 11 · spelled numbers),
+  46 were TRUE kills (the #ADT specimen: the proposal said only
+  TRANSFER OUT where the scope selects types 3 AND 4 — the gate
+  stopped a lie one blessing away from Collibra; 15 rows never
+  said what they carry; value lists dropped).
+- **B6**: connective words + spelled small numbers join the
+  skeleton lists (fact words never join); `rejected` verdicts
+  RE-JUDGE free at every batch from stored candidates — his
+  hand-edited sentence on a rejected row re-judges mechanically.
+- **B7**: one repair call per fresh rejection, the gate's named
+  violations IN the repair prompt; repaired → re-gated;
+  still dirty → the row keeps sentence + violations for HIS
+  hand, repair_spent stamped, no basis pays twice; a seat-down
+  repair retries (transient).
+- Pins RED first (5 new: skeleton-pass · invention-still-dies ·
+  free re-judge · the repair round with violations verified in
+  the prompt · repair-never-pays-twice); 16/16 green; ruff zero
+  new; TEST_MAP regen; R16 amended (the skeleton clause + THE
+  VERDICT LIFECYCLE block).
+- **His next batch, expected**: ~111 glue-only rows flip to
+  proposed FREE (cache re-judge); the ~46 true drops each earn
+  one repair call; survivors land on his pile with violations
+  named. Queue unchanged otherwise.
+
+## 2026-09-21 (same sitting) — B6.b: THE POSSESSIVE WITNESS BUG
+## DIES + THE WRITER FINDS ITS FIXPOINT (his #AllMeds example the
+## trigger; his batch after B6/B7: 140 proposed · 39 repaired_ok ·
+## 125 re_judged free · 27 rejected)
+
+- **THE BUG**: the witness extractor paired R5.c possessive
+  apostrophes as quote delimiters — "the med admin record's taken
+  time is before the base pop selection's ed departure time"
+  yielded the manufactured witness "s taken time is before the
+  base pop selection", unfixable by any sentence; 6 of the 27
+  residual rejections were this bug ALONE. Possessive apostrophes
+  now fold before witnesses read (witness_pairs); pinned on the
+  LIVE #AllMeds mech + his batch's exact rejected sentence (now
+  gate-clean). Skeleton grows by the measured stragglers (before ·
+  after · match/matches · condition/conditions · number).
+- **THE FIXPOINT FIND** (the verbatim pin caught it RED): once
+  verdicts can flip, one write pass voices scopes against
+  MID-BUILD sibling text — _store_scope_descriptions now REPEATS
+  until no description moves; the stored state IS the recompute's
+  fixpoint (2 passes in practice, cap 8 a runaway guard).
+- **THE WAVE VOICES**: USP_ED_SEPSIS_descriptions.txt regenerated
+  wholesale — 44 scope sentences + 36 statement lines now show
+  the business voice wherever a gate-passed row stands; HIS EYE
+  on this file is the gap-check surface. 21/21 pins green.
+- **His next batch**: the 6 false-witness rows + skeleton
+  stragglers re-judge FREE; the residue is true drops, already
+  repair_spent → his hand, violations named.
+
+## 2026-09-21 (same sitting) — B8: THE FOUR-PIECE GATE MATURATION
+## (his three answers — "1: compression acceptable" · the splice
+## question · the synonym question — then "agreed. go.")
+
+- **B8.1 LIST COMPRESSION**: a multi-value list condition needs no
+  verbatim witness (the full list is one drill-down away); single
+  literals + noted words stay required.
+- **B8.2 WITNESSES FROM THE GRAPH ROWS**: scope_witness_texts
+  walks the scope's has_part subtree; pairing is local to one
+  condition clause — the ABX/CsfCultureResults cross-clause
+  artifacts cannot exist.
+- **B8.3 THE MECHANICAL SPLICE** (his "can you add it back
+  mechanically" — yes): BV1-only residue appends the missing
+  condition's FLOOR CLAUSE and re-gates; rows land proposed,
+  marked spliced; nothing waits on a person.
+- **B8.4 THE SYNONYM LEDGER** (his "if LLM can be used… or does
+  it need to be mechanical?" — the LLM NOMINATES, the STEM GUARD
+  + local presence verify, the pair lands as DATA; tombstones for
+  failed nominations, hand-fillable; the gate stays mechanical at
+  voice time — the verbatim law's re-anchor path runs it every
+  boot; 'boarded'→'weight' dies at the guard, pinned).
+- Ladder per scope: gate → synonym round → ONE repair → splice →
+  rejected-with-violations (his hand). Pins RED first, 26/26
+  green; FIRST FIRING: 13 more USP_ED_SEPSIS scopes voice (incl.
+  #AllMeds — the possessive victim now speaking its business
+  sentence); loop file regenerated; ruff zero new.
+- **Expected at his next batch**: the 13 rejected re-run the
+  ladder — residue should converge to genuinely-broken sentences
+  only, likely zero-to-few, each self-describing.
+
+## 2026-09-21 (same sitting) — B8.b: FOUR FIELD FIXES AT HIS
+## 7-REJECTION READ + THE GATE'S STAR CATCH
+
+- **THE STAR CATCH (his #FlwshtLstSepsisAudit row)**: the model
+  wrote flowsheet id 9000002611 — ONE DIGIT OFF the real
+  9000002613 — and the gate killed it. A hallucinated clinical
+  identifier stopped one blessing short of Collibra: the
+  nothing-invented direction earning its keep, recorded.
+- **B8.b fixes**: (1) acronym expansions (blessed/matched ledger
+  rows) ARE rung-0 material — threaded into materials/basis/
+  prompt; 'los' awaits his blessing to free the delivery row.
+  (2) floor words join the allowed set — the splice can't kill
+  itself. (3) the NOISE WAIVER: witness halves must be
+  label-like; raw-SQL echoes, changelog noteds, symbol literals
+  waive (drill-down keeps them); real labels stay required.
+  (4) the synonym prompt CARRIES its vocabulary (s2 — the s1
+  prompt referenced context a stateless call never had; all
+  nominations were null); versioned tombstones re-ask once.
+- 30/30 pins green (4 new RED-first); ruff zero new; the noise
+  waiver's first firing freed 6 more USP_ED_SEPSIS scopes to
+  voice (SSOrderSetOSQ_PRL among them); loop file refreshed.
+- **His next batch**: the 7 re-run the ladder with acronyms +
+  vocabulary-carrying synonym round + noise-waived witnesses —
+  expected residue: the hallucinated-id row (his eye, or a fresh
+  proposal) and little else.
+
+## 2026-09-21 (same sitting) — B9: THE LIST THAT BUILDS ITSELF
+## (his question: "can we use LLM to make the judgement call?
+## otherwise we'll forever keep manually building the list" —
+## then "go")
+
+- **B9.5 THE ACRONYM NOMINATION**: the ratified nominate/verify/
+  data pattern applied to acronyms — the seat nominates the
+  expansion, the FORM GUARD verifies (initials los→Length Of
+  Stay ✓ · subsequence pt→patient ✓ · abx→antibiotics FAILS and
+  stays human), the row lands `proposed` in the ACRONYM LEDGER
+  with proposer recorded; load serves proposed rows only while
+  form-guarded; sentences built on them are themselves only
+  proposed — his eye is always somewhere in the chain, never a
+  gate. Manual list-building ends.
+- **B9.1–B9.4**: output aliases (projection names) are source
+  words ('[Department Rollup]' was the SQL's own alias, killed as
+  invention) · -ing/-ed folding · token-subset witnesses (a
+  paraphrase carrying every content word satisfies; absent words
+  like 'AM (Day Shift)' stay required) · violation dedupe.
+- Pins RED first (6 new), 36/36 green; ruff zero new; loop file
+  touched (#Cultures re-voiced). Projected residue at his next
+  batch: ~1 row (the repair-prompt word leak — one-word hand fix
+  or a fresh proposal).

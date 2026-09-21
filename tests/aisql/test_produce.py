@@ -80,11 +80,13 @@ def test_run_event_matches_f4_accounting(produced):
     assert event.properties["accounting"]["terms"]["attempted"] == 0
     assert event.properties["author"] == "agent:produce"
     assert event.properties["outcome"] == "completed"
+    # 2.15.0 = R15 THE VOICING REPAIRS (Brief_Pilot_Build_2 slice C,
+    # "agree with all seven recommendations, build it" 2026-09-20);
     # 2.14.0 = R14 THE BUSINESS TERM SENTENCE (Brief_Pilot_Build_3,
     # 2026-09-20; conscious bump — the kg3 floor artifacts keep the
     # R1-R10 composer, so floor_texts stays byte-exact; the scope
     # NODE descriptions changed, a different surface)
-    assert event.properties["basis"]["floor_grammar"] == "2.14.0"
+    assert event.properties["basis"]["floor_grammar"] == "2.15.0"
     assert set(event.properties["basis"]["worklist"]) == set(F4["targets"])
 
 

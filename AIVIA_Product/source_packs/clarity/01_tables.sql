@@ -1,4 +1,4 @@
--- clarity-pack-1.1 · Script 1 -> tables.csv (schema,table,description)
+-- clarity-pack-1.2 · Script 1 -> tables.csv (schema,table,description)
 -- Contract: AIVIA_Design/Contract_Source_Packs.md · pinned by
 -- AIVIA_Test/test_clarity_source_pack.py (parses under ScriptDom;
 -- aliases == the intake headers, byte-exact).

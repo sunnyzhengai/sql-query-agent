@@ -302,7 +302,8 @@ def receive_estate(store, reg: Dict[str, Any], estate_dir,
         # quantum; the homomorphism law is asserted inside translate()
         report.twins[name] = kg2_translator.apply_twin(
             store, f"{location}{name}", tree, manifest["as_of"])
-    _store_scope_descriptions(store, manifest["as_of"])
+    _store_scope_descriptions(store, manifest["as_of"],
+                              estate_dir.parent / "glossary")
     report.join_layer = _store_join_layer(store, manifest["as_of"])
     # M5-1 (ruled: "build order is the reverse. after scopes"):
     # statements build AFTER scopes, BEFORE conditions — their
@@ -320,30 +321,61 @@ def receive_estate(store, reg: Dict[str, Any], estate_dir,
     return report
 
 
-def _store_scope_descriptions(store, as_of) -> None:
+def _store_scope_descriptions(store, as_of, glossary_dir=None) -> None:
     """THE SHAPE CONTRACT, M2 (Sunny's bottom-up ruling,
-    2026-09-10) — the stored text is R14's BUSINESS TERM SENTENCE
-    since v2.14.0 (Brief_Pilot_Build_3, "approved, build brief 3"
-    2026-09-20; replaces the from-structure lead FOR SCOPES ONLY).
-    The verbatim law is a standing test: stored == recomputed
-    (test_scope_layer)."""
-    from aisql.flows import produce
+    2026-09-10) — since v2.16.0 (R16, Brief_Business_Voice
+    2026-09-20) the stored text is THE TIER's answer: a BLESSED
+    business sentence > a gate-passed `proposed` row (status
+    carried) > the mechanical R14 floor; a stale row (basis moved)
+    falls to the floor. Scopes write in definition order so a
+    sibling's sentence is standing before a later scope consumes
+    it as material. The verbatim law is a standing test: stored ==
+    recomputed through the ONE door (test_scope_layer)."""
+    from aisql.flows import business_voice
     from aisql.graph.read_api import ReadApi
     from aisql.lenses import decisions
     read = ReadApi(store)
-    by_id = {n.identity: n for n in read.nodes("scope")}
-    for key, tree in sorted(read.trees().items()):
-        for scope in decisions.named_scopes(tree):
-            node = by_id.get(scope["name_key"])
-            if node is None:
-                continue
-            lead = produce.scope_sentence(read, tree, scope)
-            if node.properties.get("description") == lead:
-                continue
-            store.append_node(
-                "scope", node.identity,
-                {**node.properties, "description": lead},
-                as_of, node.extract_id)
+    rows = (business_voice.load_rows(glossary_dir)
+            if glossary_dir is not None else {})
+    synonyms = (business_voice.load_synonyms(glossary_dir)
+                if glossary_dir is not None else {})
+    acronyms = (business_voice.load_acronym_expansions(glossary_dir)
+                if glossary_dir is not None else {})
+    anchors_before = {k: r.get("basis_hash") for k, r in rows.items()}
+    # THE FIXPOINT (B6.b live find): a scope's basis includes its
+    # siblings' STORED sentences, so one pass voices against
+    # mid-build text — the pass repeats until no description moves
+    # and the stored state IS the recompute's fixpoint (the
+    # verbatim law's ground). Converges in 2 passes in practice;
+    # the cap is a runaway guard, never an expected exit.
+    for _pass in range(8):
+        changed = 0
+        by_id = {n.identity: n for n in read.nodes("scope")}
+        for key, tree in sorted(read.trees().items()):
+            for scope in decisions.named_scopes(tree):
+                node = by_id.get(scope["name_key"])
+                if node is None:
+                    continue
+                lead, _tier = business_voice.effective_sentence(
+                    read, tree, scope, rows, synonyms=synonyms,
+                    acronyms=acronyms)
+                if node.properties.get("description") == lead:
+                    continue
+                changed += 1
+                store.append_node(
+                    "scope", node.identity,
+                    {**node.properties, "description": lead},
+                    as_of, node.extract_id)
+        if changed == 0:
+            break
+    # FL36 (re-anchor-when-gate-clean, ruled 2026-09-21): persist
+    # re-anchored rows, each stamped — counted, never silent
+    moved = [k for k, r in rows.items()
+             if r.get("basis_hash") != anchors_before.get(k)]
+    if moved and glossary_dir is not None:
+        for k in moved:
+            rows[k]["re_anchored_at"] = as_of
+        business_voice.save_rows(glossary_dir, rows)
 
 
 SAME_TREE = "SAME-TREE scope "
@@ -400,9 +432,30 @@ def _disp(target: str) -> str:
         else target.rsplit("::", 1)[-1]
 
 
+def _normalize_fragment(fragment: str) -> str:
+    """R15.d (v2.15.0, FL12 C4): whitespace collapses to single
+    spaces (the TD's embedded newlines and tabs die); -- comments
+    leave the fragment and speak as '(noted ...)' — the same R8
+    attribution conditions already carry."""
+    notes = []
+    lines = []
+    for line in str(fragment or "").splitlines() or [""]:
+        code, sep, comment = line.partition("--")
+        c = comment.strip()
+        if sep and c and c not in notes:
+            notes.append(c)
+        lines.append(code)
+    text = " ".join(" ".join(lines).split())
+    for c in notes:
+        text += f" (noted '{c}')"
+    return text
+
+
 def join_render(targets, fragment) -> str:
     """The join node's stored description — deterministic; the
-    verbatim law holds stored == this recompute."""
+    verbatim law holds stored == this recompute. The fragment
+    speaks normalized since v2.15.0 (R15.d)."""
+    fragment = _normalize_fragment(fragment)
     if len(targets) >= 2:
         return (f"Joins {_disp(targets[0])} with "
                 f"{_disp(targets[1])} on {fragment}.")
@@ -544,9 +597,13 @@ def condition_render(pred, voice) -> str:
     # the detail
     # literal: grammar
     if kind in ("AND", "OR", "NOT"):
+        # R15.e (v2.15.0, FL18 C7): the n==2 pair words, both
+        # sides of the class (enumerate-all-cases)
         # literal: grammar
-        word = {"AND": f"All {len(kids)} of its parts hold.",
-                "OR": f"Any of its {len(kids)} parts holds.",
+        word = {"AND": ("Both of its parts hold." if len(kids) == 2
+                        else f"All {len(kids)} of its parts hold."),
+                "OR": ("Either of its parts holds." if len(kids) == 2
+                       else f"Any of its {len(kids)} parts holds."),
                 "NOT": "The inner condition does not hold."}
         return word[kind]
     try:
@@ -593,6 +650,18 @@ def _condition_refs(pred):
             walk(pred[role], role)
     for e in pred.get("comparand_list") or []:
         walk(e, "comparand")
+    return out
+
+
+def _folded_refs(pred):
+    """Ruling (9) (Brief_Pilot_Build_2, 'i agree, fold entirely'):
+    the folded NOT row ABSORBS its child subtree's refs — the
+    child row is never minted, its column links are not lost."""
+    out = list(_condition_refs(pred))
+    for child in pred.get("children") or []:
+        for pair in _folded_refs(child):
+            if pair not in out:
+                out.append(pair)
     return out
 
 
@@ -1026,7 +1095,12 @@ def _store_condition_layer(store, as_of) -> dict:
                                   {}, as_of, node.extract_id)
                 counts["conditions"] += 1
                 counts[is_root_kind] += 1
-                for role, target in _condition_refs(pred):
+                # ruling (9) THE NOT FOLD (v2.15.0): one row, the
+                # folded voice; the child is NEVER minted — its
+                # refs are ABSORBED here
+                refs = (_folded_refs(pred) if kind == "NOT"
+                        else _condition_refs(pred))
+                for role, target in refs:
                     if target.startswith("@"):
                         pid = ensure_param(target, node.extract_id)
                         store.append_edge(
@@ -1039,8 +1113,9 @@ def _store_condition_layer(store, as_of) -> dict:
                             "resolves_to", cid, target,
                             {"role": role}, as_of, node.extract_id)
                         counts["resolves_column"] += 1
-                for child in pred.get("children") or []:
-                    emit(child, cid, "nested")
+                if kind != "NOT":
+                    for child in pred.get("children") or []:
+                        emit(child, cid, "nested")
 
             for i, pred in enumerate(_join_entries(scope), 1):
                 emit(pred, f"{node.identity}::join#{i}", "roots_join")
@@ -1053,7 +1128,14 @@ def _store_condition_layer(store, as_of) -> dict:
                     for w in d.get("whens") or []:
                         if isinstance(w.get("when"), dict):
                             whens.append(w["when"])
-                    for v in d.values():
+                    for k, v in d.items():
+                        if k == "select_refs":
+                            # FL13 (C6, the located generator): the
+                            # mapper's select_refs ALIAS the
+                            # projection expressions — the same
+                            # skip _derived_members carries; a
+                            # CASE's whens mint once, never twice
+                            continue
                         collect(v)
                 elif isinstance(d, list):
                     for v in d:
@@ -1109,7 +1191,10 @@ def _store_condition_layer(store, as_of) -> dict:
                                   {}, as_of, snode.extract_id)
                 counts["conditions"] += 1
                 counts["held_statement_rooted"] += 1
-                for role, target in _condition_refs(pred_):
+                # ruling (9): the fold holds at statement grain too
+                refs = (_folded_refs(pred_) if kind == "NOT"
+                        else _condition_refs(pred_))
+                for role, target in refs:
                     if target.startswith("@"):
                         pid = ensure_param(target, snode.extract_id)
                         store.append_edge(
@@ -1122,8 +1207,9 @@ def _store_condition_layer(store, as_of) -> dict:
                             "resolves_to", cid, target,
                             {"role": role}, as_of, snode.extract_id)
                         counts["resolves_column"] += 1
-                for child in pred_.get("children") or []:
-                    emit_st(child, cid)
+                if kind != "NOT":
+                    for child in pred_.get("children") or []:
+                        emit_st(child, cid)
 
             emit_st(pred, sid)
             for pid in sorted(st_params):

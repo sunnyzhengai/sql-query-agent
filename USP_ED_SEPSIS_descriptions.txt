@@ -1,0 +1,219 @@
+USP_ED_SEPSIS — the three levels as the END USER now sees them (Brief_Business_Voice scope rung + riders B4–B7; grammar 2.16.0; the sentence wave now VOICES: gate-passed proposed sentences speak with status carried, #ED_BORDER blessed, the rejected minority still on the mechanical floor awaiting repair/Sunny)
+The stored technical definition (the full governance catch-all) is UNCHANGED — Collibra keeps it; this file shows the display surfaces.
+======================================================================
+
+=== PROC LEVEL (the end-user short block, Q1) ===
+
+  proc: Delivers the final selection, carrying the last bp to first positive score time, the last bp to first negative score time, the first positive score time to first bp, the first negative score time to first bp, the fps bolus abx re screen compliance, and 12 carried-through columns.
+  window: The date when the patient arrived is between the d start date parameter and the d end date parameter (inclusive).
+  reads: adt events, alert actions, alert history, clinical alerts, config value set, departments, ed encounters dm, ed encounters fact, ed event info, ed event templates, ed patient info, employees, encounter visit reasons, flowsheet measurements, flowsheet records, grouper med records, hospital encounters, lab order results, line device airway, locations, med admin records, med mix components, medication orders, medication orders ext, medications, non severe sepsis staging, order dispense info, order tracking metrics, organisms, patient demographics race, patients, procedure orders, procedure orders ext, ref alert actions, ref alert override reasons, ref alert status, ref ed disposition, ref ethnic group, ref generic med, ref patient race, ref shown place, rx verify trace, severe sepsis staging, v patient location history, v pharmacy dispense, v pharmacy dispense action, v pharmacy order, visit reasons
+  (the full technical definition is the stored governance field — Collibra's technical_definition)
+  description (Scribe, approved-only): AI-generated: sepsis patient encounters, vital signs and scoring times, for monitoring treatment compliance and outcomes.
+
+=== STATEMENT LEVEL (the end-user line, Q3) ===
+
+stmt/5: A decision step, taken when the start date parameter is not recorded or the start date parameter is ''.
+
+stmt/6: A decision step, taken when the end date parameter is not recorded or the end date parameter is ''.
+
+stmt/8: Builds the base pop selection: one record per distinct combination of its columns, matched in hospital encounters records and in ed encounters dm records and in patients records: The date when the patient arrived is between the d start date parameter and the d end date parameter (inclusive).
+
+stmt/10: Builds the allmeds selection: the selection includes records of medication administrations where the taken time is before the base population's ED departure time while in ED, the route of administration is intravenous, and the MAR action category number is one of 16 values.
+
+stmt/12: Builds the basepopabx selection: the abx selection includes medications with an id from medication orders, matched in medications records, med mix components records, ref generic med records, and config value set records where the value_set unique is 3016 and the taken time is before the allmeds selection's ed departure time, preparing the abx selection first.
+
+stmt/14: Builds the basepopbolus selection: one record per encounter id and taken time and order med id and medication name: The taken time is before the ED departure time while in ED; the hv discr freq id is '300902'; the route of administration is intravenous; the MAR action category number is one of 16 values.
+
+stmt/16: Builds the pressors selection: one record per distinct encounter id and taken time and medication name and time line, matched in grouper med records: The taken time is between the adt arrival time and the ed departure time (inclusive); The unique identifier for the base grouper record is VCG-.1 is one of 5 values.
+
+stmt/18: Builds the firstabxadmintimedetails selection: the basepopabx selection includes encounters with the first antibiotic administration time noted 'LOOK FOR FIRST ANTIBIOTIC ADMINISTRATION ONLY', where the action instant is below the basepopabx selection's abx admin time noted 'MAKE SURE WE ARE LOOKING AT THE RIGHT MEDICATION ADMIN TIME.'.
+
+stmt/19: Builds the flowsheets selection: the base population selection, matched in flowsheet records and in flowsheet measurements records, includes unique identifiers for the flowsheet group linked to readings, where the recorded time is recorded, the meas value is recorded, and the recorded time is on or before the base population's ed departure time.
+
+stmt/21: Builds the encounterweights selection: the flowsheets selection: The flo meas id is '94' (noted 'Weight').
+
+stmt/23: Builds the hypotension selection: the hypotensive systolic blood pressure selection: the recorded time is between the adt arrival time and the ed departure time (inclusive) and the flo meas id is '95', preparing the systolic selection first.
+
+stmt/24: Builds the bloodpressure selection: the flowsheets selection includes records where the recorded time is between the adt arrival time and the ed departure time (inclusive) and the flo meas id is one of the values '95', '9001140203', or '9001140205'.
+
+stmt/27: Builds the sepsisalertcancelled selection: the flowsheets selection includes records where the recorded time is between the adt arrival time and the ed departure time (inclusive) and the flo meas id is '9001125002'.
+
+stmt/29: Builds the base pop severe ed scores selection: the flowsheets selection includes records where the recorded time is between the adt arrival time and the ed departure time (inclusive) and the flo meas id is one of the values '9000161709' or '9000002613'.
+
+stmt/31: Builds the ed positivescores selection: the base pop severe ed scores selection includes records where the recorded time is between the adt arrival time and the ed departure time, and the flo meas id is one of '9000161709' or '9000002613'.
+
+stmt/33: Builds the ed negativescores selection: the base pop severe ed scores includes records where the meas value is at most 4, no matching record exists in the ed positivescores.
+
+stmt/35: Builds the base pop sepsisscores concat selection: one record per distinct encounter id and all sepsis scores.
+
+stmt/36: Builds the lda selection: one record per encounter id and lda placement type from timeordered ldas, preparing the all ldas selection and the timeordered ldas selection first.
+
+stmt/37: Builds the labs and cultures selection: the selection includes lab order results and procedure orders where the order time is between the adt arrival time and the ed departure time.
+
+stmt/38: Builds the labs selection: one record per encounter id and lab test type where the order time is between the adt arrival time and the ed departure time, preparing the timeordered labs selection first.
+
+stmt/40: Builds the cultures selection: the positive cultures selection, preparing the allcultures selection, the positivecultures selection and the negativecultures selection first.
+
+stmt/41: Builds the adt selection: the base pop selection includes distinct combinations of encounter records matched in adt events and departments where the event type code is 4 (noted 'TRANSFER OUT'), the event subtype code is not 2 (noted 'CANCELED'), the unit associated with the event record at the time it became effective is one of the values 200108022 (noted 'Emergency'), the event type code is 3 (noted 'TRANSFER IN'), the department id associated with the event record is one of 17 values, and carrying the department group along with 4 additional columns.
+
+stmt/43: Builds the ed2hemonc selection: the adt selection: The dept group is 'HemOnc'.
+
+stmt/45: Builds the ed2icu selection: the adt selection: The dept group is 'ICU'.
+
+stmt/47: Builds the ed2gen selection: the adt selection, matched in departments records: The dept group is 'GenCare'.
+
+stmt/49: Builds the bpa selection: the base population selection, matched in clinical alerts records (the locators that were activated is '900130001') and in alert history records: the moment when the warning is dismissed following certain actions is between the adt arrival time and the ed departure time (inclusive).
+
+stmt/51: Builds the bedevents selection: the base population selection, matched in ed patient info records and in ed event info records (the event type is one of the values '2600000347', '2600000346') and in ed event templates records.
+
+stmt/53: Builds the base pop ed readmit all selection: one record per distinct encounter id, matched in ed encounters dm records (the arrival dttm is between the ed departure time and 24 hours after the ed departure time (inclusive)).
+
+stmt/55: Builds the base pop ed readmit selection: one record per distinct encounter id, matched in the base pop and in ed encounters dm records where the arrival dttm is between the ed departure time and 24 hours after the ed departure time (inclusive).
+
+stmt/56: Builds the patientlocation selection: the selection includes records of patient location history, where each record has a matching base population record.
+
+stmt/59: Builds the firstpositiveod to abxadmintime selection: one record per encounter id, matched in the ed positive scores selection (the recorded time is before the abx admin time; the first time line is 1).
+
+stmt/61: Builds the base pop enc reason selection: one record per distinct encounter id and all enc reasons, matched in encounter visit reasons records where the line_number of the reason for visit within the encounter exceeds 1 and in visit reasons records where the line_number of the reason for visit within the encounter exceeds 1.
+
+stmt/63: Builds the ed border selection: the base population's ED encounters that had an 'ED BOARDER PATIENTS' event — one row per encounter.
+
+stmt/65: Builds the ssorderset selection: the ssorder set osq prl selection includes the order metric ids from medication orders ext records, where the prl orderset id is one of the values 400001 or 4001326023, preparing the ordermetricids selection and the ssordersetosq prl selection first.
+
+stmt/66: Builds the final selection: the base pop selection, combined with severe sepsis staging records and non severe sepsis staging records.
+
+stmt/67: Delivers the procedure's result set.
+
+=== SCOPE LEVEL (the stored sentence; the R16 tier) ===
+
+— #ADT
+  The base pop selection includes distinct combinations of encounter records matched in adt events and departments where the event type code is 4 (noted 'TRANSFER OUT'), the event subtype code is not 2 (noted 'CANCELED'), the unit associated with the event record at the time it became effective is one of the values 200108022 (noted 'Emergency'), the event type code is 3 (noted 'TRANSFER IN'), the department id associated with the event record is one of 17 values, and carrying the department group along with 4 additional columns.
+
+— #AllMeds
+  The selection includes records of medication administrations where the taken time is before the base population's ED departure time while in ED, the route of administration is intravenous, and the MAR action category number is one of 16 values, carrying the encounter id, the order med id, the taken time, the medication name, the thera class code, the med route code, and 6 additional columns.
+
+— #BPA
+  The base population selection, matched in clinical alerts records (the locators that were activated is '900130001') and in alert history records: the moment when the warning is dismissed following certain actions is between the adt arrival time and the ed departure time (inclusive); carrying the time line, and 9 carried-through columns.
+
+— #BasePopABX
+  The abx selection includes medications with an id from medication orders, matched in medications records, med mix components records, ref generic med records, and config value set records where the value_set unique is 3016 and the taken time is before the allmeds selection's ed departure time, carrying the encounter id, the order med id, the abx admin time, the medication name, and the thera class code.
+
+— #BasePopBolus
+  One record per encounter id and taken time and order med id and medication name: The taken time is before the ED departure time while in ED; the hv discr freq id is '300902'; the route of administration is intravenous; the MAR action category number is one of 16 values; carrying the encounter id, the order med id, the taken time, the medication name, the thera class code, the med route code, and 6 additional columns.
+
+— #Base_Pop
+  One record per distinct combination of its columns, matched in hospital encounters records and in ed encounters dm records and in patients records: The date when the patient arrived is between the d start date parameter and the d end date parameter (inclusive); carrying the age at arrival months, the age at arrival years, the adt arrival date, and 19 carried-through columns.
+
+— #Base_Pop_ED_Readmit
+  One record per distinct encounter id, matched in the base pop and in ed encounters dm records where the arrival dttm is between the ed departure time and 24 hours after the ed departure time (inclusive); carrying the encounter id.
+
+— #Base_Pop_ED_Readmit_All
+  One record per distinct encounter id, matched in ed encounters dm records (the arrival dttm is between the ed departure time and 24 hours after the ed departure time (inclusive)), carrying the encounter id.
+
+— #Base_Pop_ENC_Reason
+  One record per distinct encounter id and all enc reasons, matched in encounter visit reasons records where the line_number of the reason for visit within the encounter exceeds 1 and in visit reasons records where the line_number of the reason for visit within the encounter exceeds 1; carrying the all enc reasons and 1 carried-through column.
+
+— #Base_Pop_SepsisScores_ConCat
+  One record per distinct encounter id and all sepsis scores, carrying the inpatient data id, the encounter id, the adt arrival time, the ed departure time, the age months, the age years, and 4 more columns.
+
+— #Base_Pop_Severe_ED_Scores
+  The flowsheets selection includes records where the recorded time is between the adt arrival time and the ed departure time (inclusive) and the flo meas id is one of the values '9000161709' or '9000002613', carrying the inpatient data id, the encounter id, the adt arrival time, the ed departure time, the age months, the age years, and 4 more columns.
+
+— #BedEvents
+  The base population selection, matched in ed patient info records and in ed event info records (the event type is one of the values '2600000347', '2600000346') and in ed event templates records, carrying the event time, the event id, the record id, and the record name.
+
+— #BloodPressure
+  The flowsheets selection includes records where the recorded time is between the adt arrival time and the ed departure time (inclusive) and the flo meas id is one of the values '95', '9001140203', or '9001140205', carrying the encounter id, the flo meas id, the recorded time, and the meas value.
+
+— #Cultures
+  The positive cultures selection includes one record per encounter id and culture type, where the order time is between the adt arrival time and the ed departure time, carrying the encounter id, the order proc id, the ord value, the result time, and 11 more columns.
+
+— #ED2GEN
+  The adt selection, matched in departments records: The dept group is 'GenCare'; carrying the department id, department name, and 4 carried-through columns.
+
+— #ED2HEMONC
+  The adt selection: The dept group is 'HemOnc'; carrying the time line, and 4 carried-through columns.
+
+— #ED2ICU
+  The adt selection: The dept group is 'ICU'; carrying the dept group, and 4 carried-through columns.
+
+— #ED_BORDER
+  The base population's ED encounters that had an 'ED BOARDER PATIENTS' event — one row per encounter, carrying only its encounter id; a membership list.
+
+— #ED_NegativeScores
+  The base pop severe ed scores includes records where the meas value is at most 4, no matching record exists in the ed positivescores, carrying the first time line, the last time line, and 3 carried-through columns.
+
+— #ED_PositiveScores
+  The base pop severe ed scores selection includes records where the recorded time is between the adt arrival time and the ed departure time, and the flo meas id is one of '9000161709' or '9000002613', carrying the time line and 3 carried-through columns.
+
+— #EncounterWeights
+  The flowsheets selection: The flo meas id is '94' (noted 'Weight'); carrying the inpatient data id, the encounter id, the adt arrival time, the ed departure time, the age months, the age years, and 4 more columns.
+
+— #Final
+  The base pop selection, combined with severe sepsis staging records and non severe sepsis staging records, carrying the age in days count, the age in days indicator, the ed arrival date, the screened positive 01, the first positive score am/pm, the arrival to first abx admin time, the triage to first abx admin time, the first positive screen to first abx time and 92 more computed columns, and 81 carried-through columns.
+
+— #FirstABXAdminTimeDetails
+  The basepopabx selection includes encounters with the first antibiotic administration time noted 'LOOK FOR FIRST ANTIBIOTIC ADMINISTRATION ONLY', where the action instant is below the basepopabx selection's abx admin time noted 'MAKE SURE WE ARE LOOKING AT THE RIGHT MEDICATION ADMIN TIME.', carrying the encounter id, the order med id, the order date and time, the in verify queue time, the verified in queue time, the queue verified by, and three more columns.
+
+— #FirstPositiveOD_To_ABXAdminTime
+  One record per encounter id, matched in the ed positive scores selection (the recorded time is before the abx admin time; the first time line is 1), carrying the posod2 abx, and 4 carried-through columns.
+
+— #Flowsheets
+  The base population selection, matched in flowsheet records and in flowsheet measurements records, includes unique identifiers for the flowsheet group linked to readings, where the recorded time is recorded, the meas value is recorded, and the recorded time is on or before the base population's ed departure time, carrying the inpatient data id, the encounter id, the adt arrival time, the ed departure time, the age months, the age years, and 4 more columns.
+
+— #Hypotension
+  The hypotensive systolic blood pressure selection: the recorded time is between the adt arrival time and the ed departure time (inclusive) and the flo meas id is '95'; carrying the hypotension y and 2 carried-through columns.
+
+— #LDA
+  One record per encounter id and lda placement type from timeordered ldas, carrying the lda placement type and 5 carried-through columns.
+
+— #Labs
+  One record per encounter id and lab test type where the order time is between the adt arrival time and the ed departure time, carrying the component id, the encounter id, the order proc id, the ord value, the result flag code, the result time, and 11 carried-through columns.
+
+— #Labs_and_Cultures
+  The selection includes lab order results and procedure orders where the order time is between the adt arrival time and the ed departure time, carrying the component id, the encounter id, the order proc id, the ord value, the result flag code, the result time, and 11 carried-through columns, with the unique identifier for the procedure record associated being one of 9 values or the source category of the procedure order being 304 (noted 'Lumber puncture') and the unique identifier for the procedure record associated being one of the values 600005 (noted 'BODY FLUID CULTURE, AEROBE AND GRAM STAIN'), 600006 (noted 'BODY FLUID CULTURE, AEROBE, ANAEROBE, AND GRAM STAIN'), 600002 (noted 'CSF CULTURE AND GRAM STAIN').
+
+— #PatientLocation
+  The selection includes records of patient location history, where each record has a matching base population record, carrying the encounter number, the moment the patient was transferred to the department, and the name associated with the department.
+
+— #Pressors
+  One record per distinct encounter id and taken time and medication name and time line, matched in grouper med records: The taken time is between the adt arrival time and the ed departure time (inclusive); The unique identifier for the base grouper record is VCG-.1 is one of 5 values; carrying the time line, and 3 carried-through columns.
+
+— #SSOrderSet
+  The ssorder set osq prl selection includes the order metric ids from medication orders ext records, where the prl orderset id is one of the values 400001 or 4001326023, carrying the encounter id, the order dttm, and the prl orderset id.
+
+— #SepsisAlertCancelled
+  The flowsheets selection includes records where the recorded time is between the adt arrival time and the ed departure time (inclusive) and the flo meas id is '9001125002', carrying the sepsis alert canc flag, the time line, and 3 carried-through columns.
+
+— ABX
+  The allmeds selection includes medications with an id from medication orders, matched in medications records, med mix components records, ref generic med records, and config value set records where the value_set unique is 3016, and the taken time is before the allmeds selection's ed departure time (noted 'including prior to "Arrival"'), carrying the encounter id, the order med id, the abx admin time, the medication name, and the thera class code (noted 'Antibiotics').
+
+— AllCultures
+  The labs and cultures selection includes lab order results and procedure orders where the order time is between the adt arrival time and the ed departure time, carrying the encounter id, the order proc id, the ord value, the result time, and 11 more columns.
+
+— All_LDAs
+  The selection includes records of airway devices with a placement instant recorded between the adt arrival time and the ed departure time, where the flowsheet id is '900112', '900111', or the value set id is 3022 (noted 'SEPSIS_CVL_PLACEMENT'), carrying the lda placement type and 5 carried-through columns.
+
+— NegativeCultures
+  One record per encounter id and culture type, where the order time is between the adt arrival time and the ed departure time, carrying the encounter id, the order proc id, the ord value, the result time, and 11 more columns.
+
+— OrderMetricIDs
+  The base population selection, matched in order tracking metrics records: the date and time when the order was created is between the adt arrival time and the ed departure time (inclusive); carrying the encounter id, the order id, the order dttm, the prl orderset id.
+
+— PositiveCultures
+  One record per encounter id and culture type, where the order time is between the adt arrival time and the ed departure time, carrying the encounter id, the order proc id, the ord value, the result time, and 11 more columns.
+
+— SSOrderSetOSQ_PRL
+  The order metric ids selection, matched in medication orders ext records, includes records where the prl orderset id is one of the values 400001 ('Sepsis Pathway [400001]') or 4001326023 ('HS ED ONCOLOGY SEPSIS RN PROTOCOL O'), carrying the encounter id, the order id, and the order dttm; also: The prl orderset id is one of the values 400001, 4001326023 (noted 'Sepsis Pathway [400001]; HS ED ONCOLOGY SEPSIS RN PROTOCOL O').
+
+— Systolic
+  The flowsheets selection includes records where the recorded time is between the adt arrival time and the ed departure time (inclusive) and the flo meas id is '95' (noted 'Blood pressure'), carrying the hypotensive systolic bp, the hypotension y, and 2 carried-through columns.
+
+— TimeOrdered_LDAs
+  The all ldas selection, carrying the lda placement type, and 5 carried-through columns.
+
+— TimeOrdered_Labs
+  The labs and cultures selection includes lab order results and procedure orders where the order time is between the adt arrival time and the ed departure time, carrying the component id, the encounter id, the order proc id, the ord value, the result flag code, the result time, and 11 carried-through columns, with the unique identifier for the procedure record associated being one of 9 values or the source category of the procedure order being 304 or the unique identifier for the procedure record associated being one of the values 600005, 600006, or 600002.
+
+— delivery
+  The final selection includes patients from the base population with severe ED scores, where the recorded time is between the adt arrival time and the ed departure time, and the flo meas id is one of the specified values, carrying the last bp to first positive score time, the last bp to first negative score time, the first positive score time to first bp, the first negative score time to first bp, the fps bolus abx re screen compliance, and 12 carried-through columns.

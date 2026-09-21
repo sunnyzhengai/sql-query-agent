@@ -122,10 +122,11 @@ def test_dry_run_speaks_composed_texts_first(monkeypatch, tmp_path,
 
 def test_dry_run_statement_lines_wear_the_scope_head(
         monkeypatch, tmp_path, capsys):
-    """Q5 (Brief_Pilot_Build_3, "agree with all five"): dry_run's
-    statement lines borrow the built scope's head clause at
-    render — a derivable display join; the stored text is
-    untouched."""
+    """Q5 (Brief_Pilot_Build_3) EXTENDED at Brief_Description_
+    Levels Q3 (b) (built 2026-09-20): dry_run's statement line
+    wears the scope's sentence MINUS the payload tail, colon-
+    joined — render-time, the stored text untouched (the TD's
+    pipeline keeps the head-clause form, Q1 (b))."""
     base = _estate(tmp_path)
     store = _Store([
         _Node("f1.sql::#Base_Pop", "scope", {
@@ -140,5 +141,30 @@ def test_dry_run_statement_lines_wear_the_scope_head(
         (store, base))
     fabric_run.dry_run(str(base))
     out = capsys.readouterr().out
-    assert ("Builds the base pop selection (events records)."
-            in out)
+    assert ("Builds the base pop selection: events records: "
+            "The seq is 1." in out)
+
+
+def test_dry_run_file_speaks_the_short_block(monkeypatch, tmp_path,
+                                             capsys):
+    """Brief_Description_Levels Q1 (b) (built 2026-09-20): the
+    end-user surface renders the SHORT BLOCK — the headline, never
+    the appendix flood; the stored TD stands byte-identical for
+    governance and a pointer line names it."""
+    base = _estate(tmp_path)
+    td = ("Delivers the final selection, carrying stuff. "
+          "Pipeline: (1) Builds x. Presents: a; b. "
+          "Population filters: FLOOD-SENTINEL. "
+          "Inner joins: JOIN-FLOOD.")
+    store = _Store([_Node("db.dbo.f1.sql::file", "file",
+                          {"technical_definition": td})])
+    monkeypatch.setattr(
+        console, "build_store",
+        lambda estate, journal_path=None, descriptions=True:
+        (store, base))
+    fabric_run.dry_run(str(base))
+    out = capsys.readouterr().out
+    assert "Delivers the final selection, carrying stuff." in out
+    assert "FLOOD-SENTINEL" not in out
+    assert "JOIN-FLOOD" not in out
+    assert "full technical definition" in out  # the pointer line

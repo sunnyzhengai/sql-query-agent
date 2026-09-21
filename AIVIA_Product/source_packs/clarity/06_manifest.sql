@@ -1,4 +1,4 @@
--- clarity-pack-1.1 · Script 6 -> the manifest.json values
+-- clarity-pack-1.2 · Script 6 -> the manifest.json values
 --
 -- Copy the results into manifest.json EXACTLY as returned.
 -- db_name and server are OPTIONAL (MR1a, 2026-09-19): omit both
@@ -10,7 +10,7 @@
 --  "source": "clarity",
 --  "operator": "<your name>",
 --  "as_of": "<as_of below>",
---  "source_pack_version": "clarity-pack-1.1",
+--  "source_pack_version": "clarity-pack-1.2",
 --  "default_schema": "dbo"
 -- }
 SELECT

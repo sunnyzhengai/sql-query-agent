@@ -1,4 +1,26 @@
 {
-  "_comment": "Vendor facts the engine reads mechanically (Brief_Pilot_Build_1, ruling (5): default_schema fills the estate manifest template FROM THE PACK — vendor knowledge lives in the pack, never in the engine). Clarity tables live in dbo on every Epic system.",
-  "default_schema": "dbo"
+  "_comment": "Vendor facts the engine reads mechanically (Brief_Pilot_Build_1, ruling (5): default_schema fills the estate manifest template FROM THE PACK — vendor knowledge lives in the pack, never in the engine). Clarity tables live in dbo on every Epic system. naming_conventions added at clarity-pack-1.2 (Brief_Pilot_Build_2, ruling (6) 'i agree with option a': per-vendor naming knowledge lives IN THE SOURCE PACK; the voicing ladder is blessed name -> pack convention -> readable identifier; estates with no pack are untouched). Suffix rules authored from Epic's documented Clarity column conventions; matching is longest-suffix-first, case-insensitive; the engine reads suffix + rule, 'speaks' documents the resulting voice for the gap-check eye.",
+  "default_schema": "dbo",
+  "naming_conventions": [
+    {
+      "suffix": "_C",
+      "rule": "category_code",
+      "speaks": "the stem words without the suffix — the category values map supplies the meaning (values.csv, R8 precedence); ENC_TYPE_C speaks 'enc type', never 'enc type c'"
+    },
+    {
+      "suffix": "_YN",
+      "rule": "yes_no_flag",
+      "speaks": "<stem words> yes/no flag — ADMITTED_YN speaks 'admitted yes/no flag'"
+    },
+    {
+      "suffix": "_DTTM",
+      "rule": "datetime_words",
+      "speaks": "<stem words> date and time — ADM_DTTM speaks 'adm date and time'"
+    },
+    {
+      "suffix": "_DATE_REAL",
+      "rule": "internal_date",
+      "speaks": "<stem words> date (internal decimal form) — CONTACT_DATE_REAL speaks 'contact date (internal decimal form)'"
+    }
+  ]
 }

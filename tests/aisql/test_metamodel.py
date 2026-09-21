@@ -102,6 +102,11 @@ def test_every_loaded_registry_is_ratified_v1():
     # the 31-statement debt retires) — after 1.46.0 = M5 (Sunny's "approved" +
     # "ratified", 2026-09-17): statement PRESENT, Statement_
     # Voicings library, the (b) 36/31 split, the F2+F4 export fix
+    # 1.52.0 = THE SCRIBE GROWS (Brief_Description_Levels Q2 (a),
+    # 2026-09-20: Seat_Prompts scribe 1.2.0 — purpose + themed
+    # outputs for files, caged and approved-only);
+    # 1.51.0 = THE FUNCTION LIBRARY GROWS + ONE-LIBRARY-TWO-READERS
+    # (Brief_Pilot_Build_2 slice C, 2026-09-20);
     # 1.50.0 = THE GRAIN-SOURCE CAPTURE (Brief_Pilot_Build_3,
     # Sunny "approved, build brief 3" 2026-09-20): GROUP BY refs +
     # DISTINCT + OVER contents + the IF guard's THEN kind, one
@@ -110,7 +115,7 @@ def test_every_loaded_registry_is_ratified_v1():
     # the corpus re-parse trigger — after
     for reg in metamodel.load_all().values():
         assert reg.ratified is True
-        assert reg.version == "1.50.0"
+        assert reg.version == "1.52.0"
 
 
 def test_load_single_exposes_sheets_and_stamp():

@@ -10,7 +10,7 @@ Proves: contract:aisql-design-to-code
 """
 import pytest
 
-from aisql.flows import produce, speech
+from aisql.flows import speech
 from aisql.graph.read_api import ReadApi
 from aisql.lenses import decisions
 
@@ -35,9 +35,21 @@ def test_every_scope_stores_a_description(world):
 
 
 def test_stored_equals_recomputed_the_verbatim_law(world):
-    """R14 (v2.14.0, Brief_Pilot_Build_3): the stored text is the
-    Business Term sentence — stored == recomputed, byte-exact."""
+    """R16 (v2.16.0, Brief_Business_Voice): the stored text is the
+    tier's answer — blessed > gate-passed proposed > the mechanical
+    R14 floor — recomputed through THE ONE DOOR
+    (business_voice.effective_sentence, the registry read as input
+    data exactly like KG1 descriptions). stored == recomputed,
+    byte-exact."""
+    import pathlib
+
+    from aisql.flows import business_voice
     _store, read = world
+    glossary = (pathlib.Path(__file__).resolve().parents[2]
+                / "AIVIA_Product" / "estates" / "sepsis" / "glossary")
+    rows = business_voice.load_rows(glossary)
+    synonyms = business_voice.load_synonyms(glossary)
+    acronyms = business_voice.load_acronym_expansions(glossary)
     trees = read.trees()
     by_id = {n.identity: n for n in read.nodes("scope")}
     checked = 0
@@ -46,7 +58,9 @@ def test_stored_equals_recomputed_the_verbatim_law(world):
             node = by_id.get(scope["name_key"])
             if node is None:
                 continue
-            sentence = produce.scope_sentence(read, tree, scope)
+            sentence, _tier = business_voice.effective_sentence(
+                read, tree, scope, rows, synonyms=synonyms,
+                acronyms=acronyms)
             assert node.properties["description"] == sentence, \
                 scope["name_key"]
             checked += 1

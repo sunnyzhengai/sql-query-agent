@@ -8,6 +8,21 @@ Versioning follows [Semantic Versioning](https://semver.org/).
 
 ## [Unreleased]
 
+### Fixed — CI's lint step returns to the retired reality (Brief_CI_Lint)
+- The ci.yml lint line drops `notebooks/` (untracked, local-only)
+  and `./*.Notebook/` (folders retired 2026-09-19) — both E902'd
+  every CI run since; the line is now
+  `ruff check src/ tests/ scripts/ devtools/` and
+  tests/test_ci_lint_paths.py pins every lint path to the tracked
+  tree, glob-free.
+- devtools/answer_evals.py, devtools/grounding_evals.py, and
+  devtools/local_llm.py RETIRED: the evals import the retired
+  src.orchestrator/src.parser and could not run at all; local_llm
+  was consumed only by them. The tripwire pins them gone.
+- The ruff-before-push habit is now `--no-cache` (CLAUDE.md): a
+  stale local cache reported "all passed" on the exact files CI
+  failed.
+
 ### Fixed — the honest pure-anaphor clarify returns; the connection filter filters again (Brief_Anaphor_Clarify)
 - THE ESTATE-VOCABULARY GATE (ruled 2026-09-20, "agree with all
   four, build it"): a reference-marked mention with an empty
@@ -30,6 +45,58 @@ Versioning follows [Semantic Versioning](https://semver.org/).
   FL24, Contract_Logic_Layer).
 
 ---
+
+## [2.5.0] - 2026-09-20
+
+### Changed — the voicing repairs (Brief_Pilot_Build_2, slice C; Grammar Floor R15, v2.15.0; registries 1.51.0/1.52.0)
+- Column-to-column comparisons name BOTH owners — "The ed
+  encounters fact record's encounter is the hospital encounters
+  record's encounter."; the "the x is the x" tautology cannot
+  print again (R15.a, with the records-records possessive guard).
+- The temporal-window idiom: comparisons against
+  DATEADD(unit, ±N, GETDATE()) speak "within the last/next N
+  <unit>s"; a negative DATEADD offset speaks "before"; ISNULL
+  with a far-future sentinel speaks "(treating a missing date as
+  open-ended)"; CONVERT is transparent in WHERE; GETDATE speaks
+  "the current date and time". One library, two readers: WHERE
+  operands fill from the same Function_Voicings rows as computed
+  outputs (GETDATE, LAG, LEAD rows added).
+- The pack naming ladder (ruling (6)): blessed name → pack
+  convention → readable identifier; clarity-pack-1.2 carries the
+  suffix rules (_C, _YN, _DTTM, _DATE_REAL); estates without a
+  pack are untouched.
+- Join descriptions normalize their ON fragments (embedded
+  newlines/tabs die; inline -- comments speak as "(noted …)").
+- AND/OR pairs speak "Both of its parts hold." / "Either of its
+  parts holds."; LAG/LEAD speak the slotted window form; the
+  noun-phrase gate sends verb-led dictionary descriptions to the
+  identifier tier instead of printing broken subjects.
+
+### Fixed — two condition-store defects (counted, decomposed exactly)
+- A searched CASE's WHEN branches minted TWICE (the mapper's
+  select_refs alias — the condition walker now carries the same
+  skip _derived_members had); 389 duplicate rows retired on the
+  dev estate.
+- A NOT predicate minted its child as a second row speaking the
+  OPPOSITE sentence (ruling (9): fold entirely) — 123 child rows
+  retired, their column links absorbed by the folded row.
+  Dev-estate conditions 1147 → 635 (= 635 + 389 + 123,
+  conservation exact); sepsis corpus 6018 → 3891.
+
+### Changed — each level answers one question (Brief_Description_Levels)
+- dry_run's FILE entry is now the end-user SHORT BLOCK — proc
+  headline · window (parameter-bound filters) · reads (source
+  tables) · a pointer to the stored full technical definition,
+  which stands byte-identical as the Collibra governance field.
+- dry_run's STATEMENT lines carry the built selection's meaning
+  after a colon ("Builds the allmeds selection: the base pop
+  selection, matched in …") — render-time, nothing new stored.
+- Noted-label value lists compress past 3 members in the scope
+  sentence (bare lists keep 6); full lists stay on the condition
+  rows.
+- The Scribe prompt (Seat_Prompts 1.2.0): a FILE's description
+  grows to purpose + "Reports: <themed groups>" — caged,
+  evidence-only, approved-only.
 
 ## [2.4.0] - 2026-09-20
 

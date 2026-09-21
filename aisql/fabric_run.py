@@ -136,6 +136,51 @@ def _write_manifest_template(base, sql_dir):
           "estate SQL was captured)")
 
 
+def _file_block(store, fnode, td):
+    """Q1 (b) — THE END-USER BLOCK: headline (the TD's own
+    opening) · window (the file's scope-rooted parameter-bound
+    condition phrases, stored words) · reads (the distinct source
+    tables, readable words) · the pointer line. Derivable — the
+    stored TD never re-shapes; a scripted double without edges
+    simply omits the window and reads lines."""
+    from aisql.flows.produce import _readable_name
+    lines = []
+    headline = str(td or "").split(" Pipeline: ")[0].strip()
+    if headline:
+        lines.append(f"  proc: {headline}")
+    get_edges = getattr(store, "current_edges", None)
+    if get_edges is not None:
+        def _mine(node_id):
+            fid = node_id.split("::")[0]
+            return (fnode.identity == fid
+                    or fnode.identity.endswith("/" + fid))
+        conds = {c.identity: c for c in store.current_nodes()
+                 if c.label == "condition"
+                 and "::stmt/" not in c.identity
+                 and _mine(c.identity)}
+        window = []
+        for e in get_edges("resolves_to"):
+            if e.from_id in conds and "::param/" in e.to_id:
+                phrase = conds[e.from_id].properties.get(
+                    "description", "")
+                if phrase and phrase not in window:
+                    window.append(phrase)
+        if window:
+            lines.append("  window: " + " ".join(sorted(window)))
+        tables = set()
+        for kind in ("left_side", "right_side"):
+            for e in get_edges(kind):
+                if _mine(e.from_id) and e.to_id.count("|") == 2:
+                    tables.add(_readable_name(
+                        e.to_id.rsplit("|", 1)[-1]))
+        if tables:
+            lines.append("  reads: " + ", ".join(sorted(tables)))
+    lines.append("  (the full technical definition is the stored "
+                 "governance field — Collibra's "
+                 "technical_definition)")
+    return lines
+
+
 def dry_run(estate: str):
     """Boot the estate, speak the census + every governance text.
     Returns the store so later cells can keep asking it."""
@@ -158,17 +203,21 @@ def dry_run(estate: str):
     speaking = [n for n in nodes
                 if n.properties.get("technical_definition")
                 or n.properties.get("description")]
-    # Q5 (Brief_Pilot_Build_3): statement lines borrow the built
-    # scope's head clause at RENDER — derivable, stored never
+    # Q3 (b) (Brief_Description_Levels, built 2026-09-20): the
+    # END-USER statement line wears the scope's sentence minus
+    # the payload tail — render-time; the stored text and the
+    # TD's head-clause pipeline are untouched
     from aisql.flows import produce
-    heads = {}
+    meanings = {}
     for n in speaking:
         if n.label != "scope" or "::" not in n.identity:
             continue
-        head = produce.scope_head(n.properties.get("description"))
-        if head:
+        meaning = produce.scope_meaning(
+            n.properties.get("description"))
+        if meaning:
             fid, name = n.identity.rsplit("::", 1)
-            heads.setdefault(fid, {})[produce._squash(name)] = head
+            meanings.setdefault(fid, {})[
+                produce._squash(name)] = meaning
     # literal: frame — the ruled speaking order (Brief_Dryrun_Order)
     first = ("file", "scope", "statement")
     labels = list(first) + sorted(
@@ -186,12 +235,18 @@ def dry_run(estate: str):
             td = n.properties.get("technical_definition")
             desc = n.properties.get("description")
             if td:
-                print(f"  technical definition: {td}")
+                # Q1 (b) (Brief_Description_Levels, built
+                # 2026-09-20): the end-user surface speaks the
+                # SHORT BLOCK — headline · window · reads — never
+                # the appendix flood; the stored TD stands
+                # byte-identical for governance
+                for line in _file_block(store, n, td):
+                    print(line)
             if desc:
                 if label == "statement" and "::" in n.identity:
                     fid = n.identity.rsplit("::", 1)[0]
-                    desc = produce.statement_display(
-                        desc, heads.get(fid, {}))
+                    desc = produce.statement_enduser(
+                        desc, meanings.get(fid, {}))
                 print(f"  description: {desc}")
     print(f"\n{spoken} node(s) carry governance text · "
           f"{len(nodes)} nodes total")

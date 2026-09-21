@@ -15228,7 +15228,8 @@
    "reporting/USP_ED_SEPSIS.sql::delivery",
    "reporting/USP_IP_SepsisDates.sql::delivery"
   ],
-  "status": "unreviewed"
+  "status": "unreviewed",
+  "nomination_version": "bv1"
  },
  "delivr": {
   "carriers": 1,
@@ -15959,7 +15960,8 @@
    "DISCHARGE_DISPOSITION_CODE",
    "ED_DISPOSITION_CODE"
   ],
-  "status": "unreviewed"
+  "status": "unreviewed",
+  "nomination_version": "bv1"
  },
  "dispqty": {
   "carriers": 1,
@@ -21480,7 +21482,8 @@
    "IP_SepsisEncountersWLocations",
    "IP_SepsisPatientDates"
   ],
-  "status": "unreviewed"
+  "status": "unreviewed",
+  "nomination_version": "bv1"
  },
  "ipemr": {
   "carriers": 1,
@@ -22529,7 +22532,8 @@
    "MEAS_LOCATION",
    "BELONG_LOCATION"
   ],
-  "status": "unreviewed"
+  "status": "unreviewed",
+  "nomination_version": "bv1"
  },
  "locations": {
   "carriers": 1,
@@ -26172,7 +26176,8 @@
   "sample": [
    "PATENCENCID"
   ],
-  "status": "unreviewed"
+  "status": "unreviewed",
+  "nomination_version": "bv1"
  },
  "path": {
   "carriers": 1,
@@ -26219,7 +26224,8 @@
   "sample": [
    "PATIENTMRN"
   ],
-  "status": "unreviewed"
+  "status": "unreviewed",
+  "nomination_version": "bv1"
  },
  "patients": {
   "carriers": 1,
@@ -28790,7 +28796,8 @@
    "PATIENT_RACE_CODE",
    "Race"
   ],
-  "status": "unreviewed"
+  "status": "unreviewed",
+  "nomination_version": "bv1"
  },
  "rad": {
   "carriers": 1,

@@ -38,9 +38,12 @@ jobs:
 
       - name: Lint with ruff
         run: |
-          # Everything: production notebooks live in *.Notebook/, and unlinted
-          # notebooks/scripts once hid a 100%-broken MERGE (audit 2026-08-15)
-          ruff check src/ tests/ notebooks/ scripts/ devtools/ ./*.Notebook/
+          # Tracked paths only (F13, Brief_CI_Lint 2026-09-20): the
+          # *.Notebook/ folders retired 2026-09-19 and notebooks/ is
+          # untracked local scratch — a lint path the checkout lacks
+          # is E902, not coverage. tests/test_ci_lint_paths.py pins
+          # every path here to the tracked tree.
+          ruff check src/ tests/ scripts/ devtools/
 
       - name: Run tests
         run: |

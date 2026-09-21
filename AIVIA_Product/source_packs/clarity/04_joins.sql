@@ -1,4 +1,4 @@
--- clarity-pack-1.1 · Script 4 -> joins.csv
+-- clarity-pack-1.2 · Script 4 -> joins.csv
 -- (fk_num,ordinal,src_schema,src_table,src_column,
 --  dest_schema,dest_table,dest_column)
 --

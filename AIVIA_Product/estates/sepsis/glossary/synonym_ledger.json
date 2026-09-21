@@ -1,0 +1,49 @@
+{
+ "administered": {
+  "source_word": null,
+  "proposed_at": "2026-09-21T20:38:58Z",
+  "model": "gpt-4o-mini"
+ },
+ "discharge": {
+  "source_word": "disch",
+  "proposed_at": "2026-09-21T22:30:04Z",
+  "prompt_version": "s2",
+  "model": "gpt-4o-mini"
+ },
+ "entries": {
+  "source_word": null,
+  "proposed_at": "2026-09-21T20:53:05Z",
+  "prompt_version": "s2",
+  "model": "gpt-4o-mini"
+ },
+ "falling": {
+  "source_word": null,
+  "proposed_at": "2026-09-21T20:53:05Z",
+  "prompt_version": "s2",
+  "model": "gpt-4o-mini"
+ },
+ "length": {
+  "source_word": null,
+  "proposed_at": "2026-09-21T20:53:05Z",
+  "prompt_version": "s2",
+  "model": "gpt-4o-mini"
+ },
+ "rollup": {
+  "source_word": null,
+  "proposed_at": "2026-09-21T20:53:05Z",
+  "prompt_version": "s2",
+  "model": "gpt-4o-mini"
+ },
+ "submission": {
+  "source_word": null,
+  "proposed_at": "2026-09-21T20:53:05Z",
+  "prompt_version": "s2",
+  "model": "gpt-4o-mini"
+ },
+ "witnesses": {
+  "source_word": null,
+  "proposed_at": "2026-09-21T20:53:05Z",
+  "prompt_version": "s2",
+  "model": "gpt-4o-mini"
+ }
+}

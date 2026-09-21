@@ -1,4 +1,4 @@
--- clarity-pack-1.1 · Script 2 -> columns.csv
+-- clarity-pack-1.2 · Script 2 -> columns.csv
 -- (schema,table,column,description,data_type)
 --
 -- DESCRIPTION must be the PROSE field (English sentences). Some

@@ -1,4 +1,4 @@
--- clarity-pack-1.1 · Script 5 -> values.csv (table,code,meaning)
+-- clarity-pack-1.2 · Script 5 -> values.csv (table,code,meaning)
 --
 -- THE GENERATOR (Sunny's ruling, 2026-09-19: "for any table that
 -- starts with ZC_, pull SELECT *. the 'NAME' column is always the

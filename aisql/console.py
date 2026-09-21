@@ -297,6 +297,52 @@ def run_name_proposals(estate: str, scope: str = "voiced") -> None:
           "the next console boot seeds them)")
 
 
+def make_sentence_seat(key: str):
+    """THE SENTENCE SEAT (Grammar_Floor §R16): the R5.b model
+    boundary widened from a word to a sentence — the whole prompt
+    (instructions + materials) is assembled per scope by
+    business_voice.proposal_prompt; the caller owns the
+    double-run, the gate, and the cache."""
+    def seat(prompt: str) -> str:
+        # literal: shape
+        out = _openai("chat/completions", {
+            "model": INTERPRETER_MODEL, "temperature": 0,
+            "messages": [{"role": "user", "content": prompt}],
+            "max_tokens": 300}, key)
+        return str(out["choices"][0]["message"]["content"]).strip()
+    return seat
+
+
+def run_sentence_proposals(estate: str) -> None:
+    """The R16 sentence batch, at Sunny's hand ONLY (the paid-call
+    law): proposes business sentences per scope; writes
+    proposed/disputed/rejected registry rows — a human flips
+    'blessed'; gate-passed `proposed` voices with status carried
+    (ruling 5). Runbook: python3.11 -c
+    \"import aisql.console as c; c.run_sentence_proposals('<estate>')\""""
+    from aisql.flows import business_voice
+    key = _env_key()
+    if not key:
+        print("no model key in the environment — the sentence seat "
+              "cannot sit (set the key, or author registry rows "
+              "by hand; the gate treats both identically)")
+        return
+    store, base = build_store(estate)
+    read = ReadApi(store)
+    counts = business_voice.propose_sentences(
+        read, base / "glossary", make_sentence_seat(key),
+        model=INTERPRETER_MODEL,
+        run_at=datetime.datetime.now(datetime.timezone.utc)
+        .strftime("%Y-%m-%dT%H:%M:%SZ"),
+        cache_path=base / ".cache" / "business_sentences.json")
+    print("sentence batch: " + " · ".join(
+        f"{v} {k}" for k, v in sorted(counts.items())))
+    print(f"review + bless by hand: "
+          f"{base / 'glossary' / 'business_sentences.json'} "
+          "(flip status to 'blessed', add blessed_by/blessed_at; "
+          "the next console boot voices them)")
+
+
 def render_phrase_corpus(estate: str) -> None:
     """THE PHRASE-CORPUS SWEEP (Sunny's go, 2026-09-14): render
     every stored voicing into one class-deduplicated artifact for

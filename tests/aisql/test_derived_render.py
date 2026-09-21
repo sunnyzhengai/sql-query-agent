@@ -246,4 +246,38 @@ def test_skeletons_mirror_the_registry():
 
 
 def test_grammar_version_bumped():
-    assert produce.FLOOR_GRAMMAR_VERSION == "2.14.0"
+    assert produce.FLOOR_GRAMMAR_VERSION == "2.15.0"
+
+
+# ---- R15.f LAG/LEAD SPEAK THE SLOT FORM (Brief_Pilot_Build_2
+# slice C, FL14 C5 (a) — Sunny "agree with all seven
+# recommendations, build it" 2026-09-20). RED before the rows. ----
+
+def test_lag_renders_the_slot_form():
+    m = member("PREV_BP",
+               fn("LAG", col(MEAS, "MEAS_VALUE"),
+                  over={"partition_by": [col(DOSE, "DOSE_AMT")],
+                        "order_by": [{"expr": col(ARRIVE,
+                                                  "ADT_ARRIVAL_TIME")}]}))
+    assert produce.derived_phrase(m, _voice()) == (
+        "Prev bp: the previous record's measured value within each "
+        "dose amount, ordered by the arrival time.")
+
+
+def test_lead_flag_only_keeps_the_slotless_phrase():
+    m = member("NEXT_BP", fn("LEAD", col(MEAS, "MEAS_VALUE"),
+                             over=True))
+    assert produce.derived_phrase(m, _voice()) == (
+        "Next bp: the next record's measured value in its ordered "
+        "sequence.")
+
+
+def test_lag_order_only_names_the_ordering():
+    m = member("PREV_BP",
+               fn("LAG", col(MEAS, "MEAS_VALUE"),
+                  over={"partition_by": [],
+                        "order_by": [{"expr": col(ARRIVE,
+                                                  "ADT_ARRIVAL_TIME")}]}))
+    assert produce.derived_phrase(m, _voice()) == (
+        "Prev bp: the previous record's measured value, ordered by "
+        "the arrival time.")

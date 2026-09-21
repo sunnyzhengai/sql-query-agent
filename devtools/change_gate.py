@@ -18,6 +18,34 @@ COVERED_ROOTS = ("aisql/", "src/", "devtools/", "tests/",
                  "AIVIA_Test/", "services/", "AIVIA_Product/")
 GATE_FILES = (".claude/settings.json", "devtools/change_gate.py")
 UNLOCKING = ("APPROVED", "BUILT")
+# the well-formedness rider (Brief_Business_Voice, 2026-09-20): an
+# ambiguity still marked OPEN under an unlocking status
+AMBIGUITY_OPEN = re.compile(r"\(\d+\)\s+OPEN\b")
+
+
+def malformed_briefs(briefs_dir: Path) -> list:
+    """The well-formedness rider: a malformed APPROVAL is itself a
+    breach. An unlocking brief may not carry an OPEN ambiguity
+    marker, and must declare at least one non-blank line under
+    `## Files declared`."""
+    bad = []
+    for brief in sorted(briefs_dir.glob("*.md")):
+        text = brief.read_text(errors="replace")
+        status = re.search(r"\*\*Status:\s*([A-Z]+)", text)
+        if not status or status.group(1) not in UNLOCKING:
+            continue
+        if AMBIGUITY_OPEN.search(text):
+            bad.append(f"{brief.name}: OPEN ambiguity under "
+                       f"{status.group(1)} — Sunny rules every "
+                       "ambiguity before code")
+        section = re.split(r"^## Files declared\s*$", text,
+                           maxsplit=1, flags=re.M)
+        body = "" if len(section) < 2 else \
+            re.split(r"^## ", section[1], maxsplit=1, flags=re.M)[0]
+        if not body.strip():
+            bad.append(f"{brief.name}: empty Files declared under "
+                       f"{status.group(1)}")
+    return bad
 
 
 def declared_paths(briefs_dir: Path) -> set:
@@ -61,7 +89,14 @@ def decide(payload: dict, project: Path):
     if not covered:
         return 0, None
 
-    if rel in declared_paths(project / "AIVIA_Design" / "briefs"):
+    briefs_dir = project / "AIVIA_Design" / "briefs"
+    bad = malformed_briefs(briefs_dir)
+    if bad:
+        return 2, ("THE HARD GATE, WELL-FORMEDNESS RIDER "
+                   "(Brief_Business_Voice): a malformed approval is "
+                   "a breach — " + "; ".join(bad))
+
+    if rel in declared_paths(briefs_dir):
         return 0, None
 
     return 2, (

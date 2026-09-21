@@ -1,7 +1,7 @@
 {
  "registry": "kg2_kind_library",
  "stamp": {
-  "version": "1.50.0",
+  "version": "1.52.0",
   "doc_section": "Level 1 / KG Layer 2 — kind library (T-SQL predicates)",
   "doc_stamp": "v1.0.0 (ratified 2026-09-05, Sunny); v1.1.0 twin-graph ruling ADR 0077; v1.2.0 Phase A metamodel bump; v1.3.0 Phase B composite-kinds correction; v1.4.0 T-2 operational-statements ruling; v1.5.0 the gap taxonomy; v1.6.0 the plug-all-holes sweep; v1.7.0 ledger close; v1.8.0 the ask console ADR 0078; v1.9.0 the list op; v1.10.0 kind vocabulary; v1.11.0 ADR 0079 interpreter; v1.12.0 Tier A build data; v1.13.0 the seat-failure law; v1.14.0 follow-up context; v1.15.0 anaphor vocabulary (all 2026-09-06); v1.16.0 THE JOIN-NODE RULING (Sunny 2026-09-10): logic gains the join node (left_side/right_side → table-or-scope, ON-resolved pair, syntactic side order; join has_part condition); clauseProvenance property retired (parentage carries it); joins_to stays dictionary-only); v1.17.0 M2 THE JOIN LAYER BUILT (2026-09-10): join/left_side/right_side flip PRESENT, join rows in Connection_Ledger + Speech_Sources; reads = the remainder); v1.18.0 M3 THE CONDITION LAYER BUILT (2026-09-10): condition/param/resolves_to flip PRESENT, uses_param ships, condition/param become store citizens (has_part/uses_param birth edges); joinType closed (the tree held it all along); v1.40.0 THE STRUCTURE-WORD CLAIM + THE RELATION-WORD SEAT (Sunny's 'fix these gaps' go, 2026-09-12): interpreter prompt 3.1.0 (relation words are referring words, marked in the caged relations field — the L4-D3 role precedent); edge kinds gain _edge self-speech rows (Notes stop serving as speech); _self scope speech names the subquery word (industry-standard for the grain); v1.41.0 THE NAMER SEAT (Grammar_Floor §R5.b riders c/d ruled, Sunny's 'rule riders c and d' 2026-09-12): Seat_Prompts gains the namer row 1.0.0 — the blessed-name proposer's prompt is registry law; selection from vendor words only, the GATE-SUBJ family stands behind it; v1.42.0 = THE READS RELATION SPEAKS (Sunny's 'fix all three gaps' go, 2026-09-14, from the live ADT_EVENTS round): Speech_Sources gains the _edge reads row — the v1.40.0 deferral CLOSES: its recorded reason (a 'read' constraint would veto join-side travel) is dissolved by the READS COMPOUND (the question relation expands to owner-to-side join travel + the declared reads remainder; a scope on a join's other side is being read, not reading) — speech row only, twin structure untouched; v1.43.0 = ERA 3 THE FROM-STRUCTURE FAMILY (Sunny's ratification 2026-09-14: 'ratified — build era 3, a1 if the probe passes'; a1 built as the ruled default, the probe blocked on capacity — the a2 relabel is the recorded contingency): every FROM clause walks the same sided shape — the direct_read node kind (one left_side, no ON, no type; twins ScriptDom's NamedTableReference) joins the ledger PRESENT and the reads edge RETIRES into it; absence lives in the KIND, never a null endpoint; one invariant stands: per scope, side-targets == read-set; v1.44.0 = THE FUNCTION-VOICING LIBRARY (Sunny's ruling 2026-09-16 at M4 planning, taking the recommendation; authored at his 'author the grammar rule + function library'): kg2_kind_library gains the Function_Voicings sheet — operation voicings are a CLOSED registry set (14 named functions, seed = the MEASURED ed_sepsis_dev twin census, conservation exact: top-level 154 = case 71 + DATEDIFF 41 + ROW_NUMBER 26 + MIN 4 + FLOOR 3 + arithmetic 3 + cast 3 + STUFF 2 + COALESCE 1; the 4 composite kinds voice by rule — case standing phrase, cast TRANSPARENT, unary sign-fold, arithmetic operator words), the kind-vs-label posture for functions: a new function is a registry row, never silent; the ADR 0076 code overlays (COALESCE, LEFT/RIGHT, DATEADD) absorb as rows VERBATIM, their produce.py hardcodes retire at the M4 build slice; an unlisted operation renders the safe fallback + a COUNTED REMAINDER row; Grammar_Floor §R12 THE COMPUTED OUTPUT (RATIFIED v2.10.0, Sunny 2026-09-16 'ratified — go on M4') is the speaking rule — registry rows only, twin structure untouched; both flagged drafts RULED same day at Sunny's word: MIN temporal args read 'earliest' ('yes, say earliest for dates') + THE STUFF LIST IDIOM ('rule the idiom': the compound row STUFF over FOR XML PATH('') voices as list-joining — STRING_AGG's meaning, matched before the literal row; meaning over syntax, the token-link-reduction precedent); v1.45.0 = M4 THE DERIVED-COLUMN LAYER BUILT (Sunny's 'ratified — go on M4', 2026-09-16): derived_column flips PRESENT (::dcol# grain, one node per computed output — STAY FLAT ruled same day, expression trees stay at L1) with scope—has_part→derived_column birth edges + scope—cites→column at STORE grain (cites re-based 100→97 by measurement: three twin-path heads collapse into named scopes — the joins-93→95 precedent); Connection_Ledger derived_column re-homes to has_part 'edged' (the defines pseudo stays for the ask surface, the M2 reads precedent); Speech_Sources derived_column speaks the STORED R12 phrase; grammar constant 2.10.0 (the declared deferral closes in this build's first slice); the mapper gains the arithmetic/unary operator property (twin untouched — the translator reads kind/name/args only); ROW_NUMBER partition/order + list-idiom <order> slots DEFERRED with recorded reasons (over/ORDER BY are structure flags, not contents); v1.46.0 = M5 THE STATEMENT LAYER (Sunny's 'approved' 2026-09-17, Brief_M5_Statement_Layer — every ambiguity ruled one at a time): statement flips PRESENT (::stmt/N grain = file::stmt/<position>, the 2026-09-10 identity ruling; twin-authored 67; subkind READ from the translator's T-2 field, never re-derived — one writer since 2026-09-06) with statement—has_part→scope birth edges pointing DOWN (built AFTER scopes BEFORE conditions — M5-1 'build order is the reverse. after scopes'); descriptions = R11 renders for the 36 data-producing, the 31 operational EMPTY-BY-RULE counted (the (b) ruling 'b': no fixed phrases restating the kind field — derivable is never stored); ruled-silent in the ask index (THE RULED-SILENT LIST, gap-checked + re-affirmed 'leave as is'); the 31 counted-missing in the connection census, landing M6 (file→statement); the Speech_Sources join row's stale 'with scopes' phrasing corrected same breath (scopes are IN)",
   "ratified": true,
@@ -413,7 +413,7 @@
    },
    {
     "Set": "FUNCTION_VOICING_OPS",
-    "Members": "DATEDIFF|ROW_NUMBER|DATEADD|CHARINDEX|LEFT|MIN|FLOOR|COALESCE|DATENAME|DATEPART|STUFF|ISNULL|ROUND|STRING_AGG|RIGHT",
+    "Members": "DATEDIFF|ROW_NUMBER|DATEADD|CHARINDEX|LEFT|MIN|FLOOR|COALESCE|DATENAME|DATEPART|STUFF|ISNULL|ROUND|STRING_AGG|RIGHT|GETDATE|LAG|LEAD",
     "Cites": "Function_Voicings sheet (v1.44.0; the closed named-function set — composite kinds voice by rule, Grammar_Floor §R12)"
    }
   ],
@@ -478,8 +478,8 @@
     "Operation": "DATEADD",
     "Kind": "function",
     "Slots": "unit, n, base",
-    "Voicing template (DRAFT — Sunny gap-checks phrasing)": "<n> <unit>s after <base>",
-    "Source": "ADR 0076 overlay ABSORBED verbatim",
+    "Voicing template (DRAFT — Sunny gap-checks phrasing)": "<n> <unit>s after <base>; NEGATIVE n (v1.51.0, FL10 C3): <n> <unit>s before <base> — the guard reads through the unary-minus wrapper, the raw fragment can never print for a negative offset again; GETDATE-relative COMPARISON idiom (law in Grammar_Floor R15): subject >= DATEADD(unit, -N, now) speaks 'is within the last N <unit>s', <= +N 'within the next N <unit>s'",
+    "Source": "ADR 0076 overlay ABSORBED verbatim; negative-offset + idiom riders Brief_Pilot_Build_2 (Sunny 'agree with all seven recommendations, build it' 2026-09-20)",
     "Estate count (measured 2026-09-16)": "13"
    },
    {
@@ -558,8 +558,8 @@
     "Operation": "ISNULL",
     "Kind": "function",
     "Slots": "a, b",
-    "Voicing template (DRAFT — Sunny gap-checks phrasing)": "<a>, or <b> when <a> is not recorded",
-    "Source": "authored 2026-09-16",
+    "Voicing template (DRAFT — Sunny gap-checks phrasing)": "<a>, or <b> when <a> is not recorded; FAR-FUTURE SENTINEL rider (v1.51.0, FL10 C3): <b> a date literal with year 2900+ speaks '<a>, treating a missing date as open-ended' — the sentinel is the author's open-ended idiom, never a real date",
+    "Source": "authored 2026-09-16; sentinel rider Brief_Pilot_Build_2 (2026-09-20)",
     "Estate count (measured 2026-09-16)": "1"
    },
    {
@@ -585,6 +585,30 @@
     "Voicing template (DRAFT — Sunny gap-checks phrasing)": "the last <n> characters of <s>",
     "Source": "ADR 0076 overlay ABSORBED verbatim (rides its LEFT pair)",
     "Estate count (measured 2026-09-16)": "0"
+   },
+   {
+    "Operation": "GETDATE",
+    "Kind": "function",
+    "Slots": "(none)",
+    "Voicing template (DRAFT — Sunny gap-checks phrasing)": "the current date and time (the R12 remainder row lands — FL10 named CONVERT and GETDATE rowless; CONVERT needs none, it maps as the cast kind and cast is TRANSPARENT on both paths since v1.51.0)",
+    "Source": "Brief_Pilot_Build_2 C3 (Sunny 'agree with all seven recommendations, build it' 2026-09-20)",
+    "Estate count (measured 2026-09-16)": "-"
+   },
+   {
+    "Operation": "LAG",
+    "Kind": "function (window)",
+    "Slots": "x, partition, order (captured contents; slotless fallback)",
+    "Voicing template (DRAFT — Sunny gap-checks phrasing)": "with captured over contents: the previous record's <x> within each <partition>, ordered by <order>; order-only: the previous record's <x>, ordered by <order>; flag-only fallback: the previous record's <x> in its ordered sequence — the R12 slot form (C5 (a): slice E's capture predates this row; never an empty slot in prose)",
+    "Source": "Brief_Pilot_Build_2 C5 (FL14; 2026-09-20)",
+    "Estate count (measured 2026-09-16)": "-"
+   },
+   {
+    "Operation": "LEAD",
+    "Kind": "function (window)",
+    "Slots": "x, partition, order (captured contents; slotless fallback)",
+    "Voicing template (DRAFT — Sunny gap-checks phrasing)": "with captured over contents: the next record's <x> within each <partition>, ordered by <order>; order-only: the next record's <x>, ordered by <order>; flag-only fallback: the next record's <x> in its ordered sequence (rides its LAG pair)",
+    "Source": "Brief_Pilot_Build_2 C5 (FL14; 2026-09-20)",
+    "Estate count (measured 2026-09-16)": "-"
    }
   ],
   "Structure_Kinds_Phase_A": [

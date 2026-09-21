@@ -1,4 +1,11 @@
-# The Floor Grammar — v2.14.0 (§R14 THE BUSINESS TERM SENTENCE
+# The Floor Grammar — v2.16.0 (§R16 THE BUSINESS VOICE TIER +
+# THE MEANING LADDER 2026-09-20, Brief_Business_Voice "agree
+# with all remaining open items, use your recommendations. make
+# sure we lock these in contracts" then B1–B3 + "build it";
+# v2.15.0 §R15 THE VOICING REPAIRS
+# 2026-09-20, Brief_Pilot_Build_2 slice C "agree with all seven
+# recommendations, build it";
+# v2.14.0 §R14 THE BUSINESS TERM SENTENCE
 # 2026-09-20, Brief_Pilot_Build_3 "approved, build brief 3";
 # v2.13.0 THE REPORT GRAIN rider 2026-09-18; v2.12.0 THE
 # CATCH-ALL 2026-09-17; v2.11.0 THE STATEMENT STEP same day;
@@ -10,10 +17,12 @@
 # v2.0.0 POLICY-WALK major 2026-09-06; v1.3.1 RATIFIED Sunny
 # 2026-09-05)
 
-**Status: RATIFIED v2.14.0 (§R14 + the R11/R12/R13 riders,
-2026-09-20 — Sunny's "approved, build brief 3" approved the
-PRESENTED worked examples; his eye on the re-voiced corpus closes
-the brief).**
+**Status: RATIFIED v2.15.0 (§R15 THE VOICING REPAIRS, slice C —
+Sunny's "agree with all seven recommendations, build it"
+2026-09-20; his eye on the re-voiced corpus after the shared
+closing run closes Brief_Pilot_Build_2). Prior: v2.14.0 (§R14 +
+the R11/R12/R13 riders, 2026-09-20 — "approved, build brief 3";
+his eye closes Brief_Pilot_Build_3).**
 (Header line added 2026-09-17, audit CI-C3.)
 
 *v2.14.0 (Brief_Pilot_Build_3, Sunny "approved, build brief 3"
@@ -1157,7 +1166,12 @@ The payload separator is ";" after a population or rank clause,
   Q3: identical subjects' betweens merge with "or between".
   Ruling (3) compression: IN-lists longer than 6 members speak
   "The \<subject\> is one/none of \<N\> values" — the FULL list
-  stays on the condition row.
+  stays on the condition row. AMENDED at Brief_Description_Levels
+  Q4 (a) ("agree with all seven recommendations", 2026-09-20; the
+  FL27 find — #BasePopBolus's 6 noted medications printed ~450
+  chars): a list whose members carry NOTED LABELS (annotation or
+  values-map meaning) compresses past 3 members; bare lists keep
+  the ruled 6. Compose time only, as ever.
 - **payload (Q1 + ruling (10))** — the named computed outputs
   (dcols) by readable name, first 8, then "and N more computed
   columns", then ", and N carried-through column(s)"; no dcols →
@@ -1186,8 +1200,14 @@ counted sentence. Both out of the Business-Term class.
   "Builds the base poptemp selection (the main adm details
   selection), preparing…". Derivable (produce.statement_display);
   the clause lives ONCE, on the scope; the stored R11 text is
-  untouched. Surfaces: dry_run's statement lines + R13's
-  pipeline.
+  untouched. Surfaces: R13's pipeline (the head clause stands
+  there — the TD stays byte-identical per Brief_Description_
+  Levels Q1 (b)). THE END-USER FORM (Q3 (b), built 2026-09-20):
+  dry_run's statement line wears the scope's WHOLE sentence
+  minus the payload tail, colon-joined — "Builds the allmeds
+  selection: the base pop selection, matched in …" —
+  produce.statement_enduser over produce.scope_meaning, both
+  derivable, nothing new stored.
 - **R12 THE SLOTS CLOSE (FL17's echo):** ROW_NUMBER with
   captured over contents voices "the record's position within
   each \<partition\>, ordered by \<order\>" (descending elements
@@ -1204,7 +1224,17 @@ counted sentence. Both out of the Business-Term class.
   Presents (content unchanged; the M7 report cherry-pick's
   source stays), then Population filters AND Inner joins BOTH
   grouped per selection (FL20). Byte pins re-based by
-  measurement (the answer-key precedent).
+  measurement (the answer-key precedent). THE END-USER BLOCK
+  (Brief_Description_Levels Q1 (b), built 2026-09-20): the
+  STORED TD stands byte-identical — the governance archive; the
+  end-user surfaces (dry_run today) render a SHORT BLOCK at
+  display time instead of the dump: the headline (the TD's own
+  opening, before " Pipeline: ") · the window (the delivery
+  chain's parameter-bound condition phrases, stored words) ·
+  the reads line (the distinct source tables, readable words) ·
+  a one-line pointer naming where the full definition lives.
+  Derivable, never stored twice (the Brief_Dryrun_Order
+  precedent — same bytes in the store, a new surface shape).
 
 ### What R14 does NOT touch
 
@@ -1228,3 +1258,270 @@ The twin walk and parsed_census stay symmetric over the new keys
 — the homomorphism holds untouched; the acceptance test is the
 partitioned ROW_NUMBER dcol whose stored phrase names its
 partition and its ordering (test_grain_capture.py).
+
+## R15 — THE VOICING REPAIRS (**RATIFIED v2.15.0, Sunny "agree
+## with all seven recommendations, build it" 2026-09-20 —
+## Brief_Pilot_Build_2, slice C of Brief_Pilot_Findings_R1
+## ruling (7); C1–C7 each quoted in the brief**)
+
+The slice-C phrase laws. Every re-voiced stored text re-bases by
+measurement at the shared closing run (one regen with
+Brief_Description_Levels, per its Q7).
+
+### R15.a — THE TWO-SIDED RELATION (FL9, C2 (a))
+
+EVERY column-to-column comparison (the six compare kinds) names
+BOTH owners — extends the v2.7.0 relation rule, which chose name
+words but dropped the owners, so `T1.X = T2.X` voiced "The x is
+the x":
+
+> The abx selection's encounter id is the base pop selection's
+> encounter id.
+
+Owner words: a SAME-TREE scope side speaks "the \<spoken
+selection\> selection's" (the author's selection name through
+_spoken_selection — R5.b standing); a table side speaks the
+BLESSED table name's possessive, else "\<readable table words\>
+record's" (C2 ruled the readable fallback INTO this position;
+R5.c's blessed-only law stands untouched for the recordedness
+pointer, its own seat). THE RECORDS-RECORDS GUARD
+(echo-mandated — the 2026-09-15 class): a table whose own words
+end in "records" folds the plural into the possessive —
+MED_ADMIN_RECORDS speaks "the med admin record's", never
+"records record's". An UNRESOLVED side keeps bare name words
+— honesty over invention. Column-to-value comparisons keep the
+v2.7.0 dictionary-definition subject unchanged.
+
+### R15.b — THE TEMPORAL-WINDOW IDIOM + ONE LIBRARY, TWO READERS (FL10, C3 — all five ratified)
+
+- **The idiom**: a comparison whose comparand is DATEADD(unit,
+  -N, \<now\>) — \<now\> = GETDATE() or a cast of it — speaks
+  "The \<subject\> is within the last N \<unit\>s."; the +N
+  future twin speaks "within the next N \<unit\>s". The idiom
+  fires at the PREDICATE, the compositional render stays for
+  every other DATEADD.
+- **The negative offset**: DATEADD with a unary-minus n voices
+  "\<n\> \<unit\>s before \<base\>" — the guard reads THROUGH
+  the wrapper (the raw fragment can never print for a negative
+  offset again).
+- **The open-ended sentinel**: ISNULL(\<date\>, \<literal with
+  year 2900+\>) speaks "\<a\> (treating a missing date as
+  open-ended)" — the parenthetical glues in every sentence
+  position; the far-future date is the author's open-ended
+  idiom, never a real date.
+- **ONE LIBRARY, TWO READERS**: the WHERE path (condition
+  subjects and operands through _Voice.value) fills from the
+  SAME Function_Voicings rows the derived path reads — ISNULL in
+  a WHERE fills like ISNULL in a projection; the cast kind is
+  TRANSPARENT on both paths (CONVERT never prints raw again);
+  GETDATE's row speaks "the current date and time". Registries
+  1.51.0 carry the rows (GETDATE · LAG · LEAD + the DATEADD and
+  ISNULL riders).
+
+### R15.c — THE PACK LADDER (FL11, ruling (6) "i agree with option a")
+
+The identifier-words tier gains a middle rung: **blessed name →
+pack convention → readable identifier**. Per-vendor naming
+knowledge lives IN THE SOURCE PACK (clarity-pack-1.2
+naming_conventions: _C category code — stem words, the values
+map supplies meaning per R8 · _YN yes/no flag · _DTTM date and
+time · _DATE_REAL internal decimal date; longest-suffix-first).
+The rung applies ONLY where identifier words would speak (name
+words; the empty-description fallback) — a dictionary
+description outranks it, a blessed name outranks both. The
+grammar floor itself stays vendor-free: this section names the
+LADDER, the pack names the suffixes. Estates with no pack are
+untouched. The vendor resolves from the dictionary extract's
+pack id; conventions load from the packaged pack.json — one
+home, the wheel carries it.
+
+### R15.d — THE JOIN FALLBACK'S VOICE (FL12, C4)
+
+The join description's ON fragment NORMALIZES: whitespace
+collapses to single spaces (the TD's embedded newlines and tabs
+die); `--` comments leave the fragment and surface as "(noted
+'\<text\>')" — the same R8 attribution conditions already speak.
+Both sides named whenever resolution reached them (F9's fix did
+the reaching); the residual raw class is MEASURED at build and
+the count recorded in the brief.
+
+### R15.e — THE PAIR WORDS (FL18, C7 — both sides, the
+### enumerate-all-cases law)
+
+The AND/OR structural sentences gain their n==2 forms: "Both of
+its parts hold." · "Either of its parts holds."; n≥3 keeps the
+counted forms ("All 3 of its parts hold." · "Any of its 3 parts
+holds.").
+
+### R15.f — LAG/LEAD SPEAK THE SLOT FORM (FL14, C5 (a))
+
+"the previous/next record's \<x\> within each \<partition\>,
+ordered by \<order\>" — the R12 slotted shape, slice E's capture
+filling the slots; order-only windows "the previous/next
+record's \<x\>, ordered by \<order\>"; flag-only fallback "the
+previous/next record's \<x\> in its ordered sequence". Never an
+empty slot in prose (the R12 law). Rows in registries 1.51.0.
+
+### R15.g — THE NOUN-PHRASE GATE (FL19, C1 — the F12 generator
+### class in the grammar domain)
+
+The R5 dictionary-phrase tier gains a GATE: a description whose
+first sentence LEADS with a non-noun word (the closed lead list:
+third-person verb forms — stores, contains, indicates, captures,
+specifies, denotes, determines, identifies, defines, describes,
+displays, shows, lists, links, holds, provides, tracks, records,
+flags, marks, represents, references, returns, reflects, gives,
+allows, enables, includes, applies, associates — and the
+non-subject leads: you, your, this, these, it, if, whether,
+when, used, use) FALLS to the identifier tier (through the R15.c
+ladder), never a broken pass-through. Comma-truncation respects
+PARENTHESIS BALANCE — the cut never lands inside an open paren.
+The closed list is the code's mirror (produce._NON_NOUN_LEADS);
+growing it is a grammar amendment, never a silent edit.
+
+### The store-shape rider — THE NOT FOLD (FL16, ruling (9) "i
+### agree, fold entirely")
+
+Not a phrase law — the WALKER: one NOT predicate mints ONE
+condition row speaking the 2.5.0 folded voice; the child row is
+NEVER minted; the folded row ABSORBS the child subtree's
+column-resolution links; the tree shape survives in the parse
+record; the un-negated form DERIVES at ask time. The condition
+census re-bases and the re-base reaches EVERY coverage string
+(the FL7 lesson). FL13's double-visit investigation runs in the
+same brief (C6, the generator clause).
+
+## THE DRILL-PATH DIRECTION (**AGREED, Sunny 2026-09-20 "i agree
+## with the level design, draft the brief. make sure we record it
+## in the design doc"; ALL SEVEN ambiguities RULED same day at
+## "agree with all seven recommendations"; BUILT same day at his
+## "build it" after slice C landed (Q7's order) — the law lives
+## in R14's amended compression clause, R11's END-USER FORM
+## rider, and R13 v2's END-USER BLOCK rider; this section stays
+## as the direction's record**)
+
+Born at his end-user read of the dryrun_sepsis output
+(USP_ED_SEPSIS the ruled focus): the file technical definition
+shown first to an end user is the FULL catch-all (~6,500 words —
+the appendix restates every scope's filters and joins one level
+up), while the statement line ("Builds the allmeds selection.")
+carries no meaning at all. The agreed principle:
+
+**Each level answers ONE question; drill-down replaces
+repetition.**
+
+| level | the one question |
+|---|---|
+| file | "what does this give me?" — purpose · grain + window (the R13 v2 headline) · themed outputs (home = Q2) · main sources. Never the filter/join dump. |
+| statement | "what does this step contribute?" — "Builds the \<x\> selection: \<what belongs in it\>", borrowed from the scope's sentence at RENDER (extends the ruled render-join) |
+| scope | "exactly what is in this selection?" — the R14 sentence; compression bar under amendment (Q4) |
+| condition/join rows | every literal value — already the law |
+
+Q1–Q7 ALL RULED (Sunny "agree with all seven recommendations",
+2026-09-20, quoted in Brief_Description_Levels): (Q1 b) the
+stored technical_definition STANDS byte-identical — R13's
+governance consumer keeps the complete catch-all; the end-user
+surfaces render the short block (headline · window · main
+sources) at display time, a derivable projection never stored
+twice (the Brief_Dryrun_Order precedent). (Q2 a) purpose +
+themed outputs live in the Scribe description — the LLM cage,
+approved-only, receive_descriptions the one writer; the
+deterministic surfaces carry no themes. (Q3 b) the statement
+line wears the scope's sentence MINUS the payload tail,
+render-time via produce.statement_display; the stored R11 text
+untouched. (Q4 a) noted-label lists compress past 3 members,
+bare lists keep the ruled 6; full lists stay on the condition
+rows. (Q5 b) the appendix's ruled completeness stands, no
+dedup. (Q6 b) the contradiction-detector queues as its own
+feature brief. (Q7 a) the build lands AFTER slice C — the
+levels display already-repaired join/condition text, and the
+Q4 re-voicing rides slice C's single regen + load. FL9 and
+FL12 stay slice C's rows — cited there, not re-claimed.
+
+## R16 — THE BUSINESS VOICE TIER + THE MEANING LADDER
+(**RATIFIED v2.16.0, Sunny 2026-09-20 — Brief_Business_Voice:
+"store only the business voice, derive the technical voice" ·
+"i confirm strict layering, and statement should compose from
+scope sentences" · "i agree with all remaining open items, use
+your recommendations. make sure we lock these in contracts" ·
+build rulings B1–B3 each "agree with (a)" + "build it"; the
+full ruling record, his words quoted, lives in the brief**)
+
+THE MEANING LADDER (his directive, the generation law at every
+level): "from the bottom levels, each time we advance to a
+higher level, the meaning acts as the material for the next
+level to consume." Rung 0 = the dictionary's table and column
+descriptions, noted comments, values maps, blessed vocabulary.
+Rung 1 = the scope sentence, proposed FROM rung 0 + the scope's
+fact basis. Rung 2 = the statement description, COMPOSED from
+its scopes' sentences. Rung 3 = the proc description, composed
+from its statements' descriptions. STRICT LAYERING (ruled): a
+rung never reaches past its children to raw sources. Every rung
+COMPOSES — no verbatim pasting; the gate's nothing-dropped
+check is what makes compression safe.
+
+THE TIER (rung 1, this build — B2 ruled the scope rung only):
+the stored scope description resolves in ruled order —
+1. a BLESSED business sentence (registry row, Sunny's status);
+2. a gate-PASSED `proposed` row, its status carried (ruling 5);
+3. the mechanical R14 sentence — the FLOOR, always derivable,
+   voicing wherever no fresh gated row exists.
+A row voices ONLY while its basis_hash matches the recomputed
+basis (the mechanical sentence + every material text, hashed):
+the SQL changes OR a dictionary row changes → the row is STALE
+(counted, never silent) and the floor voices. The verbatim law
+is untouched: the registry is INPUT DATA exactly like KG1
+descriptions — stored == recomputed reads the registry through
+the same one door (business_voice.effective_sentence).
+
+THE PIPELINE (the R5.b seat, widened from a word to a
+sentence): the proposer (a model, INJECTED, double-run law,
+cache keyed on basis · model · prompt_version, seat-down law)
+reads the rung's materials — every touched table's and column's
+DICTIONARY ROW (the FL35 remedy), noted comments, child scope
+sentences — and proposes ONE sentence in the core slots:
+population · conditions · what's carried. THE GATE (mechanical,
+no model, named violations):
+- NOTHING DROPPED — every basis witness appears: the grain
+  words, each condition's literals and noted words, each
+  membership source's words, the carried payload (words or
+  count);
+- NOTHING INVENTED — every content word of the sentence traces
+  to a material text or the FRAME vocabulary (the core-slot
+  grammar words: population, membership, row, record, list,
+  selection, carrying …). "kilograms" (units nowhere in the
+  estate) and "boarded awaiting an inpatient bed" (a
+  clinician's knowledge, no source row) are the canonical
+  kills. B6 (Sunny "agree with your fix to class 1",
+  2026-09-21, his first batch the measurement — 'where' alone
+  killed 98 rows): connective English and spelled small
+  numbers are sentence SKELETON, never facts — they live in
+  the stop/frame lists; fact words never join.
+THE VERDICT LIFECYCLE (B6+B7, ruled 2026-09-21): a `rejected`
+verdict RE-JUDGES at every batch from its stored candidates,
+free — the gate is code and code changes, and a sentence Sunny
+hand-edits on a rejected row re-judges the same way. A fresh
+gate-rejection earns ONE REPAIR CALL (B7, his "either propose
+to the llm to fix the error or propose to me"): the repair
+prompt carries the gate's named violations; the repaired
+sentence re-gates; still dirty → the row stays `rejected` WITH
+sentence + violations for Sunny's hand, `repair_spent` stamped
+— no basis ever pays twice. FL36 (ruled same day,
+"approve re-anchor-when-gate-clean"): a basis move is judged by
+THE GATE, not the hash alone — a stale row still gate-clean
+against the new basis voices with status carried and its hash
+RE-ANCHORS (persisted, stamped re_anchored_at, counted);
+gate-dirty stale falls to the floor. Without this, every
+proposal wave staled sibling blessed rows and blessing never
+converged.
+Registry: estates/<estate>/glossary/business_sentences.json —
+row keys the scope's KG1 identity; statuses proposed · disputed
+· rejected · blessed (human-only, the field law); machine
+refresh may never write nor overwrite `blessed`. Voicing
+repairs ruled with the tier (FL31–FL34): EXISTS-membership
+voices as membership exactly like join-membership, in the
+population slot; the grain lead and the base-source lead
+COEXIST; a carries-only-its-key scope says "a membership
+list"; a one-value list drops the plural frame. (The
+mechanical R14 floor adopts these at its next amendment; the
+business tier's gate speaks them from birth.)

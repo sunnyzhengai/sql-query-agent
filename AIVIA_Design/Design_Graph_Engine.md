@@ -279,9 +279,9 @@ algorithm · evidence returned with the query as artifact).
 
 ## The laws carried forward from v1 (storage-independent, all kept)
 
-[registry stamps: kg1_technical v1.50.0 · kg2_logic v1.50.0 ·
-kg2_kind_library v1.50.0 · kg3_artifacts v1.50.0 ·
-kg4_concepts v1.50.0 · flows v1.50.0 · lenses v1.50.0]
+[registry stamps: kg1_technical v1.52.0 · kg2_logic v1.52.0 ·
+kg2_kind_library v1.52.0 · kg3_artifacts v1.52.0 ·
+kg4_concepts v1.52.0 · flows v1.52.0 · lenses v1.52.0]
 (1.50.0 = Brief_Pilot_Build_3 2026-09-20, THE GRAIN-SOURCE
 CAPTURE: GROUP BY refs + DISTINCT + OVER contents + the IF THEN
 kind — Structure_Kinds_Grain; ROW_NUMBER slots close; the

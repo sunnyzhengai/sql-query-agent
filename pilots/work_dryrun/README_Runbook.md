@@ -14,7 +14,7 @@ work clone.
 
 | prerequisite | Windows laptop | Fabric (notebook route) |
 |---|---|---|
-| the engine files | the GitHub ship zip (~7.5 MB), extracted | ONE wheel — `dist/sql_query_agent-2.4.0-py3-none-any.whl` from GitHub; engine + registries + DLL all inside (Brief_Fabric_Resident) |
+| the engine files | the GitHub ship zip (~7.5 MB), extracted | ONE wheel — `dist/sql_query_agent-2.5.0-py3-none-any.whl` from GitHub; engine + registries + DLL all inside (Brief_Fabric_Resident) |
 | Python 3.11 (3.10–3.12 fine; dev = 3.11.15) | per-user install, no admin (P3) | comes WITH the runtime — pick the Environment runtime whose Python is 3.11 (Runtime 1.3 today); never a library install |
 | pythonnet — 3.0.1 exact (Fabric-proven 2026-08; floor ≥3.0.1; dev = 3.1.0) | `pip install pythonnet` (P4) | already in the built-in libraries; pin 3.0.1 under Public libraries only if absent |
 | .NET runtime 8 (6+ works) | often preinstalled; else per-user (P6) | built into the Fabric runtime — the SOP's F8 probe proves it |
@@ -32,7 +32,7 @@ work clone.
 The deployment stays the FIVE-STEP CENSUS (FR8 — any step beyond
 these is a defect); the extract writes itself (the derived-list
 law). In order, after downloading the wheel
-(`https://github.com/sunnyzhengai/sql-query-agent/raw/dev/dist/sql_query_agent-2.4.0-py3-none-any.whl`):
+(`https://github.com/sunnyzhengai/sql-query-agent/raw/dev/dist/sql_query_agent-2.5.0-py3-none-any.whl`):
 
 1. Environment: "+ New item" → Environment → runtime with Python
    3.11 → Custom libraries → upload the wheel → Publish → attach
@@ -72,16 +72,22 @@ law). In order, after downloading the wheel
    `=== file (n) ===` · `=== scope (n) ===` · `=== statement (n)
    ===` — then every remaining label (the table/column dictionary
    flood) under its own counted header, skippable. What the texts
-   look like since wheel 2.4.0 (Brief_Pilot_Build_3): each FILE's
-   technical definition opens "Delivers …" (or "… delivers
-   nothing." for a build-only file), then "Pipeline: (1) …", then
-   the per-selection filters and joins; each SCOPE speaks ONE
-   Business Term sentence ("One record per <grain>: …, carrying
-   …" or "<Base source> records: …, carrying …"); each
-   "Builds the <x> selection …" STATEMENT line shows the built
-   selection's head in parentheses. First-run eyes: the
-   description column reads as SENTENCES (the 02 prose-field
-   check) · compound joins group sanely (F-CP6).
+   look like since wheel 2.5.0 (Brief_Pilot_Build_2 slice C +
+   Brief_Description_Levels): each FILE speaks the SHORT BLOCK —
+   `proc:` the headline ("Delivers …", or "… delivers nothing."
+   for a build-only file) · `window:` the parameter-bound date
+   filters · `reads:` the source tables · a pointer line naming
+   the stored full technical definition (the Collibra governance
+   field — the appendix flood never prints here); each SCOPE
+   speaks ONE Business Term sentence ("One record per <grain>: …,
+   carrying …" or "<Base source> records: …, carrying …" — noted
+   value lists past 3 compress to a count); each "Builds the <x>
+   selection …" STATEMENT line carries the built selection's
+   meaning after a colon ("Builds the allmeds selection: the base
+   pop selection, matched in …"). First-run eyes: the description
+   column reads as SENTENCES (the 02 prose-field check) · no
+   "the x is the x" tautologies (R15.a names both owners) ·
+   compound joins group sanely (F-CP6).
 7. LAST, paid, your hand — contingent on the F10 egress test and
    the OpenAI key set as an environment/notebook secret:
    cell 4: `f.scribe("/lakehouse/default/Files/<estate>")`

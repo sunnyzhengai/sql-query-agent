@@ -13,7 +13,7 @@ needed. Joined to the KG1 intake contract
 (`L1_KG1_CONTRACT_DATALOAD.md`, `kg1_intake.REQUIRED_FILES`) by the
 extract-file key.
 
-## PACK: clarity (clarity-pack-1.1)
+## PACK: clarity (clarity-pack-1.2 — naming_conventions added at Brief_Pilot_Build_2, ruling (6); 1.1 retired, git history keeps it)
 
 | script | feeds | vendor source | headers (exact) | status |
 |---|---|---|---|---|
@@ -23,7 +23,7 @@ extract-file key.
 | 04_joins.sql | joins.csv | CLARITY_TBL_FK ⋈ CLARITY_TBL ×2 ⋈ CLARITY_COL ×2 (LINE enumerates; SOURCE_COLUMN_ID / DESTNATN_TABLE_ID / DESTNATN_COLUMN_ID — Epic's spelling) | fk_num,ordinal,src_schema,src_table,src_column,dest_schema,dest_table,dest_column | SOLID (pack 1.1) |
 | 05_values.sql | values.csv | GENERATOR over every ZC_* table: code = the table's first column, meaning = NAME (his law: "the 'NAME' column is always the value column"); only NAME-carrying tables qualify | table,code,meaning | SOLID (generator, pack 1.1) |
 | 06_manifest.sql | manifest.json | DB_NAME(), @@SERVERNAME, SYSUTCDATETIME() | db_name,server,as_of | SOLID |
-| pack.json | the estate manifest TEMPLATE (`extract_scripts` fills default_schema from it — Brief_Pilot_Build_1, ruling (5)) | vendor fact: Clarity tables live in dbo on every Epic system | n/a (JSON facts, not a script) | SOLID (2026-09-20; rides the wheel with the scripts) |
+| pack.json | the estate manifest TEMPLATE (`extract_scripts` fills default_schema from it — Brief_Pilot_Build_1, ruling (5)) + THE NAMING-CONVENTIONS TABLE (ruling (6), Brief_Pilot_Build_2: the voicing ladder's middle rung — blessed name → pack convention → readable identifier; the engine reads suffix + rule, longest-suffix-first; consumed by produce._Voice at voicing, vendor resolved from the dictionary extract's pack id; estates with no pack untouched) | vendor facts: Clarity lives in dbo; the documented column suffixes — _C category code (stem words, values map supplies meaning per R8) · _YN yes/no flag · _DTTM date and time · _DATE_REAL internal decimal date | n/a (JSON facts, not a script) | SOLID (2026-09-20; 1.2 rides the wheel with the scripts; the suffix list faces Sunny's gap-check eye at the re-voiced corpus) |
 
 ## LAWS (Sunny's rulings, 2026-09-19, quoted in Brief_Clarity_Source_Pack)
 

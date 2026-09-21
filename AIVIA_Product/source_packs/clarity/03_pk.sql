@@ -1,4 +1,4 @@
--- clarity-pack-1.1 · Script 3 -> pk.csv (schema,table,column,ordinal)
+-- clarity-pack-1.2 · Script 3 -> pk.csv (schema,table,column,ordinal)
 --
 -- CLARITY_TBL_PK (Sunny's find, 2026-09-19, F-CP4): LINE is the
 -- key ordinal; PK_COLUMN_ID joins CLARITY_COL.COLUMN_ID for the

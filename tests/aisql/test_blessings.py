@@ -203,7 +203,9 @@ def test_blessed_names_speak_both_relation_sides():
             "subject": _ref(TAKEN, "MA.TAKEN_TIME"),
             "comparand": _ref(DEPART, "B.ED_DEPARTURE_TIME")}
     assert produce._voice_predicate(pred, voice) \
-        == "The taken time is before the ed exit time."
+        == ("The med admin record's taken time is before the "
+            "hospital encounters record's ed exit time.")  # R15.a
+        # re-based at v2.15.0 (Brief_Pilot_Build_2): both owners
 
 
 def test_blessed_name_speaks_in_recordedness():
@@ -283,7 +285,10 @@ def test_possessive_stays_out_of_relations_and_values():
            "subject": _ref(TAKEN, "MA.TAKEN_TIME"),
            "comparand": _ref(DEPART, "B.ED_DEPARTURE_TIME")}
     assert produce._voice_predicate(rel, voice) \
-        == "The taken time is before the ed departure time."
+        == ("The medication administration's taken time is before "
+            "the hospital encounters record's ed departure time.")
+        # re-based at v2.15.0: the blessed owner speaks its blessed
+        # name; the unblessed side the readable record's
     val = {"kind": "COMPARE_EQ", "node": "predicate",
            "subject": _ref(COL, "MA.MAR_ACTION_CODE"),
            "comparand": {"kind": "literal", "value": "1"}}
@@ -346,7 +351,9 @@ def test_temporal_union_blessing_only_adds_evidence():
             "comparand": _ref(DEPART, "B.ED_DEPARTURE_TIME")}
     # name words carry "time" — temporal survives the blessing
     assert produce._voice_predicate(pred, voice) \
-        == "The administration clock is before the ed exit moment."
+        == ("The med admin record's administration clock is before "
+            "the hospital encounters record's ed exit moment.")
+        # re-based at v2.15.0 (R15.a)
 
 
 def test_declared_type_is_temporal_truth():

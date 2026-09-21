@@ -125,12 +125,14 @@ def test_the_ratified_estate_definition_byte_exact():
     assert hashlib.sha256(td.encode()).hexdigest() == RATIFIED_SHA
 
 
-# re-based BY MEASUREMENT at Brief_Pilot_Build_3 (R13 v2 — the
-# three levels; was 16195/fa03a791… at the v2.12.0 checkpoint);
-# Sunny's gap-check eye closes the brief
-RATIFIED_LEN = 20255
-RATIFIED_SHA = ("6c5867a8cb3e13994be207e2e8a5e793"
-                "6bfb3bf2beeb5f69507fd5b59fefea92")
+# re-based BY MEASUREMENT at Brief_Pilot_Build_2 (R15 slice C —
+# two-sided owners, the temporal-window idiom, one-library-two-
+# readers, normalized join fragments; was 20255/6c5867a8… at
+# Brief_Pilot_Build_3, 16195/fa03a791… at the v2.12.0
+# checkpoint); Sunny's gap-check eye at the shared closing run
+RATIFIED_LEN = 21411
+RATIFIED_SHA = ("73f6ad264080ff3129fdbe441165d10a"
+                "f16ff5d2c5c42826131fb31fc75bc4b0")
 
 
 def test_definition_is_deterministic(read):
