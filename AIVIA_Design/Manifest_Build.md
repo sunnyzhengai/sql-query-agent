@@ -2697,3 +2697,26 @@ ship-unit 3 of Brief_Pilot_Findings_R1 ruling (7). What built:
   boot (~245 rows re_anchored_at stamped, the B5 mechanism
   working as ruled — counted, never silent); the registry
   converges and further boots move nothing.
+
+## 2026-09-21 (same sitting) — THE LADDER CONVERGES TO ZERO:
+## 311 PROPOSED + 1 BLESSED, 0 REJECTED — THE SHARED CLOSING
+## RUN'S CODE SIDE IS DONE
+
+- **His final batch** (1 paid call): the delivery row's basis
+  moved under B10's acronym material, the seat proposed FRESH
+  against it, the gate passed — census 310 kept · 1 proposed ·
+  1 blessed_kept · 0 rejected. The estate's every scope now
+  speaks a blessed or gate-passed business sentence; the floor
+  serves nowhere.
+- **His AISQL_RECORD run + the verification suite**: FULL SUITE
+  904 passed · 0 failed · 0 errors (7:51) on the closing tree —
+  fully green, zero RecordingGaps.
+- **The regen**: sepsis graph export — exactly ONE file moved,
+  graph_scope.parquet (the delivery sentence). The loop file is
+  a DECLARED NO-OP: no USP_ED_SEPSIS sentence changed in this
+  wave.
+- **Remaining, his hand alone**: ONE Fabric load (closes
+  Brief_Pilot_Build_2 + Brief_Description_Levels +
+  Brief_Business_Voice) · the 311-sentence bless-by-hand review
+  (any order, no second load — blessing flips status only).
+  Brief_Collibra.md sits UNTRACKED at his hand, left alone.

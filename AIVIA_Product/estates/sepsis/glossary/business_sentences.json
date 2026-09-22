@@ -1728,19 +1728,15 @@
   "re_anchored_at": "2026-09-06T00:00:00Z"
  },
  "reporting/USP_IP_SepsisEncountersDetails.sql::delivery": {
-  "status": "rejected",
-  "basis_hash": "dab9adf0711c671b2237cb61c5671ca7654221c6a8d16636cfc00cae82699602",
-  "proposed_at": "2026-09-21T23:37:04Z",
+  "status": "proposed",
+  "basis_hash": "671c5497236c151a4765c8d6eb05f0c772184e3b7060c1c4bbe662e6fcfe65ff",
+  "proposed_at": "2026-09-22T00:26:15Z",
   "proposer": {
    "model": "gpt-4o-mini",
    "prompt_version": "bv1",
-   "runs": 2
+   "runs": 1
   },
-  "repair_spent": true,
-  "sentence": "One record per distinct combination of its columns, carrying the patients, the patient ID, the medical record number, the ethnic group, the race, the location, the age months, the age years, the inpatient admission time, the discharge time, the disposition, the length of stay hours, the birth date, the all encounter diagnosis, and the refresh date.",
-  "violations": [
-   "GATE-BV2: 'length' traces to no source row"
-  ]
+  "sentence": "One record per distinct combination of its columns, carrying the patients, the patient ID, the medical record number, the ethnic group, the race, the location, the age months, the age years, the inpatient admission time, the discharge time, the disposition, the length of stay, the birth date, the encounter diagnosis, and the refresh date."
  },
  "reporting/USP_IP_SepsisEncountersWLocations.sql::#Base_Pop": {
   "status": "proposed",
