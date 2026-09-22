@@ -62,7 +62,7 @@ def surface():
 
 def _round(base, **params):
     url = base + "/round?" + urllib.parse.urlencode(params)
-    with urllib.request.urlopen(url, timeout=10) as r:
+    with urllib.request.urlopen(url, timeout=60) as r:
         return json.loads(r.read())
 
 

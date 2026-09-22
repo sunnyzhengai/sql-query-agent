@@ -7,7 +7,7 @@
 
 # Test Map — what every test proves
 
-100 modules, 872 tests, every module accounted: claimed by an ADR in the trace registry or declaring a law/contract in its docstring (`Proves:` line).
+100 modules, 873 tests, every module accounted: claimed by an ADR in the trace registry or declaring a law/contract in its docstring (`Proves:` line).
 
 ## By ADR
 
@@ -123,7 +123,7 @@
 - `tests/aisql/test_approve_land.py` (10): Slice 6 exit: the F5 script against the BUILT approve/land flows.
 - `tests/aisql/test_ask_console.py` (21): Tier A exit (ADR 0079): the F10 answer keys go RUNNABLE.
 - `tests/aisql/test_blessings.py` (36): R5.b THE BLESSED NAME, slice 1 (Grammar_Floor v2.8.0, ratified
-- `tests/aisql/test_business_voice.py` (33): BV1–BV6 — Brief_Business_Voice acceptance pins (Grammar_Floor
+- `tests/aisql/test_business_voice.py` (34): BV1–BV6 — Brief_Business_Voice acceptance pins (Grammar_Floor
 - `tests/aisql/test_center_censuses.py` (18): ADR 0080 — the center and the three censuses, red-first.
 - `tests/aisql/test_change_gate.py` (12): THE HARD GATE — Brief_Hard_Gate_Hook (P2 ruled 2026-09-16).
 - `tests/aisql/test_click_reroute.py` (4): STEP A of the search rebuild — CLICKS ARE STEER (gap 12). Suite

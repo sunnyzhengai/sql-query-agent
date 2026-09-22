@@ -313,6 +313,15 @@ def receive_estate(store, reg: Dict[str, Any], estate_dir,
         store, manifest["as_of"])
     report.condition_layer = _store_condition_layer(
         store, manifest["as_of"])
+    # B10.b (the B6.b beat one layer out, generator-fixed): the
+    # gate reads witnesses from CONDITION rows, which build after
+    # scopes — a stale row re-gated at the first voicing sees an
+    # empty subtree and every value word dies to the floor. The
+    # voicing repeats HERE, where everything the gate reads
+    # exists; the stored state is again the reader's fixpoint
+    # (the verbatim law's ground).
+    _store_scope_descriptions(store, manifest["as_of"],
+                              estate_dir.parent / "glossary")
     report.derived_layer = _store_derived_column_layer(
         store, manifest["as_of"])
     # M6 (approved 2026-09-17): the file layer runs LAST — its

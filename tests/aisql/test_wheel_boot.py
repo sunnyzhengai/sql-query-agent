@@ -99,10 +99,10 @@ def test_build_requires_ride_the_dev_extras():
     # resolves fresh; floors drift). CI's first test-step run
     # after F13's fix errored all three pins above on a missing
     # `wheel`; this pin makes the gap a suite failure everywhere.
-    try:
-        import tomllib
-    except ModuleNotFoundError:  # the 3.9/3.10 CI legs
-        import tomli as tomllib
+    # tomli on EVERY leg (3.11's stdlib tomllib would fork the
+    # import per version and the declaration tripwire scans
+    # source statically — one import, one declaration)
+    import tomli as tomllib
     from packaging.requirements import Requirement
     from packaging.utils import canonicalize_name
     data = tomllib.loads((ROOT / "pyproject.toml").read_text())

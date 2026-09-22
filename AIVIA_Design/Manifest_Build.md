@@ -2558,3 +2558,142 @@ ship-unit 3 of Brief_Pilot_Findings_R1 ruling (7). What built:
   mid-write and manufacture phantom reds. CI runs the suite on
   the push; the expected remaining red is ONLY the 406-text
   RecordingGap until his recording run lands.
+
+## 2026-09-21 (same sitting) — RECORD CORRECTION + HIS CLOSING
+## COMMANDS LAND: THE SUITE IS FULLY GREEN FOR THE FIRST TIME
+
+- **Correction, declared-vs-actual**: commit fc1ef5b (the F15
+  rider) was staged with `git add -A` while Sunny's two paid
+  commands were finishing — it SWEPT IN two files its message
+  never declared: business_sentences.json (his batch's verdicts)
+  and the embeddings fixture (30.97 MB -> 32.0 MB, the 406
+  recorded vectors). Nothing lost, everything pushed — but the
+  commit's declared files ≠ actual files, recorded here the
+  moment it was seen. The mechanism lesson: no `git add -A`
+  while his hand may be writing; stage by name.
+- **His batch census** (paid, his hand): 0 acronyms_nominated ·
+  1 blessed_kept (#ED_BORDER) · 2 cache_hits · 307 kept · 2
+  model_calls · 2 proposed · 2 re_judged · 2 rejected · 0
+  repaired_ok · 0 seat_error · 0 spliced · 0 synonyms_added.
+  Registry now: 309 proposed · 2 rejected · 1 blessed. B9's
+  projection ("~1 row, the repair-prompt word leak") held: the
+  #FlwshtLstSepsisAudit rejection IS the leak — the proposal
+  says "for witnesses 9000002611, …", the repair prompt's own
+  vocabulary word; GATE-BV2 killed 'witnesses' (traces to no
+  source row). The second rejection is the KNOWN los row:
+  delivery (USP_IP_SepsisEncountersDetails) says "length of
+  stay hours"; 'length' dies because the los acronym-ledger row
+  still sits unreviewed with no expansion (B8.b: his blessing
+  frees it).
+- **His AISQL_RECORD run**: 903 passed · 25 skipped · 3 xfailed ·
+  ZERO failures · ZERO RecordingGaps (8:07) — the FIRST fully
+  green full suite since the business-voice wave began; the
+  fixture carries all 406 new vectors.
+- **The remaining closing steps, in order**: (1) his two hand
+  fixes — bless los in acronym_ledger.json (expansions +
+  status, the aap row is the shape) · replace the leaked word
+  'witnesses' in the #FlwshtLstSepsisAudit sentence; (2) one
+  FREE re-batch (both rows re-judge mechanically, zero paid
+  calls expected); (3) the LOCAL export regen; (4) his ONE
+  Fabric load — closes Brief_Pilot_Build_2 +
+  Brief_Description_Levels + Brief_Business_Voice; (5) his
+  review of the 309 proposed sentences, bless by hand, any
+  order, any time — blessing flips status only, the text
+  already voices, no second load needed.
+
+## 2026-09-21 (same sitting) — B10: THE BLESSING LEARNS TO READ
+## ALIASES (FL37; his los blessing by hand between the batches;
+## his words: "ok build b10")
+
+- **THE FIND, at his re-batch**: he blessed los -> Length Of
+  Stay (his hand, the ledger row correct) and the
+  USP_IP_SepsisEncountersDetails delivery row STAYED rejected
+  ("'length' traces to no source row"). Traced by hand:
+  materials() threads a blessed expansion only for tokens of
+  RESOLVED identifiers + the scope name — but the scope's only
+  clean 'los' token is the OUTPUT ALIAS [LOS Hours]; the source
+  column LosHours folds to the single word 'loshours' (_fold
+  splits underscores, never CamelCase). B9.1 ruled aliases ARE
+  source words; the acronym pass was an incomplete consumer of
+  that ruling. The blessing was correct and unreachable by
+  construction.
+- **THE BUILD** (rider B10 on Brief_Business_Voice): one clause
+  in materials() — the projection alias tokens join
+  touched_tokens for the acronym pass. RED-first pin on the
+  live specimen (test_b10_alias_carried_acronym_reaches_material:
+  blessed los + alias-only carrier => "Length Of Stay" in the
+  delivery scope's materials); business-voice module 34/34.
+- **THE GATE'S OWN LESSON stands recorded**: earlier this
+  sitting the hard gate REFUSED my delegated typing of his
+  blessing into acronym_ledger.json — by design; blessing is
+  literally his hand ("blessed" is a ruled status the machine
+  may never write). His hand made both edits; the second (the
+  'witnesses' -> 'flowsheet ids' word) already re-judged clean.
+- **CamelCase splitting stays OPEN in FL37, unruled** — a wider
+  re-voicing change, its own question.
+- **Expected at his next batch**: the delivery row re-judges
+  FREE to proposed (312 = 311 proposed + 1 blessed, 0 rejected);
+  the two re-voiced sentences are NEW searchable texts, so a
+  small RecordingGap returns until his next AISQL_RECORD run —
+  the same one command he already knows; then the LOCAL export
+  regen, then his ONE load closes the three briefs.
+
+## 2026-09-21 (same sitting) — F16: THE 3.9 LEG'S FIRST TEST RUN
+## EVER — AND THE FIRST ALL-GREEN 3.11 CI JOB (run 35666769593,
+## the fc1ef5b watch)
+
+- **THE GREEN**: test (3.11) SUCCESS end to end — lint (F13's
+  fix), the wheel build (F15's fix), and the full suite with the
+  recorded fixture. The first fully green CI test job in the
+  repo's memory.
+- **THE 3.9 FIND (F16, Contract_Technical_Layer)**: the
+  Fabric-floor leg, running tests for the FIRST time, failed 8 —
+  two version-blind assumptions, both mine, both fixed in the
+  act under the F15 CI-green continuation: (a) the pin test's
+  tomllib/tomli import fork can never satisfy the static
+  declaration tripwire on 3.9 (tomllib is stdlib only on 3.11+)
+  — ONE `import tomli as tomllib` on every leg, tomli==2.4.1
+  declared unconditionally; (b) five console-surface tests
+  (ask_console CS1–CS3, click_reroute ×4 → 5 failures) died
+  socket.timeout at 10 seconds against their own LOCAL test
+  server on a runner that needed 30:40 for an 8-minute suite —
+  the three urlopen sites go timeout=60 (patience, zero behavior
+  change; 3.11 passed the same tests on the same commit).
+- Touched modules 30/30 locally (tomli installed to the
+  Homebrew 3.11 env, mirroring the new declaration); the full
+  suite re-runs on the FINAL tree before the push — the
+  "targeted runs are not the suite" lesson applied the same
+  hour it was written. The 3.9 leg's own green at the next push
+  is F16's closing proof.
+
+## 2026-09-21 (same sitting) — B10.b: THE WITNESS-BLIND FIRST
+## VOICING — THE B6.b BEAT ONE LAYER OUT, GENERATOR-FIXED (the
+## verbatim pin authored the RED; found closing B10's suite)
+
+- **THE FIND**: B10's material change staled a wave of rows in
+  one boot — and the verbatim pin went RED on
+  #FlwshtLstSepsisAudit: STORED the floor, RECOMPUTED the
+  business sentence. Traced: the boot voices scope descriptions
+  at the SCOPE layer, but the gate's witnesses are CONDITION
+  rows (B8.2), built two layers later — a stale row re-gated at
+  first voicing sees an EMPTY subtree, every value word
+  ('9000002611' …) dies BV2, the floor stores, no re-anchor.
+  After boot the same sentence is gate-clean (33 witness texts
+  standing). Pre-B10 the defect was latent: a non-stale row
+  skips the gate, and nothing had ever staled a wave at boot.
+- **THE GENERATOR named** (Echo Law clause — B6.b was the first
+  firing of this beat: the writer judging against incomplete
+  state; this is the second): voice ONLY when everything the
+  gate reads exists. The build: _store_scope_descriptions
+  REPEATS after _store_condition_layer (order of the ruled
+  M5-1 ladder untouched — scopes still voice first for their
+  consumers; the re-voice lands before derived/file so the R13
+  catch-all reads final text). Idempotent by the B6.b fixpoint.
+- **THE PIN**: the verbatim law test IS the acceptance pin
+  (reality authored the RED, the house pattern); green after,
+  business-voice 37/37, scope-layer 3/3.
+- **THE COUNTED WAVE, riding this commit**: the B10 basis move
+  re-anchored the registry's stale-but-gate-clean rows in one
+  boot (~245 rows re_anchored_at stamped, the B5 mechanism
+  working as ruled — counted, never silent); the registry
+  converges and further boots move nothing.

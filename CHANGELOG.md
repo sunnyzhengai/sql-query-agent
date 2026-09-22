@@ -8,6 +8,31 @@ Versioning follows [Semantic Versioning](https://semver.org/).
 
 ## [Unreleased]
 
+### Fixed — a blessed acronym reaches alias-carried scopes (FL37, rider B10)
+- materials() joined a blessed acronym expansion only for tokens
+  of the scope's resolved identifiers — but B9.1 ruled the
+  projection's output aliases ARE source words, and their tokens
+  never entered the acronym pass. Sunny's blessed los→Length Of
+  Stay could not reach the USP_IP_SepsisEncountersDetails
+  delivery scope, whose only clean 'los' token is the alias
+  [LOS Hours] (the source column LosHours folds to one word);
+  the row stayed rejected on "'length' traces to no source row"
+  no matter what he blessed.
+- One clause: the projection alias tokens join the acronym
+  pass's token set. Pinned RED-first on the live specimen
+  (test_b10_alias_carried_acronym_reaches_material). His next
+  batch re-judges the row free.
+- B10.b (the verbatim pin authored the RED): the boot voiced
+  scope descriptions BEFORE the condition layer, and the gate's
+  witnesses are condition rows — a stale row re-gated at first
+  voicing saw an empty subtree, every value word died, the floor
+  stored while the reader recomputed the business sentence. The
+  voicing now repeats after conditions build (the B6.b beat one
+  layer out: voice only when everything the gate reads exists).
+  B10's basis move re-anchored ~245 stale-but-gate-clean
+  registry rows in one boot (the FL36 mechanism, counted); the
+  registry converges and further boots move nothing.
+
 ### Fixed — CI's test step can build the wheel (F15)
 - The three test_wheel_boot pins errored on CI with "Missing
   dependencies: wheel": build_wheel builds with `--no-isolation`,
@@ -25,9 +50,16 @@ Versioning follows [Semantic Versioning](https://semver.org/).
   CI.
 - Rider (caught by CI's declaration tripwire on the fix's own
   push): the pin test's imports — packaging==26.3 and
-  tomli==2.4.1 on the <3.11 legs — are now declared in the [dev]
+  tomli==2.4.1, both every leg — are now declared in the [dev]
   extras instead of arriving as pytest/build's transitive
   dependencies.
+- F16 (the 3.9 Fabric-floor leg's FIRST test run ever, same
+  watch that proved 3.11 fully green): the pin test's
+  version-forked tomllib import could never satisfy the static
+  declaration tripwire on 3.9 — one `import tomli` on every leg
+  now; and five console-surface tests died at their 10-second
+  local-server timeout on a runner needing 30:40 for an 8-minute
+  suite — the three urlopen sites go timeout=60, patience only.
 
 ### Fixed — CI's lint step returns to the retired reality (Brief_CI_Lint)
 - The ci.yml lint line drops `notebooks/` (untracked, local-only)

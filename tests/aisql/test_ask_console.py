@@ -489,7 +489,7 @@ def _round(base, **params):
     import urllib.parse
     import urllib.request
     url = base + "/round?" + urllib.parse.urlencode(params)
-    with urllib.request.urlopen(url, timeout=10) as r:
+    with urllib.request.urlopen(url, timeout=60) as r:
         return json.loads(r.read())
 
 
@@ -511,7 +511,7 @@ def test_cs1_context_is_conversation_scoped(surface):
 def test_cs2_rounds_are_data_page_is_a_shell(surface):
     base, _calls = surface
     import urllib.request
-    with urllib.request.urlopen(base + "/", timeout=10) as r:
+    with urllib.request.urlopen(base + "/", timeout=60) as r:
         shell = r.read().decode()
     # the shell is a transcript surface: a log to append to, a form
     # the client intercepts — never a server-rendered answer

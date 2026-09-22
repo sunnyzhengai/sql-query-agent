@@ -651,6 +651,35 @@ def test_b9_witness_violations_dedupe(world):
     assert len([x for x in v if "AM (Day Shift)" in x]) == 1
 
 
+def test_b10_alias_carried_acronym_reaches_material(world):
+    """B10 (FL37, Sunny "ok build b10", 2026-09-21): B9.1 ruled the
+    projection's output aliases ARE source words — the acronym pass
+    must read their tokens too. The live specimen: los is blessed
+    'Length Of Stay' (his hand, 2026-09-21) and the
+    USP_IP_SepsisEncountersDetails delivery's ONLY clean 'los'
+    token is the alias [LOS Hours] — the source column LosHours
+    folds to the single word 'loshours', so before B10 the
+    blessing could not reach the scope and its row stayed rejected
+    on "'length' traces to no source row"."""
+    _store, read, _tree, _sc = world
+    exps = business_voice.load_acronym_expansions(GLOSSARY)
+    assert "los" in exps and "Length Of Stay" in exps["los"]
+    for _k, tree in sorted(read.trees().items()):
+        for sc in decisions.named_scopes(tree):
+            if sc["name_key"] == ("reporting/USP_IP_SepsisEncounters"
+                                  "Details.sql::delivery"):
+                mats = business_voice.materials(read, tree, sc,
+                                                acronyms=exps)
+                assert any("Length Of Stay" in v
+                           for v in mats.values()), (
+                    "the blessed los expansion never reached the "
+                    "delivery scope's materials — the alias "
+                    "[LOS Hours] is its only 'los' carrier")
+                return
+    raise AssertionError("no delivery scope in "
+                         "USP_IP_SepsisEncountersDetails")
+
+
 def test_b9_acronym_form_guard():
     """B9.5's mechanical half: initials or in-order subsequence —
     the acronym analogue of the stem guard."""

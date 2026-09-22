@@ -65,11 +65,12 @@ dev = [
     "setuptools==83.0.0; python_version >= '3.10'",
     "setuptools==80.9.0; python_version < '3.10'",
     # F15's pin test imports packaging (Requirement parsing) and
-    # tomli (TOML on the <3.11 legs; 3.11+ uses stdlib tomllib) —
-    # until now both arrived only as pytest/build's transitive
-    # dependencies; the declaration tripwire caught them on CI.
+    # tomli — until now both arrived only as pytest/build's
+    # transitive dependencies; the declaration tripwire caught
+    # them on CI. tomli rides EVERY leg (F16: a version-forked
+    # tomllib import cannot satisfy the tripwire on 3.9).
     "packaging==26.3",
-    "tomli==2.4.1; python_version < '3.11'",
+    "tomli==2.4.1",
     # FR6: the old-era src/ tree left the wheel but its tests still
     # run in CI — its two imports ride here now, not in the product
     "pyyaml>=6.0.1",

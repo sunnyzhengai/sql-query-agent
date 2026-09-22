@@ -341,6 +341,11 @@ def materials(read, tree, scope,
                 | {scope.get("name_key") or ""}:
             touched_tokens |= set(_fold(ident.rsplit("|", 1)[-1]
                                         .rsplit("::", 1)[-1]))
+        # B10 (FL37): B9.1's output aliases are source words, so
+        # their tokens carry acronyms too — [LOS Hours] can be a
+        # scope's only clean 'los' (LosHours folds to one word)
+        for n in names:
+            touched_tokens |= set(_fold(n))
         for t in sorted(touched_tokens & set(acronyms)):
             mats[f"acronym {t}"] = f"{t}. {acronyms[t]}"
     return mats

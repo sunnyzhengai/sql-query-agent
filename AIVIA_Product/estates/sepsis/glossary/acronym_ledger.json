@@ -22671,20 +22671,27 @@
   "status": "unreviewed"
  },
  "los": {
-  "carriers": 20,
-  "position": [
-   "first",
-   "last",
-   "only"
-  ],
-  "sample": [
-   "FACILITY_LOS",
-   "PROFESSIONAL_LOS",
-   "BILL_DRG_LONG_LOS",
-   "BILL_DRG_SHORT_LOS",
-   "LOS_MODIFIER1_ID"
-  ],
-  "status": "unreviewed"
+    "approved_at": "2026-09-21T23:29:22Z",
+    "approved_by": "person:sunny",
+    "carriers": 20,
+    "expansions": [
+     "Length Of Stay"
+    ],
+    "position": [
+     "first",
+     "last",
+     "only"
+    ],
+    "provenance": "Sunny blessing 2026-09-21 (frees the USP_IP_SepsisEncountersDetails delivery sentence per B8.b)",
+    "sample": [
+     "FACILITY_LOS",
+     "PROFESSIONAL_LOS",
+     "BILL_DRG_LONG_LOS",
+     "BILL_DRG_SHORT_LOS",
+     "LOS_MODIFIER1_ID"
+    ],
+    "scope": "estate",
+    "status": "blessed"
  },
  "low": {
   "carriers": 4,
