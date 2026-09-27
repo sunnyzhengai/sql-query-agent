@@ -53,9 +53,25 @@
 #     )
 #     df = spark.createDataFrame(rows)
 #     df.write.mode("overwrite").saveAsTable("f01_subject_sql_files_lh_table")
+#     df.drop("fileNameEmbedding").write.mode("overwrite") \
+#         .saveAsTable("f01_subject_sql_files_graph")
 #
 #     Overwrite mode: the sheet is the truth; rerunning the notebook
-#     replaces the table wholesale, never appends duplicates.
+#     replaces the tables wholesale, never appends duplicates.
+#
+#     THE GRAPH EXPORT TABLE, RULED 2026-09-27 (found live at F12/F13):
+#     the graph model cannot hold the 3072-number embedding array as a
+#     node property — the mapping UI shows the column typed "?", and
+#     loads of the full table died (SystemError1009). RULED: the graph
+#     reads its OWN embedding-free table, f01_subject_sql_files_graph
+#     (fileName/databaseName/schemaName only) — the drop line above —
+#     and embeddings STAY in f01_subject_sql_files_lh_table; a chat
+#     embeds the question and reads embeddings from the lakehouse table,
+#     the graph serves structure. (The old project's graph_* export-table
+#     pattern and Delta-for-search / graph-for-traversal verdict, met
+#     again.) NOTE: at ruling time even the clean 3-column load still
+#     failed with the service's transient 1009 on trial capacity — a
+#     Fabric-side fault under support/retry, not a mapping error.
 #     THE NAME, RULED 2026-09-27: the leading-digit risk called out here
 #     BIT in T-SQL, not Spark — "select * from 01_..." dies with
 #     "Incorrect syntax near '01'", and every SQL consumer would need
