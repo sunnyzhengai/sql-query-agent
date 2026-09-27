@@ -19,7 +19,7 @@ Where are these sql files located for local development?
 - /Users/sunnyzheng/sql-query-agent/AIVIA_01_Data/01_subject_sql_files/
 
 Where are these sql files located for production?
-- Fabric lakehouse, AIVIA_01_lh/Files/01_subject_sql_files/
+- Fabric lakehouse, AIVIA_01_LH/Files/Data/01_subject_sql_files/
 
 What is the output of this data contract?
 - A data sheet, 01_subject_sql_files_data_sheet.json

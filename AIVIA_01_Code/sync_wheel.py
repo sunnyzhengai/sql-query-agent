@@ -39,12 +39,17 @@
 #     already on the one Python). Take the newest .whl from
 #     AIVIA_01_Code/dist/. Print its name and size.
 #
-# Step 2 — sign in (device-code flow, standard library only).
-#     No new packages: plain https calls to Microsoft's login service.
-#     The script prints: "go to https://microsoft.com/devicelogin and
-#     enter code XXXX-XXXX". Sunny signs in with her own Entra ID in the
-#     browser; the script polls until sign-in completes, then holds a
-#     Fabric API token for this run only. Nothing is stored on disk.
+# Step 2 — sign in (normal browser sign-in, standard library only).
+#     RULED 2026-09-27: the original device-code flow is BLOCKED by the
+#     tenant's security defaults (error 530035, first real run) — device
+#     codes are a phishing vector and Entra refuses them. Security
+#     defaults stay ON; the script adapts, not the tenant.
+#     The flow now: the script opens the browser to the Microsoft
+#     sign-in page; Sunny signs in the normal way (same as the Fabric
+#     portal); Microsoft sends the browser back to a one-time localhost
+#     address where the script is listening, and the script trades that
+#     answer for a Fabric API token. Standard library only, token held
+#     in memory for this run only, nothing stored on disk.
 #     (A service principal / GitHub Actions variant can come later; this
 #     step is the by-Sunny's-hand version.)
 #
@@ -81,7 +86,10 @@
 #     "Sunny validates by eyeballing the artifacts".
 
 import argparse
+import base64
+import hashlib
 import json
+import os
 import subprocess
 import sys
 import time
@@ -89,6 +97,8 @@ import urllib.error
 import urllib.parse
 import urllib.request
 import uuid
+import webbrowser
+from http.server import BaseHTTPRequestHandler, HTTPServer
 from pathlib import Path
 
 CODE_DIR = Path(__file__).resolve().parent
@@ -97,8 +107,8 @@ FABRIC_API = "https://api.fabric.microsoft.com/v1"
 FABRIC_SCOPE = "https://api.fabric.microsoft.com/.default"
 LOGIN_BASE = "https://login.microsoftonline.com"
 # Microsoft's well-known PUBLIC client id for the Azure CLI — the standard
-# app id for device-code sign-in; it is not a secret and belongs to no tenant.
-DEVICE_LOGIN_CLIENT_ID = "04b07795-8ddb-461a-bbee-02f9e1bf7b46"
+# app id for command-line sign-in; it is not a secret and belongs to no tenant.
+SIGN_IN_CLIENT_ID = "04b07795-8ddb-461a-bbee-02f9e1bf7b46"
 
 POLL_SECONDS = 30
 
@@ -122,42 +132,94 @@ def build_wheel(code_dir=CODE_DIR):
 
 
 # --------------------------------------------------------------------------
-# Step 2 — device-code sign-in (standard library only)
+# Step 2 — normal browser sign-in (standard library only)
 # --------------------------------------------------------------------------
 
 
 def _post_form(url, fields):
     data = urllib.parse.urlencode(fields).encode()
-    with urllib.request.urlopen(urllib.request.Request(url, data=data)) as resp:
-        return json.loads(resp.read())
+    try:
+        with urllib.request.urlopen(urllib.request.Request(url, data=data)) as resp:
+            return json.loads(resp.read())
+    except urllib.error.HTTPError as e:
+        body = json.loads(e.read())
+        raise SystemExit(f"sign-in failed: {body.get('error_description', body)}")
+
+
+class _SignInHandler(BaseHTTPRequestHandler):
+    """Catches the single browser redirect that carries the sign-in answer."""
+
+    def do_GET(self):
+        query = urllib.parse.parse_qs(urllib.parse.urlparse(self.path).query)
+        self.server.signin_answer = {k: v[0] for k, v in query.items()}
+        page = (
+            "<html><body style='font-family:sans-serif'>"
+            "<h2>Signed in — you can close this tab and return to the "
+            "command window.</h2></body></html>"
+        ).encode()
+        self.send_response(200)
+        self.send_header("Content-Type", "text/html; charset=utf-8")
+        self.send_header("Content-Length", str(len(page)))
+        self.end_headers()
+        self.wfile.write(page)
+
+    def log_message(self, *args):  # keep the terminal clean
+        pass
 
 
 def sign_in(tenant):
-    start = _post_form(
-        f"{LOGIN_BASE}/{tenant}/oauth2/v2.0/devicecode",
-        {"client_id": DEVICE_LOGIN_CLIENT_ID, "scope": FABRIC_SCOPE},
+    # Proof-of-possession pair (PKCE): a secret made fresh for this run;
+    # only the process that STARTED the sign-in can finish it.
+    verifier = base64.urlsafe_b64encode(os.urandom(32)).rstrip(b"=").decode()
+    challenge = (
+        base64.urlsafe_b64encode(hashlib.sha256(verifier.encode()).digest())
+        .rstrip(b"=")
+        .decode()
     )
-    print()
-    print(start["message"])  # "go to https://microsoft.com/devicelogin, code ..."
-    print()
-    while True:
-        time.sleep(int(start.get("interval", 5)))
-        try:
-            token = _post_form(
-                f"{LOGIN_BASE}/{tenant}/oauth2/v2.0/token",
-                {
-                    "grant_type": "urn:ietf:params:oauth:grant-type:device_code",
-                    "client_id": DEVICE_LOGIN_CLIENT_ID,
-                    "device_code": start["device_code"],
-                },
-            )
-            print("signed in")
-            return token["access_token"]
-        except urllib.error.HTTPError as e:
-            body = json.loads(e.read())
-            if body.get("error") == "authorization_pending":
-                continue  # Sunny has not finished the browser step yet
-            raise SystemExit(f"sign-in failed: {body.get('error_description', body)}")
+    state = uuid.uuid4().hex
+
+    listener = HTTPServer(("127.0.0.1", 0), _SignInHandler)  # free port
+    redirect_uri = f"http://localhost:{listener.server_address[1]}"
+
+    auth_url = f"{LOGIN_BASE}/{tenant}/oauth2/v2.0/authorize?" + urllib.parse.urlencode(
+        {
+            "client_id": SIGN_IN_CLIENT_ID,
+            "response_type": "code",
+            "redirect_uri": redirect_uri,
+            "scope": FABRIC_SCOPE,
+            "state": state,
+            "code_challenge": challenge,
+            "code_challenge_method": "S256",
+            "prompt": "select_account",
+        }
+    )
+    print("\nopening the browser for Microsoft sign-in…")
+    print(f"(if no browser opens, paste this address yourself:\n{auth_url})\n")
+    webbrowser.open(auth_url)
+
+    listener.handle_request()  # waits for the one redirect back
+    answer = getattr(listener, "signin_answer", {})
+    listener.server_close()
+
+    if answer.get("error"):
+        raise SystemExit(
+            f"sign-in failed: {answer.get('error_description', answer['error'])}"
+        )
+    if answer.get("state") != state or "code" not in answer:
+        raise SystemExit("sign-in failed: the browser's answer did not match this run")
+
+    token = _post_form(
+        f"{LOGIN_BASE}/{tenant}/oauth2/v2.0/token",
+        {
+            "grant_type": "authorization_code",
+            "client_id": SIGN_IN_CLIENT_ID,
+            "code": answer["code"],
+            "redirect_uri": redirect_uri,
+            "code_verifier": verifier,
+        },
+    )
+    print("signed in")
+    return token["access_token"]
 
 
 # --------------------------------------------------------------------------
