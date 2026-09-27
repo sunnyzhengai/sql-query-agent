@@ -1,0 +1,77 @@
+
+-- =============================================
+-- Revise Date:    11/4/2022
+-- Description:    This stored procedure was created to replace the Crystal report CC_Encounter Recon (Crystal).rpt  
+-- =============================================
+CREATE             PROCEDURE [schema1].[USP_ADT_MONTHLY_INPATIENT_CENSUS_TOTALS_SSRS]
+
+-- Add the parameters for the stored procedure here
+  @StartDate DATE
+, @EndDate DATE
+, @AsOfDate DATE
+, @ServiceArea VARCHAR(MAX)
+, @Location VARCHAR(MAX)
+
+AS
+
+BEGIN
+
+-- SET NOCOUNT ON added to prevent extra result sets from
+-- interfering with SELECT statements.
+SET NOCOUNT ON;
+
+SELECT adt.EVENT_TYPE_C as					'Event Type',
+	   adt.EVENT_SUBTYPE_C as				'Event SubType',
+	   adt.EFFECTIVE_TIME as				'Effective Time',
+	   adt.PAT_ID as						'Patient ID',
+	   pc.ABBR as							'Patient Class',
+	   dep.DEPT_ABBREVIATION as				'Department',
+	   rm.ROOM_NAME as						'Room',
+	   bd.BED_LABEL as						'Bed Label',
+	   ps.NAME as							'Patient Servce',
+	   adt.DELETE_TIME as					'Delete Time',
+	   adt.EVENT_TIME as					'Event Time',
+	   sa.SERV_AREA_NAME as					'Service Area',
+	   dep.DEPARTMENT_ID as					'Department ID',
+	   rm.ROOM_ID as						'Room ID',
+	   bd.BED_ID as							'Bed ID',
+	   adt.EVENT_ID as						'Event ID',
+	   DATEPART(DAY, adt.EFFECTIVE_TIME) as 'Census Day'
+
+
+FROM clarity..CLARITY_ADT adt
+
+	LEFT JOIN clarity..CLARITY_BED bd
+	ON adt.BED_CSN_ID = bd.BED_CSN_ID
+
+	LEFT JOIN clarity..CLARITY_ROM rm
+	ON adt.ROOM_CSN_ID = rm.ROOM_CSN_ID
+
+	LEFT JOIN clarity..CLARITY_DEP dep
+	ON adt.DEPARTMENT_ID = dep.DEPARTMENT_ID
+
+	LEFT JOIN clarity..ZC_PAT_CLASS pc
+	ON adt.PAT_CLASS_C = pc.ADT_PAT_CLASS_C
+
+	LEFT JOIN clarity..ZC_PAT_SERVICE ps
+	ON adt.PAT_SERVICE_C = ps.HOSP_SERV_C
+
+	LEFT JOIN clarity..CLARITY_SA sa
+	ON dep.SERV_AREA_ID = sa.SERV_AREA_ID
+
+
+WHERE adt.EVENT_TYPE_C = '6'
+and adt.EFFECTIVE_TIME >= @StartDate
+and adt.EFFECTIVE_TIME < DATEADD(D, 1, @EndDate)
+and adt.EVENT_TIME < DATEADD(D, 1, @AsOfDate)
+and adt.PAT_ID is not null
+and ((adt.EVENT_SUBTYPE_C <> '2') OR (adt.EVENT_SUBTYPE_C = '2' AND adt.DELETE_TIME >= DATEADD(D, 1, @AsOfDate)))
+AND EXISTS (SELECT 1 FROM STRING_SPLIT(@ServiceArea, ',') WHERE [value] IN ('0', dep.SERV_AREA_ID))
+AND EXISTS (SELECT 1 FROM STRING_SPLIT(@Location, ',') WHERE [value] IN ('0', dep.REV_LOC_ID))
+and adt.DEPARTMENT_ID not in ('108022','108034','108047','108049','108068','108112','108118','639001')
+
+END 
+
+GO
+
+
