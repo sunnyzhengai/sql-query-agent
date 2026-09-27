@@ -329,6 +329,16 @@ def parse_args(argv=None):
         "--tenant", default="organizations",
         help="Entra tenant id (default: asked during sign-in)",
     )
+    # F21: one command syncs wheel + notebook. Optional — without it,
+    # behavior is exactly as before.
+    parser.add_argument(
+        "--notebook", help="Notebook item id — also sync its definition (F21)"
+    )
+    parser.add_argument(
+        "--notebook-source",
+        default=str(CODE_DIR / "notebook_f11_load_lh_table.py"),
+        help="source .py to push when --notebook is given (default: the F11 cell)",
+    )
     return parser.parse_args(argv)
 
 
@@ -346,6 +356,11 @@ def main(argv=None):
 
     upload_staging_library(token, args.workspace, args.environment, wheel)
     print(f"staged: {wheel.name} is uploaded (not live until publish)")
+
+    if args.notebook:
+        from sync_notebook import sync_definition  # one sign-in covers both
+
+        sync_definition(token, args.workspace, args.notebook, args.notebook_source)
 
     reply = input("Publish environment now? Takes minutes, consumes capacity. [y/N] ")
     if reply.strip().lower() != "y":

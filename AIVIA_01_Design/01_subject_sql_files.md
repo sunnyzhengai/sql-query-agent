@@ -25,11 +25,13 @@ Fabric
     
     F11: Create a Notebook. Attach AIVIA_01_ENV as its environment and AIVIA_01_LH as its default lakehouse, paste the one cell from the top of load_lh_table.py (the from load_lh_table import to_table_rows … saveAsTable block), and run it. Load the data sheet json (01_subject_sql_files_data_sheet.json) from Files into lakehouse table f01_subject_sql_files_lh_table.".     
     F12: Create a Fabric graph model, AIVIA_01_GRAPH.
-    F13: Load the lakehouse table into the graph model. Each report as a node, populate names and embeddings in the nodes as properties.
+    F13: Load the lakehouse table f01_subject_sql_files_graph (embedding-free graph export written by the F11 notebook) into the graph model. Each report as a node (SQL_FILE), names as properties. Embeddings do NOT enter the graph — ruled 2026-09-27: the graph cannot hold the 3072-number array; embeddings stay in f01_subject_sql_files_lh_table.
+    
     F14: Create the test suites using GQL to validate the loading of the table is correct. Run the tests.
     F15: Create a graph visual design document to standardize the graph visual page. (In the past we always encountered the same issues with visuals).
     F16: Create visual page for this graph model.
-    F17: Create a chat interface for this graph model, using LLM to understand user's questions and compare embeddings with the graph model's embeddings.
+    F17: Create a chat interface for this graph model, using LLM to understand user's questions and compare embeddings with the embeddings in f01_subject_sql_files_lh_table; the graph serves structure.
     F18: Return matched nodes. Return all nodes ranked, with similarity scores.
     F19: Packages arrive in Fabric via a Fabric Environment item with pinned versions matching local (openai==3.19.2) — not per-notebook %pip install.
-    - All paths and the key location are parameters/contract facts, never written inside code — the notebook passes lakehouse paths to the same functions we tested locally.
+    F20: All paths and the key location are parameters/contract facts, never written inside code — the notebook passes lakehouse paths to the same functions we tested locally.
+    F21: notebook definitions sync from AIVIA_01_Code via the sync script; running stays by my hand
