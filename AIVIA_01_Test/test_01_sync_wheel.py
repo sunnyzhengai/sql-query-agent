@@ -32,11 +32,12 @@ def test_build_wheel_produces_aivia01_wheel_with_both_modules():
     two modules the notebook will import (a wheel is a zip - look inside)."""
     wheel = build_wheel()
     assert wheel.exists()
-    assert wheel.name.startswith("aivia01-0.1.0"), wheel.name
+    assert wheel.name.startswith("aivia01-0.2.0"), wheel.name
     assert wheel.suffix == ".whl"
     names = zipfile.ZipFile(wheel).namelist()
     assert "build_data_sheet.py" in names, names
     assert "local_chat.py" in names, names
+    assert "load_lh_table.py" in names, names
 
 
 def test_command_refuses_to_run_without_ids_naming_them():
@@ -50,3 +51,20 @@ def test_command_refuses_to_run_without_ids_naming_them():
     assert proc.returncode != 0
     assert "--workspace" in proc.stderr
     assert "--environment" in proc.stderr
+
+
+def test_stale_wheel_names_lists_every_other_aivia01_wheel():
+    """The version-collision mechanism (ruled 2026-09-27): a version bump
+    changes the wheel FILE NAME, so Fabric would keep old and new side by
+    side. Before uploading, the script deletes every stale aivia01 wheel
+    from the environment's staging; this pins which names it targets."""
+    from sync_wheel import build_wheel, stale_wheel_names
+
+    current = build_wheel()
+    stale = stale_wheel_names(current)
+    assert current.name not in stale, "must never delete the wheel being shipped"
+    assert all(n.startswith("aivia01-") and n.endswith(".whl") for n in stale)
+    dist_names = {p.name for p in current.parent.glob("aivia01-*.whl")}
+    assert set(stale) == dist_names - {current.name}, (
+        "stale = every OTHER aivia01 wheel in dist"
+    )

@@ -59,6 +59,13 @@
 #     Staging = uploaded but not live. Uploading the same file name again
 #     replaces it. Fail loudly on any non-success answer, printing
 #     Fabric's error text verbatim.
+#     THE VERSION-COLLISION MECHANISM (ruled 2026-09-27, found at the
+#     0.1.0 -> 0.2.0 bump before it could bite): a version bump changes
+#     the wheel FILE NAME, so Fabric would keep old and new side by side
+#     and the import winner would be luck. Before uploading, the script
+#     deletes every OTHER aivia01-*.whl it knows from local dist/ out of
+#     the environment's staging (absent ones are fine and skipped) —
+#     every sync leaves exactly ONE aivia01 in the environment.
 #
 # Step 4 — confirm, then publish.
 #     Publish rebuilds the environment pool: several minutes, consumes
@@ -261,6 +268,30 @@ def upload_staging_library(token, workspace, environment, wheel_path):
     )
 
 
+def stale_wheel_names(current_wheel):
+    """Every OTHER aivia01 wheel in dist/ — the file names a version bump
+    left behind, which must not linger in the environment."""
+    return sorted(
+        p.name
+        for p in current_wheel.parent.glob("aivia01-*.whl")
+        if p.name != current_wheel.name
+    )
+
+
+def delete_staged_library(token, workspace, environment, file_name):
+    """Best effort: True if deleted, False if Fabric said no (usually
+    'not there', which is exactly the state we want)."""
+    try:
+        _fabric(
+            token, "DELETE",
+            f"workspaces/{workspace}/environments/{environment}/staging/libraries"
+            f"?libraryToDelete={urllib.parse.quote(file_name)}",
+        )
+        return True
+    except SystemExit:
+        return False
+
+
 def publish(token, workspace, environment):
     _fabric(
         token, "POST",
@@ -308,6 +339,10 @@ def main(argv=None):
     print(f"\nwheel built: {wheel.name} ({wheel.stat().st_size:,} bytes)")
 
     token = sign_in(args.tenant)
+
+    for stale in stale_wheel_names(wheel):
+        if delete_staged_library(token, args.workspace, args.environment, stale):
+            print(f"removed stale wheel from staging: {stale}")
 
     upload_staging_library(token, args.workspace, args.environment, wheel)
     print(f"staged: {wheel.name} is uploaded (not live until publish)")
