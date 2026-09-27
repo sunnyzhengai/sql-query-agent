@@ -1,7 +1,12 @@
 Sunny's Test Cases
 
 Testing Method:
-- Sunny to open a command window and use command:"/opt/homebrew/bin/python3.11 -m pytest AIVIA_01_Test/ -v"
+- Sunny to open a command window and use command:
+  /opt/homebrew/bin/python3.11 AIVIA_01_Code/local_chat.py AIVIA_01_Data/01_subject_sql_files/01_subject_sql_files_data_sheet.json
+- To type the inputs below, Sunny starts the local web chat with command:
+  "/opt/homebrew/bin/python3.11 AIVIA_01_Code/local_chat.py AIVIA_01_Data/01_subject_sql_files/01_subject_sql_files_data_sheet.json"
+  then opens http://localhost:8701 in a browser. Ctrl+C in the command window stops it.
+  Each question costs one paid embedding call.
 - Sunny to type each of the following inputs and see the outputs.
 
 Test Case 1:
@@ -9,7 +14,7 @@ Test Case 1:
 - Expected Output: all 8 file names should be returned.
 
 - Input: Which reports for for CCMC?
-- Expected Output: all 8 file names should be returned. 2 report names with "CCMC" in the name should be ranked higher than other 6 files names.
+- Expected Output: all 8 file names should be returned. 2 report names with "CCMC" in the name may or may not be ranked higher than other 6 files names.
   Reporting_USP_CCMC_LOTE_Census_Interpreter_Services_Detail_PBI
   Reporting_USP_CCMC_LOTE_Census_Interpreter_Services_Summary_PBI
 

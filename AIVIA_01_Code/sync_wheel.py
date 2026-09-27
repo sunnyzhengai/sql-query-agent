@@ -1,0 +1,276 @@
+# sync_wheel.py — PSEUDO CODE ONLY, awaiting Sunny's review.
+# Real code will be written directly below these comments after approval.
+#
+# Design:  AIVIA_01_Design/01_subject_sql_files.md — "Packages arrive in
+#          Fabric via a Fabric Environment item" — this script is the local
+#          automation of that arrival: build the wheel, upload it to the
+#          Environment item, publish. Ruled 2026-09-26: automation runs by
+#          Sunny's hand (one command), never on a timer or a git push.
+#
+# WHAT MUST EXIST FIRST (one-time, Sunny's hand, in the Fabric portal):
+#   - the workspace for AIVIA_01
+#   - an Environment item in it (the design doc's pinned openai==3.19.2
+#     goes in its public libraries, set once in the portal)
+#   The script never creates these — creating Fabric items is capacity
+#   and stays with Sunny.
+#
+# THE WHEEL (new, rides this step):
+#   AIVIA_01_Code/pyproject.toml — package name aivia01, version 0.1.0,
+#   floor python 3.11. It packages the two modules built so far:
+#   build_data_sheet and local_chat (the notebook imports build_data_sheet
+#   and local_chat's rank/answer functions; the web layer just comes along).
+#   Version bumps by hand in pyproject.toml when code changes — Fabric
+#   replaces a staged library by file name, so the file name stays
+#   aivia01-<version>-py3-none-any.whl.
+#
+# THE COMMAND (all ids are PARAMETERS — never written inside the code):
+#   /opt/homebrew/bin/python3.11 AIVIA_01_Code/sync_wheel.py \
+#       --workspace <workspace-id> --environment <environment-id> \
+#       [--tenant <tenant-id>]
+#   Workspace and environment ids come from the Fabric portal URL when the
+#   Environment item is open (the script prints where to look if missing).
+#   --tenant defaults to "organizations" (the sign-in step then asks which
+#   tenant); passing your tenant id skips that question.
+#
+# PSEUDO CODE
+#
+# Step 1 — build the wheel.
+#     Run: python -m build --wheel AIVIA_01_Code/  (the `build` package,
+#     already on the one Python). Take the newest .whl from
+#     AIVIA_01_Code/dist/. Print its name and size.
+#
+# Step 2 — sign in (device-code flow, standard library only).
+#     No new packages: plain https calls to Microsoft's login service.
+#     The script prints: "go to https://microsoft.com/devicelogin and
+#     enter code XXXX-XXXX". Sunny signs in with her own Entra ID in the
+#     browser; the script polls until sign-in completes, then holds a
+#     Fabric API token for this run only. Nothing is stored on disk.
+#     (A service principal / GitHub Actions variant can come later; this
+#     step is the by-Sunny's-hand version.)
+#
+# Step 3 — upload the wheel to the Environment's STAGING libraries.
+#     POST the .whl bytes to the Fabric REST endpoint:
+#       workspaces/<id>/environments/<id>/staging/libraries
+#     Staging = uploaded but not live. Uploading the same file name again
+#     replaces it. Fail loudly on any non-success answer, printing
+#     Fabric's error text verbatim.
+#
+# Step 4 — confirm, then publish.
+#     Publish rebuilds the environment pool: several minutes, consumes
+#     capacity. The script STOPS and asks:
+#       "Publish environment now? [y/N]"
+#     Only "y" proceeds (the capacity law, enforced in code). "N" leaves
+#     the wheel staged — publishable later from the portal.
+#
+# Step 5 — poll until publish finishes.
+#     GET the environment every 30 seconds, print the publish state
+#     (running / success / failed). On failed: print Fabric's error
+#     verbatim and exit non-zero. On success: print the installed
+#     libraries list so Sunny sees aivia01 sitting next to openai 3.19.2.
+#
+# TESTS (test_01_sync_wheel.py, red first) — what is mechanically pinned:
+#   - Step 1 is fully testable: building produces exactly one
+#     aivia01-*.whl, and the wheel really contains build_data_sheet and
+#     local_chat (unzip and look — a wheel is a zip).
+#   - the command refuses to run without --workspace/--environment,
+#     naming what is missing.
+#   - Steps 2-5 touch the live Fabric service and Sunny's sign-in; they
+#     are NOT pytest-able without her hand. Their acceptance test is the
+#     first real run: Sunny runs the command, signs in, sees aivia01 in
+#     the environment's libraries in the portal. That run is this step's
+#     "Sunny validates by eyeballing the artifacts".
+
+import argparse
+import json
+import subprocess
+import sys
+import time
+import urllib.error
+import urllib.parse
+import urllib.request
+import uuid
+from pathlib import Path
+
+CODE_DIR = Path(__file__).resolve().parent
+
+FABRIC_API = "https://api.fabric.microsoft.com/v1"
+FABRIC_SCOPE = "https://api.fabric.microsoft.com/.default"
+LOGIN_BASE = "https://login.microsoftonline.com"
+# Microsoft's well-known PUBLIC client id for the Azure CLI — the standard
+# app id for device-code sign-in; it is not a secret and belongs to no tenant.
+DEVICE_LOGIN_CLIENT_ID = "04b07795-8ddb-461a-bbee-02f9e1bf7b46"
+
+POLL_SECONDS = 30
+
+
+# --------------------------------------------------------------------------
+# Step 1 — build the wheel
+# --------------------------------------------------------------------------
+
+
+def build_wheel(code_dir=CODE_DIR):
+    subprocess.run(
+        [sys.executable, "-m", "build", "--wheel", "--no-isolation", str(code_dir)],
+        check=True,
+    )
+    wheels = sorted(
+        (code_dir / "dist").glob("aivia01-*.whl"), key=lambda p: p.stat().st_mtime
+    )
+    if not wheels:
+        raise FileNotFoundError(f"build finished but no aivia01 wheel in {code_dir}/dist")
+    return wheels[-1]
+
+
+# --------------------------------------------------------------------------
+# Step 2 — device-code sign-in (standard library only)
+# --------------------------------------------------------------------------
+
+
+def _post_form(url, fields):
+    data = urllib.parse.urlencode(fields).encode()
+    with urllib.request.urlopen(urllib.request.Request(url, data=data)) as resp:
+        return json.loads(resp.read())
+
+
+def sign_in(tenant):
+    start = _post_form(
+        f"{LOGIN_BASE}/{tenant}/oauth2/v2.0/devicecode",
+        {"client_id": DEVICE_LOGIN_CLIENT_ID, "scope": FABRIC_SCOPE},
+    )
+    print()
+    print(start["message"])  # "go to https://microsoft.com/devicelogin, code ..."
+    print()
+    while True:
+        time.sleep(int(start.get("interval", 5)))
+        try:
+            token = _post_form(
+                f"{LOGIN_BASE}/{tenant}/oauth2/v2.0/token",
+                {
+                    "grant_type": "urn:ietf:params:oauth:grant-type:device_code",
+                    "client_id": DEVICE_LOGIN_CLIENT_ID,
+                    "device_code": start["device_code"],
+                },
+            )
+            print("signed in")
+            return token["access_token"]
+        except urllib.error.HTTPError as e:
+            body = json.loads(e.read())
+            if body.get("error") == "authorization_pending":
+                continue  # Sunny has not finished the browser step yet
+            raise SystemExit(f"sign-in failed: {body.get('error_description', body)}")
+
+
+# --------------------------------------------------------------------------
+# Steps 3-5 — Fabric REST calls (fail loudly, Fabric's words verbatim)
+# --------------------------------------------------------------------------
+
+
+def _fabric(token, method, path, body=None, content_type=None):
+    req = urllib.request.Request(
+        f"{FABRIC_API}/{path}", data=body, method=method,
+        headers={"Authorization": f"Bearer {token}"},
+    )
+    if content_type:
+        req.add_header("Content-Type", content_type)
+    try:
+        with urllib.request.urlopen(req) as resp:
+            raw = resp.read()
+            return json.loads(raw) if raw else {}
+    except urllib.error.HTTPError as e:
+        raise SystemExit(
+            f"Fabric said no to {method} {path} "
+            f"(HTTP {e.code}):\n{e.read().decode(errors='replace')}"
+        )
+
+
+def upload_staging_library(token, workspace, environment, wheel_path):
+    boundary = uuid.uuid4().hex
+    head = (
+        f"--{boundary}\r\n"
+        f'Content-Disposition: form-data; name="file"; filename="{wheel_path.name}"\r\n'
+        f"Content-Type: application/octet-stream\r\n\r\n"
+    ).encode()
+    tail = f"\r\n--{boundary}--\r\n".encode()
+    _fabric(
+        token, "POST",
+        f"workspaces/{workspace}/environments/{environment}/staging/libraries",
+        body=head + wheel_path.read_bytes() + tail,
+        content_type=f"multipart/form-data; boundary={boundary}",
+    )
+
+
+def publish(token, workspace, environment):
+    _fabric(
+        token, "POST",
+        f"workspaces/{workspace}/environments/{environment}/staging/publish",
+    )
+
+
+def publish_state(token, workspace, environment):
+    env = _fabric(token, "GET", f"workspaces/{workspace}/environments/{environment}")
+    details = (env.get("properties") or {}).get("publishDetails") or {}
+    return details.get("state", "unknown"), env
+
+
+def list_libraries(token, workspace, environment):
+    return _fabric(
+        token, "GET", f"workspaces/{workspace}/environments/{environment}/libraries"
+    )
+
+
+# --------------------------------------------------------------------------
+# The command
+# --------------------------------------------------------------------------
+
+
+def parse_args(argv=None):
+    parser = argparse.ArgumentParser(
+        description="Build the aivia01 wheel, upload it to the Fabric "
+        "Environment item, and (after asking) publish. Ids are in the "
+        "portal URL when the Environment item is open: "
+        ".../groups/<workspace-id>/environments/<environment-id>",
+    )
+    parser.add_argument("--workspace", required=True, help="Fabric workspace id")
+    parser.add_argument("--environment", required=True, help="Environment item id")
+    parser.add_argument(
+        "--tenant", default="organizations",
+        help="Entra tenant id (default: asked during sign-in)",
+    )
+    return parser.parse_args(argv)
+
+
+def main(argv=None):
+    args = parse_args(argv)
+
+    wheel = build_wheel()
+    print(f"\nwheel built: {wheel.name} ({wheel.stat().st_size:,} bytes)")
+
+    token = sign_in(args.tenant)
+
+    upload_staging_library(token, args.workspace, args.environment, wheel)
+    print(f"staged: {wheel.name} is uploaded (not live until publish)")
+
+    reply = input("Publish environment now? Takes minutes, consumes capacity. [y/N] ")
+    if reply.strip().lower() != "y":
+        print("left staged — publish later from the portal or rerun this script")
+        return 0
+
+    publish(token, args.workspace, args.environment)
+    print("publish started")
+    while True:
+        state, env = publish_state(token, args.workspace, args.environment)
+        print(f"  publish state: {state}")
+        if state.lower() == "success":
+            print("\ninstalled libraries now:")
+            print(json.dumps(list_libraries(token, args.workspace, args.environment),
+                             indent=2))
+            return 0
+        if state.lower() in ("failed", "cancelled"):
+            print("publish did not succeed — Fabric's answer, verbatim:")
+            print(json.dumps(env, indent=2))
+            return 1
+        time.sleep(POLL_SECONDS)
+
+
+if __name__ == "__main__":
+    sys.exit(main())

@@ -1,0 +1,15 @@
+# aivia01 — the AIVIA_01 modules, packaged as a wheel for the Fabric
+# Environment item (design doc: the wheel arrives via sync_wheel.py, run
+# by Sunny's hand). Version bumps by hand here when code changes.
+[build-system]
+requires = ["setuptools", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "aivia01"
+version = "0.1.0"
+description = "AIVIA_01 subject-sql-files modules: data sheet builder + embedding chat"
+requires-python = ">=3.11"
+
+[tool.setuptools]
+py-modules = ["build_data_sheet", "local_chat"]
