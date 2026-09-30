@@ -84,6 +84,13 @@ def decide(payload: dict, project: Path):
             or rel == ".claude/settings.local.json":
         return 0, None  # verdicts always land
 
+    if rel.startswith(("AIVIA_01_Code/", "AIVIA_01_Test/")):
+        # AIVIA_01 estate (Brief_AIVIA_01_Gate_Carveout, ruled
+        # 2026-09-26): CLAUDE.md "THE CHANGE PROCESS" governs —
+        # Claude authors these two folders with Sunny's permission
+        # in chat. AIVIA_01_Design/ and AIVIA_01_Data/ stay covered.
+        return 0, None
+
     covered = (rel.startswith(COVERED_ROOTS) or rel in GATE_FILES
                or rel.endswith((".py", ".ipynb")))
     if not covered:

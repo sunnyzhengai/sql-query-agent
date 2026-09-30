@@ -1,0 +1,12 @@
+[
+  {
+    "database_name": "clarity",
+    "schema_name": "dbo",
+    "table_name": "CR_STAT_EXECUTION",
+    "column_name": "",
+    "sql_file_names": [
+      "COOK_RPT_usp_PTA_CensusDashboard_PBI",
+      "COOK_RPT_usp_SF_CensusDashboard"
+    ]
+  }
+]

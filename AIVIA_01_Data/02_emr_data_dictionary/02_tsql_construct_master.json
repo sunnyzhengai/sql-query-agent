@@ -1,0 +1,7482 @@
+[
+  {
+    "construct": "AIAnalyzeSentimentFunctionCall",
+    "keywords": "AIANALYZE SENTIMENT FUNCTION CALL",
+    "count_in_corpus": 0,
+    "example": "",
+    "status": "unseen",
+    "ruling": ""
+  },
+  {
+    "construct": "AIClassifyFunctionCall",
+    "keywords": "AICLASSIFY FUNCTION CALL",
+    "count_in_corpus": 0,
+    "example": "",
+    "status": "unseen",
+    "ruling": ""
+  },
+  {
+    "construct": "AIExtractFunctionCall",
+    "keywords": "AIEXTRACT FUNCTION CALL",
+    "count_in_corpus": 0,
+    "example": "",
+    "status": "unseen",
+    "ruling": ""
+  },
+  {
+    "construct": "AIFixGrammarFunctionCall",
+    "keywords": "AIFIX GRAMMAR FUNCTION CALL",
+    "count_in_corpus": 0,
+    "example": "",
+    "status": "unseen",
+    "ruling": ""
+  },
+  {
+    "construct": "AIGenerateChunksTableReference",
+    "keywords": "AIGENERATE CHUNKS TABLE REFERENCE",
+    "count_in_corpus": 0,
+    "example": "",
+    "status": "unseen",
+    "ruling": ""
+  },
+  {
+    "construct": "AIGenerateEmbeddingsFunctionCall",
+    "keywords": "AIGENERATE EMBEDDINGS FUNCTION CALL",
+    "count_in_corpus": 0,
+    "example": "",
+    "status": "unseen",
+    "ruling": ""
+  },
+  {
+    "construct": "AIGenerateFixedChunksTableReference",
+    "keywords": "AIGENERATE FIXED CHUNKS TABLE REFERENCE",
+    "count_in_corpus": 0,
+    "example": "",
+    "status": "unseen",
+    "ruling": ""
+  },
+  {
+    "construct": "AIGenerateResponseFunctionCall",
+    "keywords": "AIGENERATE RESPONSE FUNCTION CALL",
+    "count_in_corpus": 0,
+    "example": "",
+    "status": "unseen",
+    "ruling": ""
+  },
+  {
+    "construct": "AISummarizeFunctionCall",
+    "keywords": "AISUMMARIZE FUNCTION CALL",
+    "count_in_corpus": 0,
+    "example": "",
+    "status": "unseen",
+    "ruling": ""
+  },
+  {
+    "construct": "AITranslateFunctionCall",
+    "keywords": "AITRANSLATE FUNCTION CALL",
+    "count_in_corpus": 0,
+    "example": "",
+    "status": "unseen",
+    "ruling": ""
+  },
+  {
+    "construct": "AcceleratedDatabaseRecoveryDatabaseOption",
+    "keywords": "ACCELERATED DATABASE RECOVERY DATABASE OPTION",
+    "count_in_corpus": 0,
+    "example": "",
+    "status": "unseen",
+    "ruling": ""
+  },
+  {
+    "construct": "AdHocDataSource",
+    "keywords": "AD HOC DATA SOURCE",
+    "count_in_corpus": 0,
+    "example": "",
+    "status": "unseen",
+    "ruling": ""
+  },
+  {
+    "construct": "AdHocTableReference",
+    "keywords": "AD HOC TABLE REFERENCE",
+    "count_in_corpus": 0,
+    "example": "",
+    "status": "unseen",
+    "ruling": ""
+  },
+  {
+    "construct": "AddAlterFullTextIndexAction",
+    "keywords": "ADD ALTER FULL TEXT INDEX ACTION",
+    "count_in_corpus": 0,
+    "example": "",
+    "status": "unseen",
+    "ruling": ""
+  },
+  {
+    "construct": "AddFileSpec",
+    "keywords": "ADD FILE SPEC",
+    "count_in_corpus": 0,
+    "example": "",
+    "status": "unseen",
+    "ruling": ""
+  },
+  {
+    "construct": "AddMemberAlterRoleAction",
+    "keywords": "ADD MEMBER ALTER ROLE ACTION",
+    "count_in_corpus": 0,
+    "example": "",
+    "status": "unseen",
+    "ruling": ""
+  },
+  {
+    "construct": "AddSearchPropertyListAction",
+    "keywords": "ADD SEARCH PROPERTY LIST ACTION",
+    "count_in_corpus": 0,
+    "example": "",
+    "status": "unseen",
+    "ruling": ""
+  },
+  {
+    "construct": "AddSensitivityClassificationStatement",
+    "keywords": "ADD SENSITIVITY CLASSIFICATION STATEMENT",
+    "count_in_corpus": 0,
+    "example": "",
+    "status": "unseen",
+    "ruling": ""
+  },
+  {
+    "construct": "AddSignatureStatement",
+    "keywords": "ADD SIGNATURE STATEMENT",
+    "count_in_corpus": 0,
+    "example": "",
+    "status": "unseen",
+    "ruling": ""
+  },
+  {
+    "construct": "AlgorithmKeyOption",
+    "keywords": "ALGORITHM KEY OPTION",
+    "count_in_corpus": 0,
+    "example": "",
+    "status": "unseen",
+    "ruling": ""
+  },
+  {
+    "construct": "AlterApplicationRoleStatement",
+    "keywords": "ALTER APPLICATION ROLE STATEMENT",
+    "count_in_corpus": 0,
+    "example": "",
+    "status": "unseen",
+    "ruling": ""
+  },
+  {
+    "construct": "AlterAssemblyStatement",
+    "keywords": "ALTER ASSEMBLY STATEMENT",
+    "count_in_corpus": 0,
+    "example": "",
+    "status": "unseen",
+    "ruling": ""
+  },
+  {
+    "construct": "AlterAsymmetricKeyStatement",
+    "keywords": "ALTER ASYMMETRIC KEY STATEMENT",
+    "count_in_corpus": 0,
+    "example": "",
+    "status": "unseen",
+    "ruling": ""
+  },
+  {
+    "construct": "AlterAuthorizationStatement",
+    "keywords": "ALTER AUTHORIZATION STATEMENT",
+    "count_in_corpus": 0,
+    "example": "",
+    "status": "unseen",
+    "ruling": ""
+  },
+  {
+    "construct": "AlterAvailabilityGroupAction",
+    "keywords": "ALTER AVAILABILITY GROUP ACTION",
+    "count_in_corpus": 0,
+    "example": "",
+    "status": "unseen",
+    "ruling": ""
+  },
+  {
+    "construct": "AlterAvailabilityGroupFailoverAction",
+    "keywords": "ALTER AVAILABILITY GROUP FAILOVER ACTION",
+    "count_in_corpus": 0,
+    "example": "",
+    "status": "unseen",
+    "ruling": ""
+  },
+  {
+    "construct": "AlterAvailabilityGroupFailoverOption",
+    "keywords": "ALTER AVAILABILITY GROUP FAILOVER OPTION",
+    "count_in_corpus": 0,
+    "example": "",
+    "status": "unseen",
+    "ruling": ""
+  },
+  {
+    "construct": "AlterAvailabilityGroupStatement",
+    "keywords": "ALTER AVAILABILITY GROUP STATEMENT",
+    "count_in_corpus": 0,
+    "example": "",
+    "status": "unseen",
+    "ruling": ""
+  },
+  {
+    "construct": "AlterBrokerPriorityStatement",
+    "keywords": "ALTER BROKER PRIORITY STATEMENT",
+    "count_in_corpus": 0,
+    "example": "",
+    "status": "unseen",
+    "ruling": ""
+  },
+  {
+    "construct": "AlterCertificateStatement",
+    "keywords": "ALTER CERTIFICATE STATEMENT",
+    "count_in_corpus": 0,
+    "example": "",
+    "status": "unseen",
+    "ruling": ""
+  },
+  {
+    "construct": "AlterColumnAlterFullTextIndexAction",
+    "keywords": "ALTER COLUMN ALTER FULL TEXT INDEX ACTION",
+    "count_in_corpus": 0,
+    "example": "",
+    "status": "unseen",
+    "ruling": ""
+  },
+  {
+    "construct": "AlterColumnEncryptionKeyStatement",
+    "keywords": "ALTER COLUMN ENCRYPTION KEY STATEMENT",
+    "count_in_corpus": 0,
+    "example": "",
+    "status": "unseen",
+    "ruling": ""
+  },
+  {
+    "construct": "AlterCredentialStatement",
+    "keywords": "ALTER CREDENTIAL STATEMENT",
+    "count_in_corpus": 0,
+    "example": "",
+    "status": "unseen",
+    "ruling": ""
+  },
+  {
+    "construct": "AlterCryptographicProviderStatement",
+    "keywords": "ALTER CRYPTOGRAPHIC PROVIDER STATEMENT",
+    "count_in_corpus": 0,
+    "example": "",
+    "status": "unseen",
+    "ruling": ""
+  },
+  {
+    "construct": "AlterDatabaseAddFileGroupStatement",
+    "keywords": "ALTER DATABASE ADD FILE GROUP STATEMENT",
+    "count_in_corpus": 0,
+    "example": "",
+    "status": "unseen",
+    "ruling": ""
+  },
+  {
+    "construct": "AlterDatabaseAddFileStatement",
+    "keywords": "ALTER DATABASE ADD FILE STATEMENT",
+    "count_in_corpus": 0,
+    "example": "",
+    "status": "unseen",
+    "ruling": ""
+  },
+  {
+    "construct": "AlterDatabaseAuditSpecificationStatement",
+    "keywords": "ALTER DATABASE AUDIT SPECIFICATION STATEMENT",
+    "count_in_corpus": 0,
+    "example": "",
+    "status": "unseen",
+    "ruling": ""
+  },
+  {
+    "construct": "AlterDatabaseCollateStatement",
+    "keywords": "ALTER DATABASE COLLATE STATEMENT",
+    "count_in_corpus": 0,
+    "example": "",
+    "status": "unseen",
+    "ruling": ""
+  },
+  {
+    "construct": "AlterDatabaseEncryptionKeyStatement",
+    "keywords": "ALTER DATABASE ENCRYPTION KEY STATEMENT",
+    "count_in_corpus": 0,
+    "example": "",
+    "status": "unseen",
+    "ruling": ""
+  },
+  {
+    "construct": "AlterDatabaseModifyFileGroupStatement",
+    "keywords": "ALTER DATABASE MODIFY FILE GROUP STATEMENT",
+    "count_in_corpus": 0,
+    "example": "",
+    "status": "unseen",
+    "ruling": ""
+  },
+  {
+    "construct": "AlterDatabaseModifyFileStatement",
+    "keywords": "ALTER DATABASE MODIFY FILE STATEMENT",
+    "count_in_corpus": 0,
+    "example": "",
+    "status": "unseen",
+    "ruling": ""
+  },
+  {
+    "construct": "AlterDatabaseModifyNameStatement",
+    "keywords": "ALTER DATABASE MODIFY NAME STATEMENT",
+    "count_in_corpus": 0,
+    "example": "",
+    "status": "unseen",
+    "ruling": ""
+  },
+  {
+    "construct": "AlterDatabasePerformCutoverStatement",
+    "keywords": "ALTER DATABASE PERFORM CUTOVER STATEMENT",
+    "count_in_corpus": 0,
+    "example": "",
+    "status": "unseen",
+    "ruling": ""
+  },
+  {
+    "construct": "AlterDatabaseRebuildLogStatement",
+    "keywords": "ALTER DATABASE REBUILD LOG STATEMENT",
+    "count_in_corpus": 0,
+    "example": "",
+    "status": "unseen",
+    "ruling": ""
+  },
+  {
+    "construct": "AlterDatabaseRemoveFileGroupStatement",
+    "keywords": "ALTER DATABASE REMOVE FILE GROUP STATEMENT",
+    "count_in_corpus": 0,
+    "example": "",
+    "status": "unseen",
+    "ruling": ""
+  },
+  {
+    "construct": "AlterDatabaseRemoveFileStatement",
+    "keywords": "ALTER DATABASE REMOVE FILE STATEMENT",
+    "count_in_corpus": 0,
+    "example": "",
+    "status": "unseen",
+    "ruling": ""
+  },
+  {
+    "construct": "AlterDatabaseScopedConfigurationClearStatement",
+    "keywords": "ALTER DATABASE SCOPED CONFIGURATION CLEAR STATEMENT",
+    "count_in_corpus": 0,
+    "example": "",
+    "status": "unseen",
+    "ruling": ""
+  },
+  {
+    "construct": "AlterDatabaseScopedConfigurationSetStatement",
+    "keywords": "ALTER DATABASE SCOPED CONFIGURATION SET STATEMENT",
+    "count_in_corpus": 0,
+    "example": "",
+    "status": "unseen",
+    "ruling": ""
+  },
+  {
+    "construct": "AlterDatabaseSetStatement",
+    "keywords": "ALTER DATABASE SET STATEMENT",
+    "count_in_corpus": 0,
+    "example": "",
+    "status": "unseen",
+    "ruling": ""
+  },
+  {
+    "construct": "AlterDatabaseTermination",
+    "keywords": "ALTER DATABASE TERMINATION",
+    "count_in_corpus": 0,
+    "example": "",
+    "status": "unseen",
+    "ruling": ""
+  },
+  {
+    "construct": "AlterEndpointStatement",
+    "keywords": "ALTER ENDPOINT STATEMENT",
+    "count_in_corpus": 0,
+    "example": "",
+    "status": "unseen",
+    "ruling": ""
+  },
+  {
+    "construct": "AlterEventSessionStatement",
+    "keywords": "ALTER EVENT SESSION STATEMENT",
+    "count_in_corpus": 0,
+    "example": "",
+    "status": "unseen",
+    "ruling": ""
+  },
+  {
+    "construct": "AlterExternalDataSourceStatement",
+    "keywords": "ALTER EXTERNAL DATA SOURCE STATEMENT",
+    "count_in_corpus": 0,
+    "example": "",
+    "status": "unseen",
+    "ruling": ""
+  },
+  {
+    "construct": "AlterExternalFunctionStatement",
+    "keywords": "ALTER EXTERNAL FUNCTION STATEMENT",
+    "count_in_corpus": 0,
+    "example": "",
+    "status": "unseen",
+    "ruling": ""
+  },
+  {
+    "construct": "AlterExternalLanguageStatement",
+    "keywords": "ALTER EXTERNAL LANGUAGE STATEMENT",
+    "count_in_corpus": 0,
+    "example": "",
+    "status": "unseen",
+    "ruling": ""
+  },
+  {
+    "construct": "AlterExternalLibraryStatement",
+    "keywords": "ALTER EXTERNAL LIBRARY STATEMENT",
+    "count_in_corpus": 0,
+    "example": "",
+    "status": "unseen",
+    "ruling": ""
+  },
+  {
+    "construct": "AlterExternalModelStatement",
+    "keywords": "ALTER EXTERNAL MODEL STATEMENT",
+    "count_in_corpus": 0,
+    "example": "",
+    "status": "unseen",
+    "ruling": ""
+  },
+  {
+    "construct": "AlterExternalResourcePoolStatement",
+    "keywords": "ALTER EXTERNAL RESOURCE POOL STATEMENT",
+    "count_in_corpus": 0,
+    "example": "",
+    "status": "unseen",
+    "ruling": ""
+  },
+  {
+    "construct": "AlterFederationStatement",
+    "keywords": "ALTER FEDERATION STATEMENT",
+    "count_in_corpus": 0,
+    "example": "",
+    "status": "unseen",
+    "ruling": ""
+  },
+  {
+    "construct": "AlterFullTextCatalogStatement",
+    "keywords": "ALTER FULL TEXT CATALOG STATEMENT",
+    "count_in_corpus": 0,
+    "example": "",
+    "status": "unseen",
+    "ruling": ""
+  },
+  {
+    "construct": "AlterFullTextIndexStatement",
+    "keywords": "ALTER FULL TEXT INDEX STATEMENT",
+    "count_in_corpus": 0,
+    "example": "",
+    "status": "unseen",
+    "ruling": ""
+  },
+  {
+    "construct": "AlterFullTextStopListStatement",
+    "keywords": "ALTER FULL TEXT STOP LIST STATEMENT",
+    "count_in_corpus": 0,
+    "example": "",
+    "status": "unseen",
+    "ruling": ""
+  },
+  {
+    "construct": "AlterFunctionStatement",
+    "keywords": "ALTER FUNCTION STATEMENT",
+    "count_in_corpus": 0,
+    "example": "",
+    "status": "unseen",
+    "ruling": ""
+  },
+  {
+    "construct": "AlterIndexStatement",
+    "keywords": "ALTER INDEX STATEMENT",
+    "count_in_corpus": 0,
+    "example": "",
+    "status": "unseen",
+    "ruling": ""
+  },
+  {
+    "construct": "AlterLoginAddDropCredentialStatement",
+    "keywords": "ALTER LOGIN ADD DROP CREDENTIAL STATEMENT",
+    "count_in_corpus": 0,
+    "example": "",
+    "status": "unseen",
+    "ruling": ""
+  },
+  {
+    "construct": "AlterLoginEnableDisableStatement",
+    "keywords": "ALTER LOGIN ENABLE DISABLE STATEMENT",
+    "count_in_corpus": 0,
+    "example": "",
+    "status": "unseen",
+    "ruling": ""
+  },
+  {
+    "construct": "AlterLoginOptionsStatement",
+    "keywords": "ALTER LOGIN OPTIONS STATEMENT",
+    "count_in_corpus": 0,
+    "example": "",
+    "status": "unseen",
+    "ruling": ""
+  },
+  {
+    "construct": "AlterMasterKeyStatement",
+    "keywords": "ALTER MASTER KEY STATEMENT",
+    "count_in_corpus": 0,
+    "example": "",
+    "status": "unseen",
+    "ruling": ""
+  },
+  {
+    "construct": "AlterMessageTypeStatement",
+    "keywords": "ALTER MESSAGE TYPE STATEMENT",
+    "count_in_corpus": 0,
+    "example": "",
+    "status": "unseen",
+    "ruling": ""
+  },
+  {
+    "construct": "AlterPartitionFunctionStatement",
+    "keywords": "ALTER PARTITION FUNCTION STATEMENT",
+    "count_in_corpus": 0,
+    "example": "",
+    "status": "unseen",
+    "ruling": ""
+  },
+  {
+    "construct": "AlterPartitionSchemeStatement",
+    "keywords": "ALTER PARTITION SCHEME STATEMENT",
+    "count_in_corpus": 0,
+    "example": "",
+    "status": "unseen",
+    "ruling": ""
+  },
+  {
+    "construct": "AlterProcedureStatement",
+    "keywords": "ALTER PROCEDURE STATEMENT",
+    "count_in_corpus": 0,
+    "example": "",
+    "status": "unseen",
+    "ruling": ""
+  },
+  {
+    "construct": "AlterQueueStatement",
+    "keywords": "ALTER QUEUE STATEMENT",
+    "count_in_corpus": 0,
+    "example": "",
+    "status": "unseen",
+    "ruling": ""
+  },
+  {
+    "construct": "AlterRemoteServiceBindingStatement",
+    "keywords": "ALTER REMOTE SERVICE BINDING STATEMENT",
+    "count_in_corpus": 0,
+    "example": "",
+    "status": "unseen",
+    "ruling": ""
+  },
+  {
+    "construct": "AlterResourceGovernorStatement",
+    "keywords": "ALTER RESOURCE GOVERNOR STATEMENT",
+    "count_in_corpus": 0,
+    "example": "",
+    "status": "unseen",
+    "ruling": ""
+  },
+  {
+    "construct": "AlterResourcePoolStatement",
+    "keywords": "ALTER RESOURCE POOL STATEMENT",
+    "count_in_corpus": 0,
+    "example": "",
+    "status": "unseen",
+    "ruling": ""
+  },
+  {
+    "construct": "AlterRoleStatement",
+    "keywords": "ALTER ROLE STATEMENT",
+    "count_in_corpus": 0,
+    "example": "",
+    "status": "unseen",
+    "ruling": ""
+  },
+  {
+    "construct": "AlterRouteStatement",
+    "keywords": "ALTER ROUTE STATEMENT",
+    "count_in_corpus": 0,
+    "example": "",
+    "status": "unseen",
+    "ruling": ""
+  },
+  {
+    "construct": "AlterSchemaStatement",
+    "keywords": "ALTER SCHEMA STATEMENT",
+    "count_in_corpus": 0,
+    "example": "",
+    "status": "unseen",
+    "ruling": ""
+  },
+  {
+    "construct": "AlterSearchPropertyListStatement",
+    "keywords": "ALTER SEARCH PROPERTY LIST STATEMENT",
+    "count_in_corpus": 0,
+    "example": "",
+    "status": "unseen",
+    "ruling": ""
+  },
+  {
+    "construct": "AlterSecurityPolicyStatement",
+    "keywords": "ALTER SECURITY POLICY STATEMENT",
+    "count_in_corpus": 0,
+    "example": "",
+    "status": "unseen",
+    "ruling": ""
+  },
+  {
+    "construct": "AlterSequenceStatement",
+    "keywords": "ALTER SEQUENCE STATEMENT",
+    "count_in_corpus": 0,
+    "example": "",
+    "status": "unseen",
+    "ruling": ""
+  },
+  {
+    "construct": "AlterServerAuditSpecificationStatement",
+    "keywords": "ALTER SERVER AUDIT SPECIFICATION STATEMENT",
+    "count_in_corpus": 0,
+    "example": "",
+    "status": "unseen",
+    "ruling": ""
+  },
+  {
+    "construct": "AlterServerAuditStatement",
+    "keywords": "ALTER SERVER AUDIT STATEMENT",
+    "count_in_corpus": 0,
+    "example": "",
+    "status": "unseen",
+    "ruling": ""
+  },
+  {
+    "construct": "AlterServerConfigurationBufferPoolExtensionContainerOption",
+    "keywords": "ALTER SERVER CONFIGURATION BUFFER POOL EXTENSION CONTAINER OPTION",
+    "count_in_corpus": 0,
+    "example": "",
+    "status": "unseen",
+    "ruling": ""
+  },
+  {
+    "construct": "AlterServerConfigurationBufferPoolExtensionOption",
+    "keywords": "ALTER SERVER CONFIGURATION BUFFER POOL EXTENSION OPTION",
+    "count_in_corpus": 0,
+    "example": "",
+    "status": "unseen",
+    "ruling": ""
+  },
+  {
+    "construct": "AlterServerConfigurationBufferPoolExtensionSizeOption",
+    "keywords": "ALTER SERVER CONFIGURATION BUFFER POOL EXTENSION SIZE OPTION",
+    "count_in_corpus": 0,
+    "example": "",
+    "status": "unseen",
+    "ruling": ""
+  },
+  {
+    "construct": "AlterServerConfigurationDiagnosticsLogMaxSizeOption",
+    "keywords": "ALTER SERVER CONFIGURATION DIAGNOSTICS LOG MAX SIZE OPTION",
+    "count_in_corpus": 0,
+    "example": "",
+    "status": "unseen",
+    "ruling": ""
+  },
+  {
+    "construct": "AlterServerConfigurationDiagnosticsLogOption",
+    "keywords": "ALTER SERVER CONFIGURATION DIAGNOSTICS LOG OPTION",
+    "count_in_corpus": 0,
+    "example": "",
+    "status": "unseen",
+    "ruling": ""
+  },
+  {
+    "construct": "AlterServerConfigurationExternalAuthenticationContainerOption",
+    "keywords": "ALTER SERVER CONFIGURATION EXTERNAL AUTHENTICATION CONTAINER OPTION",
+    "count_in_corpus": 0,
+    "example": "",
+    "status": "unseen",
+    "ruling": ""
+  },
+  {
+    "construct": "AlterServerConfigurationExternalAuthenticationOption",
+    "keywords": "ALTER SERVER CONFIGURATION EXTERNAL AUTHENTICATION OPTION",
+    "count_in_corpus": 0,
+    "example": "",
+    "status": "unseen",
+    "ruling": ""
+  },
+  {
+    "construct": "AlterServerConfigurationFailoverClusterPropertyOption",
+    "keywords": "ALTER SERVER CONFIGURATION FAILOVER CLUSTER PROPERTY OPTION",
+    "count_in_corpus": 0,
+    "example": "",
+    "status": "unseen",
+    "ruling": ""
+  },
+  {
+    "construct": "AlterServerConfigurationHadrClusterOption",
+    "keywords": "ALTER SERVER CONFIGURATION HADR CLUSTER OPTION",
+    "count_in_corpus": 0,
+    "example": "",
+    "status": "unseen",
+    "ruling": ""
+  },
+  {
+    "construct": "AlterServerConfigurationSetBufferPoolExtensionStatement",
+    "keywords": "ALTER SERVER CONFIGURATION SET BUFFER POOL EXTENSION STATEMENT",
+    "count_in_corpus": 0,
+    "example": "",
+    "status": "unseen",
+    "ruling": ""
+  },
+  {
+    "construct": "AlterServerConfigurationSetDiagnosticsLogStatement",
+    "keywords": "ALTER SERVER CONFIGURATION SET DIAGNOSTICS LOG STATEMENT",
+    "count_in_corpus": 0,
+    "example": "",
+    "status": "unseen",
+    "ruling": ""
+  },
+  {
+    "construct": "AlterServerConfigurationSetExternalAuthenticationStatement",
+    "keywords": "ALTER SERVER CONFIGURATION SET EXTERNAL AUTHENTICATION STATEMENT",
+    "count_in_corpus": 0,
+    "example": "",
+    "status": "unseen",
+    "ruling": ""
+  },
+  {
+    "construct": "AlterServerConfigurationSetFailoverClusterPropertyStatement",
+    "keywords": "ALTER SERVER CONFIGURATION SET FAILOVER CLUSTER PROPERTY STATEMENT",
+    "count_in_corpus": 0,
+    "example": "",
+    "status": "unseen",
+    "ruling": ""
+  },
+  {
+    "construct": "AlterServerConfigurationSetHadrClusterStatement",
+    "keywords": "ALTER SERVER CONFIGURATION SET HADR CLUSTER STATEMENT",
+    "count_in_corpus": 0,
+    "example": "",
+    "status": "unseen",
+    "ruling": ""
+  },
+  {
+    "construct": "AlterServerConfigurationSetSoftNumaStatement",
+    "keywords": "ALTER SERVER CONFIGURATION SET SOFT NUMA STATEMENT",
+    "count_in_corpus": 0,
+    "example": "",
+    "status": "unseen",
+    "ruling": ""
+  },
+  {
+    "construct": "AlterServerConfigurationSoftNumaOption",
+    "keywords": "ALTER SERVER CONFIGURATION SOFT NUMA OPTION",
+    "count_in_corpus": 0,
+    "example": "",
+    "status": "unseen",
+    "ruling": ""
+  },
+  {
+    "construct": "AlterServerConfigurationStatement",
+    "keywords": "ALTER SERVER CONFIGURATION STATEMENT",
+    "count_in_corpus": 0,
+    "example": "",
+    "status": "unseen",
+    "ruling": ""
+  },
+  {
+    "construct": "AlterServerRoleStatement",
+    "keywords": "ALTER SERVER ROLE STATEMENT",
+    "count_in_corpus": 0,
+    "example": "",
+    "status": "unseen",
+    "ruling": ""
+  },
+  {
+    "construct": "AlterServiceMasterKeyStatement",
+    "keywords": "ALTER SERVICE MASTER KEY STATEMENT",
+    "count_in_corpus": 0,
+    "example": "",
+    "status": "unseen",
+    "ruling": ""
+  },
+  {
+    "construct": "AlterServiceStatement",
+    "keywords": "ALTER SERVICE STATEMENT",
+    "count_in_corpus": 0,
+    "example": "",
+    "status": "unseen",
+    "ruling": ""
+  },
+  {
+    "construct": "AlterSymmetricKeyStatement",
+    "keywords": "ALTER SYMMETRIC KEY STATEMENT",
+    "count_in_corpus": 0,
+    "example": "",
+    "status": "unseen",
+    "ruling": ""
+  },
+  {
+    "construct": "AlterTableAddClusterByStatement",
+    "keywords": "ALTER TABLE ADD CLUSTER BY STATEMENT",
+    "count_in_corpus": 0,
+    "example": "",
+    "status": "unseen",
+    "ruling": ""
+  },
+  {
+    "construct": "AlterTableAddTableElementStatement",
+    "keywords": "ALTER TABLE ADD TABLE ELEMENT STATEMENT",
+    "count_in_corpus": 0,
+    "example": "",
+    "status": "unseen",
+    "ruling": ""
+  },
+  {
+    "construct": "AlterTableAlterColumnStatement",
+    "keywords": "ALTER TABLE ALTER COLUMN STATEMENT",
+    "count_in_corpus": 0,
+    "example": "",
+    "status": "unseen",
+    "ruling": ""
+  },
+  {
+    "construct": "AlterTableAlterIndexStatement",
+    "keywords": "ALTER TABLE ALTER INDEX STATEMENT",
+    "count_in_corpus": 0,
+    "example": "",
+    "status": "unseen",
+    "ruling": ""
+  },
+  {
+    "construct": "AlterTableAlterPartitionStatement",
+    "keywords": "ALTER TABLE ALTER PARTITION STATEMENT",
+    "count_in_corpus": 0,
+    "example": "",
+    "status": "unseen",
+    "ruling": ""
+  },
+  {
+    "construct": "AlterTableChangeTrackingModificationStatement",
+    "keywords": "ALTER TABLE CHANGE TRACKING MODIFICATION STATEMENT",
+    "count_in_corpus": 0,
+    "example": "",
+    "status": "unseen",
+    "ruling": ""
+  },
+  {
+    "construct": "AlterTableConstraintModificationStatement",
+    "keywords": "ALTER TABLE CONSTRAINT MODIFICATION STATEMENT",
+    "count_in_corpus": 0,
+    "example": "",
+    "status": "unseen",
+    "ruling": ""
+  },
+  {
+    "construct": "AlterTableDropTableElement",
+    "keywords": "ALTER TABLE DROP TABLE ELEMENT",
+    "count_in_corpus": 0,
+    "example": "",
+    "status": "unseen",
+    "ruling": ""
+  },
+  {
+    "construct": "AlterTableDropTableElementStatement",
+    "keywords": "ALTER TABLE DROP TABLE ELEMENT STATEMENT",
+    "count_in_corpus": 0,
+    "example": "",
+    "status": "unseen",
+    "ruling": ""
+  },
+  {
+    "construct": "AlterTableFileTableNamespaceStatement",
+    "keywords": "ALTER TABLE FILE TABLE NAMESPACE STATEMENT",
+    "count_in_corpus": 0,
+    "example": "",
+    "status": "unseen",
+    "ruling": ""
+  },
+  {
+    "construct": "AlterTableRebuildStatement",
+    "keywords": "ALTER TABLE REBUILD STATEMENT",
+    "count_in_corpus": 0,
+    "example": "",
+    "status": "unseen",
+    "ruling": ""
+  },
+  {
+    "construct": "AlterTableSetStatement",
+    "keywords": "ALTER TABLE SET STATEMENT",
+    "count_in_corpus": 0,
+    "example": "",
+    "status": "unseen",
+    "ruling": ""
+  },
+  {
+    "construct": "AlterTableSwitchStatement",
+    "keywords": "ALTER TABLE SWITCH STATEMENT",
+    "count_in_corpus": 0,
+    "example": "",
+    "status": "unseen",
+    "ruling": ""
+  },
+  {
+    "construct": "AlterTableTriggerModificationStatement",
+    "keywords": "ALTER TABLE TRIGGER MODIFICATION STATEMENT",
+    "count_in_corpus": 0,
+    "example": "",
+    "status": "unseen",
+    "ruling": ""
+  },
+  {
+    "construct": "AlterTriggerStatement",
+    "keywords": "ALTER TRIGGER STATEMENT",
+    "count_in_corpus": 0,
+    "example": "",
+    "status": "unseen",
+    "ruling": ""
+  },
+  {
+    "construct": "AlterUserStatement",
+    "keywords": "ALTER USER STATEMENT",
+    "count_in_corpus": 0,
+    "example": "",
+    "status": "unseen",
+    "ruling": ""
+  },
+  {
+    "construct": "AlterViewStatement",
+    "keywords": "ALTER VIEW STATEMENT",
+    "count_in_corpus": 0,
+    "example": "",
+    "status": "unseen",
+    "ruling": ""
+  },
+  {
+    "construct": "AlterWorkloadGroupStatement",
+    "keywords": "ALTER WORKLOAD GROUP STATEMENT",
+    "count_in_corpus": 0,
+    "example": "",
+    "status": "unseen",
+    "ruling": ""
+  },
+  {
+    "construct": "AlterXmlSchemaCollectionStatement",
+    "keywords": "ALTER XML SCHEMA COLLECTION STATEMENT",
+    "count_in_corpus": 0,
+    "example": "",
+    "status": "unseen",
+    "ruling": ""
+  },
+  {
+    "construct": "ApplicationRoleOption",
+    "keywords": "APPLICATION ROLE OPTION",
+    "count_in_corpus": 0,
+    "example": "",
+    "status": "unseen",
+    "ruling": ""
+  },
+  {
+    "construct": "AssemblyEncryptionSource",
+    "keywords": "ASSEMBLY ENCRYPTION SOURCE",
+    "count_in_corpus": 0,
+    "example": "",
+    "status": "unseen",
+    "ruling": ""
+  },
+  {
+    "construct": "AssemblyName",
+    "keywords": "ASSEMBLY NAME",
+    "count_in_corpus": 0,
+    "example": "",
+    "status": "unseen",
+    "ruling": ""
+  },
+  {
+    "construct": "AssemblyOption",
+    "keywords": "ASSEMBLY OPTION",
+    "count_in_corpus": 0,
+    "example": "",
+    "status": "unseen",
+    "ruling": ""
+  },
+  {
+    "construct": "AssignmentSetClause",
+    "keywords": "ASSIGNMENT SET CLAUSE",
+    "count_in_corpus": 0,
+    "example": "",
+    "status": "unseen",
+    "ruling": ""
+  },
+  {
+    "construct": "AsymmetricKeyCreateLoginSource",
+    "keywords": "ASYMMETRIC KEY CREATE LOGIN SOURCE",
+    "count_in_corpus": 0,
+    "example": "",
+    "status": "unseen",
+    "ruling": ""
+  },
+  {
+    "construct": "AtTimeZoneCall",
+    "keywords": "AT TIME ZONE CALL",
+    "count_in_corpus": 0,
+    "example": "",
+    "status": "unseen",
+    "ruling": ""
+  },
+  {
+    "construct": "AuditActionGroupReference",
+    "keywords": "AUDIT ACTION GROUP REFERENCE",
+    "count_in_corpus": 0,
+    "example": "",
+    "status": "unseen",
+    "ruling": ""
+  },
+  {
+    "construct": "AuditActionSpecification",
+    "keywords": "AUDIT ACTION SPECIFICATION",
+    "count_in_corpus": 0,
+    "example": "",
+    "status": "unseen",
+    "ruling": ""
+  },
+  {
+    "construct": "AuditGuidAuditOption",
+    "keywords": "AUDIT GUID AUDIT OPTION",
+    "count_in_corpus": 0,
+    "example": "",
+    "status": "unseen",
+    "ruling": ""
+  },
+  {
+    "construct": "AuditSpecificationPart",
+    "keywords": "AUDIT SPECIFICATION PART",
+    "count_in_corpus": 0,
+    "example": "",
+    "status": "unseen",
+    "ruling": ""
+  },
+  {
+    "construct": "AuditTarget",
+    "keywords": "AUDIT TARGET",
+    "count_in_corpus": 0,
+    "example": "",
+    "status": "unseen",
+    "ruling": ""
+  },
+  {
+    "construct": "AuthenticationEndpointProtocolOption",
+    "keywords": "AUTHENTICATION ENDPOINT PROTOCOL OPTION",
+    "count_in_corpus": 0,
+    "example": "",
+    "status": "unseen",
+    "ruling": ""
+  },
+  {
+    "construct": "AuthenticationPayloadOption",
+    "keywords": "AUTHENTICATION PAYLOAD OPTION",
+    "count_in_corpus": 0,
+    "example": "",
+    "status": "unseen",
+    "ruling": ""
+  },
+  {
+    "construct": "AutoCleanupChangeTrackingOptionDetail",
+    "keywords": "AUTO CLEANUP CHANGE TRACKING OPTION DETAIL",
+    "count_in_corpus": 0,
+    "example": "",
+    "status": "unseen",
+    "ruling": ""
+  },
+  {
+    "construct": "AutoCreateStatisticsDatabaseOption",
+    "keywords": "AUTO CREATE STATISTICS DATABASE OPTION",
+    "count_in_corpus": 0,
+    "example": "",
+    "status": "unseen",
+    "ruling": ""
+  },
+  {
+    "construct": "AutomaticTuningCreateIndexOption",
+    "keywords": "AUTOMATIC TUNING CREATE INDEX OPTION",
+    "count_in_corpus": 0,
+    "example": "",
+    "status": "unseen",
+    "ruling": ""
+  },
+  {
+    "construct": "AutomaticTuningDatabaseOption",
+    "keywords": "AUTOMATIC TUNING DATABASE OPTION",
+    "count_in_corpus": 0,
+    "example": "",
+    "status": "unseen",
+    "ruling": ""
+  },
+  {
+    "construct": "AutomaticTuningDropIndexOption",
+    "keywords": "AUTOMATIC TUNING DROP INDEX OPTION",
+    "count_in_corpus": 0,
+    "example": "",
+    "status": "unseen",
+    "ruling": ""
+  },
+  {
+    "construct": "AutomaticTuningForceLastGoodPlanOption",
+    "keywords": "AUTOMATIC TUNING FORCE LAST GOOD PLAN OPTION",
+    "count_in_corpus": 0,
+    "example": "",
+    "status": "unseen",
+    "ruling": ""
+  },
+  {
+    "construct": "AutomaticTuningMaintainIndexOption",
+    "keywords": "AUTOMATIC TUNING MAINTAIN INDEX OPTION",
+    "count_in_corpus": 0,
+    "example": "",
+    "status": "unseen",
+    "ruling": ""
+  },
+  {
+    "construct": "AutomaticTuningOption",
+    "keywords": "AUTOMATIC TUNING OPTION",
+    "count_in_corpus": 0,
+    "example": "",
+    "status": "unseen",
+    "ruling": ""
+  },
+  {
+    "construct": "AvailabilityModeReplicaOption",
+    "keywords": "AVAILABILITY MODE REPLICA OPTION",
+    "count_in_corpus": 0,
+    "example": "",
+    "status": "unseen",
+    "ruling": ""
+  },
+  {
+    "construct": "AvailabilityReplica",
+    "keywords": "AVAILABILITY REPLICA",
+    "count_in_corpus": 0,
+    "example": "",
+    "status": "unseen",
+    "ruling": ""
+  },
+  {
+    "construct": "BackupCertificateStatement",
+    "keywords": "BACKUP CERTIFICATE STATEMENT",
+    "count_in_corpus": 0,
+    "example": "",
+    "status": "unseen",
+    "ruling": ""
+  },
+  {
+    "construct": "BackupDatabaseStatement",
+    "keywords": "BACKUP DATABASE STATEMENT",
+    "count_in_corpus": 0,
+    "example": "",
+    "status": "unseen",
+    "ruling": ""
+  },
+  {
+    "construct": "BackupEncryptionOption",
+    "keywords": "BACKUP ENCRYPTION OPTION",
+    "count_in_corpus": 0,
+    "example": "",
+    "status": "unseen",
+    "ruling": ""
+  },
+  {
+    "construct": "BackupMasterKeyStatement",
+    "keywords": "BACKUP MASTER KEY STATEMENT",
+    "count_in_corpus": 0,
+    "example": "",
+    "status": "unseen",
+    "ruling": ""
+  },
+  {
+    "construct": "BackupOption",
+    "keywords": "BACKUP OPTION",
+    "count_in_corpus": 0,
+    "example": "",
+    "status": "unseen",
+    "ruling": ""
+  },
+  {
+    "construct": "BackupRestoreFileInfo",
+    "keywords": "BACKUP RESTORE FILE INFO",
+    "count_in_corpus": 0,
+    "example": "",
+    "status": "unseen",
+    "ruling": ""
+  },
+  {
+    "construct": "BackupServiceMasterKeyStatement",
+    "keywords": "BACKUP SERVICE MASTER KEY STATEMENT",
+    "count_in_corpus": 0,
+    "example": "",
+    "status": "unseen",
+    "ruling": ""
+  },
+  {
+    "construct": "BackupTransactionLogStatement",
+    "keywords": "BACKUP TRANSACTION LOG STATEMENT",
+    "count_in_corpus": 0,
+    "example": "",
+    "status": "unseen",
+    "ruling": ""
+  },
+  {
+    "construct": "BackwardsCompatibleDropIndexClause",
+    "keywords": "BACKWARDS COMPATIBLE DROP INDEX CLAUSE",
+    "count_in_corpus": 0,
+    "example": "",
+    "status": "unseen",
+    "ruling": ""
+  },
+  {
+    "construct": "BeginConversationTimerStatement",
+    "keywords": "BEGIN CONVERSATION TIMER STATEMENT",
+    "count_in_corpus": 0,
+    "example": "",
+    "status": "unseen",
+    "ruling": ""
+  },
+  {
+    "construct": "BeginDialogStatement",
+    "keywords": "BEGIN DIALOG STATEMENT",
+    "count_in_corpus": 0,
+    "example": "",
+    "status": "unseen",
+    "ruling": ""
+  },
+  {
+    "construct": "BeginEndAtomicBlockStatement",
+    "keywords": "BEGIN END ATOMIC BLOCK STATEMENT",
+    "count_in_corpus": 0,
+    "example": "",
+    "status": "unseen",
+    "ruling": ""
+  },
+  {
+    "construct": "BeginEndBlockStatement",
+    "keywords": "BEGIN END BLOCK STATEMENT",
+    "count_in_corpus": 1,
+    "example": "BEGIN\n\n-- SET NOCOUNT ON added to prevent extra result sets from\n-- interfering with SELECT statements.\nSET NOCOUNT ON;\n",
+    "status": "mapped",
+    "ruling": ""
+  },
+  {
+    "construct": "BeginTransactionStatement",
+    "keywords": "BEGIN TRANSACTION STATEMENT",
+    "count_in_corpus": 0,
+    "example": "",
+    "status": "unseen",
+    "ruling": ""
+  },
+  {
+    "construct": "BinaryExpression",
+    "keywords": "BINARY EXPRESSION",
+    "count_in_corpus": 66,
+    "example": "getdate() - datepart(d, getdate()) + 1",
+    "status": "mapped",
+    "ruling": ""
+  },
+  {
+    "construct": "BinaryLiteral",
+    "keywords": "BINARY LITERAL",
+    "count_in_corpus": 0,
+    "example": "",
+    "status": "mapped",
+    "ruling": ""
+  },
+  {
+    "construct": "BinaryQueryExpression",
+    "keywords": "BINARY QUERY EXPRESSION",
+    "count_in_corpus": 2,
+    "example": "SELECT *, 'Inpatient' as [Dept Type]\nINTO #combined_census\nFROM #census_monthly\nUNION\nSELECT *, 'Outpatient' as [Dept Ty",
+    "status": "mapped",
+    "ruling": ""
+  },
+  {
+    "construct": "BooleanBinaryExpression",
+    "keywords": "BOOLEAN BINARY EXPRESSION",
+    "count_in_corpus": 79,
+    "example": "adt.EVENT_TYPE_C = '6'\nand adt.EFFECTIVE_TIME >= @StartDate\nand adt.EFFECTIVE_TIME < DATEADD(D, 1, @EndDate)\nand adt.EVE",
+    "status": "mapped",
+    "ruling": ""
+  },
+  {
+    "construct": "BooleanComparisonExpression",
+    "keywords": "BOOLEAN COMPARISON EXPRESSION",
+    "count_in_corpus": 160,
+    "example": "adt.DELETE_TIME >= DATEADD(D, 1, @AsOfDate)",
+    "status": "mapped",
+    "ruling": ""
+  },
+  {
+    "construct": "BooleanExpressionSnippet",
+    "keywords": "BOOLEAN EXPRESSION SNIPPET",
+    "count_in_corpus": 0,
+    "example": "",
+    "status": "unseen",
+    "ruling": ""
+  },
+  {
+    "construct": "BooleanIsNullExpression",
+    "keywords": "BOOLEAN IS NULL EXPRESSION",
+    "count_in_corpus": 22,
+    "example": "adt.PAT_ID is not null",
+    "status": "mapped",
+    "ruling": ""
+  },
+  {
+    "construct": "BooleanNotExpression",
+    "keywords": "BOOLEAN NOT EXPRESSION",
+    "count_in_corpus": 0,
+    "example": "",
+    "status": "mapped",
+    "ruling": ""
+  },
+  {
+    "construct": "BooleanParenthesisExpression",
+    "keywords": "BOOLEAN PARENTHESIS EXPRESSION",
+    "count_in_corpus": 14,
+    "example": "((adt.EVENT_SUBTYPE_C <> '2') OR (adt.EVENT_SUBTYPE_C = '2' AND adt.DELETE_TIME >= DATEADD(D, 1, @AsOfDate)))",
+    "status": "mapped",
+    "ruling": ""
+  },
+  {
+    "construct": "BooleanTernaryExpression",
+    "keywords": "BOOLEAN TERNARY EXPRESSION",
+    "count_in_corpus": 4,
+    "example": "[enc].CONTACT_DATE BETWEEN @StartDate AND @EndDate",
+    "status": "mapped",
+    "ruling": ""
+  },
+  {
+    "construct": "BoundingBoxParameter",
+    "keywords": "BOUNDING BOX PARAMETER",
+    "count_in_corpus": 0,
+    "example": "",
+    "status": "unseen",
+    "ruling": ""
+  },
+  {
+    "construct": "BoundingBoxSpatialIndexOption",
+    "keywords": "BOUNDING BOX SPATIAL INDEX OPTION",
+    "count_in_corpus": 0,
+    "example": "",
+    "status": "unseen",
+    "ruling": ""
+  },
+  {
+    "construct": "BreakStatement",
+    "keywords": "BREAK STATEMENT",
+    "count_in_corpus": 0,
+    "example": "",
+    "status": "unseen",
+    "ruling": ""
+  },
+  {
+    "construct": "BrokerPriorityParameter",
+    "keywords": "BROKER PRIORITY PARAMETER",
+    "count_in_corpus": 0,
+    "example": "",
+    "status": "unseen",
+    "ruling": ""
+  },
+  {
+    "construct": "BrowseForClause",
+    "keywords": "BROWSE FOR CLAUSE",
+    "count_in_corpus": 0,
+    "example": "",
+    "status": "unseen",
+    "ruling": ""
+  },
+  {
+    "construct": "BuiltInFunctionTableReference",
+    "keywords": "BUILT IN FUNCTION TABLE REFERENCE",
+    "count_in_corpus": 0,
+    "example": "",
+    "status": "unseen",
+    "ruling": ""
+  },
+  {
+    "construct": "BulkInsertOption",
+    "keywords": "BULK INSERT OPTION",
+    "count_in_corpus": 0,
+    "example": "",
+    "status": "unseen",
+    "ruling": ""
+  },
+  {
+    "construct": "BulkInsertStatement",
+    "keywords": "BULK INSERT STATEMENT",
+    "count_in_corpus": 0,
+    "example": "",
+    "status": "unseen",
+    "ruling": ""
+  },
+  {
+    "construct": "BulkOpenRowset",
+    "keywords": "BULK OPEN ROWSET",
+    "count_in_corpus": 0,
+    "example": "",
+    "status": "unseen",
+    "ruling": ""
+  },
+  {
+    "construct": "CastCall",
+    "keywords": "CAST CALL",
+    "count_in_corpus": 0,
+    "example": "",
+    "status": "mapped",
+    "ruling": ""
+  },
+  {
+    "construct": "CatalogCollationOption",
+    "keywords": "CATALOG COLLATION OPTION",
+    "count_in_corpus": 0,
+    "example": "",
+    "status": "unseen",
+    "ruling": ""
+  },
+  {
+    "construct": "CellsPerObjectSpatialIndexOption",
+    "keywords": "CELLS PER OBJECT SPATIAL INDEX OPTION",
+    "count_in_corpus": 0,
+    "example": "",
+    "status": "unseen",
+    "ruling": ""
+  },
+  {
+    "construct": "CertificateCreateLoginSource",
+    "keywords": "CERTIFICATE CREATE LOGIN SOURCE",
+    "count_in_corpus": 0,
+    "example": "",
+    "status": "unseen",
+    "ruling": ""
+  },
+  {
+    "construct": "CertificateOption",
+    "keywords": "CERTIFICATE OPTION",
+    "count_in_corpus": 0,
+    "example": "",
+    "status": "unseen",
+    "ruling": ""
+  },
+  {
+    "construct": "ChangeRetentionChangeTrackingOptionDetail",
+    "keywords": "CHANGE RETENTION CHANGE TRACKING OPTION DETAIL",
+    "count_in_corpus": 0,
+    "example": "",
+    "status": "unseen",
+    "ruling": ""
+  },
+  {
+    "construct": "ChangeTableChangesTableReference",
+    "keywords": "CHANGE TABLE CHANGES TABLE REFERENCE",
+    "count_in_corpus": 0,
+    "example": "",
+    "status": "unseen",
+    "ruling": ""
+  },
+  {
+    "construct": "ChangeTableVersionTableReference",
+    "keywords": "CHANGE TABLE VERSION TABLE REFERENCE",
+    "count_in_corpus": 0,
+    "example": "",
+    "status": "unseen",
+    "ruling": ""
+  },
+  {
+    "construct": "ChangeTrackingDatabaseOption",
+    "keywords": "CHANGE TRACKING DATABASE OPTION",
+    "count_in_corpus": 0,
+    "example": "",
+    "status": "unseen",
+    "ruling": ""
+  },
+  {
+    "construct": "ChangeTrackingFullTextIndexOption",
+    "keywords": "CHANGE TRACKING FULL TEXT INDEX OPTION",
+    "count_in_corpus": 0,
+    "example": "",
+    "status": "unseen",
+    "ruling": ""
+  },
+  {
+    "construct": "CharacterSetPayloadOption",
+    "keywords": "CHARACTER SET PAYLOAD OPTION",
+    "count_in_corpus": 0,
+    "example": "",
+    "status": "unseen",
+    "ruling": ""
+  },
+  {
+    "construct": "CheckConstraintDefinition",
+    "keywords": "CHECK CONSTRAINT DEFINITION",
+    "count_in_corpus": 0,
+    "example": "",
+    "status": "unseen",
+    "ruling": ""
+  },
+  {
+    "construct": "CheckpointStatement",
+    "keywords": "CHECKPOINT STATEMENT",
+    "count_in_corpus": 0,
+    "example": "",
+    "status": "unseen",
+    "ruling": ""
+  },
+  {
+    "construct": "ChildObjectName",
+    "keywords": "CHILD OBJECT NAME",
+    "count_in_corpus": 0,
+    "example": "",
+    "status": "unseen",
+    "ruling": ""
+  },
+  {
+    "construct": "ClassifierEndTimeOption",
+    "keywords": "CLASSIFIER END TIME OPTION",
+    "count_in_corpus": 0,
+    "example": "",
+    "status": "unseen",
+    "ruling": ""
+  },
+  {
+    "construct": "ClassifierImportanceOption",
+    "keywords": "CLASSIFIER IMPORTANCE OPTION",
+    "count_in_corpus": 0,
+    "example": "",
+    "status": "unseen",
+    "ruling": ""
+  },
+  {
+    "construct": "ClassifierMemberNameOption",
+    "keywords": "CLASSIFIER MEMBER NAME OPTION",
+    "count_in_corpus": 0,
+    "example": "",
+    "status": "unseen",
+    "ruling": ""
+  },
+  {
+    "construct": "ClassifierStartTimeOption",
+    "keywords": "CLASSIFIER START TIME OPTION",
+    "count_in_corpus": 0,
+    "example": "",
+    "status": "unseen",
+    "ruling": ""
+  },
+  {
+    "construct": "ClassifierWlmContextOption",
+    "keywords": "CLASSIFIER WLM CONTEXT OPTION",
+    "count_in_corpus": 0,
+    "example": "",
+    "status": "unseen",
+    "ruling": ""
+  },
+  {
+    "construct": "ClassifierWlmLabelOption",
+    "keywords": "CLASSIFIER WLM LABEL OPTION",
+    "count_in_corpus": 0,
+    "example": "",
+    "status": "unseen",
+    "ruling": ""
+  },
+  {
+    "construct": "ClassifierWorkloadGroupOption",
+    "keywords": "CLASSIFIER WORKLOAD GROUP OPTION",
+    "count_in_corpus": 0,
+    "example": "",
+    "status": "unseen",
+    "ruling": ""
+  },
+  {
+    "construct": "CloseCursorStatement",
+    "keywords": "CLOSE CURSOR STATEMENT",
+    "count_in_corpus": 0,
+    "example": "",
+    "status": "unseen",
+    "ruling": ""
+  },
+  {
+    "construct": "CloseMasterKeyStatement",
+    "keywords": "CLOSE MASTER KEY STATEMENT",
+    "count_in_corpus": 0,
+    "example": "",
+    "status": "unseen",
+    "ruling": ""
+  },
+  {
+    "construct": "CloseSymmetricKeyStatement",
+    "keywords": "CLOSE SYMMETRIC KEY STATEMENT",
+    "count_in_corpus": 0,
+    "example": "",
+    "status": "unseen",
+    "ruling": ""
+  },
+  {
+    "construct": "ClusterByTableOption",
+    "keywords": "CLUSTER BY TABLE OPTION",
+    "count_in_corpus": 0,
+    "example": "",
+    "status": "unseen",
+    "ruling": ""
+  },
+  {
+    "construct": "CoalesceExpression",
+    "keywords": "COALESCE EXPRESSION",
+    "count_in_corpus": 4,
+    "example": "COALESCE(@i_vEND_DATE,'ME-1')",
+    "status": "mapped",
+    "ruling": ""
+  },
+  {
+    "construct": "ColumnDefinition",
+    "keywords": "COLUMN DEFINITION",
+    "count_in_corpus": 0,
+    "example": "",
+    "status": "unseen",
+    "ruling": ""
+  },
+  {
+    "construct": "ColumnDefinitionBase",
+    "keywords": "COLUMN DEFINITION BASE",
+    "count_in_corpus": 0,
+    "example": "",
+    "status": "unseen",
+    "ruling": ""
+  },
+  {
+    "construct": "ColumnEncryptionAlgorithmNameParameter",
+    "keywords": "COLUMN ENCRYPTION ALGORITHM NAME PARAMETER",
+    "count_in_corpus": 0,
+    "example": "",
+    "status": "unseen",
+    "ruling": ""
+  },
+  {
+    "construct": "ColumnEncryptionAlgorithmParameter",
+    "keywords": "COLUMN ENCRYPTION ALGORITHM PARAMETER",
+    "count_in_corpus": 0,
+    "example": "",
+    "status": "unseen",
+    "ruling": ""
+  },
+  {
+    "construct": "ColumnEncryptionDefinition",
+    "keywords": "COLUMN ENCRYPTION DEFINITION",
+    "count_in_corpus": 0,
+    "example": "",
+    "status": "unseen",
+    "ruling": ""
+  },
+  {
+    "construct": "ColumnEncryptionKeyNameParameter",
+    "keywords": "COLUMN ENCRYPTION KEY NAME PARAMETER",
+    "count_in_corpus": 0,
+    "example": "",
+    "status": "unseen",
+    "ruling": ""
+  },
+  {
+    "construct": "ColumnEncryptionKeyValue",
+    "keywords": "COLUMN ENCRYPTION KEY VALUE",
+    "count_in_corpus": 0,
+    "example": "",
+    "status": "unseen",
+    "ruling": ""
+  },
+  {
+    "construct": "ColumnEncryptionTypeParameter",
+    "keywords": "COLUMN ENCRYPTION TYPE PARAMETER",
+    "count_in_corpus": 0,
+    "example": "",
+    "status": "unseen",
+    "ruling": ""
+  },
+  {
+    "construct": "ColumnMasterKeyEnclaveComputationsParameter",
+    "keywords": "COLUMN MASTER KEY ENCLAVE COMPUTATIONS PARAMETER",
+    "count_in_corpus": 0,
+    "example": "",
+    "status": "unseen",
+    "ruling": ""
+  },
+  {
+    "construct": "ColumnMasterKeyNameParameter",
+    "keywords": "COLUMN MASTER KEY NAME PARAMETER",
+    "count_in_corpus": 0,
+    "example": "",
+    "status": "unseen",
+    "ruling": ""
+  },
+  {
+    "construct": "ColumnMasterKeyPathParameter",
+    "keywords": "COLUMN MASTER KEY PATH PARAMETER",
+    "count_in_corpus": 0,
+    "example": "",
+    "status": "unseen",
+    "ruling": ""
+  },
+  {
+    "construct": "ColumnMasterKeyStoreProviderNameParameter",
+    "keywords": "COLUMN MASTER KEY STORE PROVIDER NAME PARAMETER",
+    "count_in_corpus": 0,
+    "example": "",
+    "status": "unseen",
+    "ruling": ""
+  },
+  {
+    "construct": "ColumnReferenceExpression",
+    "keywords": "COLUMN REFERENCE EXPRESSION",
+    "count_in_corpus": 581,
+    "example": "adt.DEPARTMENT_ID",
+    "status": "mapped",
+    "ruling": ""
+  },
+  {
+    "construct": "ColumnStorageOptions",
+    "keywords": "COLUMN STORAGE OPTIONS",
+    "count_in_corpus": 0,
+    "example": "",
+    "status": "unseen",
+    "ruling": ""
+  },
+  {
+    "construct": "ColumnWithSortOrder",
+    "keywords": "COLUMN WITH SORT ORDER",
+    "count_in_corpus": 0,
+    "example": "",
+    "status": "unseen",
+    "ruling": ""
+  },
+  {
+    "construct": "CommandSecurityElement80",
+    "keywords": "COMMAND SECURITY ELEMENT80",
+    "count_in_corpus": 0,
+    "example": "",
+    "status": "unseen",
+    "ruling": ""
+  },
+  {
+    "construct": "CommitTransactionStatement",
+    "keywords": "COMMIT TRANSACTION STATEMENT",
+    "count_in_corpus": 0,
+    "example": "",
+    "status": "unseen",
+    "ruling": ""
+  },
+  {
+    "construct": "CommonTableExpression",
+    "keywords": "COMMON TABLE EXPRESSION",
+    "count_in_corpus": 4,
+    "example": "month_cte as\n(select datepart(day, Max(adt.EFFECTIVE_TIME)) as 'CurrentMonth' \n\tfrom Clarity.dbo.CLARITY_ADT adt\n\twhere ",
+    "status": "mapped",
+    "ruling": ""
+  },
+  {
+    "construct": "CompositeGroupingSpecification",
+    "keywords": "COMPOSITE GROUPING SPECIFICATION",
+    "count_in_corpus": 0,
+    "example": "",
+    "status": "unseen",
+    "ruling": ""
+  },
+  {
+    "construct": "CompressionDelayIndexOption",
+    "keywords": "COMPRESSION DELAY INDEX OPTION",
+    "count_in_corpus": 0,
+    "example": "",
+    "status": "unseen",
+    "ruling": ""
+  },
+  {
+    "construct": "CompressionEndpointProtocolOption",
+    "keywords": "COMPRESSION ENDPOINT PROTOCOL OPTION",
+    "count_in_corpus": 0,
+    "example": "",
+    "status": "unseen",
+    "ruling": ""
+  },
+  {
+    "construct": "CompressionPartitionRange",
+    "keywords": "COMPRESSION PARTITION RANGE",
+    "count_in_corpus": 0,
+    "example": "",
+    "status": "unseen",
+    "ruling": ""
+  },
+  {
+    "construct": "ComputeClause",
+    "keywords": "COMPUTE CLAUSE",
+    "count_in_corpus": 0,
+    "example": "",
+    "status": "unseen",
+    "ruling": ""
+  },
+  {
+    "construct": "ComputeFunction",
+    "keywords": "COMPUTE FUNCTION",
+    "count_in_corpus": 0,
+    "example": "",
+    "status": "unseen",
+    "ruling": ""
+  },
+  {
+    "construct": "ContainmentDatabaseOption",
+    "keywords": "CONTAINMENT DATABASE OPTION",
+    "count_in_corpus": 0,
+    "example": "",
+    "status": "unseen",
+    "ruling": ""
+  },
+  {
+    "construct": "ContinueStatement",
+    "keywords": "CONTINUE STATEMENT",
+    "count_in_corpus": 0,
+    "example": "",
+    "status": "unseen",
+    "ruling": ""
+  },
+  {
+    "construct": "ContractMessage",
+    "keywords": "CONTRACT MESSAGE",
+    "count_in_corpus": 0,
+    "example": "",
+    "status": "unseen",
+    "ruling": ""
+  },
+  {
+    "construct": "ConvertCall",
+    "keywords": "CONVERT CALL",
+    "count_in_corpus": 23,
+    "example": "CONVERT(DATE, pt.BIRTH_DATE)",
+    "status": "mapped",
+    "ruling": ""
+  },
+  {
+    "construct": "CopyColumnOption",
+    "keywords": "COPY COLUMN OPTION",
+    "count_in_corpus": 0,
+    "example": "",
+    "status": "unseen",
+    "ruling": ""
+  },
+  {
+    "construct": "CopyCredentialOption",
+    "keywords": "COPY CREDENTIAL OPTION",
+    "count_in_corpus": 0,
+    "example": "",
+    "status": "unseen",
+    "ruling": ""
+  },
+  {
+    "construct": "CopyOption",
+    "keywords": "COPY OPTION",
+    "count_in_corpus": 0,
+    "example": "",
+    "status": "unseen",
+    "ruling": ""
+  },
+  {
+    "construct": "CopyStatement",
+    "keywords": "COPY STATEMENT",
+    "count_in_corpus": 0,
+    "example": "",
+    "status": "unseen",
+    "ruling": ""
+  },
+  {
+    "construct": "CreateAggregateStatement",
+    "keywords": "CREATE AGGREGATE STATEMENT",
+    "count_in_corpus": 0,
+    "example": "",
+    "status": "unseen",
+    "ruling": ""
+  },
+  {
+    "construct": "CreateApplicationRoleStatement",
+    "keywords": "CREATE APPLICATION ROLE STATEMENT",
+    "count_in_corpus": 0,
+    "example": "",
+    "status": "unseen",
+    "ruling": ""
+  },
+  {
+    "construct": "CreateAssemblyStatement",
+    "keywords": "CREATE ASSEMBLY STATEMENT",
+    "count_in_corpus": 0,
+    "example": "",
+    "status": "unseen",
+    "ruling": ""
+  },
+  {
+    "construct": "CreateAsymmetricKeyStatement",
+    "keywords": "CREATE ASYMMETRIC KEY STATEMENT",
+    "count_in_corpus": 0,
+    "example": "",
+    "status": "unseen",
+    "ruling": ""
+  },
+  {
+    "construct": "CreateAvailabilityGroupStatement",
+    "keywords": "CREATE AVAILABILITY GROUP STATEMENT",
+    "count_in_corpus": 0,
+    "example": "",
+    "status": "unseen",
+    "ruling": ""
+  },
+  {
+    "construct": "CreateBrokerPriorityStatement",
+    "keywords": "CREATE BROKER PRIORITY STATEMENT",
+    "count_in_corpus": 0,
+    "example": "",
+    "status": "unseen",
+    "ruling": ""
+  },
+  {
+    "construct": "CreateCertificateStatement",
+    "keywords": "CREATE CERTIFICATE STATEMENT",
+    "count_in_corpus": 0,
+    "example": "",
+    "status": "unseen",
+    "ruling": ""
+  },
+  {
+    "construct": "CreateColumnEncryptionKeyStatement",
+    "keywords": "CREATE COLUMN ENCRYPTION KEY STATEMENT",
+    "count_in_corpus": 0,
+    "example": "",
+    "status": "unseen",
+    "ruling": ""
+  },
+  {
+    "construct": "CreateColumnMasterKeyStatement",
+    "keywords": "CREATE COLUMN MASTER KEY STATEMENT",
+    "count_in_corpus": 0,
+    "example": "",
+    "status": "unseen",
+    "ruling": ""
+  },
+  {
+    "construct": "CreateColumnStoreIndexStatement",
+    "keywords": "CREATE COLUMN STORE INDEX STATEMENT",
+    "count_in_corpus": 0,
+    "example": "",
+    "status": "unseen",
+    "ruling": ""
+  },
+  {
+    "construct": "CreateContractStatement",
+    "keywords": "CREATE CONTRACT STATEMENT",
+    "count_in_corpus": 0,
+    "example": "",
+    "status": "unseen",
+    "ruling": ""
+  },
+  {
+    "construct": "CreateCredentialStatement",
+    "keywords": "CREATE CREDENTIAL STATEMENT",
+    "count_in_corpus": 0,
+    "example": "",
+    "status": "unseen",
+    "ruling": ""
+  },
+  {
+    "construct": "CreateCryptographicProviderStatement",
+    "keywords": "CREATE CRYPTOGRAPHIC PROVIDER STATEMENT",
+    "count_in_corpus": 0,
+    "example": "",
+    "status": "unseen",
+    "ruling": ""
+  },
+  {
+    "construct": "CreateDatabaseAuditSpecificationStatement",
+    "keywords": "CREATE DATABASE AUDIT SPECIFICATION STATEMENT",
+    "count_in_corpus": 0,
+    "example": "",
+    "status": "unseen",
+    "ruling": ""
+  },
+  {
+    "construct": "CreateDatabaseEncryptionKeyStatement",
+    "keywords": "CREATE DATABASE ENCRYPTION KEY STATEMENT",
+    "count_in_corpus": 0,
+    "example": "",
+    "status": "unseen",
+    "ruling": ""
+  },
+  {
+    "construct": "CreateDatabaseStatement",
+    "keywords": "CREATE DATABASE STATEMENT",
+    "count_in_corpus": 0,
+    "example": "",
+    "status": "unseen",
+    "ruling": ""
+  },
+  {
+    "construct": "CreateDefaultStatement",
+    "keywords": "CREATE DEFAULT STATEMENT",
+    "count_in_corpus": 0,
+    "example": "",
+    "status": "unseen",
+    "ruling": ""
+  },
+  {
+    "construct": "CreateEndpointStatement",
+    "keywords": "CREATE ENDPOINT STATEMENT",
+    "count_in_corpus": 0,
+    "example": "",
+    "status": "unseen",
+    "ruling": ""
+  },
+  {
+    "construct": "CreateEventNotificationStatement",
+    "keywords": "CREATE EVENT NOTIFICATION STATEMENT",
+    "count_in_corpus": 0,
+    "example": "",
+    "status": "unseen",
+    "ruling": ""
+  },
+  {
+    "construct": "CreateEventSessionStatement",
+    "keywords": "CREATE EVENT SESSION STATEMENT",
+    "count_in_corpus": 0,
+    "example": "",
+    "status": "unseen",
+    "ruling": ""
+  },
+  {
+    "construct": "CreateExternalDataSourceStatement",
+    "keywords": "CREATE EXTERNAL DATA SOURCE STATEMENT",
+    "count_in_corpus": 0,
+    "example": "",
+    "status": "unseen",
+    "ruling": ""
+  },
+  {
+    "construct": "CreateExternalFileFormatStatement",
+    "keywords": "CREATE EXTERNAL FILE FORMAT STATEMENT",
+    "count_in_corpus": 0,
+    "example": "",
+    "status": "unseen",
+    "ruling": ""
+  },
+  {
+    "construct": "CreateExternalFunctionStatement",
+    "keywords": "CREATE EXTERNAL FUNCTION STATEMENT",
+    "count_in_corpus": 0,
+    "example": "",
+    "status": "unseen",
+    "ruling": ""
+  },
+  {
+    "construct": "CreateExternalLanguageStatement",
+    "keywords": "CREATE EXTERNAL LANGUAGE STATEMENT",
+    "count_in_corpus": 0,
+    "example": "",
+    "status": "unseen",
+    "ruling": ""
+  },
+  {
+    "construct": "CreateExternalLibraryStatement",
+    "keywords": "CREATE EXTERNAL LIBRARY STATEMENT",
+    "count_in_corpus": 0,
+    "example": "",
+    "status": "unseen",
+    "ruling": ""
+  },
+  {
+    "construct": "CreateExternalModelStatement",
+    "keywords": "CREATE EXTERNAL MODEL STATEMENT",
+    "count_in_corpus": 0,
+    "example": "",
+    "status": "unseen",
+    "ruling": ""
+  },
+  {
+    "construct": "CreateExternalResourcePoolStatement",
+    "keywords": "CREATE EXTERNAL RESOURCE POOL STATEMENT",
+    "count_in_corpus": 0,
+    "example": "",
+    "status": "unseen",
+    "ruling": ""
+  },
+  {
+    "construct": "CreateExternalStreamStatement",
+    "keywords": "CREATE EXTERNAL STREAM STATEMENT",
+    "count_in_corpus": 0,
+    "example": "",
+    "status": "unseen",
+    "ruling": ""
+  },
+  {
+    "construct": "CreateExternalStreamingJobStatement",
+    "keywords": "CREATE EXTERNAL STREAMING JOB STATEMENT",
+    "count_in_corpus": 0,
+    "example": "",
+    "status": "unseen",
+    "ruling": ""
+  },
+  {
+    "construct": "CreateExternalTableStatement",
+    "keywords": "CREATE EXTERNAL TABLE STATEMENT",
+    "count_in_corpus": 0,
+    "example": "",
+    "status": "unseen",
+    "ruling": ""
+  },
+  {
+    "construct": "CreateFederationStatement",
+    "keywords": "CREATE FEDERATION STATEMENT",
+    "count_in_corpus": 0,
+    "example": "",
+    "status": "unseen",
+    "ruling": ""
+  },
+  {
+    "construct": "CreateFullTextCatalogStatement",
+    "keywords": "CREATE FULL TEXT CATALOG STATEMENT",
+    "count_in_corpus": 0,
+    "example": "",
+    "status": "unseen",
+    "ruling": ""
+  },
+  {
+    "construct": "CreateFullTextIndexStatement",
+    "keywords": "CREATE FULL TEXT INDEX STATEMENT",
+    "count_in_corpus": 0,
+    "example": "",
+    "status": "unseen",
+    "ruling": ""
+  },
+  {
+    "construct": "CreateFullTextStopListStatement",
+    "keywords": "CREATE FULL TEXT STOP LIST STATEMENT",
+    "count_in_corpus": 0,
+    "example": "",
+    "status": "unseen",
+    "ruling": ""
+  },
+  {
+    "construct": "CreateFunctionStatement",
+    "keywords": "CREATE FUNCTION STATEMENT",
+    "count_in_corpus": 0,
+    "example": "",
+    "status": "unseen",
+    "ruling": ""
+  },
+  {
+    "construct": "CreateIndexStatement",
+    "keywords": "CREATE INDEX STATEMENT",
+    "count_in_corpus": 0,
+    "example": "",
+    "status": "unseen",
+    "ruling": ""
+  },
+  {
+    "construct": "CreateJsonIndexStatement",
+    "keywords": "CREATE JSON INDEX STATEMENT",
+    "count_in_corpus": 0,
+    "example": "",
+    "status": "unseen",
+    "ruling": ""
+  },
+  {
+    "construct": "CreateLoginStatement",
+    "keywords": "CREATE LOGIN STATEMENT",
+    "count_in_corpus": 0,
+    "example": "",
+    "status": "unseen",
+    "ruling": ""
+  },
+  {
+    "construct": "CreateMasterKeyStatement",
+    "keywords": "CREATE MASTER KEY STATEMENT",
+    "count_in_corpus": 0,
+    "example": "",
+    "status": "unseen",
+    "ruling": ""
+  },
+  {
+    "construct": "CreateMessageTypeStatement",
+    "keywords": "CREATE MESSAGE TYPE STATEMENT",
+    "count_in_corpus": 0,
+    "example": "",
+    "status": "unseen",
+    "ruling": ""
+  },
+  {
+    "construct": "CreateOrAlterExternalFunctionStatement",
+    "keywords": "CREATE OR ALTER EXTERNAL FUNCTION STATEMENT",
+    "count_in_corpus": 0,
+    "example": "",
+    "status": "unseen",
+    "ruling": ""
+  },
+  {
+    "construct": "CreateOrAlterFunctionStatement",
+    "keywords": "CREATE OR ALTER FUNCTION STATEMENT",
+    "count_in_corpus": 0,
+    "example": "",
+    "status": "unseen",
+    "ruling": ""
+  },
+  {
+    "construct": "CreateOrAlterProcedureStatement",
+    "keywords": "CREATE OR ALTER PROCEDURE STATEMENT",
+    "count_in_corpus": 0,
+    "example": "",
+    "status": "unseen",
+    "ruling": ""
+  },
+  {
+    "construct": "CreateOrAlterTriggerStatement",
+    "keywords": "CREATE OR ALTER TRIGGER STATEMENT",
+    "count_in_corpus": 0,
+    "example": "",
+    "status": "unseen",
+    "ruling": ""
+  },
+  {
+    "construct": "CreateOrAlterViewStatement",
+    "keywords": "CREATE OR ALTER VIEW STATEMENT",
+    "count_in_corpus": 0,
+    "example": "",
+    "status": "unseen",
+    "ruling": ""
+  },
+  {
+    "construct": "CreatePartitionFunctionStatement",
+    "keywords": "CREATE PARTITION FUNCTION STATEMENT",
+    "count_in_corpus": 0,
+    "example": "",
+    "status": "unseen",
+    "ruling": ""
+  },
+  {
+    "construct": "CreatePartitionSchemeStatement",
+    "keywords": "CREATE PARTITION SCHEME STATEMENT",
+    "count_in_corpus": 0,
+    "example": "",
+    "status": "unseen",
+    "ruling": ""
+  },
+  {
+    "construct": "CreateProcedureStatement",
+    "keywords": "CREATE PROCEDURE STATEMENT",
+    "count_in_corpus": 8,
+    "example": "CREATE             PROCEDURE [schema1].[USP_ADT_MONTHLY_INPATIENT_CENSUS_TOTALS_SSRS]\n\n-- Add the parameters for the sto",
+    "status": "mapped",
+    "ruling": ""
+  },
+  {
+    "construct": "CreateQueueStatement",
+    "keywords": "CREATE QUEUE STATEMENT",
+    "count_in_corpus": 0,
+    "example": "",
+    "status": "unseen",
+    "ruling": ""
+  },
+  {
+    "construct": "CreateRemoteServiceBindingStatement",
+    "keywords": "CREATE REMOTE SERVICE BINDING STATEMENT",
+    "count_in_corpus": 0,
+    "example": "",
+    "status": "unseen",
+    "ruling": ""
+  },
+  {
+    "construct": "CreateResourcePoolStatement",
+    "keywords": "CREATE RESOURCE POOL STATEMENT",
+    "count_in_corpus": 0,
+    "example": "",
+    "status": "unseen",
+    "ruling": ""
+  },
+  {
+    "construct": "CreateRoleStatement",
+    "keywords": "CREATE ROLE STATEMENT",
+    "count_in_corpus": 0,
+    "example": "",
+    "status": "unseen",
+    "ruling": ""
+  },
+  {
+    "construct": "CreateRouteStatement",
+    "keywords": "CREATE ROUTE STATEMENT",
+    "count_in_corpus": 0,
+    "example": "",
+    "status": "unseen",
+    "ruling": ""
+  },
+  {
+    "construct": "CreateRuleStatement",
+    "keywords": "CREATE RULE STATEMENT",
+    "count_in_corpus": 0,
+    "example": "",
+    "status": "unseen",
+    "ruling": ""
+  },
+  {
+    "construct": "CreateSchemaStatement",
+    "keywords": "CREATE SCHEMA STATEMENT",
+    "count_in_corpus": 0,
+    "example": "",
+    "status": "unseen",
+    "ruling": ""
+  },
+  {
+    "construct": "CreateSearchPropertyListStatement",
+    "keywords": "CREATE SEARCH PROPERTY LIST STATEMENT",
+    "count_in_corpus": 0,
+    "example": "",
+    "status": "unseen",
+    "ruling": ""
+  },
+  {
+    "construct": "CreateSecurityPolicyStatement",
+    "keywords": "CREATE SECURITY POLICY STATEMENT",
+    "count_in_corpus": 0,
+    "example": "",
+    "status": "unseen",
+    "ruling": ""
+  },
+  {
+    "construct": "CreateSelectiveXmlIndexStatement",
+    "keywords": "CREATE SELECTIVE XML INDEX STATEMENT",
+    "count_in_corpus": 0,
+    "example": "",
+    "status": "unseen",
+    "ruling": ""
+  },
+  {
+    "construct": "CreateSemanticIndexStatement",
+    "keywords": "CREATE SEMANTIC INDEX STATEMENT",
+    "count_in_corpus": 0,
+    "example": "",
+    "status": "unseen",
+    "ruling": ""
+  },
+  {
+    "construct": "CreateSequenceStatement",
+    "keywords": "CREATE SEQUENCE STATEMENT",
+    "count_in_corpus": 0,
+    "example": "",
+    "status": "unseen",
+    "ruling": ""
+  },
+  {
+    "construct": "CreateServerAuditSpecificationStatement",
+    "keywords": "CREATE SERVER AUDIT SPECIFICATION STATEMENT",
+    "count_in_corpus": 0,
+    "example": "",
+    "status": "unseen",
+    "ruling": ""
+  },
+  {
+    "construct": "CreateServerAuditStatement",
+    "keywords": "CREATE SERVER AUDIT STATEMENT",
+    "count_in_corpus": 0,
+    "example": "",
+    "status": "unseen",
+    "ruling": ""
+  },
+  {
+    "construct": "CreateServerRoleStatement",
+    "keywords": "CREATE SERVER ROLE STATEMENT",
+    "count_in_corpus": 0,
+    "example": "",
+    "status": "unseen",
+    "ruling": ""
+  },
+  {
+    "construct": "CreateServiceStatement",
+    "keywords": "CREATE SERVICE STATEMENT",
+    "count_in_corpus": 0,
+    "example": "",
+    "status": "unseen",
+    "ruling": ""
+  },
+  {
+    "construct": "CreateSpatialIndexStatement",
+    "keywords": "CREATE SPATIAL INDEX STATEMENT",
+    "count_in_corpus": 0,
+    "example": "",
+    "status": "unseen",
+    "ruling": ""
+  },
+  {
+    "construct": "CreateStatisticsStatement",
+    "keywords": "CREATE STATISTICS STATEMENT",
+    "count_in_corpus": 0,
+    "example": "",
+    "status": "unseen",
+    "ruling": ""
+  },
+  {
+    "construct": "CreateSymmetricKeyStatement",
+    "keywords": "CREATE SYMMETRIC KEY STATEMENT",
+    "count_in_corpus": 0,
+    "example": "",
+    "status": "unseen",
+    "ruling": ""
+  },
+  {
+    "construct": "CreateSynonymStatement",
+    "keywords": "CREATE SYNONYM STATEMENT",
+    "count_in_corpus": 0,
+    "example": "",
+    "status": "unseen",
+    "ruling": ""
+  },
+  {
+    "construct": "CreateTableStatement",
+    "keywords": "CREATE TABLE STATEMENT",
+    "count_in_corpus": 0,
+    "example": "",
+    "status": "unseen",
+    "ruling": ""
+  },
+  {
+    "construct": "CreateTriggerStatement",
+    "keywords": "CREATE TRIGGER STATEMENT",
+    "count_in_corpus": 0,
+    "example": "",
+    "status": "unseen",
+    "ruling": ""
+  },
+  {
+    "construct": "CreateTypeTableStatement",
+    "keywords": "CREATE TYPE TABLE STATEMENT",
+    "count_in_corpus": 0,
+    "example": "",
+    "status": "unseen",
+    "ruling": ""
+  },
+  {
+    "construct": "CreateTypeUddtStatement",
+    "keywords": "CREATE TYPE UDDT STATEMENT",
+    "count_in_corpus": 0,
+    "example": "",
+    "status": "unseen",
+    "ruling": ""
+  },
+  {
+    "construct": "CreateTypeUdtStatement",
+    "keywords": "CREATE TYPE UDT STATEMENT",
+    "count_in_corpus": 0,
+    "example": "",
+    "status": "unseen",
+    "ruling": ""
+  },
+  {
+    "construct": "CreateUserStatement",
+    "keywords": "CREATE USER STATEMENT",
+    "count_in_corpus": 0,
+    "example": "",
+    "status": "unseen",
+    "ruling": ""
+  },
+  {
+    "construct": "CreateVectorIndexStatement",
+    "keywords": "CREATE VECTOR INDEX STATEMENT",
+    "count_in_corpus": 0,
+    "example": "",
+    "status": "unseen",
+    "ruling": ""
+  },
+  {
+    "construct": "CreateViewStatement",
+    "keywords": "CREATE VIEW STATEMENT",
+    "count_in_corpus": 0,
+    "example": "",
+    "status": "unseen",
+    "ruling": ""
+  },
+  {
+    "construct": "CreateWorkloadClassifierStatement",
+    "keywords": "CREATE WORKLOAD CLASSIFIER STATEMENT",
+    "count_in_corpus": 0,
+    "example": "",
+    "status": "unseen",
+    "ruling": ""
+  },
+  {
+    "construct": "CreateWorkloadGroupStatement",
+    "keywords": "CREATE WORKLOAD GROUP STATEMENT",
+    "count_in_corpus": 0,
+    "example": "",
+    "status": "unseen",
+    "ruling": ""
+  },
+  {
+    "construct": "CreateXmlIndexStatement",
+    "keywords": "CREATE XML INDEX STATEMENT",
+    "count_in_corpus": 0,
+    "example": "",
+    "status": "unseen",
+    "ruling": ""
+  },
+  {
+    "construct": "CreateXmlSchemaCollectionStatement",
+    "keywords": "CREATE XML SCHEMA COLLECTION STATEMENT",
+    "count_in_corpus": 0,
+    "example": "",
+    "status": "unseen",
+    "ruling": ""
+  },
+  {
+    "construct": "CreationDispositionKeyOption",
+    "keywords": "CREATION DISPOSITION KEY OPTION",
+    "count_in_corpus": 0,
+    "example": "",
+    "status": "unseen",
+    "ruling": ""
+  },
+  {
+    "construct": "CryptoMechanism",
+    "keywords": "CRYPTO MECHANISM",
+    "count_in_corpus": 0,
+    "example": "",
+    "status": "unseen",
+    "ruling": ""
+  },
+  {
+    "construct": "CubeGroupingSpecification",
+    "keywords": "CUBE GROUPING SPECIFICATION",
+    "count_in_corpus": 0,
+    "example": "",
+    "status": "unseen",
+    "ruling": ""
+  },
+  {
+    "construct": "CursorDefaultDatabaseOption",
+    "keywords": "CURSOR DEFAULT DATABASE OPTION",
+    "count_in_corpus": 0,
+    "example": "",
+    "status": "unseen",
+    "ruling": ""
+  },
+  {
+    "construct": "CursorDefinition",
+    "keywords": "CURSOR DEFINITION",
+    "count_in_corpus": 0,
+    "example": "",
+    "status": "unseen",
+    "ruling": ""
+  },
+  {
+    "construct": "CursorId",
+    "keywords": "CURSOR ID",
+    "count_in_corpus": 0,
+    "example": "",
+    "status": "unseen",
+    "ruling": ""
+  },
+  {
+    "construct": "CursorOption",
+    "keywords": "CURSOR OPTION",
+    "count_in_corpus": 0,
+    "example": "",
+    "status": "unseen",
+    "ruling": ""
+  },
+  {
+    "construct": "DWCompatibilityLevelConfigurationOption",
+    "keywords": "DWCOMPATIBILITY LEVEL CONFIGURATION OPTION",
+    "count_in_corpus": 0,
+    "example": "",
+    "status": "unseen",
+    "ruling": ""
+  },
+  {
+    "construct": "DataCompressionOption",
+    "keywords": "DATA COMPRESSION OPTION",
+    "count_in_corpus": 0,
+    "example": "",
+    "status": "unseen",
+    "ruling": ""
+  },
+  {
+    "construct": "DataModificationTableReference",
+    "keywords": "DATA MODIFICATION TABLE REFERENCE",
+    "count_in_corpus": 0,
+    "example": "",
+    "status": "unseen",
+    "ruling": ""
+  },
+  {
+    "construct": "DataRetentionTableOption",
+    "keywords": "DATA RETENTION TABLE OPTION",
+    "count_in_corpus": 0,
+    "example": "",
+    "status": "unseen",
+    "ruling": ""
+  },
+  {
+    "construct": "DataTypeSequenceOption",
+    "keywords": "DATA TYPE SEQUENCE OPTION",
+    "count_in_corpus": 0,
+    "example": "",
+    "status": "unseen",
+    "ruling": ""
+  },
+  {
+    "construct": "DatabaseAuditAction",
+    "keywords": "DATABASE AUDIT ACTION",
+    "count_in_corpus": 0,
+    "example": "",
+    "status": "unseen",
+    "ruling": ""
+  },
+  {
+    "construct": "DatabaseConfigurationClearOption",
+    "keywords": "DATABASE CONFIGURATION CLEAR OPTION",
+    "count_in_corpus": 0,
+    "example": "",
+    "status": "unseen",
+    "ruling": ""
+  },
+  {
+    "construct": "DatabaseConfigurationSetOption",
+    "keywords": "DATABASE CONFIGURATION SET OPTION",
+    "count_in_corpus": 0,
+    "example": "",
+    "status": "unseen",
+    "ruling": ""
+  },
+  {
+    "construct": "DatabaseOption",
+    "keywords": "DATABASE OPTION",
+    "count_in_corpus": 0,
+    "example": "",
+    "status": "unseen",
+    "ruling": ""
+  },
+  {
+    "construct": "DbccNamedLiteral",
+    "keywords": "DBCC NAMED LITERAL",
+    "count_in_corpus": 0,
+    "example": "",
+    "status": "unseen",
+    "ruling": ""
+  },
+  {
+    "construct": "DbccOption",
+    "keywords": "DBCC OPTION",
+    "count_in_corpus": 0,
+    "example": "",
+    "status": "unseen",
+    "ruling": ""
+  },
+  {
+    "construct": "DbccStatement",
+    "keywords": "DBCC STATEMENT",
+    "count_in_corpus": 0,
+    "example": "",
+    "status": "unseen",
+    "ruling": ""
+  },
+  {
+    "construct": "DeallocateCursorStatement",
+    "keywords": "DEALLOCATE CURSOR STATEMENT",
+    "count_in_corpus": 0,
+    "example": "",
+    "status": "unseen",
+    "ruling": ""
+  },
+  {
+    "construct": "DeclareCursorStatement",
+    "keywords": "DECLARE CURSOR STATEMENT",
+    "count_in_corpus": 0,
+    "example": "",
+    "status": "unseen",
+    "ruling": ""
+  },
+  {
+    "construct": "DeclareTableVariableBody",
+    "keywords": "DECLARE TABLE VARIABLE BODY",
+    "count_in_corpus": 0,
+    "example": "",
+    "status": "unseen",
+    "ruling": ""
+  },
+  {
+    "construct": "DeclareTableVariableStatement",
+    "keywords": "DECLARE TABLE VARIABLE STATEMENT",
+    "count_in_corpus": 0,
+    "example": "",
+    "status": "unseen",
+    "ruling": ""
+  },
+  {
+    "construct": "DeclareVariableElement",
+    "keywords": "DECLARE VARIABLE ELEMENT",
+    "count_in_corpus": 14,
+    "example": "@StartDate DATE =  case when dateadd(m, -24, getdate() - datepart(d, getdate()) + 1) < '03/01/2018' then '03/01/2018' el",
+    "status": "mapped",
+    "ruling": ""
+  },
+  {
+    "construct": "DeclareVariableStatement",
+    "keywords": "DECLARE VARIABLE STATEMENT",
+    "count_in_corpus": 8,
+    "example": "declare @StartDate DATE =  case when dateadd(m, -24, getdate() - datepart(d, getdate()) + 1) < '03/01/2018' then '03/01/",
+    "status": "mapped",
+    "ruling": ""
+  },
+  {
+    "construct": "DefaultConstraintDefinition",
+    "keywords": "DEFAULT CONSTRAINT DEFINITION",
+    "count_in_corpus": 0,
+    "example": "",
+    "status": "unseen",
+    "ruling": ""
+  },
+  {
+    "construct": "DefaultLiteral",
+    "keywords": "DEFAULT LITERAL",
+    "count_in_corpus": 0,
+    "example": "",
+    "status": "mapped",
+    "ruling": ""
+  },
+  {
+    "construct": "DelayedDurabilityDatabaseOption",
+    "keywords": "DELAYED DURABILITY DATABASE OPTION",
+    "count_in_corpus": 0,
+    "example": "",
+    "status": "unseen",
+    "ruling": ""
+  },
+  {
+    "construct": "DeleteMergeAction",
+    "keywords": "DELETE MERGE ACTION",
+    "count_in_corpus": 0,
+    "example": "",
+    "status": "unseen",
+    "ruling": ""
+  },
+  {
+    "construct": "DeleteSpecification",
+    "keywords": "DELETE SPECIFICATION",
+    "count_in_corpus": 0,
+    "example": "",
+    "status": "unseen",
+    "ruling": ""
+  },
+  {
+    "construct": "DeleteStatement",
+    "keywords": "DELETE STATEMENT",
+    "count_in_corpus": 0,
+    "example": "",
+    "status": "unseen",
+    "ruling": ""
+  },
+  {
+    "construct": "DenyStatement",
+    "keywords": "DENY STATEMENT",
+    "count_in_corpus": 0,
+    "example": "",
+    "status": "unseen",
+    "ruling": ""
+  },
+  {
+    "construct": "DenyStatement80",
+    "keywords": "DENY STATEMENT80",
+    "count_in_corpus": 0,
+    "example": "",
+    "status": "unseen",
+    "ruling": ""
+  },
+  {
+    "construct": "DeviceInfo",
+    "keywords": "DEVICE INFO",
+    "count_in_corpus": 0,
+    "example": "",
+    "status": "unseen",
+    "ruling": ""
+  },
+  {
+    "construct": "DiskStatement",
+    "keywords": "DISK STATEMENT",
+    "count_in_corpus": 0,
+    "example": "",
+    "status": "unseen",
+    "ruling": ""
+  },
+  {
+    "construct": "DiskStatementOption",
+    "keywords": "DISK STATEMENT OPTION",
+    "count_in_corpus": 0,
+    "example": "",
+    "status": "unseen",
+    "ruling": ""
+  },
+  {
+    "construct": "DistinctPredicate",
+    "keywords": "DISTINCT PREDICATE",
+    "count_in_corpus": 0,
+    "example": "",
+    "status": "unseen",
+    "ruling": ""
+  },
+  {
+    "construct": "DropAggregateStatement",
+    "keywords": "DROP AGGREGATE STATEMENT",
+    "count_in_corpus": 0,
+    "example": "",
+    "status": "unseen",
+    "ruling": ""
+  },
+  {
+    "construct": "DropAlterFullTextIndexAction",
+    "keywords": "DROP ALTER FULL TEXT INDEX ACTION",
+    "count_in_corpus": 0,
+    "example": "",
+    "status": "unseen",
+    "ruling": ""
+  },
+  {
+    "construct": "DropApplicationRoleStatement",
+    "keywords": "DROP APPLICATION ROLE STATEMENT",
+    "count_in_corpus": 0,
+    "example": "",
+    "status": "unseen",
+    "ruling": ""
+  },
+  {
+    "construct": "DropAssemblyStatement",
+    "keywords": "DROP ASSEMBLY STATEMENT",
+    "count_in_corpus": 0,
+    "example": "",
+    "status": "unseen",
+    "ruling": ""
+  },
+  {
+    "construct": "DropAsymmetricKeyStatement",
+    "keywords": "DROP ASYMMETRIC KEY STATEMENT",
+    "count_in_corpus": 0,
+    "example": "",
+    "status": "unseen",
+    "ruling": ""
+  },
+  {
+    "construct": "DropAvailabilityGroupStatement",
+    "keywords": "DROP AVAILABILITY GROUP STATEMENT",
+    "count_in_corpus": 0,
+    "example": "",
+    "status": "unseen",
+    "ruling": ""
+  },
+  {
+    "construct": "DropBrokerPriorityStatement",
+    "keywords": "DROP BROKER PRIORITY STATEMENT",
+    "count_in_corpus": 0,
+    "example": "",
+    "status": "unseen",
+    "ruling": ""
+  },
+  {
+    "construct": "DropCertificateStatement",
+    "keywords": "DROP CERTIFICATE STATEMENT",
+    "count_in_corpus": 0,
+    "example": "",
+    "status": "unseen",
+    "ruling": ""
+  },
+  {
+    "construct": "DropClusteredConstraintMoveOption",
+    "keywords": "DROP CLUSTERED CONSTRAINT MOVE OPTION",
+    "count_in_corpus": 0,
+    "example": "",
+    "status": "unseen",
+    "ruling": ""
+  },
+  {
+    "construct": "DropClusteredConstraintStateOption",
+    "keywords": "DROP CLUSTERED CONSTRAINT STATE OPTION",
+    "count_in_corpus": 0,
+    "example": "",
+    "status": "unseen",
+    "ruling": ""
+  },
+  {
+    "construct": "DropClusteredConstraintValueOption",
+    "keywords": "DROP CLUSTERED CONSTRAINT VALUE OPTION",
+    "count_in_corpus": 0,
+    "example": "",
+    "status": "unseen",
+    "ruling": ""
+  },
+  {
+    "construct": "DropClusteredConstraintWaitAtLowPriorityLockOption",
+    "keywords": "DROP CLUSTERED CONSTRAINT WAIT AT LOW PRIORITY LOCK OPTION",
+    "count_in_corpus": 0,
+    "example": "",
+    "status": "unseen",
+    "ruling": ""
+  },
+  {
+    "construct": "DropColumnEncryptionKeyStatement",
+    "keywords": "DROP COLUMN ENCRYPTION KEY STATEMENT",
+    "count_in_corpus": 0,
+    "example": "",
+    "status": "unseen",
+    "ruling": ""
+  },
+  {
+    "construct": "DropColumnMasterKeyStatement",
+    "keywords": "DROP COLUMN MASTER KEY STATEMENT",
+    "count_in_corpus": 0,
+    "example": "",
+    "status": "unseen",
+    "ruling": ""
+  },
+  {
+    "construct": "DropContractStatement",
+    "keywords": "DROP CONTRACT STATEMENT",
+    "count_in_corpus": 0,
+    "example": "",
+    "status": "unseen",
+    "ruling": ""
+  },
+  {
+    "construct": "DropCredentialStatement",
+    "keywords": "DROP CREDENTIAL STATEMENT",
+    "count_in_corpus": 0,
+    "example": "",
+    "status": "unseen",
+    "ruling": ""
+  },
+  {
+    "construct": "DropCryptographicProviderStatement",
+    "keywords": "DROP CRYPTOGRAPHIC PROVIDER STATEMENT",
+    "count_in_corpus": 0,
+    "example": "",
+    "status": "unseen",
+    "ruling": ""
+  },
+  {
+    "construct": "DropDatabaseAuditSpecificationStatement",
+    "keywords": "DROP DATABASE AUDIT SPECIFICATION STATEMENT",
+    "count_in_corpus": 0,
+    "example": "",
+    "status": "unseen",
+    "ruling": ""
+  },
+  {
+    "construct": "DropDatabaseEncryptionKeyStatement",
+    "keywords": "DROP DATABASE ENCRYPTION KEY STATEMENT",
+    "count_in_corpus": 0,
+    "example": "",
+    "status": "unseen",
+    "ruling": ""
+  },
+  {
+    "construct": "DropDatabaseStatement",
+    "keywords": "DROP DATABASE STATEMENT",
+    "count_in_corpus": 0,
+    "example": "",
+    "status": "unseen",
+    "ruling": ""
+  },
+  {
+    "construct": "DropDefaultStatement",
+    "keywords": "DROP DEFAULT STATEMENT",
+    "count_in_corpus": 0,
+    "example": "",
+    "status": "unseen",
+    "ruling": ""
+  },
+  {
+    "construct": "DropEndpointStatement",
+    "keywords": "DROP ENDPOINT STATEMENT",
+    "count_in_corpus": 0,
+    "example": "",
+    "status": "unseen",
+    "ruling": ""
+  },
+  {
+    "construct": "DropEventNotificationStatement",
+    "keywords": "DROP EVENT NOTIFICATION STATEMENT",
+    "count_in_corpus": 0,
+    "example": "",
+    "status": "unseen",
+    "ruling": ""
+  },
+  {
+    "construct": "DropEventSessionStatement",
+    "keywords": "DROP EVENT SESSION STATEMENT",
+    "count_in_corpus": 0,
+    "example": "",
+    "status": "unseen",
+    "ruling": ""
+  },
+  {
+    "construct": "DropExternalDataSourceStatement",
+    "keywords": "DROP EXTERNAL DATA SOURCE STATEMENT",
+    "count_in_corpus": 0,
+    "example": "",
+    "status": "unseen",
+    "ruling": ""
+  },
+  {
+    "construct": "DropExternalFileFormatStatement",
+    "keywords": "DROP EXTERNAL FILE FORMAT STATEMENT",
+    "count_in_corpus": 0,
+    "example": "",
+    "status": "unseen",
+    "ruling": ""
+  },
+  {
+    "construct": "DropExternalLanguageStatement",
+    "keywords": "DROP EXTERNAL LANGUAGE STATEMENT",
+    "count_in_corpus": 0,
+    "example": "",
+    "status": "unseen",
+    "ruling": ""
+  },
+  {
+    "construct": "DropExternalLibraryStatement",
+    "keywords": "DROP EXTERNAL LIBRARY STATEMENT",
+    "count_in_corpus": 0,
+    "example": "",
+    "status": "unseen",
+    "ruling": ""
+  },
+  {
+    "construct": "DropExternalModelStatement",
+    "keywords": "DROP EXTERNAL MODEL STATEMENT",
+    "count_in_corpus": 0,
+    "example": "",
+    "status": "unseen",
+    "ruling": ""
+  },
+  {
+    "construct": "DropExternalResourcePoolStatement",
+    "keywords": "DROP EXTERNAL RESOURCE POOL STATEMENT",
+    "count_in_corpus": 0,
+    "example": "",
+    "status": "unseen",
+    "ruling": ""
+  },
+  {
+    "construct": "DropExternalStreamStatement",
+    "keywords": "DROP EXTERNAL STREAM STATEMENT",
+    "count_in_corpus": 0,
+    "example": "",
+    "status": "unseen",
+    "ruling": ""
+  },
+  {
+    "construct": "DropExternalStreamingJobStatement",
+    "keywords": "DROP EXTERNAL STREAMING JOB STATEMENT",
+    "count_in_corpus": 0,
+    "example": "",
+    "status": "unseen",
+    "ruling": ""
+  },
+  {
+    "construct": "DropExternalTableStatement",
+    "keywords": "DROP EXTERNAL TABLE STATEMENT",
+    "count_in_corpus": 0,
+    "example": "",
+    "status": "unseen",
+    "ruling": ""
+  },
+  {
+    "construct": "DropFederationStatement",
+    "keywords": "DROP FEDERATION STATEMENT",
+    "count_in_corpus": 0,
+    "example": "",
+    "status": "unseen",
+    "ruling": ""
+  },
+  {
+    "construct": "DropFullTextCatalogStatement",
+    "keywords": "DROP FULL TEXT CATALOG STATEMENT",
+    "count_in_corpus": 0,
+    "example": "",
+    "status": "unseen",
+    "ruling": ""
+  },
+  {
+    "construct": "DropFullTextIndexStatement",
+    "keywords": "DROP FULL TEXT INDEX STATEMENT",
+    "count_in_corpus": 0,
+    "example": "",
+    "status": "unseen",
+    "ruling": ""
+  },
+  {
+    "construct": "DropFullTextStopListStatement",
+    "keywords": "DROP FULL TEXT STOP LIST STATEMENT",
+    "count_in_corpus": 0,
+    "example": "",
+    "status": "unseen",
+    "ruling": ""
+  },
+  {
+    "construct": "DropFunctionStatement",
+    "keywords": "DROP FUNCTION STATEMENT",
+    "count_in_corpus": 0,
+    "example": "",
+    "status": "unseen",
+    "ruling": ""
+  },
+  {
+    "construct": "DropIndexClause",
+    "keywords": "DROP INDEX CLAUSE",
+    "count_in_corpus": 0,
+    "example": "",
+    "status": "unseen",
+    "ruling": ""
+  },
+  {
+    "construct": "DropIndexStatement",
+    "keywords": "DROP INDEX STATEMENT",
+    "count_in_corpus": 0,
+    "example": "",
+    "status": "unseen",
+    "ruling": ""
+  },
+  {
+    "construct": "DropLoginStatement",
+    "keywords": "DROP LOGIN STATEMENT",
+    "count_in_corpus": 0,
+    "example": "",
+    "status": "unseen",
+    "ruling": ""
+  },
+  {
+    "construct": "DropMasterKeyStatement",
+    "keywords": "DROP MASTER KEY STATEMENT",
+    "count_in_corpus": 0,
+    "example": "",
+    "status": "unseen",
+    "ruling": ""
+  },
+  {
+    "construct": "DropMemberAlterRoleAction",
+    "keywords": "DROP MEMBER ALTER ROLE ACTION",
+    "count_in_corpus": 0,
+    "example": "",
+    "status": "unseen",
+    "ruling": ""
+  },
+  {
+    "construct": "DropMessageTypeStatement",
+    "keywords": "DROP MESSAGE TYPE STATEMENT",
+    "count_in_corpus": 0,
+    "example": "",
+    "status": "unseen",
+    "ruling": ""
+  },
+  {
+    "construct": "DropPartitionFunctionStatement",
+    "keywords": "DROP PARTITION FUNCTION STATEMENT",
+    "count_in_corpus": 0,
+    "example": "",
+    "status": "unseen",
+    "ruling": ""
+  },
+  {
+    "construct": "DropPartitionSchemeStatement",
+    "keywords": "DROP PARTITION SCHEME STATEMENT",
+    "count_in_corpus": 0,
+    "example": "",
+    "status": "unseen",
+    "ruling": ""
+  },
+  {
+    "construct": "DropProcedureStatement",
+    "keywords": "DROP PROCEDURE STATEMENT",
+    "count_in_corpus": 0,
+    "example": "",
+    "status": "unseen",
+    "ruling": ""
+  },
+  {
+    "construct": "DropQueueStatement",
+    "keywords": "DROP QUEUE STATEMENT",
+    "count_in_corpus": 0,
+    "example": "",
+    "status": "unseen",
+    "ruling": ""
+  },
+  {
+    "construct": "DropRemoteServiceBindingStatement",
+    "keywords": "DROP REMOTE SERVICE BINDING STATEMENT",
+    "count_in_corpus": 0,
+    "example": "",
+    "status": "unseen",
+    "ruling": ""
+  },
+  {
+    "construct": "DropResourcePoolStatement",
+    "keywords": "DROP RESOURCE POOL STATEMENT",
+    "count_in_corpus": 0,
+    "example": "",
+    "status": "unseen",
+    "ruling": ""
+  },
+  {
+    "construct": "DropRoleStatement",
+    "keywords": "DROP ROLE STATEMENT",
+    "count_in_corpus": 0,
+    "example": "",
+    "status": "unseen",
+    "ruling": ""
+  },
+  {
+    "construct": "DropRouteStatement",
+    "keywords": "DROP ROUTE STATEMENT",
+    "count_in_corpus": 0,
+    "example": "",
+    "status": "unseen",
+    "ruling": ""
+  },
+  {
+    "construct": "DropRuleStatement",
+    "keywords": "DROP RULE STATEMENT",
+    "count_in_corpus": 0,
+    "example": "",
+    "status": "unseen",
+    "ruling": ""
+  },
+  {
+    "construct": "DropSchemaStatement",
+    "keywords": "DROP SCHEMA STATEMENT",
+    "count_in_corpus": 0,
+    "example": "",
+    "status": "unseen",
+    "ruling": ""
+  },
+  {
+    "construct": "DropSearchPropertyListAction",
+    "keywords": "DROP SEARCH PROPERTY LIST ACTION",
+    "count_in_corpus": 0,
+    "example": "",
+    "status": "unseen",
+    "ruling": ""
+  },
+  {
+    "construct": "DropSearchPropertyListStatement",
+    "keywords": "DROP SEARCH PROPERTY LIST STATEMENT",
+    "count_in_corpus": 0,
+    "example": "",
+    "status": "unseen",
+    "ruling": ""
+  },
+  {
+    "construct": "DropSecurityPolicyStatement",
+    "keywords": "DROP SECURITY POLICY STATEMENT",
+    "count_in_corpus": 0,
+    "example": "",
+    "status": "unseen",
+    "ruling": ""
+  },
+  {
+    "construct": "DropSensitivityClassificationStatement",
+    "keywords": "DROP SENSITIVITY CLASSIFICATION STATEMENT",
+    "count_in_corpus": 0,
+    "example": "",
+    "status": "unseen",
+    "ruling": ""
+  },
+  {
+    "construct": "DropSequenceStatement",
+    "keywords": "DROP SEQUENCE STATEMENT",
+    "count_in_corpus": 0,
+    "example": "",
+    "status": "unseen",
+    "ruling": ""
+  },
+  {
+    "construct": "DropServerAuditSpecificationStatement",
+    "keywords": "DROP SERVER AUDIT SPECIFICATION STATEMENT",
+    "count_in_corpus": 0,
+    "example": "",
+    "status": "unseen",
+    "ruling": ""
+  },
+  {
+    "construct": "DropServerAuditStatement",
+    "keywords": "DROP SERVER AUDIT STATEMENT",
+    "count_in_corpus": 0,
+    "example": "",
+    "status": "unseen",
+    "ruling": ""
+  },
+  {
+    "construct": "DropServerRoleStatement",
+    "keywords": "DROP SERVER ROLE STATEMENT",
+    "count_in_corpus": 0,
+    "example": "",
+    "status": "unseen",
+    "ruling": ""
+  },
+  {
+    "construct": "DropServiceStatement",
+    "keywords": "DROP SERVICE STATEMENT",
+    "count_in_corpus": 0,
+    "example": "",
+    "status": "unseen",
+    "ruling": ""
+  },
+  {
+    "construct": "DropSignatureStatement",
+    "keywords": "DROP SIGNATURE STATEMENT",
+    "count_in_corpus": 0,
+    "example": "",
+    "status": "unseen",
+    "ruling": ""
+  },
+  {
+    "construct": "DropStatisticsStatement",
+    "keywords": "DROP STATISTICS STATEMENT",
+    "count_in_corpus": 0,
+    "example": "",
+    "status": "unseen",
+    "ruling": ""
+  },
+  {
+    "construct": "DropSymmetricKeyStatement",
+    "keywords": "DROP SYMMETRIC KEY STATEMENT",
+    "count_in_corpus": 0,
+    "example": "",
+    "status": "unseen",
+    "ruling": ""
+  },
+  {
+    "construct": "DropSynonymStatement",
+    "keywords": "DROP SYNONYM STATEMENT",
+    "count_in_corpus": 0,
+    "example": "",
+    "status": "unseen",
+    "ruling": ""
+  },
+  {
+    "construct": "DropTableStatement",
+    "keywords": "DROP TABLE STATEMENT",
+    "count_in_corpus": 14,
+    "example": "DROP TABLE IF EXISTS #coverage;",
+    "status": "mapped",
+    "ruling": ""
+  },
+  {
+    "construct": "DropTriggerStatement",
+    "keywords": "DROP TRIGGER STATEMENT",
+    "count_in_corpus": 0,
+    "example": "",
+    "status": "unseen",
+    "ruling": ""
+  },
+  {
+    "construct": "DropTypeStatement",
+    "keywords": "DROP TYPE STATEMENT",
+    "count_in_corpus": 0,
+    "example": "",
+    "status": "unseen",
+    "ruling": ""
+  },
+  {
+    "construct": "DropUserStatement",
+    "keywords": "DROP USER STATEMENT",
+    "count_in_corpus": 0,
+    "example": "",
+    "status": "unseen",
+    "ruling": ""
+  },
+  {
+    "construct": "DropViewStatement",
+    "keywords": "DROP VIEW STATEMENT",
+    "count_in_corpus": 0,
+    "example": "",
+    "status": "unseen",
+    "ruling": ""
+  },
+  {
+    "construct": "DropWorkloadClassifierStatement",
+    "keywords": "DROP WORKLOAD CLASSIFIER STATEMENT",
+    "count_in_corpus": 0,
+    "example": "",
+    "status": "unseen",
+    "ruling": ""
+  },
+  {
+    "construct": "DropWorkloadGroupStatement",
+    "keywords": "DROP WORKLOAD GROUP STATEMENT",
+    "count_in_corpus": 0,
+    "example": "",
+    "status": "unseen",
+    "ruling": ""
+  },
+  {
+    "construct": "DropXmlSchemaCollectionStatement",
+    "keywords": "DROP XML SCHEMA COLLECTION STATEMENT",
+    "count_in_corpus": 0,
+    "example": "",
+    "status": "unseen",
+    "ruling": ""
+  },
+  {
+    "construct": "DurabilityTableOption",
+    "keywords": "DURABILITY TABLE OPTION",
+    "count_in_corpus": 0,
+    "example": "",
+    "status": "unseen",
+    "ruling": ""
+  },
+  {
+    "construct": "ElasticPoolSpecification",
+    "keywords": "ELASTIC POOL SPECIFICATION",
+    "count_in_corpus": 0,
+    "example": "",
+    "status": "unseen",
+    "ruling": ""
+  },
+  {
+    "construct": "EnableDisableTriggerStatement",
+    "keywords": "ENABLE DISABLE TRIGGER STATEMENT",
+    "count_in_corpus": 0,
+    "example": "",
+    "status": "unseen",
+    "ruling": ""
+  },
+  {
+    "construct": "EnabledDisabledPayloadOption",
+    "keywords": "ENABLED DISABLED PAYLOAD OPTION",
+    "count_in_corpus": 0,
+    "example": "",
+    "status": "unseen",
+    "ruling": ""
+  },
+  {
+    "construct": "EncryptedValueParameter",
+    "keywords": "ENCRYPTED VALUE PARAMETER",
+    "count_in_corpus": 0,
+    "example": "",
+    "status": "unseen",
+    "ruling": ""
+  },
+  {
+    "construct": "EncryptionPayloadOption",
+    "keywords": "ENCRYPTION PAYLOAD OPTION",
+    "count_in_corpus": 0,
+    "example": "",
+    "status": "unseen",
+    "ruling": ""
+  },
+  {
+    "construct": "EndConversationStatement",
+    "keywords": "END CONVERSATION STATEMENT",
+    "count_in_corpus": 0,
+    "example": "",
+    "status": "unseen",
+    "ruling": ""
+  },
+  {
+    "construct": "EndpointAffinity",
+    "keywords": "ENDPOINT AFFINITY",
+    "count_in_corpus": 0,
+    "example": "",
+    "status": "unseen",
+    "ruling": ""
+  },
+  {
+    "construct": "EventDeclaration",
+    "keywords": "EVENT DECLARATION",
+    "count_in_corpus": 0,
+    "example": "",
+    "status": "unseen",
+    "ruling": ""
+  },
+  {
+    "construct": "EventDeclarationCompareFunctionParameter",
+    "keywords": "EVENT DECLARATION COMPARE FUNCTION PARAMETER",
+    "count_in_corpus": 0,
+    "example": "",
+    "status": "unseen",
+    "ruling": ""
+  },
+  {
+    "construct": "EventDeclarationSetParameter",
+    "keywords": "EVENT DECLARATION SET PARAMETER",
+    "count_in_corpus": 0,
+    "example": "",
+    "status": "unseen",
+    "ruling": ""
+  },
+  {
+    "construct": "EventGroupContainer",
+    "keywords": "EVENT GROUP CONTAINER",
+    "count_in_corpus": 0,
+    "example": "",
+    "status": "unseen",
+    "ruling": ""
+  },
+  {
+    "construct": "EventNotificationObjectScope",
+    "keywords": "EVENT NOTIFICATION OBJECT SCOPE",
+    "count_in_corpus": 0,
+    "example": "",
+    "status": "unseen",
+    "ruling": ""
+  },
+  {
+    "construct": "EventRetentionSessionOption",
+    "keywords": "EVENT RETENTION SESSION OPTION",
+    "count_in_corpus": 0,
+    "example": "",
+    "status": "unseen",
+    "ruling": ""
+  },
+  {
+    "construct": "EventSessionObjectName",
+    "keywords": "EVENT SESSION OBJECT NAME",
+    "count_in_corpus": 0,
+    "example": "",
+    "status": "unseen",
+    "ruling": ""
+  },
+  {
+    "construct": "EventSessionStatement",
+    "keywords": "EVENT SESSION STATEMENT",
+    "count_in_corpus": 0,
+    "example": "",
+    "status": "unseen",
+    "ruling": ""
+  },
+  {
+    "construct": "EventTypeContainer",
+    "keywords": "EVENT TYPE CONTAINER",
+    "count_in_corpus": 0,
+    "example": "",
+    "status": "unseen",
+    "ruling": ""
+  },
+  {
+    "construct": "ExecutableProcedureReference",
+    "keywords": "EXECUTABLE PROCEDURE REFERENCE",
+    "count_in_corpus": 0,
+    "example": "",
+    "status": "mapped",
+    "ruling": ""
+  },
+  {
+    "construct": "ExecutableStringList",
+    "keywords": "EXECUTABLE STRING LIST",
+    "count_in_corpus": 2,
+    "example": "@SQL",
+    "status": "mapped",
+    "ruling": ""
+  },
+  {
+    "construct": "ExecuteAsClause",
+    "keywords": "EXECUTE AS CLAUSE",
+    "count_in_corpus": 0,
+    "example": "",
+    "status": "unseen",
+    "ruling": ""
+  },
+  {
+    "construct": "ExecuteAsFunctionOption",
+    "keywords": "EXECUTE AS FUNCTION OPTION",
+    "count_in_corpus": 0,
+    "example": "",
+    "status": "unseen",
+    "ruling": ""
+  },
+  {
+    "construct": "ExecuteAsProcedureOption",
+    "keywords": "EXECUTE AS PROCEDURE OPTION",
+    "count_in_corpus": 0,
+    "example": "",
+    "status": "unseen",
+    "ruling": ""
+  },
+  {
+    "construct": "ExecuteAsStatement",
+    "keywords": "EXECUTE AS STATEMENT",
+    "count_in_corpus": 0,
+    "example": "",
+    "status": "unseen",
+    "ruling": ""
+  },
+  {
+    "construct": "ExecuteAsTriggerOption",
+    "keywords": "EXECUTE AS TRIGGER OPTION",
+    "count_in_corpus": 0,
+    "example": "",
+    "status": "unseen",
+    "ruling": ""
+  },
+  {
+    "construct": "ExecuteContext",
+    "keywords": "EXECUTE CONTEXT",
+    "count_in_corpus": 0,
+    "example": "",
+    "status": "unseen",
+    "ruling": ""
+  },
+  {
+    "construct": "ExecuteInsertSource",
+    "keywords": "EXECUTE INSERT SOURCE",
+    "count_in_corpus": 0,
+    "example": "",
+    "status": "unseen",
+    "ruling": ""
+  },
+  {
+    "construct": "ExecuteOption",
+    "keywords": "EXECUTE OPTION",
+    "count_in_corpus": 0,
+    "example": "",
+    "status": "unseen",
+    "ruling": ""
+  },
+  {
+    "construct": "ExecuteParameter",
+    "keywords": "EXECUTE PARAMETER",
+    "count_in_corpus": 0,
+    "example": "",
+    "status": "unseen",
+    "ruling": ""
+  },
+  {
+    "construct": "ExecuteSpecification",
+    "keywords": "EXECUTE SPECIFICATION",
+    "count_in_corpus": 2,
+    "example": "EXEC (@SQL)",
+    "status": "mapped",
+    "ruling": ""
+  },
+  {
+    "construct": "ExecuteStatement",
+    "keywords": "EXECUTE STATEMENT",
+    "count_in_corpus": 2,
+    "example": "EXEC (@SQL)",
+    "status": "mapped",
+    "ruling": ""
+  },
+  {
+    "construct": "ExistsPredicate",
+    "keywords": "EXISTS PREDICATE",
+    "count_in_corpus": 4,
+    "example": "(SELECT 1 FROM STRING_SPLIT(@Location, ',') WHERE [value] IN ('0', dep.REV_LOC_ID))",
+    "status": "mapped",
+    "ruling": ""
+  },
+  {
+    "construct": "ExpressionCallTarget",
+    "keywords": "EXPRESSION CALL TARGET",
+    "count_in_corpus": 0,
+    "example": "",
+    "status": "unseen",
+    "ruling": ""
+  },
+  {
+    "construct": "ExpressionGroupingSpecification",
+    "keywords": "EXPRESSION GROUPING SPECIFICATION",
+    "count_in_corpus": 54,
+    "example": "[#caregivers].PAT_ID",
+    "status": "mapped",
+    "ruling": ""
+  },
+  {
+    "construct": "ExpressionWithSortOrder",
+    "keywords": "EXPRESSION WITH SORT ORDER",
+    "count_in_corpus": 9,
+    "example": "adt.ROOM_ID",
+    "status": "mapped",
+    "ruling": ""
+  },
+  {
+    "construct": "ExternalCreateLoginSource",
+    "keywords": "EXTERNAL CREATE LOGIN SOURCE",
+    "count_in_corpus": 0,
+    "example": "",
+    "status": "unseen",
+    "ruling": ""
+  },
+  {
+    "construct": "ExternalDataSourceLiteralOrIdentifierOption",
+    "keywords": "EXTERNAL DATA SOURCE LITERAL OR IDENTIFIER OPTION",
+    "count_in_corpus": 0,
+    "example": "",
+    "status": "unseen",
+    "ruling": ""
+  },
+  {
+    "construct": "ExternalFileFormatContainerOption",
+    "keywords": "EXTERNAL FILE FORMAT CONTAINER OPTION",
+    "count_in_corpus": 0,
+    "example": "",
+    "status": "unseen",
+    "ruling": ""
+  },
+  {
+    "construct": "ExternalFileFormatLiteralOption",
+    "keywords": "EXTERNAL FILE FORMAT LITERAL OPTION",
+    "count_in_corpus": 0,
+    "example": "",
+    "status": "unseen",
+    "ruling": ""
+  },
+  {
+    "construct": "ExternalFileFormatUseDefaultTypeOption",
+    "keywords": "EXTERNAL FILE FORMAT USE DEFAULT TYPE OPTION",
+    "count_in_corpus": 0,
+    "example": "",
+    "status": "unseen",
+    "ruling": ""
+  },
+  {
+    "construct": "ExternalLanguageFileOption",
+    "keywords": "EXTERNAL LANGUAGE FILE OPTION",
+    "count_in_corpus": 0,
+    "example": "",
+    "status": "unseen",
+    "ruling": ""
+  },
+  {
+    "construct": "ExternalLibraryFileOption",
+    "keywords": "EXTERNAL LIBRARY FILE OPTION",
+    "count_in_corpus": 0,
+    "example": "",
+    "status": "unseen",
+    "ruling": ""
+  },
+  {
+    "construct": "ExternalModelTypeSpecification",
+    "keywords": "EXTERNAL MODEL TYPE SPECIFICATION",
+    "count_in_corpus": 0,
+    "example": "",
+    "status": "unseen",
+    "ruling": ""
+  },
+  {
+    "construct": "ExternalResourcePoolAffinitySpecification",
+    "keywords": "EXTERNAL RESOURCE POOL AFFINITY SPECIFICATION",
+    "count_in_corpus": 0,
+    "example": "",
+    "status": "unseen",
+    "ruling": ""
+  },
+  {
+    "construct": "ExternalResourcePoolParameter",
+    "keywords": "EXTERNAL RESOURCE POOL PARAMETER",
+    "count_in_corpus": 0,
+    "example": "",
+    "status": "unseen",
+    "ruling": ""
+  },
+  {
+    "construct": "ExternalResourcePoolStatement",
+    "keywords": "EXTERNAL RESOURCE POOL STATEMENT",
+    "count_in_corpus": 0,
+    "example": "",
+    "status": "unseen",
+    "ruling": ""
+  },
+  {
+    "construct": "ExternalStreamLiteralOrIdentifierOption",
+    "keywords": "EXTERNAL STREAM LITERAL OR IDENTIFIER OPTION",
+    "count_in_corpus": 0,
+    "example": "",
+    "status": "unseen",
+    "ruling": ""
+  },
+  {
+    "construct": "ExternalTableColumnDefinition",
+    "keywords": "EXTERNAL TABLE COLUMN DEFINITION",
+    "count_in_corpus": 0,
+    "example": "",
+    "status": "unseen",
+    "ruling": ""
+  },
+  {
+    "construct": "ExternalTableDistributionOption",
+    "keywords": "EXTERNAL TABLE DISTRIBUTION OPTION",
+    "count_in_corpus": 0,
+    "example": "",
+    "status": "unseen",
+    "ruling": ""
+  },
+  {
+    "construct": "ExternalTableLiteralOrIdentifierOption",
+    "keywords": "EXTERNAL TABLE LITERAL OR IDENTIFIER OPTION",
+    "count_in_corpus": 0,
+    "example": "",
+    "status": "unseen",
+    "ruling": ""
+  },
+  {
+    "construct": "ExternalTableRejectTypeOption",
+    "keywords": "EXTERNAL TABLE REJECT TYPE OPTION",
+    "count_in_corpus": 0,
+    "example": "",
+    "status": "unseen",
+    "ruling": ""
+  },
+  {
+    "construct": "ExternalTableReplicatedDistributionPolicy",
+    "keywords": "EXTERNAL TABLE REPLICATED DISTRIBUTION POLICY",
+    "count_in_corpus": 0,
+    "example": "",
+    "status": "unseen",
+    "ruling": ""
+  },
+  {
+    "construct": "ExternalTableRoundRobinDistributionPolicy",
+    "keywords": "EXTERNAL TABLE ROUND ROBIN DISTRIBUTION POLICY",
+    "count_in_corpus": 0,
+    "example": "",
+    "status": "unseen",
+    "ruling": ""
+  },
+  {
+    "construct": "ExternalTableShardedDistributionPolicy",
+    "keywords": "EXTERNAL TABLE SHARDED DISTRIBUTION POLICY",
+    "count_in_corpus": 0,
+    "example": "",
+    "status": "unseen",
+    "ruling": ""
+  },
+  {
+    "construct": "ExtractFromExpression",
+    "keywords": "EXTRACT FROM EXPRESSION",
+    "count_in_corpus": 0,
+    "example": "",
+    "status": "unseen",
+    "ruling": ""
+  },
+  {
+    "construct": "FailoverModeReplicaOption",
+    "keywords": "FAILOVER MODE REPLICA OPTION",
+    "count_in_corpus": 0,
+    "example": "",
+    "status": "unseen",
+    "ruling": ""
+  },
+  {
+    "construct": "FederationScheme",
+    "keywords": "FEDERATION SCHEME",
+    "count_in_corpus": 0,
+    "example": "",
+    "status": "unseen",
+    "ruling": ""
+  },
+  {
+    "construct": "FetchCursorStatement",
+    "keywords": "FETCH CURSOR STATEMENT",
+    "count_in_corpus": 0,
+    "example": "",
+    "status": "unseen",
+    "ruling": ""
+  },
+  {
+    "construct": "FetchType",
+    "keywords": "FETCH TYPE",
+    "count_in_corpus": 0,
+    "example": "",
+    "status": "unseen",
+    "ruling": ""
+  },
+  {
+    "construct": "FileDeclaration",
+    "keywords": "FILE DECLARATION",
+    "count_in_corpus": 0,
+    "example": "",
+    "status": "unseen",
+    "ruling": ""
+  },
+  {
+    "construct": "FileDeclarationOption",
+    "keywords": "FILE DECLARATION OPTION",
+    "count_in_corpus": 0,
+    "example": "",
+    "status": "unseen",
+    "ruling": ""
+  },
+  {
+    "construct": "FileEncryptionSource",
+    "keywords": "FILE ENCRYPTION SOURCE",
+    "count_in_corpus": 0,
+    "example": "",
+    "status": "unseen",
+    "ruling": ""
+  },
+  {
+    "construct": "FileGroupDefinition",
+    "keywords": "FILE GROUP DEFINITION",
+    "count_in_corpus": 0,
+    "example": "",
+    "status": "unseen",
+    "ruling": ""
+  },
+  {
+    "construct": "FileGroupOrPartitionScheme",
+    "keywords": "FILE GROUP OR PARTITION SCHEME",
+    "count_in_corpus": 0,
+    "example": "",
+    "status": "unseen",
+    "ruling": ""
+  },
+  {
+    "construct": "FileGrowthFileDeclarationOption",
+    "keywords": "FILE GROWTH FILE DECLARATION OPTION",
+    "count_in_corpus": 0,
+    "example": "",
+    "status": "unseen",
+    "ruling": ""
+  },
+  {
+    "construct": "FileNameFileDeclarationOption",
+    "keywords": "FILE NAME FILE DECLARATION OPTION",
+    "count_in_corpus": 0,
+    "example": "",
+    "status": "unseen",
+    "ruling": ""
+  },
+  {
+    "construct": "FileStreamDatabaseOption",
+    "keywords": "FILE STREAM DATABASE OPTION",
+    "count_in_corpus": 0,
+    "example": "",
+    "status": "unseen",
+    "ruling": ""
+  },
+  {
+    "construct": "FileStreamOnDropIndexOption",
+    "keywords": "FILE STREAM ON DROP INDEX OPTION",
+    "count_in_corpus": 0,
+    "example": "",
+    "status": "unseen",
+    "ruling": ""
+  },
+  {
+    "construct": "FileStreamOnTableOption",
+    "keywords": "FILE STREAM ON TABLE OPTION",
+    "count_in_corpus": 0,
+    "example": "",
+    "status": "unseen",
+    "ruling": ""
+  },
+  {
+    "construct": "FileStreamRestoreOption",
+    "keywords": "FILE STREAM RESTORE OPTION",
+    "count_in_corpus": 0,
+    "example": "",
+    "status": "unseen",
+    "ruling": ""
+  },
+  {
+    "construct": "FileTableCollateFileNameTableOption",
+    "keywords": "FILE TABLE COLLATE FILE NAME TABLE OPTION",
+    "count_in_corpus": 0,
+    "example": "",
+    "status": "unseen",
+    "ruling": ""
+  },
+  {
+    "construct": "FileTableConstraintNameTableOption",
+    "keywords": "FILE TABLE CONSTRAINT NAME TABLE OPTION",
+    "count_in_corpus": 0,
+    "example": "",
+    "status": "unseen",
+    "ruling": ""
+  },
+  {
+    "construct": "FileTableDirectoryTableOption",
+    "keywords": "FILE TABLE DIRECTORY TABLE OPTION",
+    "count_in_corpus": 0,
+    "example": "",
+    "status": "unseen",
+    "ruling": ""
+  },
+  {
+    "construct": "ForceSeekTableHint",
+    "keywords": "FORCE SEEK TABLE HINT",
+    "count_in_corpus": 0,
+    "example": "",
+    "status": "unseen",
+    "ruling": ""
+  },
+  {
+    "construct": "ForeignKeyConstraintDefinition",
+    "keywords": "FOREIGN KEY CONSTRAINT DEFINITION",
+    "count_in_corpus": 0,
+    "example": "",
+    "status": "unseen",
+    "ruling": ""
+  },
+  {
+    "construct": "FromClause",
+    "keywords": "FROM CLAUSE",
+    "count_in_corpus": 34,
+    "example": "FROM STRING_SPLIT(@Location, ',')",
+    "status": "mapped",
+    "ruling": ""
+  },
+  {
+    "construct": "FullTextCatalogAndFileGroup",
+    "keywords": "FULL TEXT CATALOG AND FILE GROUP",
+    "count_in_corpus": 0,
+    "example": "",
+    "status": "unseen",
+    "ruling": ""
+  },
+  {
+    "construct": "FullTextIndexColumn",
+    "keywords": "FULL TEXT INDEX COLUMN",
+    "count_in_corpus": 0,
+    "example": "",
+    "status": "unseen",
+    "ruling": ""
+  },
+  {
+    "construct": "FullTextPredicate",
+    "keywords": "FULL TEXT PREDICATE",
+    "count_in_corpus": 0,
+    "example": "",
+    "status": "unseen",
+    "ruling": ""
+  },
+  {
+    "construct": "FullTextStopListAction",
+    "keywords": "FULL TEXT STOP LIST ACTION",
+    "count_in_corpus": 0,
+    "example": "",
+    "status": "unseen",
+    "ruling": ""
+  },
+  {
+    "construct": "FullTextTableReference",
+    "keywords": "FULL TEXT TABLE REFERENCE",
+    "count_in_corpus": 0,
+    "example": "",
+    "status": "unseen",
+    "ruling": ""
+  },
+  {
+    "construct": "FunctionCall",
+    "keywords": "FUNCTION CALL",
+    "count_in_corpus": 101,
+    "example": "DATEADD(D, 1, @AsOfDate)",
+    "status": "mapped",
+    "ruling": ""
+  },
+  {
+    "construct": "FunctionCallSetClause",
+    "keywords": "FUNCTION CALL SET CLAUSE",
+    "count_in_corpus": 0,
+    "example": "",
+    "status": "unseen",
+    "ruling": ""
+  },
+  {
+    "construct": "FunctionOption",
+    "keywords": "FUNCTION OPTION",
+    "count_in_corpus": 0,
+    "example": "",
+    "status": "unseen",
+    "ruling": ""
+  },
+  {
+    "construct": "GeneralSetCommand",
+    "keywords": "GENERAL SET COMMAND",
+    "count_in_corpus": 0,
+    "example": "",
+    "status": "unseen",
+    "ruling": ""
+  },
+  {
+    "construct": "GenericConfigurationOption",
+    "keywords": "GENERIC CONFIGURATION OPTION",
+    "count_in_corpus": 0,
+    "example": "",
+    "status": "unseen",
+    "ruling": ""
+  },
+  {
+    "construct": "GetConversationGroupStatement",
+    "keywords": "GET CONVERSATION GROUP STATEMENT",
+    "count_in_corpus": 0,
+    "example": "",
+    "status": "unseen",
+    "ruling": ""
+  },
+  {
+    "construct": "GlobalFunctionTableReference",
+    "keywords": "GLOBAL FUNCTION TABLE REFERENCE",
+    "count_in_corpus": 2,
+    "example": "STRING_SPLIT(@Location, ',')",
+    "status": "mapped",
+    "ruling": ""
+  },
+  {
+    "construct": "GlobalVariableExpression",
+    "keywords": "GLOBAL VARIABLE EXPRESSION",
+    "count_in_corpus": 0,
+    "example": "",
+    "status": "unseen",
+    "ruling": ""
+  },
+  {
+    "construct": "GoToStatement",
+    "keywords": "GO TO STATEMENT",
+    "count_in_corpus": 0,
+    "example": "",
+    "status": "unseen",
+    "ruling": ""
+  },
+  {
+    "construct": "GrandTotalGroupingSpecification",
+    "keywords": "GRAND TOTAL GROUPING SPECIFICATION",
+    "count_in_corpus": 0,
+    "example": "",
+    "status": "unseen",
+    "ruling": ""
+  },
+  {
+    "construct": "GrantStatement",
+    "keywords": "GRANT STATEMENT",
+    "count_in_corpus": 0,
+    "example": "",
+    "status": "unseen",
+    "ruling": ""
+  },
+  {
+    "construct": "GrantStatement80",
+    "keywords": "GRANT STATEMENT80",
+    "count_in_corpus": 0,
+    "example": "",
+    "status": "unseen",
+    "ruling": ""
+  },
+  {
+    "construct": "GraphConnectionBetweenNodes",
+    "keywords": "GRAPH CONNECTION BETWEEN NODES",
+    "count_in_corpus": 0,
+    "example": "",
+    "status": "unseen",
+    "ruling": ""
+  },
+  {
+    "construct": "GraphConnectionConstraintDefinition",
+    "keywords": "GRAPH CONNECTION CONSTRAINT DEFINITION",
+    "count_in_corpus": 0,
+    "example": "",
+    "status": "unseen",
+    "ruling": ""
+  },
+  {
+    "construct": "GraphMatchCompositeExpression",
+    "keywords": "GRAPH MATCH COMPOSITE EXPRESSION",
+    "count_in_corpus": 0,
+    "example": "",
+    "status": "unseen",
+    "ruling": ""
+  },
+  {
+    "construct": "GraphMatchExpression",
+    "keywords": "GRAPH MATCH EXPRESSION",
+    "count_in_corpus": 0,
+    "example": "",
+    "status": "unseen",
+    "ruling": ""
+  },
+  {
+    "construct": "GraphMatchLastNodePredicate",
+    "keywords": "GRAPH MATCH LAST NODE PREDICATE",
+    "count_in_corpus": 0,
+    "example": "",
+    "status": "unseen",
+    "ruling": ""
+  },
+  {
+    "construct": "GraphMatchNodeExpression",
+    "keywords": "GRAPH MATCH NODE EXPRESSION",
+    "count_in_corpus": 0,
+    "example": "",
+    "status": "unseen",
+    "ruling": ""
+  },
+  {
+    "construct": "GraphMatchPredicate",
+    "keywords": "GRAPH MATCH PREDICATE",
+    "count_in_corpus": 0,
+    "example": "",
+    "status": "unseen",
+    "ruling": ""
+  },
+  {
+    "construct": "GraphMatchRecursivePredicate",
+    "keywords": "GRAPH MATCH RECURSIVE PREDICATE",
+    "count_in_corpus": 0,
+    "example": "",
+    "status": "unseen",
+    "ruling": ""
+  },
+  {
+    "construct": "GraphRecursiveMatchQuantifier",
+    "keywords": "GRAPH RECURSIVE MATCH QUANTIFIER",
+    "count_in_corpus": 0,
+    "example": "",
+    "status": "unseen",
+    "ruling": ""
+  },
+  {
+    "construct": "GridParameter",
+    "keywords": "GRID PARAMETER",
+    "count_in_corpus": 0,
+    "example": "",
+    "status": "unseen",
+    "ruling": ""
+  },
+  {
+    "construct": "GridsSpatialIndexOption",
+    "keywords": "GRIDS SPATIAL INDEX OPTION",
+    "count_in_corpus": 0,
+    "example": "",
+    "status": "unseen",
+    "ruling": ""
+  },
+  {
+    "construct": "GroupByClause",
+    "keywords": "GROUP BY CLAUSE",
+    "count_in_corpus": 8,
+    "example": "GROUP BY [#caregivers].PAT_ID",
+    "status": "mapped",
+    "ruling": ""
+  },
+  {
+    "construct": "GroupingSetsGroupingSpecification",
+    "keywords": "GROUPING SETS GROUPING SPECIFICATION",
+    "count_in_corpus": 0,
+    "example": "",
+    "status": "unseen",
+    "ruling": ""
+  },
+  {
+    "construct": "HadrAvailabilityGroupDatabaseOption",
+    "keywords": "HADR AVAILABILITY GROUP DATABASE OPTION",
+    "count_in_corpus": 0,
+    "example": "",
+    "status": "unseen",
+    "ruling": ""
+  },
+  {
+    "construct": "HadrDatabaseOption",
+    "keywords": "HADR DATABASE OPTION",
+    "count_in_corpus": 0,
+    "example": "",
+    "status": "unseen",
+    "ruling": ""
+  },
+  {
+    "construct": "HavingClause",
+    "keywords": "HAVING CLAUSE",
+    "count_in_corpus": 0,
+    "example": "",
+    "status": "unseen",
+    "ruling": ""
+  },
+  {
+    "construct": "IIfCall",
+    "keywords": "IIF CALL",
+    "count_in_corpus": 4,
+    "example": "IIF([pat].INTRPTR_NEEDED_YN = 'Y', 'Yes', 'No')",
+    "status": "mapped",
+    "ruling": ""
+  },
+  {
+    "construct": "IPv4",
+    "keywords": "IPV4",
+    "count_in_corpus": 0,
+    "example": "",
+    "status": "unseen",
+    "ruling": ""
+  },
+  {
+    "construct": "Identifier",
+    "keywords": "IDENTIFIER",
+    "count_in_corpus": 2163,
+    "example": "DEPARTMENT_ID",
+    "status": "mapped",
+    "ruling": ""
+  },
+  {
+    "construct": "IdentifierAtomicBlockOption",
+    "keywords": "IDENTIFIER ATOMIC BLOCK OPTION",
+    "count_in_corpus": 0,
+    "example": "",
+    "status": "unseen",
+    "ruling": ""
+  },
+  {
+    "construct": "IdentifierDatabaseOption",
+    "keywords": "IDENTIFIER DATABASE OPTION",
+    "count_in_corpus": 0,
+    "example": "",
+    "status": "unseen",
+    "ruling": ""
+  },
+  {
+    "construct": "IdentifierLiteral",
+    "keywords": "IDENTIFIER LITERAL",
+    "count_in_corpus": 35,
+    "example": "D",
+    "status": "mapped",
+    "ruling": ""
+  },
+  {
+    "construct": "IdentifierOrScalarExpression",
+    "keywords": "IDENTIFIER OR SCALAR EXPRESSION",
+    "count_in_corpus": 0,
+    "example": "",
+    "status": "unseen",
+    "ruling": ""
+  },
+  {
+    "construct": "IdentifierOrValueExpression",
+    "keywords": "IDENTIFIER OR VALUE EXPRESSION",
+    "count_in_corpus": 137,
+    "example": "'Census Day'",
+    "status": "mapped",
+    "ruling": ""
+  },
+  {
+    "construct": "IdentifierPrincipalOption",
+    "keywords": "IDENTIFIER PRINCIPAL OPTION",
+    "count_in_corpus": 0,
+    "example": "",
+    "status": "unseen",
+    "ruling": ""
+  },
+  {
+    "construct": "IdentifierSnippet",
+    "keywords": "IDENTIFIER SNIPPET",
+    "count_in_corpus": 0,
+    "example": "",
+    "status": "unseen",
+    "ruling": ""
+  },
+  {
+    "construct": "IdentityFunctionCall",
+    "keywords": "IDENTITY FUNCTION CALL",
+    "count_in_corpus": 0,
+    "example": "",
+    "status": "unseen",
+    "ruling": ""
+  },
+  {
+    "construct": "IdentityOptions",
+    "keywords": "IDENTITY OPTIONS",
+    "count_in_corpus": 0,
+    "example": "",
+    "status": "unseen",
+    "ruling": ""
+  },
+  {
+    "construct": "IdentityValueKeyOption",
+    "keywords": "IDENTITY VALUE KEY OPTION",
+    "count_in_corpus": 0,
+    "example": "",
+    "status": "unseen",
+    "ruling": ""
+  },
+  {
+    "construct": "IfStatement",
+    "keywords": "IF STATEMENT",
+    "count_in_corpus": 0,
+    "example": "",
+    "status": "mapped",
+    "ruling": ""
+  },
+  {
+    "construct": "IgnoreDupKeyIndexOption",
+    "keywords": "IGNORE DUP KEY INDEX OPTION",
+    "count_in_corpus": 0,
+    "example": "",
+    "status": "unseen",
+    "ruling": ""
+  },
+  {
+    "construct": "InPredicate",
+    "keywords": "IN PREDICATE",
+    "count_in_corpus": 17,
+    "example": "adt.DEPARTMENT_ID not in ('108022','108034','108047','108049','108068','108112','108118','639001')",
+    "status": "mapped",
+    "ruling": ""
+  },
+  {
+    "construct": "IndexDefinition",
+    "keywords": "INDEX DEFINITION",
+    "count_in_corpus": 0,
+    "example": "",
+    "status": "unseen",
+    "ruling": ""
+  },
+  {
+    "construct": "IndexExpressionOption",
+    "keywords": "INDEX EXPRESSION OPTION",
+    "count_in_corpus": 0,
+    "example": "",
+    "status": "unseen",
+    "ruling": ""
+  },
+  {
+    "construct": "IndexStateOption",
+    "keywords": "INDEX STATE OPTION",
+    "count_in_corpus": 0,
+    "example": "",
+    "status": "unseen",
+    "ruling": ""
+  },
+  {
+    "construct": "IndexTableHint",
+    "keywords": "INDEX TABLE HINT",
+    "count_in_corpus": 0,
+    "example": "",
+    "status": "unseen",
+    "ruling": ""
+  },
+  {
+    "construct": "IndexType",
+    "keywords": "INDEX TYPE",
+    "count_in_corpus": 0,
+    "example": "",
+    "status": "unseen",
+    "ruling": ""
+  },
+  {
+    "construct": "InlineDerivedTable",
+    "keywords": "INLINE DERIVED TABLE",
+    "count_in_corpus": 0,
+    "example": "",
+    "status": "unseen",
+    "ruling": ""
+  },
+  {
+    "construct": "InlineFunctionOption",
+    "keywords": "INLINE FUNCTION OPTION",
+    "count_in_corpus": 0,
+    "example": "",
+    "status": "unseen",
+    "ruling": ""
+  },
+  {
+    "construct": "InlineResultSetDefinition",
+    "keywords": "INLINE RESULT SET DEFINITION",
+    "count_in_corpus": 0,
+    "example": "",
+    "status": "unseen",
+    "ruling": ""
+  },
+  {
+    "construct": "InsertBulkColumnDefinition",
+    "keywords": "INSERT BULK COLUMN DEFINITION",
+    "count_in_corpus": 0,
+    "example": "",
+    "status": "unseen",
+    "ruling": ""
+  },
+  {
+    "construct": "InsertBulkStatement",
+    "keywords": "INSERT BULK STATEMENT",
+    "count_in_corpus": 0,
+    "example": "",
+    "status": "unseen",
+    "ruling": ""
+  },
+  {
+    "construct": "InsertMergeAction",
+    "keywords": "INSERT MERGE ACTION",
+    "count_in_corpus": 0,
+    "example": "",
+    "status": "unseen",
+    "ruling": ""
+  },
+  {
+    "construct": "InsertSpecification",
+    "keywords": "INSERT SPECIFICATION",
+    "count_in_corpus": 0,
+    "example": "",
+    "status": "mapped",
+    "ruling": ""
+  },
+  {
+    "construct": "InsertStatement",
+    "keywords": "INSERT STATEMENT",
+    "count_in_corpus": 0,
+    "example": "",
+    "status": "mapped",
+    "ruling": ""
+  },
+  {
+    "construct": "IntegerLiteral",
+    "keywords": "INTEGER LITERAL",
+    "count_in_corpus": 281,
+    "example": "1",
+    "status": "mapped",
+    "ruling": ""
+  },
+  {
+    "construct": "InternalOpenRowset",
+    "keywords": "INTERNAL OPEN ROWSET",
+    "count_in_corpus": 0,
+    "example": "",
+    "status": "unseen",
+    "ruling": ""
+  },
+  {
+    "construct": "InvokeExternalApiFunctionCall",
+    "keywords": "INVOKE EXTERNAL API FUNCTION CALL",
+    "count_in_corpus": 0,
+    "example": "",
+    "status": "unseen",
+    "ruling": ""
+  },
+  {
+    "construct": "JoinParenthesisTableReference",
+    "keywords": "JOIN PARENTHESIS TABLE REFERENCE",
+    "count_in_corpus": 0,
+    "example": "",
+    "status": "unseen",
+    "ruling": ""
+  },
+  {
+    "construct": "JsonForClause",
+    "keywords": "JSON FOR CLAUSE",
+    "count_in_corpus": 0,
+    "example": "",
+    "status": "unseen",
+    "ruling": ""
+  },
+  {
+    "construct": "JsonForClauseOption",
+    "keywords": "JSON FOR CLAUSE OPTION",
+    "count_in_corpus": 0,
+    "example": "",
+    "status": "unseen",
+    "ruling": ""
+  },
+  {
+    "construct": "JsonKeyValue",
+    "keywords": "JSON KEY VALUE",
+    "count_in_corpus": 0,
+    "example": "",
+    "status": "unseen",
+    "ruling": ""
+  },
+  {
+    "construct": "KeySourceKeyOption",
+    "keywords": "KEY SOURCE KEY OPTION",
+    "count_in_corpus": 0,
+    "example": "",
+    "status": "unseen",
+    "ruling": ""
+  },
+  {
+    "construct": "KillQueryNotificationSubscriptionStatement",
+    "keywords": "KILL QUERY NOTIFICATION SUBSCRIPTION STATEMENT",
+    "count_in_corpus": 0,
+    "example": "",
+    "status": "unseen",
+    "ruling": ""
+  },
+  {
+    "construct": "KillStatement",
+    "keywords": "KILL STATEMENT",
+    "count_in_corpus": 0,
+    "example": "",
+    "status": "unseen",
+    "ruling": ""
+  },
+  {
+    "construct": "KillStatsJobStatement",
+    "keywords": "KILL STATS JOB STATEMENT",
+    "count_in_corpus": 0,
+    "example": "",
+    "status": "unseen",
+    "ruling": ""
+  },
+  {
+    "construct": "LabelStatement",
+    "keywords": "LABEL STATEMENT",
+    "count_in_corpus": 0,
+    "example": "",
+    "status": "unseen",
+    "ruling": ""
+  },
+  {
+    "construct": "LedgerOption",
+    "keywords": "LEDGER OPTION",
+    "count_in_corpus": 0,
+    "example": "",
+    "status": "unseen",
+    "ruling": ""
+  },
+  {
+    "construct": "LedgerTableOption",
+    "keywords": "LEDGER TABLE OPTION",
+    "count_in_corpus": 0,
+    "example": "",
+    "status": "unseen",
+    "ruling": ""
+  },
+  {
+    "construct": "LedgerViewOption",
+    "keywords": "LEDGER VIEW OPTION",
+    "count_in_corpus": 0,
+    "example": "",
+    "status": "unseen",
+    "ruling": ""
+  },
+  {
+    "construct": "LeftFunctionCall",
+    "keywords": "LEFT FUNCTION CALL",
+    "count_in_corpus": 0,
+    "example": "",
+    "status": "mapped",
+    "ruling": ""
+  },
+  {
+    "construct": "LikePredicate",
+    "keywords": "LIKE PREDICATE",
+    "count_in_corpus": 8,
+    "example": "[#caregiver_languages].[Caregiver Languages] NOT LIKE '%ENGLISH%'",
+    "status": "mapped",
+    "ruling": ""
+  },
+  {
+    "construct": "LineNoStatement",
+    "keywords": "LINE NO STATEMENT",
+    "count_in_corpus": 0,
+    "example": "",
+    "status": "unseen",
+    "ruling": ""
+  },
+  {
+    "construct": "ListTypeCopyOption",
+    "keywords": "LIST TYPE COPY OPTION",
+    "count_in_corpus": 0,
+    "example": "",
+    "status": "unseen",
+    "ruling": ""
+  },
+  {
+    "construct": "ListenerIPEndpointProtocolOption",
+    "keywords": "LISTENER IPENDPOINT PROTOCOL OPTION",
+    "count_in_corpus": 0,
+    "example": "",
+    "status": "unseen",
+    "ruling": ""
+  },
+  {
+    "construct": "LiteralAtomicBlockOption",
+    "keywords": "LITERAL ATOMIC BLOCK OPTION",
+    "count_in_corpus": 0,
+    "example": "",
+    "status": "unseen",
+    "ruling": ""
+  },
+  {
+    "construct": "LiteralAuditTargetOption",
+    "keywords": "LITERAL AUDIT TARGET OPTION",
+    "count_in_corpus": 0,
+    "example": "",
+    "status": "unseen",
+    "ruling": ""
+  },
+  {
+    "construct": "LiteralAvailabilityGroupOption",
+    "keywords": "LITERAL AVAILABILITY GROUP OPTION",
+    "count_in_corpus": 0,
+    "example": "",
+    "status": "unseen",
+    "ruling": ""
+  },
+  {
+    "construct": "LiteralBulkInsertOption",
+    "keywords": "LITERAL BULK INSERT OPTION",
+    "count_in_corpus": 0,
+    "example": "",
+    "status": "unseen",
+    "ruling": ""
+  },
+  {
+    "construct": "LiteralDatabaseOption",
+    "keywords": "LITERAL DATABASE OPTION",
+    "count_in_corpus": 0,
+    "example": "",
+    "status": "unseen",
+    "ruling": ""
+  },
+  {
+    "construct": "LiteralEndpointProtocolOption",
+    "keywords": "LITERAL ENDPOINT PROTOCOL OPTION",
+    "count_in_corpus": 0,
+    "example": "",
+    "status": "unseen",
+    "ruling": ""
+  },
+  {
+    "construct": "LiteralOpenRowsetCosmosOption",
+    "keywords": "LITERAL OPEN ROWSET COSMOS OPTION",
+    "count_in_corpus": 0,
+    "example": "",
+    "status": "unseen",
+    "ruling": ""
+  },
+  {
+    "construct": "LiteralOptimizerHint",
+    "keywords": "LITERAL OPTIMIZER HINT",
+    "count_in_corpus": 0,
+    "example": "",
+    "status": "unseen",
+    "ruling": ""
+  },
+  {
+    "construct": "LiteralOptionValue",
+    "keywords": "LITERAL OPTION VALUE",
+    "count_in_corpus": 0,
+    "example": "",
+    "status": "unseen",
+    "ruling": ""
+  },
+  {
+    "construct": "LiteralPayloadOption",
+    "keywords": "LITERAL PAYLOAD OPTION",
+    "count_in_corpus": 0,
+    "example": "",
+    "status": "unseen",
+    "ruling": ""
+  },
+  {
+    "construct": "LiteralPrincipalOption",
+    "keywords": "LITERAL PRINCIPAL OPTION",
+    "count_in_corpus": 0,
+    "example": "",
+    "status": "unseen",
+    "ruling": ""
+  },
+  {
+    "construct": "LiteralRange",
+    "keywords": "LITERAL RANGE",
+    "count_in_corpus": 0,
+    "example": "",
+    "status": "unseen",
+    "ruling": ""
+  },
+  {
+    "construct": "LiteralReplicaOption",
+    "keywords": "LITERAL REPLICA OPTION",
+    "count_in_corpus": 0,
+    "example": "",
+    "status": "unseen",
+    "ruling": ""
+  },
+  {
+    "construct": "LiteralSessionOption",
+    "keywords": "LITERAL SESSION OPTION",
+    "count_in_corpus": 0,
+    "example": "",
+    "status": "unseen",
+    "ruling": ""
+  },
+  {
+    "construct": "LiteralStatisticsOption",
+    "keywords": "LITERAL STATISTICS OPTION",
+    "count_in_corpus": 0,
+    "example": "",
+    "status": "unseen",
+    "ruling": ""
+  },
+  {
+    "construct": "LiteralTableHint",
+    "keywords": "LITERAL TABLE HINT",
+    "count_in_corpus": 0,
+    "example": "",
+    "status": "unseen",
+    "ruling": ""
+  },
+  {
+    "construct": "LocationOption",
+    "keywords": "LOCATION OPTION",
+    "count_in_corpus": 0,
+    "example": "",
+    "status": "unseen",
+    "ruling": ""
+  },
+  {
+    "construct": "LockEscalationTableOption",
+    "keywords": "LOCK ESCALATION TABLE OPTION",
+    "count_in_corpus": 0,
+    "example": "",
+    "status": "unseen",
+    "ruling": ""
+  },
+  {
+    "construct": "LoginTypePayloadOption",
+    "keywords": "LOGIN TYPE PAYLOAD OPTION",
+    "count_in_corpus": 0,
+    "example": "",
+    "status": "unseen",
+    "ruling": ""
+  },
+  {
+    "construct": "LowPriorityLockWaitAbortAfterWaitOption",
+    "keywords": "LOW PRIORITY LOCK WAIT ABORT AFTER WAIT OPTION",
+    "count_in_corpus": 0,
+    "example": "",
+    "status": "unseen",
+    "ruling": ""
+  },
+  {
+    "construct": "LowPriorityLockWaitMaxDurationOption",
+    "keywords": "LOW PRIORITY LOCK WAIT MAX DURATION OPTION",
+    "count_in_corpus": 0,
+    "example": "",
+    "status": "unseen",
+    "ruling": ""
+  },
+  {
+    "construct": "LowPriorityLockWaitTableSwitchOption",
+    "keywords": "LOW PRIORITY LOCK WAIT TABLE SWITCH OPTION",
+    "count_in_corpus": 0,
+    "example": "",
+    "status": "unseen",
+    "ruling": ""
+  },
+  {
+    "construct": "MaxDispatchLatencySessionOption",
+    "keywords": "MAX DISPATCH LATENCY SESSION OPTION",
+    "count_in_corpus": 0,
+    "example": "",
+    "status": "unseen",
+    "ruling": ""
+  },
+  {
+    "construct": "MaxDopConfigurationOption",
+    "keywords": "MAX DOP CONFIGURATION OPTION",
+    "count_in_corpus": 0,
+    "example": "",
+    "status": "unseen",
+    "ruling": ""
+  },
+  {
+    "construct": "MaxDurationOption",
+    "keywords": "MAX DURATION OPTION",
+    "count_in_corpus": 0,
+    "example": "",
+    "status": "unseen",
+    "ruling": ""
+  },
+  {
+    "construct": "MaxLiteral",
+    "keywords": "MAX LITERAL",
+    "count_in_corpus": 4,
+    "example": "MAX",
+    "status": "mapped",
+    "ruling": ""
+  },
+  {
+    "construct": "MaxRolloverFilesAuditTargetOption",
+    "keywords": "MAX ROLLOVER FILES AUDIT TARGET OPTION",
+    "count_in_corpus": 0,
+    "example": "",
+    "status": "unseen",
+    "ruling": ""
+  },
+  {
+    "construct": "MaxSizeAuditTargetOption",
+    "keywords": "MAX SIZE AUDIT TARGET OPTION",
+    "count_in_corpus": 0,
+    "example": "",
+    "status": "unseen",
+    "ruling": ""
+  },
+  {
+    "construct": "MaxSizeDatabaseOption",
+    "keywords": "MAX SIZE DATABASE OPTION",
+    "count_in_corpus": 0,
+    "example": "",
+    "status": "unseen",
+    "ruling": ""
+  },
+  {
+    "construct": "MaxSizeFileDeclarationOption",
+    "keywords": "MAX SIZE FILE DECLARATION OPTION",
+    "count_in_corpus": 0,
+    "example": "",
+    "status": "unseen",
+    "ruling": ""
+  },
+  {
+    "construct": "MemoryOptimizedTableOption",
+    "keywords": "MEMORY OPTIMIZED TABLE OPTION",
+    "count_in_corpus": 0,
+    "example": "",
+    "status": "unseen",
+    "ruling": ""
+  },
+  {
+    "construct": "MemoryPartitionSessionOption",
+    "keywords": "MEMORY PARTITION SESSION OPTION",
+    "count_in_corpus": 0,
+    "example": "",
+    "status": "unseen",
+    "ruling": ""
+  },
+  {
+    "construct": "MergeActionClause",
+    "keywords": "MERGE ACTION CLAUSE",
+    "count_in_corpus": 0,
+    "example": "",
+    "status": "unseen",
+    "ruling": ""
+  },
+  {
+    "construct": "MergeSpecification",
+    "keywords": "MERGE SPECIFICATION",
+    "count_in_corpus": 0,
+    "example": "",
+    "status": "unseen",
+    "ruling": ""
+  },
+  {
+    "construct": "MergeStatement",
+    "keywords": "MERGE STATEMENT",
+    "count_in_corpus": 0,
+    "example": "",
+    "status": "unseen",
+    "ruling": ""
+  },
+  {
+    "construct": "MethodSpecifier",
+    "keywords": "METHOD SPECIFIER",
+    "count_in_corpus": 0,
+    "example": "",
+    "status": "unseen",
+    "ruling": ""
+  },
+  {
+    "construct": "MirrorToClause",
+    "keywords": "MIRROR TO CLAUSE",
+    "count_in_corpus": 0,
+    "example": "",
+    "status": "unseen",
+    "ruling": ""
+  },
+  {
+    "construct": "MoneyLiteral",
+    "keywords": "MONEY LITERAL",
+    "count_in_corpus": 0,
+    "example": "",
+    "status": "mapped",
+    "ruling": ""
+  },
+  {
+    "construct": "MoveConversationStatement",
+    "keywords": "MOVE CONVERSATION STATEMENT",
+    "count_in_corpus": 0,
+    "example": "",
+    "status": "unseen",
+    "ruling": ""
+  },
+  {
+    "construct": "MoveRestoreOption",
+    "keywords": "MOVE RESTORE OPTION",
+    "count_in_corpus": 0,
+    "example": "",
+    "status": "unseen",
+    "ruling": ""
+  },
+  {
+    "construct": "MoveToDropIndexOption",
+    "keywords": "MOVE TO DROP INDEX OPTION",
+    "count_in_corpus": 0,
+    "example": "",
+    "status": "unseen",
+    "ruling": ""
+  },
+  {
+    "construct": "MultiPartIdentifier",
+    "keywords": "MULTI PART IDENTIFIER",
+    "count_in_corpus": 581,
+    "example": "adt.DEPARTMENT_ID",
+    "status": "mapped",
+    "ruling": ""
+  },
+  {
+    "construct": "MultiPartIdentifierCallTarget",
+    "keywords": "MULTI PART IDENTIFIER CALL TARGET",
+    "count_in_corpus": 4,
+    "example": "[Clarity].EPIC_UTIL",
+    "status": "mapped",
+    "ruling": ""
+  },
+  {
+    "construct": "NameFileDeclarationOption",
+    "keywords": "NAME FILE DECLARATION OPTION",
+    "count_in_corpus": 0,
+    "example": "",
+    "status": "unseen",
+    "ruling": ""
+  },
+  {
+    "construct": "NamedTableReference",
+    "keywords": "NAMED TABLE REFERENCE",
+    "count_in_corpus": 102,
+    "example": "clarity..CLARITY_SA sa",
+    "status": "mapped",
+    "ruling": ""
+  },
+  {
+    "construct": "NextValueForExpression",
+    "keywords": "NEXT VALUE FOR EXPRESSION",
+    "count_in_corpus": 0,
+    "example": "",
+    "status": "unseen",
+    "ruling": ""
+  },
+  {
+    "construct": "NullIfExpression",
+    "keywords": "NULL IF EXPRESSION",
+    "count_in_corpus": 0,
+    "example": "",
+    "status": "mapped",
+    "ruling": ""
+  },
+  {
+    "construct": "NullLiteral",
+    "keywords": "NULL LITERAL",
+    "count_in_corpus": 6,
+    "example": "NULL",
+    "status": "mapped",
+    "ruling": ""
+  },
+  {
+    "construct": "NullableConstraintDefinition",
+    "keywords": "NULLABLE CONSTRAINT DEFINITION",
+    "count_in_corpus": 0,
+    "example": "",
+    "status": "unseen",
+    "ruling": ""
+  },
+  {
+    "construct": "NumericLiteral",
+    "keywords": "NUMERIC LITERAL",
+    "count_in_corpus": 0,
+    "example": "",
+    "status": "mapped",
+    "ruling": ""
+  },
+  {
+    "construct": "OdbcConvertSpecification",
+    "keywords": "ODBC CONVERT SPECIFICATION",
+    "count_in_corpus": 0,
+    "example": "",
+    "status": "unseen",
+    "ruling": ""
+  },
+  {
+    "construct": "OdbcFunctionCall",
+    "keywords": "ODBC FUNCTION CALL",
+    "count_in_corpus": 0,
+    "example": "",
+    "status": "unseen",
+    "ruling": ""
+  },
+  {
+    "construct": "OdbcLiteral",
+    "keywords": "ODBC LITERAL",
+    "count_in_corpus": 0,
+    "example": "",
+    "status": "unseen",
+    "ruling": ""
+  },
+  {
+    "construct": "OdbcQualifiedJoinTableReference",
+    "keywords": "ODBC QUALIFIED JOIN TABLE REFERENCE",
+    "count_in_corpus": 0,
+    "example": "",
+    "status": "unseen",
+    "ruling": ""
+  },
+  {
+    "construct": "OffsetClause",
+    "keywords": "OFFSET CLAUSE",
+    "count_in_corpus": 0,
+    "example": "",
+    "status": "unseen",
+    "ruling": ""
+  },
+  {
+    "construct": "OnFailureAuditOption",
+    "keywords": "ON FAILURE AUDIT OPTION",
+    "count_in_corpus": 0,
+    "example": "",
+    "status": "unseen",
+    "ruling": ""
+  },
+  {
+    "construct": "OnOffAssemblyOption",
+    "keywords": "ON OFF ASSEMBLY OPTION",
+    "count_in_corpus": 0,
+    "example": "",
+    "status": "unseen",
+    "ruling": ""
+  },
+  {
+    "construct": "OnOffAtomicBlockOption",
+    "keywords": "ON OFF ATOMIC BLOCK OPTION",
+    "count_in_corpus": 0,
+    "example": "",
+    "status": "unseen",
+    "ruling": ""
+  },
+  {
+    "construct": "OnOffAuditTargetOption",
+    "keywords": "ON OFF AUDIT TARGET OPTION",
+    "count_in_corpus": 0,
+    "example": "",
+    "status": "unseen",
+    "ruling": ""
+  },
+  {
+    "construct": "OnOffDatabaseOption",
+    "keywords": "ON OFF DATABASE OPTION",
+    "count_in_corpus": 0,
+    "example": "",
+    "status": "unseen",
+    "ruling": ""
+  },
+  {
+    "construct": "OnOffDialogOption",
+    "keywords": "ON OFF DIALOG OPTION",
+    "count_in_corpus": 0,
+    "example": "",
+    "status": "unseen",
+    "ruling": ""
+  },
+  {
+    "construct": "OnOffFullTextCatalogOption",
+    "keywords": "ON OFF FULL TEXT CATALOG OPTION",
+    "count_in_corpus": 0,
+    "example": "",
+    "status": "unseen",
+    "ruling": ""
+  },
+  {
+    "construct": "OnOffOptionValue",
+    "keywords": "ON OFF OPTION VALUE",
+    "count_in_corpus": 0,
+    "example": "",
+    "status": "unseen",
+    "ruling": ""
+  },
+  {
+    "construct": "OnOffPrimaryConfigurationOption",
+    "keywords": "ON OFF PRIMARY CONFIGURATION OPTION",
+    "count_in_corpus": 0,
+    "example": "",
+    "status": "unseen",
+    "ruling": ""
+  },
+  {
+    "construct": "OnOffPrincipalOption",
+    "keywords": "ON OFF PRINCIPAL OPTION",
+    "count_in_corpus": 0,
+    "example": "",
+    "status": "unseen",
+    "ruling": ""
+  },
+  {
+    "construct": "OnOffRemoteServiceBindingOption",
+    "keywords": "ON OFF REMOTE SERVICE BINDING OPTION",
+    "count_in_corpus": 0,
+    "example": "",
+    "status": "unseen",
+    "ruling": ""
+  },
+  {
+    "construct": "OnOffSessionOption",
+    "keywords": "ON OFF SESSION OPTION",
+    "count_in_corpus": 0,
+    "example": "",
+    "status": "unseen",
+    "ruling": ""
+  },
+  {
+    "construct": "OnOffStatisticsOption",
+    "keywords": "ON OFF STATISTICS OPTION",
+    "count_in_corpus": 0,
+    "example": "",
+    "status": "unseen",
+    "ruling": ""
+  },
+  {
+    "construct": "OnlineIndexLowPriorityLockWaitOption",
+    "keywords": "ONLINE INDEX LOW PRIORITY LOCK WAIT OPTION",
+    "count_in_corpus": 0,
+    "example": "",
+    "status": "unseen",
+    "ruling": ""
+  },
+  {
+    "construct": "OnlineIndexOption",
+    "keywords": "ONLINE INDEX OPTION",
+    "count_in_corpus": 0,
+    "example": "",
+    "status": "unseen",
+    "ruling": ""
+  },
+  {
+    "construct": "OpenCursorStatement",
+    "keywords": "OPEN CURSOR STATEMENT",
+    "count_in_corpus": 0,
+    "example": "",
+    "status": "unseen",
+    "ruling": ""
+  },
+  {
+    "construct": "OpenJsonTableReference",
+    "keywords": "OPEN JSON TABLE REFERENCE",
+    "count_in_corpus": 0,
+    "example": "",
+    "status": "unseen",
+    "ruling": ""
+  },
+  {
+    "construct": "OpenMasterKeyStatement",
+    "keywords": "OPEN MASTER KEY STATEMENT",
+    "count_in_corpus": 0,
+    "example": "",
+    "status": "unseen",
+    "ruling": ""
+  },
+  {
+    "construct": "OpenQueryTableReference",
+    "keywords": "OPEN QUERY TABLE REFERENCE",
+    "count_in_corpus": 0,
+    "example": "",
+    "status": "unseen",
+    "ruling": ""
+  },
+  {
+    "construct": "OpenRowsetColumnDefinition",
+    "keywords": "OPEN ROWSET COLUMN DEFINITION",
+    "count_in_corpus": 0,
+    "example": "",
+    "status": "unseen",
+    "ruling": ""
+  },
+  {
+    "construct": "OpenRowsetCosmos",
+    "keywords": "OPEN ROWSET COSMOS",
+    "count_in_corpus": 0,
+    "example": "",
+    "status": "unseen",
+    "ruling": ""
+  },
+  {
+    "construct": "OpenRowsetCosmosOption",
+    "keywords": "OPEN ROWSET COSMOS OPTION",
+    "count_in_corpus": 0,
+    "example": "",
+    "status": "unseen",
+    "ruling": ""
+  },
+  {
+    "construct": "OpenRowsetTableReference",
+    "keywords": "OPEN ROWSET TABLE REFERENCE",
+    "count_in_corpus": 0,
+    "example": "",
+    "status": "unseen",
+    "ruling": ""
+  },
+  {
+    "construct": "OpenSymmetricKeyStatement",
+    "keywords": "OPEN SYMMETRIC KEY STATEMENT",
+    "count_in_corpus": 0,
+    "example": "",
+    "status": "unseen",
+    "ruling": ""
+  },
+  {
+    "construct": "OpenXmlTableReference",
+    "keywords": "OPEN XML TABLE REFERENCE",
+    "count_in_corpus": 0,
+    "example": "",
+    "status": "unseen",
+    "ruling": ""
+  },
+  {
+    "construct": "OperatorAuditOption",
+    "keywords": "OPERATOR AUDIT OPTION",
+    "count_in_corpus": 0,
+    "example": "",
+    "status": "unseen",
+    "ruling": ""
+  },
+  {
+    "construct": "OptimizeForOptimizerHint",
+    "keywords": "OPTIMIZE FOR OPTIMIZER HINT",
+    "count_in_corpus": 0,
+    "example": "",
+    "status": "unseen",
+    "ruling": ""
+  },
+  {
+    "construct": "OptimizedLockingDatabaseOption",
+    "keywords": "OPTIMIZED LOCKING DATABASE OPTION",
+    "count_in_corpus": 0,
+    "example": "",
+    "status": "unseen",
+    "ruling": ""
+  },
+  {
+    "construct": "OptimizerHint",
+    "keywords": "OPTIMIZER HINT",
+    "count_in_corpus": 0,
+    "example": "",
+    "status": "unseen",
+    "ruling": ""
+  },
+  {
+    "construct": "OrderBulkInsertOption",
+    "keywords": "ORDER BULK INSERT OPTION",
+    "count_in_corpus": 0,
+    "example": "",
+    "status": "unseen",
+    "ruling": ""
+  },
+  {
+    "construct": "OrderByClause",
+    "keywords": "ORDER BY CLAUSE",
+    "count_in_corpus": 7,
+    "example": "order by adt.EFFECTIVE_TIME, adt.ROOM_ID",
+    "status": "mapped",
+    "ruling": ""
+  },
+  {
+    "construct": "OrderIndexOption",
+    "keywords": "ORDER INDEX OPTION",
+    "count_in_corpus": 0,
+    "example": "",
+    "status": "unseen",
+    "ruling": ""
+  },
+  {
+    "construct": "OutputClause",
+    "keywords": "OUTPUT CLAUSE",
+    "count_in_corpus": 0,
+    "example": "",
+    "status": "unseen",
+    "ruling": ""
+  },
+  {
+    "construct": "OutputIntoClause",
+    "keywords": "OUTPUT INTO CLAUSE",
+    "count_in_corpus": 0,
+    "example": "",
+    "status": "unseen",
+    "ruling": ""
+  },
+  {
+    "construct": "OverClause",
+    "keywords": "OVER CLAUSE",
+    "count_in_corpus": 2,
+    "example": "OVER(\n\t\t\tPARTITION BY [#combined_census].PAT_ID, [#combined_census].[Monthly Census Start Date]\n\t\t\tORDER BY [FILING].FIL",
+    "status": "mapped",
+    "ruling": ""
+  },
+  {
+    "construct": "PageVerifyDatabaseOption",
+    "keywords": "PAGE VERIFY DATABASE OPTION",
+    "count_in_corpus": 0,
+    "example": "",
+    "status": "unseen",
+    "ruling": ""
+  },
+  {
+    "construct": "ParameterizationDatabaseOption",
+    "keywords": "PARAMETERIZATION DATABASE OPTION",
+    "count_in_corpus": 0,
+    "example": "",
+    "status": "unseen",
+    "ruling": ""
+  },
+  {
+    "construct": "ParameterlessCall",
+    "keywords": "PARAMETERLESS CALL",
+    "count_in_corpus": 0,
+    "example": "",
+    "status": "unseen",
+    "ruling": ""
+  },
+  {
+    "construct": "ParenthesisExpression",
+    "keywords": "PARENTHESIS EXPRESSION",
+    "count_in_corpus": 0,
+    "example": "",
+    "status": "mapped",
+    "ruling": ""
+  },
+  {
+    "construct": "ParseCall",
+    "keywords": "PARSE CALL",
+    "count_in_corpus": 0,
+    "example": "",
+    "status": "unseen",
+    "ruling": ""
+  },
+  {
+    "construct": "PartitionFunctionCall",
+    "keywords": "PARTITION FUNCTION CALL",
+    "count_in_corpus": 0,
+    "example": "",
+    "status": "unseen",
+    "ruling": ""
+  },
+  {
+    "construct": "PartitionParameterType",
+    "keywords": "PARTITION PARAMETER TYPE",
+    "count_in_corpus": 0,
+    "example": "",
+    "status": "unseen",
+    "ruling": ""
+  },
+  {
+    "construct": "PartitionSpecifier",
+    "keywords": "PARTITION SPECIFIER",
+    "count_in_corpus": 0,
+    "example": "",
+    "status": "unseen",
+    "ruling": ""
+  },
+  {
+    "construct": "PartnerDatabaseOption",
+    "keywords": "PARTNER DATABASE OPTION",
+    "count_in_corpus": 0,
+    "example": "",
+    "status": "unseen",
+    "ruling": ""
+  },
+  {
+    "construct": "PasswordAlterPrincipalOption",
+    "keywords": "PASSWORD ALTER PRINCIPAL OPTION",
+    "count_in_corpus": 0,
+    "example": "",
+    "status": "unseen",
+    "ruling": ""
+  },
+  {
+    "construct": "PasswordCreateLoginSource",
+    "keywords": "PASSWORD CREATE LOGIN SOURCE",
+    "count_in_corpus": 0,
+    "example": "",
+    "status": "unseen",
+    "ruling": ""
+  },
+  {
+    "construct": "Permission",
+    "keywords": "PERMISSION",
+    "count_in_corpus": 0,
+    "example": "",
+    "status": "unseen",
+    "ruling": ""
+  },
+  {
+    "construct": "PermissionSetAssemblyOption",
+    "keywords": "PERMISSION SET ASSEMBLY OPTION",
+    "count_in_corpus": 0,
+    "example": "",
+    "status": "unseen",
+    "ruling": ""
+  },
+  {
+    "construct": "PivotedTableReference",
+    "keywords": "PIVOTED TABLE REFERENCE",
+    "count_in_corpus": 0,
+    "example": "",
+    "status": "unseen",
+    "ruling": ""
+  },
+  {
+    "construct": "PortsEndpointProtocolOption",
+    "keywords": "PORTS ENDPOINT PROTOCOL OPTION",
+    "count_in_corpus": 0,
+    "example": "",
+    "status": "unseen",
+    "ruling": ""
+  },
+  {
+    "construct": "PredicateSetStatement",
+    "keywords": "PREDICATE SET STATEMENT",
+    "count_in_corpus": 10,
+    "example": "SET NOCOUNT ON;",
+    "status": "mapped",
+    "ruling": ""
+  },
+  {
+    "construct": "PredictTableReference",
+    "keywords": "PREDICT TABLE REFERENCE",
+    "count_in_corpus": 0,
+    "example": "",
+    "status": "unseen",
+    "ruling": ""
+  },
+  {
+    "construct": "PrimaryRoleReplicaOption",
+    "keywords": "PRIMARY ROLE REPLICA OPTION",
+    "count_in_corpus": 0,
+    "example": "",
+    "status": "unseen",
+    "ruling": ""
+  },
+  {
+    "construct": "PrincipalOption",
+    "keywords": "PRINCIPAL OPTION",
+    "count_in_corpus": 0,
+    "example": "",
+    "status": "unseen",
+    "ruling": ""
+  },
+  {
+    "construct": "PrintStatement",
+    "keywords": "PRINT STATEMENT",
+    "count_in_corpus": 0,
+    "example": "",
+    "status": "unseen",
+    "ruling": ""
+  },
+  {
+    "construct": "Privilege80",
+    "keywords": "PRIVILEGE80",
+    "count_in_corpus": 0,
+    "example": "",
+    "status": "unseen",
+    "ruling": ""
+  },
+  {
+    "construct": "PrivilegeSecurityElement80",
+    "keywords": "PRIVILEGE SECURITY ELEMENT80",
+    "count_in_corpus": 0,
+    "example": "",
+    "status": "unseen",
+    "ruling": ""
+  },
+  {
+    "construct": "ProcedureOption",
+    "keywords": "PROCEDURE OPTION",
+    "count_in_corpus": 0,
+    "example": "",
+    "status": "unseen",
+    "ruling": ""
+  },
+  {
+    "construct": "ProcedureParameter",
+    "keywords": "PROCEDURE PARAMETER",
+    "count_in_corpus": 23,
+    "example": "@Location VARCHAR(MAX)",
+    "status": "mapped",
+    "ruling": ""
+  },
+  {
+    "construct": "ProcedureReference",
+    "keywords": "PROCEDURE REFERENCE",
+    "count_in_corpus": 8,
+    "example": "[schema1].[USP_ADT_MONTHLY_INPATIENT_CENSUS_TOTALS_SSRS]",
+    "status": "mapped",
+    "ruling": ""
+  },
+  {
+    "construct": "ProcedureReferenceName",
+    "keywords": "PROCEDURE REFERENCE NAME",
+    "count_in_corpus": 0,
+    "example": "",
+    "status": "unseen",
+    "ruling": ""
+  },
+  {
+    "construct": "ProcessAffinityRange",
+    "keywords": "PROCESS AFFINITY RANGE",
+    "count_in_corpus": 0,
+    "example": "",
+    "status": "unseen",
+    "ruling": ""
+  },
+  {
+    "construct": "ProviderEncryptionSource",
+    "keywords": "PROVIDER ENCRYPTION SOURCE",
+    "count_in_corpus": 0,
+    "example": "",
+    "status": "unseen",
+    "ruling": ""
+  },
+  {
+    "construct": "ProviderKeyNameKeyOption",
+    "keywords": "PROVIDER KEY NAME KEY OPTION",
+    "count_in_corpus": 0,
+    "example": "",
+    "status": "unseen",
+    "ruling": ""
+  },
+  {
+    "construct": "QualifiedJoin",
+    "keywords": "QUALIFIED JOIN",
+    "count_in_corpus": 71,
+    "example": "clarity..CLARITY_ADT adt\n\n\tLEFT JOIN clarity..CLARITY_BED bd\n\tON adt.BED_CSN_ID = bd.BED_CSN_ID\n\n\tLEFT JOIN clarity..CLA",
+    "status": "mapped",
+    "ruling": ""
+  },
+  {
+    "construct": "QueryDerivedTable",
+    "keywords": "QUERY DERIVED TABLE",
+    "count_in_corpus": 1,
+    "example": "(\n\t\tSELECT \n\t\t\t[Year]\n\t\t\t, [Quarter]\n\t\t\t, [Month Name]\n\t\t\t, [Location]\n\t\t\t, [Dept External Name]\n\t\t\t, [Department Label]",
+    "status": "mapped",
+    "ruling": ""
+  },
+  {
+    "construct": "QueryParenthesisExpression",
+    "keywords": "QUERY PARENTHESIS EXPRESSION",
+    "count_in_corpus": 0,
+    "example": "",
+    "status": "mapped",
+    "ruling": ""
+  },
+  {
+    "construct": "QuerySpecification",
+    "keywords": "QUERY SPECIFICATION",
+    "count_in_corpus": 34,
+    "example": "SELECT adt.EVENT_TYPE_C as\t\t\t\t\t'Event Type',\n\t   adt.EVENT_SUBTYPE_C as\t\t\t\t'Event SubType',\n\t   adt.EFFECTIVE_TIME as\t\t\t",
+    "status": "mapped",
+    "ruling": ""
+  },
+  {
+    "construct": "QueryStoreCapturePolicyOption",
+    "keywords": "QUERY STORE CAPTURE POLICY OPTION",
+    "count_in_corpus": 0,
+    "example": "",
+    "status": "unseen",
+    "ruling": ""
+  },
+  {
+    "construct": "QueryStoreDataFlushIntervalOption",
+    "keywords": "QUERY STORE DATA FLUSH INTERVAL OPTION",
+    "count_in_corpus": 0,
+    "example": "",
+    "status": "unseen",
+    "ruling": ""
+  },
+  {
+    "construct": "QueryStoreDatabaseOption",
+    "keywords": "QUERY STORE DATABASE OPTION",
+    "count_in_corpus": 0,
+    "example": "",
+    "status": "unseen",
+    "ruling": ""
+  },
+  {
+    "construct": "QueryStoreDesiredStateOption",
+    "keywords": "QUERY STORE DESIRED STATE OPTION",
+    "count_in_corpus": 0,
+    "example": "",
+    "status": "unseen",
+    "ruling": ""
+  },
+  {
+    "construct": "QueryStoreIntervalLengthOption",
+    "keywords": "QUERY STORE INTERVAL LENGTH OPTION",
+    "count_in_corpus": 0,
+    "example": "",
+    "status": "unseen",
+    "ruling": ""
+  },
+  {
+    "construct": "QueryStoreMaxPlansPerQueryOption",
+    "keywords": "QUERY STORE MAX PLANS PER QUERY OPTION",
+    "count_in_corpus": 0,
+    "example": "",
+    "status": "unseen",
+    "ruling": ""
+  },
+  {
+    "construct": "QueryStoreMaxStorageSizeOption",
+    "keywords": "QUERY STORE MAX STORAGE SIZE OPTION",
+    "count_in_corpus": 0,
+    "example": "",
+    "status": "unseen",
+    "ruling": ""
+  },
+  {
+    "construct": "QueryStoreSizeCleanupPolicyOption",
+    "keywords": "QUERY STORE SIZE CLEANUP POLICY OPTION",
+    "count_in_corpus": 0,
+    "example": "",
+    "status": "unseen",
+    "ruling": ""
+  },
+  {
+    "construct": "QueryStoreTimeCleanupPolicyOption",
+    "keywords": "QUERY STORE TIME CLEANUP POLICY OPTION",
+    "count_in_corpus": 0,
+    "example": "",
+    "status": "unseen",
+    "ruling": ""
+  },
+  {
+    "construct": "QueryStoreWaitStatsCaptureOption",
+    "keywords": "QUERY STORE WAIT STATS CAPTURE OPTION",
+    "count_in_corpus": 0,
+    "example": "",
+    "status": "unseen",
+    "ruling": ""
+  },
+  {
+    "construct": "QueueDelayAuditOption",
+    "keywords": "QUEUE DELAY AUDIT OPTION",
+    "count_in_corpus": 0,
+    "example": "",
+    "status": "unseen",
+    "ruling": ""
+  },
+  {
+    "construct": "QueueExecuteAsOption",
+    "keywords": "QUEUE EXECUTE AS OPTION",
+    "count_in_corpus": 0,
+    "example": "",
+    "status": "unseen",
+    "ruling": ""
+  },
+  {
+    "construct": "QueueOption",
+    "keywords": "QUEUE OPTION",
+    "count_in_corpus": 0,
+    "example": "",
+    "status": "unseen",
+    "ruling": ""
+  },
+  {
+    "construct": "QueueProcedureOption",
+    "keywords": "QUEUE PROCEDURE OPTION",
+    "count_in_corpus": 0,
+    "example": "",
+    "status": "unseen",
+    "ruling": ""
+  },
+  {
+    "construct": "QueueStateOption",
+    "keywords": "QUEUE STATE OPTION",
+    "count_in_corpus": 0,
+    "example": "",
+    "status": "unseen",
+    "ruling": ""
+  },
+  {
+    "construct": "QueueValueOption",
+    "keywords": "QUEUE VALUE OPTION",
+    "count_in_corpus": 0,
+    "example": "",
+    "status": "unseen",
+    "ruling": ""
+  },
+  {
+    "construct": "RaiseErrorLegacyStatement",
+    "keywords": "RAISE ERROR LEGACY STATEMENT",
+    "count_in_corpus": 0,
+    "example": "",
+    "status": "unseen",
+    "ruling": ""
+  },
+  {
+    "construct": "RaiseErrorStatement",
+    "keywords": "RAISE ERROR STATEMENT",
+    "count_in_corpus": 0,
+    "example": "",
+    "status": "unseen",
+    "ruling": ""
+  },
+  {
+    "construct": "ReadOnlyForClause",
+    "keywords": "READ ONLY FOR CLAUSE",
+    "count_in_corpus": 0,
+    "example": "",
+    "status": "unseen",
+    "ruling": ""
+  },
+  {
+    "construct": "ReadTextStatement",
+    "keywords": "READ TEXT STATEMENT",
+    "count_in_corpus": 0,
+    "example": "",
+    "status": "unseen",
+    "ruling": ""
+  },
+  {
+    "construct": "RealLiteral",
+    "keywords": "REAL LITERAL",
+    "count_in_corpus": 0,
+    "example": "",
+    "status": "mapped",
+    "ruling": ""
+  },
+  {
+    "construct": "ReceiveStatement",
+    "keywords": "RECEIVE STATEMENT",
+    "count_in_corpus": 0,
+    "example": "",
+    "status": "unseen",
+    "ruling": ""
+  },
+  {
+    "construct": "ReconfigureStatement",
+    "keywords": "RECONFIGURE STATEMENT",
+    "count_in_corpus": 0,
+    "example": "",
+    "status": "unseen",
+    "ruling": ""
+  },
+  {
+    "construct": "RecoveryDatabaseOption",
+    "keywords": "RECOVERY DATABASE OPTION",
+    "count_in_corpus": 0,
+    "example": "",
+    "status": "unseen",
+    "ruling": ""
+  },
+  {
+    "construct": "RegexpLikePredicate",
+    "keywords": "REGEXP LIKE PREDICATE",
+    "count_in_corpus": 0,
+    "example": "",
+    "status": "unseen",
+    "ruling": ""
+  },
+  {
+    "construct": "RemoteDataArchiveAlterTableOption",
+    "keywords": "REMOTE DATA ARCHIVE ALTER TABLE OPTION",
+    "count_in_corpus": 0,
+    "example": "",
+    "status": "unseen",
+    "ruling": ""
+  },
+  {
+    "construct": "RemoteDataArchiveDatabaseOption",
+    "keywords": "REMOTE DATA ARCHIVE DATABASE OPTION",
+    "count_in_corpus": 0,
+    "example": "",
+    "status": "unseen",
+    "ruling": ""
+  },
+  {
+    "construct": "RemoteDataArchiveDbCredentialSetting",
+    "keywords": "REMOTE DATA ARCHIVE DB CREDENTIAL SETTING",
+    "count_in_corpus": 0,
+    "example": "",
+    "status": "unseen",
+    "ruling": ""
+  },
+  {
+    "construct": "RemoteDataArchiveDbFederatedServiceAccountSetting",
+    "keywords": "REMOTE DATA ARCHIVE DB FEDERATED SERVICE ACCOUNT SETTING",
+    "count_in_corpus": 0,
+    "example": "",
+    "status": "unseen",
+    "ruling": ""
+  },
+  {
+    "construct": "RemoteDataArchiveDbServerSetting",
+    "keywords": "REMOTE DATA ARCHIVE DB SERVER SETTING",
+    "count_in_corpus": 0,
+    "example": "",
+    "status": "unseen",
+    "ruling": ""
+  },
+  {
+    "construct": "RemoteDataArchiveTableOption",
+    "keywords": "REMOTE DATA ARCHIVE TABLE OPTION",
+    "count_in_corpus": 0,
+    "example": "",
+    "status": "unseen",
+    "ruling": ""
+  },
+  {
+    "construct": "RenameAlterRoleAction",
+    "keywords": "RENAME ALTER ROLE ACTION",
+    "count_in_corpus": 0,
+    "example": "",
+    "status": "unseen",
+    "ruling": ""
+  },
+  {
+    "construct": "RenameEntityStatement",
+    "keywords": "RENAME ENTITY STATEMENT",
+    "count_in_corpus": 0,
+    "example": "",
+    "status": "unseen",
+    "ruling": ""
+  },
+  {
+    "construct": "ResampleStatisticsOption",
+    "keywords": "RESAMPLE STATISTICS OPTION",
+    "count_in_corpus": 0,
+    "example": "",
+    "status": "unseen",
+    "ruling": ""
+  },
+  {
+    "construct": "ResourcePoolAffinitySpecification",
+    "keywords": "RESOURCE POOL AFFINITY SPECIFICATION",
+    "count_in_corpus": 0,
+    "example": "",
+    "status": "unseen",
+    "ruling": ""
+  },
+  {
+    "construct": "ResourcePoolParameter",
+    "keywords": "RESOURCE POOL PARAMETER",
+    "count_in_corpus": 0,
+    "example": "",
+    "status": "unseen",
+    "ruling": ""
+  },
+  {
+    "construct": "ResourcePoolStatement",
+    "keywords": "RESOURCE POOL STATEMENT",
+    "count_in_corpus": 0,
+    "example": "",
+    "status": "unseen",
+    "ruling": ""
+  },
+  {
+    "construct": "RestoreMasterKeyStatement",
+    "keywords": "RESTORE MASTER KEY STATEMENT",
+    "count_in_corpus": 0,
+    "example": "",
+    "status": "unseen",
+    "ruling": ""
+  },
+  {
+    "construct": "RestoreOption",
+    "keywords": "RESTORE OPTION",
+    "count_in_corpus": 0,
+    "example": "",
+    "status": "unseen",
+    "ruling": ""
+  },
+  {
+    "construct": "RestoreServiceMasterKeyStatement",
+    "keywords": "RESTORE SERVICE MASTER KEY STATEMENT",
+    "count_in_corpus": 0,
+    "example": "",
+    "status": "unseen",
+    "ruling": ""
+  },
+  {
+    "construct": "RestoreStatement",
+    "keywords": "RESTORE STATEMENT",
+    "count_in_corpus": 0,
+    "example": "",
+    "status": "unseen",
+    "ruling": ""
+  },
+  {
+    "construct": "ResultColumnDefinition",
+    "keywords": "RESULT COLUMN DEFINITION",
+    "count_in_corpus": 0,
+    "example": "",
+    "status": "unseen",
+    "ruling": ""
+  },
+  {
+    "construct": "ResultSetDefinition",
+    "keywords": "RESULT SET DEFINITION",
+    "count_in_corpus": 0,
+    "example": "",
+    "status": "unseen",
+    "ruling": ""
+  },
+  {
+    "construct": "ResultSetsExecuteOption",
+    "keywords": "RESULT SETS EXECUTE OPTION",
+    "count_in_corpus": 0,
+    "example": "",
+    "status": "unseen",
+    "ruling": ""
+  },
+  {
+    "construct": "RetentionDaysAuditTargetOption",
+    "keywords": "RETENTION DAYS AUDIT TARGET OPTION",
+    "count_in_corpus": 0,
+    "example": "",
+    "status": "unseen",
+    "ruling": ""
+  },
+  {
+    "construct": "RetentionPeriodDefinition",
+    "keywords": "RETENTION PERIOD DEFINITION",
+    "count_in_corpus": 0,
+    "example": "",
+    "status": "unseen",
+    "ruling": ""
+  },
+  {
+    "construct": "ReturnStatement",
+    "keywords": "RETURN STATEMENT",
+    "count_in_corpus": 0,
+    "example": "",
+    "status": "mapped",
+    "ruling": ""
+  },
+  {
+    "construct": "RevertStatement",
+    "keywords": "REVERT STATEMENT",
+    "count_in_corpus": 0,
+    "example": "",
+    "status": "unseen",
+    "ruling": ""
+  },
+  {
+    "construct": "RevokeStatement",
+    "keywords": "REVOKE STATEMENT",
+    "count_in_corpus": 0,
+    "example": "",
+    "status": "unseen",
+    "ruling": ""
+  },
+  {
+    "construct": "RevokeStatement80",
+    "keywords": "REVOKE STATEMENT80",
+    "count_in_corpus": 0,
+    "example": "",
+    "status": "unseen",
+    "ruling": ""
+  },
+  {
+    "construct": "RightFunctionCall",
+    "keywords": "RIGHT FUNCTION CALL",
+    "count_in_corpus": 0,
+    "example": "",
+    "status": "mapped",
+    "ruling": ""
+  },
+  {
+    "construct": "RolePayloadOption",
+    "keywords": "ROLE PAYLOAD OPTION",
+    "count_in_corpus": 0,
+    "example": "",
+    "status": "unseen",
+    "ruling": ""
+  },
+  {
+    "construct": "RollbackTransactionStatement",
+    "keywords": "ROLLBACK TRANSACTION STATEMENT",
+    "count_in_corpus": 0,
+    "example": "",
+    "status": "unseen",
+    "ruling": ""
+  },
+  {
+    "construct": "RollupGroupingSpecification",
+    "keywords": "ROLLUP GROUPING SPECIFICATION",
+    "count_in_corpus": 0,
+    "example": "",
+    "status": "unseen",
+    "ruling": ""
+  },
+  {
+    "construct": "RouteOption",
+    "keywords": "ROUTE OPTION",
+    "count_in_corpus": 0,
+    "example": "",
+    "status": "unseen",
+    "ruling": ""
+  },
+  {
+    "construct": "RowValue",
+    "keywords": "ROW VALUE",
+    "count_in_corpus": 0,
+    "example": "",
+    "status": "unseen",
+    "ruling": ""
+  },
+  {
+    "construct": "SaveTransactionStatement",
+    "keywords": "SAVE TRANSACTION STATEMENT",
+    "count_in_corpus": 0,
+    "example": "",
+    "status": "unseen",
+    "ruling": ""
+  },
+  {
+    "construct": "ScalarExpressionDialogOption",
+    "keywords": "SCALAR EXPRESSION DIALOG OPTION",
+    "count_in_corpus": 0,
+    "example": "",
+    "status": "unseen",
+    "ruling": ""
+  },
+  {
+    "construct": "ScalarExpressionRestoreOption",
+    "keywords": "SCALAR EXPRESSION RESTORE OPTION",
+    "count_in_corpus": 0,
+    "example": "",
+    "status": "unseen",
+    "ruling": ""
+  },
+  {
+    "construct": "ScalarExpressionSequenceOption",
+    "keywords": "SCALAR EXPRESSION SEQUENCE OPTION",
+    "count_in_corpus": 0,
+    "example": "",
+    "status": "unseen",
+    "ruling": ""
+  },
+  {
+    "construct": "ScalarExpressionSnippet",
+    "keywords": "SCALAR EXPRESSION SNIPPET",
+    "count_in_corpus": 0,
+    "example": "",
+    "status": "unseen",
+    "ruling": ""
+  },
+  {
+    "construct": "ScalarFunctionReturnType",
+    "keywords": "SCALAR FUNCTION RETURN TYPE",
+    "count_in_corpus": 0,
+    "example": "",
+    "status": "unseen",
+    "ruling": ""
+  },
+  {
+    "construct": "ScalarSubquery",
+    "keywords": "SCALAR SUBQUERY",
+    "count_in_corpus": 8,
+    "example": "(SELECT 1 FROM STRING_SPLIT(@Location, ',') WHERE [value] IN ('0', dep.REV_LOC_ID))",
+    "status": "mapped",
+    "ruling": ""
+  },
+  {
+    "construct": "SchemaDeclarationItem",
+    "keywords": "SCHEMA DECLARATION ITEM",
+    "count_in_corpus": 0,
+    "example": "",
+    "status": "unseen",
+    "ruling": ""
+  },
+  {
+    "construct": "SchemaDeclarationItemOpenjson",
+    "keywords": "SCHEMA DECLARATION ITEM OPENJSON",
+    "count_in_corpus": 0,
+    "example": "",
+    "status": "unseen",
+    "ruling": ""
+  },
+  {
+    "construct": "SchemaObjectFunctionTableReference",
+    "keywords": "SCHEMA OBJECT FUNCTION TABLE REFERENCE",
+    "count_in_corpus": 0,
+    "example": "",
+    "status": "unseen",
+    "ruling": ""
+  },
+  {
+    "construct": "SchemaObjectName",
+    "keywords": "SCHEMA OBJECT NAME",
+    "count_in_corpus": 199,
+    "example": "clarity..CLARITY_SA",
+    "status": "mapped",
+    "ruling": ""
+  },
+  {
+    "construct": "SchemaObjectNameOrValueExpression",
+    "keywords": "SCHEMA OBJECT NAME OR VALUE EXPRESSION",
+    "count_in_corpus": 0,
+    "example": "",
+    "status": "unseen",
+    "ruling": ""
+  },
+  {
+    "construct": "SchemaObjectNameSnippet",
+    "keywords": "SCHEMA OBJECT NAME SNIPPET",
+    "count_in_corpus": 0,
+    "example": "",
+    "status": "unseen",
+    "ruling": ""
+  },
+  {
+    "construct": "SchemaObjectResultSetDefinition",
+    "keywords": "SCHEMA OBJECT RESULT SET DEFINITION",
+    "count_in_corpus": 0,
+    "example": "",
+    "status": "unseen",
+    "ruling": ""
+  },
+  {
+    "construct": "SchemaPayloadOption",
+    "keywords": "SCHEMA PAYLOAD OPTION",
+    "count_in_corpus": 0,
+    "example": "",
+    "status": "unseen",
+    "ruling": ""
+  },
+  {
+    "construct": "SearchPropertyListFullTextIndexOption",
+    "keywords": "SEARCH PROPERTY LIST FULL TEXT INDEX OPTION",
+    "count_in_corpus": 0,
+    "example": "",
+    "status": "unseen",
+    "ruling": ""
+  },
+  {
+    "construct": "SearchedCaseExpression",
+    "keywords": "SEARCHED CASE EXPRESSION",
+    "count_in_corpus": 19,
+    "example": "CASE WHEN dep.REV_LOC_ID = 100200 THEN 'PCCMC' ELSE 'CCMC' END",
+    "status": "mapped",
+    "ruling": ""
+  },
+  {
+    "construct": "SearchedWhenClause",
+    "keywords": "SEARCHED WHEN CLAUSE",
+    "count_in_corpus": 37,
+    "example": "WHEN dep.REV_LOC_ID = 100200 THEN 'PCCMC'",
+    "status": "mapped",
+    "ruling": ""
+  },
+  {
+    "construct": "SecondaryRoleReplicaOption",
+    "keywords": "SECONDARY ROLE REPLICA OPTION",
+    "count_in_corpus": 0,
+    "example": "",
+    "status": "unseen",
+    "ruling": ""
+  },
+  {
+    "construct": "SecurityPolicyOption",
+    "keywords": "SECURITY POLICY OPTION",
+    "count_in_corpus": 0,
+    "example": "",
+    "status": "unseen",
+    "ruling": ""
+  },
+  {
+    "construct": "SecurityPredicateAction",
+    "keywords": "SECURITY PREDICATE ACTION",
+    "count_in_corpus": 0,
+    "example": "",
+    "status": "unseen",
+    "ruling": ""
+  },
+  {
+    "construct": "SecurityPrincipal",
+    "keywords": "SECURITY PRINCIPAL",
+    "count_in_corpus": 0,
+    "example": "",
+    "status": "unseen",
+    "ruling": ""
+  },
+  {
+    "construct": "SecurityTargetObject",
+    "keywords": "SECURITY TARGET OBJECT",
+    "count_in_corpus": 0,
+    "example": "",
+    "status": "unseen",
+    "ruling": ""
+  },
+  {
+    "construct": "SecurityTargetObjectName",
+    "keywords": "SECURITY TARGET OBJECT NAME",
+    "count_in_corpus": 0,
+    "example": "",
+    "status": "unseen",
+    "ruling": ""
+  },
+  {
+    "construct": "SecurityUserClause80",
+    "keywords": "SECURITY USER CLAUSE80",
+    "count_in_corpus": 0,
+    "example": "",
+    "status": "unseen",
+    "ruling": ""
+  },
+  {
+    "construct": "SelectFunctionReturnType",
+    "keywords": "SELECT FUNCTION RETURN TYPE",
+    "count_in_corpus": 0,
+    "example": "",
+    "status": "unseen",
+    "ruling": ""
+  },
+  {
+    "construct": "SelectInsertSource",
+    "keywords": "SELECT INSERT SOURCE",
+    "count_in_corpus": 0,
+    "example": "",
+    "status": "mapped",
+    "ruling": ""
+  },
+  {
+    "construct": "SelectScalarExpression",
+    "keywords": "SELECT SCALAR EXPRESSION",
+    "count_in_corpus": 234,
+    "example": "1",
+    "status": "mapped",
+    "ruling": ""
+  },
+  {
+    "construct": "SelectSetVariable",
+    "keywords": "SELECT SET VARIABLE",
+    "count_in_corpus": 0,
+    "example": "",
+    "status": "mapped",
+    "ruling": ""
+  },
+  {
+    "construct": "SelectStarExpression",
+    "keywords": "SELECT STAR EXPRESSION",
+    "count_in_corpus": 6,
+    "example": "*",
+    "status": "mapped",
+    "ruling": ""
+  },
+  {
+    "construct": "SelectStatement",
+    "keywords": "SELECT STATEMENT",
+    "count_in_corpus": 19,
+    "example": "SELECT adt.EVENT_TYPE_C as\t\t\t\t\t'Event Type',\n\t   adt.EVENT_SUBTYPE_C as\t\t\t\t'Event SubType',\n\t   adt.EFFECTIVE_TIME as\t\t\t",
+    "status": "mapped",
+    "ruling": ""
+  },
+  {
+    "construct": "SelectStatementSnippet",
+    "keywords": "SELECT STATEMENT SNIPPET",
+    "count_in_corpus": 0,
+    "example": "",
+    "status": "unseen",
+    "ruling": ""
+  },
+  {
+    "construct": "SelectiveXmlIndexPromotedPath",
+    "keywords": "SELECTIVE XML INDEX PROMOTED PATH",
+    "count_in_corpus": 0,
+    "example": "",
+    "status": "unseen",
+    "ruling": ""
+  },
+  {
+    "construct": "SemanticIndexChunkOption",
+    "keywords": "SEMANTIC INDEX CHUNK OPTION",
+    "count_in_corpus": 0,
+    "example": "",
+    "status": "unseen",
+    "ruling": ""
+  },
+  {
+    "construct": "SemanticIndexColumn",
+    "keywords": "SEMANTIC INDEX COLUMN",
+    "count_in_corpus": 0,
+    "example": "",
+    "status": "unseen",
+    "ruling": ""
+  },
+  {
+    "construct": "SemanticTableReference",
+    "keywords": "SEMANTIC TABLE REFERENCE",
+    "count_in_corpus": 0,
+    "example": "",
+    "status": "unseen",
+    "ruling": ""
+  },
+  {
+    "construct": "SendStatement",
+    "keywords": "SEND STATEMENT",
+    "count_in_corpus": 0,
+    "example": "",
+    "status": "unseen",
+    "ruling": ""
+  },
+  {
+    "construct": "SensitivityClassificationOption",
+    "keywords": "SENSITIVITY CLASSIFICATION OPTION",
+    "count_in_corpus": 0,
+    "example": "",
+    "status": "unseen",
+    "ruling": ""
+  },
+  {
+    "construct": "SequenceOption",
+    "keywords": "SEQUENCE OPTION",
+    "count_in_corpus": 0,
+    "example": "",
+    "status": "unseen",
+    "ruling": ""
+  },
+  {
+    "construct": "ServiceContract",
+    "keywords": "SERVICE CONTRACT",
+    "count_in_corpus": 0,
+    "example": "",
+    "status": "unseen",
+    "ruling": ""
+  },
+  {
+    "construct": "SessionTimeoutPayloadOption",
+    "keywords": "SESSION TIMEOUT PAYLOAD OPTION",
+    "count_in_corpus": 0,
+    "example": "",
+    "status": "unseen",
+    "ruling": ""
+  },
+  {
+    "construct": "SetCommandStatement",
+    "keywords": "SET COMMAND STATEMENT",
+    "count_in_corpus": 0,
+    "example": "",
+    "status": "unseen",
+    "ruling": ""
+  },
+  {
+    "construct": "SetErrorLevelStatement",
+    "keywords": "SET ERROR LEVEL STATEMENT",
+    "count_in_corpus": 0,
+    "example": "",
+    "status": "unseen",
+    "ruling": ""
+  },
+  {
+    "construct": "SetFipsFlaggerCommand",
+    "keywords": "SET FIPS FLAGGER COMMAND",
+    "count_in_corpus": 0,
+    "example": "",
+    "status": "unseen",
+    "ruling": ""
+  },
+  {
+    "construct": "SetIdentityInsertStatement",
+    "keywords": "SET IDENTITY INSERT STATEMENT",
+    "count_in_corpus": 0,
+    "example": "",
+    "status": "unseen",
+    "ruling": ""
+  },
+  {
+    "construct": "SetOffsetsStatement",
+    "keywords": "SET OFFSETS STATEMENT",
+    "count_in_corpus": 0,
+    "example": "",
+    "status": "unseen",
+    "ruling": ""
+  },
+  {
+    "construct": "SetRowCountStatement",
+    "keywords": "SET ROW COUNT STATEMENT",
+    "count_in_corpus": 0,
+    "example": "",
+    "status": "unseen",
+    "ruling": ""
+  },
+  {
+    "construct": "SetSearchPropertyListAlterFullTextIndexAction",
+    "keywords": "SET SEARCH PROPERTY LIST ALTER FULL TEXT INDEX ACTION",
+    "count_in_corpus": 0,
+    "example": "",
+    "status": "unseen",
+    "ruling": ""
+  },
+  {
+    "construct": "SetStatisticsStatement",
+    "keywords": "SET STATISTICS STATEMENT",
+    "count_in_corpus": 0,
+    "example": "",
+    "status": "unseen",
+    "ruling": ""
+  },
+  {
+    "construct": "SetStopListAlterFullTextIndexAction",
+    "keywords": "SET STOP LIST ALTER FULL TEXT INDEX ACTION",
+    "count_in_corpus": 0,
+    "example": "",
+    "status": "unseen",
+    "ruling": ""
+  },
+  {
+    "construct": "SetTextSizeStatement",
+    "keywords": "SET TEXT SIZE STATEMENT",
+    "count_in_corpus": 0,
+    "example": "",
+    "status": "unseen",
+    "ruling": ""
+  },
+  {
+    "construct": "SetTransactionIsolationLevelStatement",
+    "keywords": "SET TRANSACTION ISOLATION LEVEL STATEMENT",
+    "count_in_corpus": 2,
+    "example": "SET TRANSACTION ISOLATION LEVEL READ UNCOMMITTED;",
+    "status": "remainder",
+    "ruling": "accepted as remainder \u2014 session behavior, no table truth (Sunny, 2026-09-28)"
+  },
+  {
+    "construct": "SetUserStatement",
+    "keywords": "SET USER STATEMENT",
+    "count_in_corpus": 0,
+    "example": "",
+    "status": "unseen",
+    "ruling": ""
+  },
+  {
+    "construct": "SetVariableStatement",
+    "keywords": "SET VARIABLE STATEMENT",
+    "count_in_corpus": 8,
+    "example": "SET @SQL = '\nSELECT  \n\tDAY(CLARITY_ADT.EFFECTIVE_TIME) EFFECTIVE_DAY,'\n\t+@GROUP1 +' AS Group1,'\n\t+@GROUP2+ +' AS Group2,",
+    "status": "mapped",
+    "ruling": ""
+  },
+  {
+    "construct": "ShutdownStatement",
+    "keywords": "SHUTDOWN STATEMENT",
+    "count_in_corpus": 0,
+    "example": "",
+    "status": "unseen",
+    "ruling": ""
+  },
+  {
+    "construct": "SimpleAlterFullTextIndexAction",
+    "keywords": "SIMPLE ALTER FULL TEXT INDEX ACTION",
+    "count_in_corpus": 0,
+    "example": "",
+    "status": "unseen",
+    "ruling": ""
+  },
+  {
+    "construct": "SimpleCaseExpression",
+    "keywords": "SIMPLE CASE EXPRESSION",
+    "count_in_corpus": 0,
+    "example": "",
+    "status": "mapped",
+    "ruling": ""
+  },
+  {
+    "construct": "SimpleWhenClause",
+    "keywords": "SIMPLE WHEN CLAUSE",
+    "count_in_corpus": 0,
+    "example": "",
+    "status": "mapped",
+    "ruling": ""
+  },
+  {
+    "construct": "SingleValueTypeCopyOption",
+    "keywords": "SINGLE VALUE TYPE COPY OPTION",
+    "count_in_corpus": 0,
+    "example": "",
+    "status": "unseen",
+    "ruling": ""
+  },
+  {
+    "construct": "SizeFileDeclarationOption",
+    "keywords": "SIZE FILE DECLARATION OPTION",
+    "count_in_corpus": 0,
+    "example": "",
+    "status": "unseen",
+    "ruling": ""
+  },
+  {
+    "construct": "SoapMethod",
+    "keywords": "SOAP METHOD",
+    "count_in_corpus": 0,
+    "example": "",
+    "status": "unseen",
+    "ruling": ""
+  },
+  {
+    "construct": "SourceDeclaration",
+    "keywords": "SOURCE DECLARATION",
+    "count_in_corpus": 0,
+    "example": "",
+    "status": "unseen",
+    "ruling": ""
+  },
+  {
+    "construct": "SpatialIndexRegularOption",
+    "keywords": "SPATIAL INDEX REGULAR OPTION",
+    "count_in_corpus": 0,
+    "example": "",
+    "status": "unseen",
+    "ruling": ""
+  },
+  {
+    "construct": "SqlCommandIdentifier",
+    "keywords": "SQL COMMAND IDENTIFIER",
+    "count_in_corpus": 0,
+    "example": "",
+    "status": "unseen",
+    "ruling": ""
+  },
+  {
+    "construct": "SqlDataTypeReference",
+    "keywords": "SQL DATA TYPE REFERENCE",
+    "count_in_corpus": 62,
+    "example": "VARCHAR(MAX)",
+    "status": "mapped",
+    "ruling": ""
+  },
+  {
+    "construct": "StateAuditOption",
+    "keywords": "STATE AUDIT OPTION",
+    "count_in_corpus": 0,
+    "example": "",
+    "status": "unseen",
+    "ruling": ""
+  },
+  {
+    "construct": "StatementList",
+    "keywords": "STATEMENT LIST",
+    "count_in_corpus": 9,
+    "example": "BEGIN\n\n-- SET NOCOUNT ON added to prevent extra result sets from\n-- interfering with SELECT statements.\nSET NOCOUNT ON;\n",
+    "status": "mapped",
+    "ruling": ""
+  },
+  {
+    "construct": "StatementListSnippet",
+    "keywords": "STATEMENT LIST SNIPPET",
+    "count_in_corpus": 0,
+    "example": "",
+    "status": "unseen",
+    "ruling": ""
+  },
+  {
+    "construct": "StatisticsOption",
+    "keywords": "STATISTICS OPTION",
+    "count_in_corpus": 0,
+    "example": "",
+    "status": "unseen",
+    "ruling": ""
+  },
+  {
+    "construct": "StatisticsPartitionRange",
+    "keywords": "STATISTICS PARTITION RANGE",
+    "count_in_corpus": 0,
+    "example": "",
+    "status": "unseen",
+    "ruling": ""
+  },
+  {
+    "construct": "StopListFullTextIndexOption",
+    "keywords": "STOP LIST FULL TEXT INDEX OPTION",
+    "count_in_corpus": 0,
+    "example": "",
+    "status": "unseen",
+    "ruling": ""
+  },
+  {
+    "construct": "StopRestoreOption",
+    "keywords": "STOP RESTORE OPTION",
+    "count_in_corpus": 0,
+    "example": "",
+    "status": "unseen",
+    "ruling": ""
+  },
+  {
+    "construct": "StringLiteral",
+    "keywords": "STRING LITERAL",
+    "count_in_corpus": 182,
+    "example": "'639001'",
+    "status": "mapped",
+    "ruling": ""
+  },
+  {
+    "construct": "SubqueryComparisonPredicate",
+    "keywords": "SUBQUERY COMPARISON PREDICATE",
+    "count_in_corpus": 0,
+    "example": "",
+    "status": "unseen",
+    "ruling": ""
+  },
+  {
+    "construct": "SystemTimePeriodDefinition",
+    "keywords": "SYSTEM TIME PERIOD DEFINITION",
+    "count_in_corpus": 0,
+    "example": "",
+    "status": "unseen",
+    "ruling": ""
+  },
+  {
+    "construct": "SystemVersioningTableOption",
+    "keywords": "SYSTEM VERSIONING TABLE OPTION",
+    "count_in_corpus": 0,
+    "example": "",
+    "status": "unseen",
+    "ruling": ""
+  },
+  {
+    "construct": "TSEqualCall",
+    "keywords": "TSEQUAL CALL",
+    "count_in_corpus": 0,
+    "example": "",
+    "status": "unseen",
+    "ruling": ""
+  },
+  {
+    "construct": "TSqlBatch",
+    "keywords": "TSQL BATCH",
+    "count_in_corpus": 14,
+    "example": "CREATE             PROCEDURE [schema1].[USP_ADT_MONTHLY_INPATIENT_CENSUS_TOTALS_SSRS]\n\n-- Add the parameters for the sto",
+    "status": "mapped",
+    "ruling": ""
+  },
+  {
+    "construct": "TSqlFragmentSnippet",
+    "keywords": "TSQL FRAGMENT SNIPPET",
+    "count_in_corpus": 0,
+    "example": "",
+    "status": "unseen",
+    "ruling": ""
+  },
+  {
+    "construct": "TSqlScript",
+    "keywords": "TSQL SCRIPT",
+    "count_in_corpus": 8,
+    "example": "\n-- =============================================\n-- Revise Date:    11/4/2022\n-- Description:    This stored procedure ",
+    "status": "mapped",
+    "ruling": ""
+  },
+  {
+    "construct": "TSqlStatementSnippet",
+    "keywords": "TSQL STATEMENT SNIPPET",
+    "count_in_corpus": 0,
+    "example": "",
+    "status": "unseen",
+    "ruling": ""
+  },
+  {
+    "construct": "TableClusteredIndexType",
+    "keywords": "TABLE CLUSTERED INDEX TYPE",
+    "count_in_corpus": 0,
+    "example": "",
+    "status": "unseen",
+    "ruling": ""
+  },
+  {
+    "construct": "TableDataCompressionOption",
+    "keywords": "TABLE DATA COMPRESSION OPTION",
+    "count_in_corpus": 0,
+    "example": "",
+    "status": "unseen",
+    "ruling": ""
+  },
+  {
+    "construct": "TableDefinition",
+    "keywords": "TABLE DEFINITION",
+    "count_in_corpus": 0,
+    "example": "",
+    "status": "unseen",
+    "ruling": ""
+  },
+  {
+    "construct": "TableDistributionOption",
+    "keywords": "TABLE DISTRIBUTION OPTION",
+    "count_in_corpus": 0,
+    "example": "",
+    "status": "unseen",
+    "ruling": ""
+  },
+  {
+    "construct": "TableHashDistributionPolicy",
+    "keywords": "TABLE HASH DISTRIBUTION POLICY",
+    "count_in_corpus": 0,
+    "example": "",
+    "status": "unseen",
+    "ruling": ""
+  },
+  {
+    "construct": "TableHint",
+    "keywords": "TABLE HINT",
+    "count_in_corpus": 0,
+    "example": "",
+    "status": "unseen",
+    "ruling": ""
+  },
+  {
+    "construct": "TableHintsOptimizerHint",
+    "keywords": "TABLE HINTS OPTIMIZER HINT",
+    "count_in_corpus": 0,
+    "example": "",
+    "status": "unseen",
+    "ruling": ""
+  },
+  {
+    "construct": "TableIndexOption",
+    "keywords": "TABLE INDEX OPTION",
+    "count_in_corpus": 0,
+    "example": "",
+    "status": "unseen",
+    "ruling": ""
+  },
+  {
+    "construct": "TableNonClusteredIndexType",
+    "keywords": "TABLE NON CLUSTERED INDEX TYPE",
+    "count_in_corpus": 0,
+    "example": "",
+    "status": "unseen",
+    "ruling": ""
+  },
+  {
+    "construct": "TablePartitionOption",
+    "keywords": "TABLE PARTITION OPTION",
+    "count_in_corpus": 0,
+    "example": "",
+    "status": "unseen",
+    "ruling": ""
+  },
+  {
+    "construct": "TablePartitionOptionSpecifications",
+    "keywords": "TABLE PARTITION OPTION SPECIFICATIONS",
+    "count_in_corpus": 0,
+    "example": "",
+    "status": "unseen",
+    "ruling": ""
+  },
+  {
+    "construct": "TableReplicateDistributionPolicy",
+    "keywords": "TABLE REPLICATE DISTRIBUTION POLICY",
+    "count_in_corpus": 0,
+    "example": "",
+    "status": "unseen",
+    "ruling": ""
+  },
+  {
+    "construct": "TableRoundRobinDistributionPolicy",
+    "keywords": "TABLE ROUND ROBIN DISTRIBUTION POLICY",
+    "count_in_corpus": 0,
+    "example": "",
+    "status": "unseen",
+    "ruling": ""
+  },
+  {
+    "construct": "TableSampleClause",
+    "keywords": "TABLE SAMPLE CLAUSE",
+    "count_in_corpus": 0,
+    "example": "",
+    "status": "unseen",
+    "ruling": ""
+  },
+  {
+    "construct": "TableValuedFunctionReturnType",
+    "keywords": "TABLE VALUED FUNCTION RETURN TYPE",
+    "count_in_corpus": 0,
+    "example": "",
+    "status": "unseen",
+    "ruling": ""
+  },
+  {
+    "construct": "TableXmlCompressionOption",
+    "keywords": "TABLE XML COMPRESSION OPTION",
+    "count_in_corpus": 0,
+    "example": "",
+    "status": "unseen",
+    "ruling": ""
+  },
+  {
+    "construct": "TargetDeclaration",
+    "keywords": "TARGET DECLARATION",
+    "count_in_corpus": 0,
+    "example": "",
+    "status": "unseen",
+    "ruling": ""
+  },
+  {
+    "construct": "TargetRecoveryTimeDatabaseOption",
+    "keywords": "TARGET RECOVERY TIME DATABASE OPTION",
+    "count_in_corpus": 0,
+    "example": "",
+    "status": "unseen",
+    "ruling": ""
+  },
+  {
+    "construct": "TemporalClause",
+    "keywords": "TEMPORAL CLAUSE",
+    "count_in_corpus": 0,
+    "example": "",
+    "status": "unseen",
+    "ruling": ""
+  },
+  {
+    "construct": "ThrowStatement",
+    "keywords": "THROW STATEMENT",
+    "count_in_corpus": 0,
+    "example": "",
+    "status": "unseen",
+    "ruling": ""
+  },
+  {
+    "construct": "TopRowFilter",
+    "keywords": "TOP ROW FILTER",
+    "count_in_corpus": 0,
+    "example": "",
+    "status": "unseen",
+    "ruling": ""
+  },
+  {
+    "construct": "TriggerAction",
+    "keywords": "TRIGGER ACTION",
+    "count_in_corpus": 0,
+    "example": "",
+    "status": "unseen",
+    "ruling": ""
+  },
+  {
+    "construct": "TriggerObject",
+    "keywords": "TRIGGER OBJECT",
+    "count_in_corpus": 0,
+    "example": "",
+    "status": "unseen",
+    "ruling": ""
+  },
+  {
+    "construct": "TriggerOption",
+    "keywords": "TRIGGER OPTION",
+    "count_in_corpus": 0,
+    "example": "",
+    "status": "unseen",
+    "ruling": ""
+  },
+  {
+    "construct": "TruncateTableStatement",
+    "keywords": "TRUNCATE TABLE STATEMENT",
+    "count_in_corpus": 0,
+    "example": "",
+    "status": "unseen",
+    "ruling": ""
+  },
+  {
+    "construct": "TruncateTargetTableSwitchOption",
+    "keywords": "TRUNCATE TARGET TABLE SWITCH OPTION",
+    "count_in_corpus": 0,
+    "example": "",
+    "status": "unseen",
+    "ruling": ""
+  },
+  {
+    "construct": "TryCastCall",
+    "keywords": "TRY CAST CALL",
+    "count_in_corpus": 0,
+    "example": "",
+    "status": "mapped",
+    "ruling": ""
+  },
+  {
+    "construct": "TryCatchStatement",
+    "keywords": "TRY CATCH STATEMENT",
+    "count_in_corpus": 0,
+    "example": "",
+    "status": "unseen",
+    "ruling": ""
+  },
+  {
+    "construct": "TryConvertCall",
+    "keywords": "TRY CONVERT CALL",
+    "count_in_corpus": 2,
+    "example": "TRY_CONVERT(DATETIME,@TillDate)",
+    "status": "mapped",
+    "ruling": ""
+  },
+  {
+    "construct": "TryParseCall",
+    "keywords": "TRY PARSE CALL",
+    "count_in_corpus": 0,
+    "example": "",
+    "status": "unseen",
+    "ruling": ""
+  },
+  {
+    "construct": "UnaryExpression",
+    "keywords": "UNARY EXPRESSION",
+    "count_in_corpus": 6,
+    "example": "-24",
+    "status": "mapped",
+    "ruling": ""
+  },
+  {
+    "construct": "UniqueConstraintDefinition",
+    "keywords": "UNIQUE CONSTRAINT DEFINITION",
+    "count_in_corpus": 0,
+    "example": "",
+    "status": "unseen",
+    "ruling": ""
+  },
+  {
+    "construct": "UnpivotedTableReference",
+    "keywords": "UNPIVOTED TABLE REFERENCE",
+    "count_in_corpus": 0,
+    "example": "",
+    "status": "unseen",
+    "ruling": ""
+  },
+  {
+    "construct": "UnqualifiedJoin",
+    "keywords": "UNQUALIFIED JOIN",
+    "count_in_corpus": 0,
+    "example": "",
+    "status": "mapped",
+    "ruling": ""
+  },
+  {
+    "construct": "UpdateCall",
+    "keywords": "UPDATE CALL",
+    "count_in_corpus": 0,
+    "example": "",
+    "status": "unseen",
+    "ruling": ""
+  },
+  {
+    "construct": "UpdateForClause",
+    "keywords": "UPDATE FOR CLAUSE",
+    "count_in_corpus": 0,
+    "example": "",
+    "status": "unseen",
+    "ruling": ""
+  },
+  {
+    "construct": "UpdateMergeAction",
+    "keywords": "UPDATE MERGE ACTION",
+    "count_in_corpus": 0,
+    "example": "",
+    "status": "unseen",
+    "ruling": ""
+  },
+  {
+    "construct": "UpdateSpecification",
+    "keywords": "UPDATE SPECIFICATION",
+    "count_in_corpus": 0,
+    "example": "",
+    "status": "unseen",
+    "ruling": ""
+  },
+  {
+    "construct": "UpdateStatement",
+    "keywords": "UPDATE STATEMENT",
+    "count_in_corpus": 0,
+    "example": "",
+    "status": "unseen",
+    "ruling": ""
+  },
+  {
+    "construct": "UpdateStatisticsStatement",
+    "keywords": "UPDATE STATISTICS STATEMENT",
+    "count_in_corpus": 0,
+    "example": "",
+    "status": "unseen",
+    "ruling": ""
+  },
+  {
+    "construct": "UpdateTextStatement",
+    "keywords": "UPDATE TEXT STATEMENT",
+    "count_in_corpus": 0,
+    "example": "",
+    "status": "unseen",
+    "ruling": ""
+  },
+  {
+    "construct": "UseFederationStatement",
+    "keywords": "USE FEDERATION STATEMENT",
+    "count_in_corpus": 0,
+    "example": "",
+    "status": "unseen",
+    "ruling": ""
+  },
+  {
+    "construct": "UseHintList",
+    "keywords": "USE HINT LIST",
+    "count_in_corpus": 0,
+    "example": "",
+    "status": "unseen",
+    "ruling": ""
+  },
+  {
+    "construct": "UseStatement",
+    "keywords": "USE STATEMENT",
+    "count_in_corpus": 2,
+    "example": "USE [CookClarity]",
+    "status": "mapped",
+    "ruling": ""
+  },
+  {
+    "construct": "UserDataTypeReference",
+    "keywords": "USER DATA TYPE REFERENCE",
+    "count_in_corpus": 0,
+    "example": "",
+    "status": "mapped",
+    "ruling": ""
+  },
+  {
+    "construct": "UserDefinedTypeCallTarget",
+    "keywords": "USER DEFINED TYPE CALL TARGET",
+    "count_in_corpus": 0,
+    "example": "",
+    "status": "unseen",
+    "ruling": ""
+  },
+  {
+    "construct": "UserDefinedTypePropertyAccess",
+    "keywords": "USER DEFINED TYPE PROPERTY ACCESS",
+    "count_in_corpus": 0,
+    "example": "",
+    "status": "unseen",
+    "ruling": ""
+  },
+  {
+    "construct": "UserLoginOption",
+    "keywords": "USER LOGIN OPTION",
+    "count_in_corpus": 0,
+    "example": "",
+    "status": "unseen",
+    "ruling": ""
+  },
+  {
+    "construct": "UserRemoteServiceBindingOption",
+    "keywords": "USER REMOTE SERVICE BINDING OPTION",
+    "count_in_corpus": 0,
+    "example": "",
+    "status": "unseen",
+    "ruling": ""
+  },
+  {
+    "construct": "ValuesInsertSource",
+    "keywords": "VALUES INSERT SOURCE",
+    "count_in_corpus": 0,
+    "example": "",
+    "status": "unseen",
+    "ruling": ""
+  },
+  {
+    "construct": "VariableMethodCallTableReference",
+    "keywords": "VARIABLE METHOD CALL TABLE REFERENCE",
+    "count_in_corpus": 0,
+    "example": "",
+    "status": "unseen",
+    "ruling": ""
+  },
+  {
+    "construct": "VariableReference",
+    "keywords": "VARIABLE REFERENCE",
+    "count_in_corpus": 70,
+    "example": "@Location",
+    "status": "mapped",
+    "ruling": ""
+  },
+  {
+    "construct": "VariableTableReference",
+    "keywords": "VARIABLE TABLE REFERENCE",
+    "count_in_corpus": 0,
+    "example": "",
+    "status": "mapped",
+    "ruling": ""
+  },
+  {
+    "construct": "VariableValuePair",
+    "keywords": "VARIABLE VALUE PAIR",
+    "count_in_corpus": 0,
+    "example": "",
+    "status": "unseen",
+    "ruling": ""
+  },
+  {
+    "construct": "VectorDataTypeReference",
+    "keywords": "VECTOR DATA TYPE REFERENCE",
+    "count_in_corpus": 0,
+    "example": "",
+    "status": "unseen",
+    "ruling": ""
+  },
+  {
+    "construct": "VectorMetricIndexOption",
+    "keywords": "VECTOR METRIC INDEX OPTION",
+    "count_in_corpus": 0,
+    "example": "",
+    "status": "unseen",
+    "ruling": ""
+  },
+  {
+    "construct": "VectorSearchTableReference",
+    "keywords": "VECTOR SEARCH TABLE REFERENCE",
+    "count_in_corpus": 0,
+    "example": "",
+    "status": "unseen",
+    "ruling": ""
+  },
+  {
+    "construct": "VectorTypeIndexOption",
+    "keywords": "VECTOR TYPE INDEX OPTION",
+    "count_in_corpus": 0,
+    "example": "",
+    "status": "unseen",
+    "ruling": ""
+  },
+  {
+    "construct": "ViewDistributionOption",
+    "keywords": "VIEW DISTRIBUTION OPTION",
+    "count_in_corpus": 0,
+    "example": "",
+    "status": "unseen",
+    "ruling": ""
+  },
+  {
+    "construct": "ViewForAppendOption",
+    "keywords": "VIEW FOR APPEND OPTION",
+    "count_in_corpus": 0,
+    "example": "",
+    "status": "unseen",
+    "ruling": ""
+  },
+  {
+    "construct": "ViewHashDistributionPolicy",
+    "keywords": "VIEW HASH DISTRIBUTION POLICY",
+    "count_in_corpus": 0,
+    "example": "",
+    "status": "unseen",
+    "ruling": ""
+  },
+  {
+    "construct": "ViewOption",
+    "keywords": "VIEW OPTION",
+    "count_in_corpus": 0,
+    "example": "",
+    "status": "unseen",
+    "ruling": ""
+  },
+  {
+    "construct": "ViewRoundRobinDistributionPolicy",
+    "keywords": "VIEW ROUND ROBIN DISTRIBUTION POLICY",
+    "count_in_corpus": 0,
+    "example": "",
+    "status": "unseen",
+    "ruling": ""
+  },
+  {
+    "construct": "WaitAtLowPriorityOption",
+    "keywords": "WAIT AT LOW PRIORITY OPTION",
+    "count_in_corpus": 0,
+    "example": "",
+    "status": "unseen",
+    "ruling": ""
+  },
+  {
+    "construct": "WaitForStatement",
+    "keywords": "WAIT FOR STATEMENT",
+    "count_in_corpus": 0,
+    "example": "",
+    "status": "unseen",
+    "ruling": ""
+  },
+  {
+    "construct": "WhereClause",
+    "keywords": "WHERE CLAUSE",
+    "count_in_corpus": 24,
+    "example": "WHERE adt.EVENT_TYPE_C = '6'\nand adt.EFFECTIVE_TIME >= @StartDate\nand adt.EFFECTIVE_TIME < DATEADD(D, 1, @EndDate)\nand a",
+    "status": "mapped",
+    "ruling": ""
+  },
+  {
+    "construct": "WhileStatement",
+    "keywords": "WHILE STATEMENT",
+    "count_in_corpus": 0,
+    "example": "",
+    "status": "mapped",
+    "ruling": ""
+  },
+  {
+    "construct": "WindowClause",
+    "keywords": "WINDOW CLAUSE",
+    "count_in_corpus": 0,
+    "example": "",
+    "status": "unseen",
+    "ruling": ""
+  },
+  {
+    "construct": "WindowDefinition",
+    "keywords": "WINDOW DEFINITION",
+    "count_in_corpus": 0,
+    "example": "",
+    "status": "unseen",
+    "ruling": ""
+  },
+  {
+    "construct": "WindowDelimiter",
+    "keywords": "WINDOW DELIMITER",
+    "count_in_corpus": 0,
+    "example": "",
+    "status": "unseen",
+    "ruling": ""
+  },
+  {
+    "construct": "WindowFrameClause",
+    "keywords": "WINDOW FRAME CLAUSE",
+    "count_in_corpus": 0,
+    "example": "",
+    "status": "unseen",
+    "ruling": ""
+  },
+  {
+    "construct": "WindowsCreateLoginSource",
+    "keywords": "WINDOWS CREATE LOGIN SOURCE",
+    "count_in_corpus": 0,
+    "example": "",
+    "status": "unseen",
+    "ruling": ""
+  },
+  {
+    "construct": "WithCtesAndXmlNamespaces",
+    "keywords": "WITH CTES AND XML NAMESPACES",
+    "count_in_corpus": 4,
+    "example": "with month_cte as\n(select datepart(day, Max(adt.EFFECTIVE_TIME)) as 'CurrentMonth' \n\tfrom Clarity.dbo.CLARITY_ADT adt\n\tw",
+    "status": "mapped",
+    "ruling": ""
+  },
+  {
+    "construct": "WithinGroupClause",
+    "keywords": "WITHIN GROUP CLAUSE",
+    "count_in_corpus": 2,
+    "example": "WITHIN GROUP(ORDER BY [lang].PAT_RELATIONSHIP_ID)",
+    "status": "mapped",
+    "ruling": ""
+  },
+  {
+    "construct": "WitnessDatabaseOption",
+    "keywords": "WITNESS DATABASE OPTION",
+    "count_in_corpus": 0,
+    "example": "",
+    "status": "unseen",
+    "ruling": ""
+  },
+  {
+    "construct": "WlmTimeLiteral",
+    "keywords": "WLM TIME LITERAL",
+    "count_in_corpus": 0,
+    "example": "",
+    "status": "unseen",
+    "ruling": ""
+  },
+  {
+    "construct": "WorkloadGroupImportanceParameter",
+    "keywords": "WORKLOAD GROUP IMPORTANCE PARAMETER",
+    "count_in_corpus": 0,
+    "example": "",
+    "status": "unseen",
+    "ruling": ""
+  },
+  {
+    "construct": "WorkloadGroupResourceParameter",
+    "keywords": "WORKLOAD GROUP RESOURCE PARAMETER",
+    "count_in_corpus": 0,
+    "example": "",
+    "status": "unseen",
+    "ruling": ""
+  },
+  {
+    "construct": "WriteTextStatement",
+    "keywords": "WRITE TEXT STATEMENT",
+    "count_in_corpus": 0,
+    "example": "",
+    "status": "unseen",
+    "ruling": ""
+  },
+  {
+    "construct": "WsdlPayloadOption",
+    "keywords": "WSDL PAYLOAD OPTION",
+    "count_in_corpus": 0,
+    "example": "",
+    "status": "unseen",
+    "ruling": ""
+  },
+  {
+    "construct": "XmlCompressionOption",
+    "keywords": "XML COMPRESSION OPTION",
+    "count_in_corpus": 0,
+    "example": "",
+    "status": "unseen",
+    "ruling": ""
+  },
+  {
+    "construct": "XmlDataTypeReference",
+    "keywords": "XML DATA TYPE REFERENCE",
+    "count_in_corpus": 0,
+    "example": "",
+    "status": "unseen",
+    "ruling": ""
+  },
+  {
+    "construct": "XmlForClause",
+    "keywords": "XML FOR CLAUSE",
+    "count_in_corpus": 0,
+    "example": "",
+    "status": "unseen",
+    "ruling": ""
+  },
+  {
+    "construct": "XmlForClauseOption",
+    "keywords": "XML FOR CLAUSE OPTION",
+    "count_in_corpus": 0,
+    "example": "",
+    "status": "unseen",
+    "ruling": ""
+  },
+  {
+    "construct": "XmlNamespaces",
+    "keywords": "XML NAMESPACES",
+    "count_in_corpus": 0,
+    "example": "",
+    "status": "unseen",
+    "ruling": ""
+  },
+  {
+    "construct": "XmlNamespacesAliasElement",
+    "keywords": "XML NAMESPACES ALIAS ELEMENT",
+    "count_in_corpus": 0,
+    "example": "",
+    "status": "unseen",
+    "ruling": ""
+  },
+  {
+    "construct": "XmlNamespacesDefaultElement",
+    "keywords": "XML NAMESPACES DEFAULT ELEMENT",
+    "count_in_corpus": 0,
+    "example": "",
+    "status": "unseen",
+    "ruling": ""
+  }
+]

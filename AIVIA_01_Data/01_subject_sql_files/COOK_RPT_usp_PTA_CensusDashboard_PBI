@@ -10,10 +10,10 @@ Date			Who						Description
 06/14/2022					Power BI Conversion - ZD#1592077
 09/05/2025					Added Age columns to allow them to get numbers by age
 07/06/2026                              Added Discharge disposition
-==================================================================================
+==================================================================================*/
 
 
-CREATE   PROCEDURE [schema1].[usp_PTA_CensusDashboard_PBI]
+CREATE   PROCEDURE [COOK_RPT].[usp_PTA_CensusDashboard_PBI]
                             
 AS
 

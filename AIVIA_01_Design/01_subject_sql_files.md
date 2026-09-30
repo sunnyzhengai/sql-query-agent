@@ -35,3 +35,12 @@ Fabric
     F19: Packages arrive in Fabric via a Fabric Environment item with pinned versions matching local (openai==3.19.2) — not per-notebook %pip install.
     F20: All paths and the key location are parameters/contract facts, never written inside code — the notebook passes lakehouse paths to the same functions we tested locally.
     F21: notebook definitions sync from AIVIA_01_Code via the sync script; running stays by my hand
+
+    Your commands, once you grab the notebook's item id from its URL (open the notebook; the id follows /synapsenotebooks/):
+
+# wheel + notebook together (the F21 one-command path):
+/opt/homebrew/bin/python3.11 AIVIA_01_Code/sync_wheel.py --workspace 23112b57-368a-46ed-941b-c10e3baad392 --environment 1b87c0e2-f56c-4253-9933-fb7a60db181d --notebook <notebook-item-id>
+
+# notebook only (no wheel build, no publish question):
+/opt/homebrew/bin/python3.11 AIVIA_01_Code/sync_notebook.py --workspace 23112b57-368a-46ed-941b-c10e3baad392 --notebook <notebook-item-id> --source AIVIA_01_Code/notebook_f11_load_lh_table.py
+

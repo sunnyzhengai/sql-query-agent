@@ -1,106 +1,41 @@
 # AIVIA — sql-query-agent
-
-Three-layer graph RAG over EMR SQL estates (Delta tables + Fabric
-Graph). The graph stores what the SQL MEANS; every stored English
-text is projected from ruled sources, never invented. Sunny is
-the sole human authority; his rulings are law.
+Owner: Sunny Zheng (she)
+Development Principle: Each development phase is independently designed, developed and tested. No mockups or shortcuts. All development is dynamic and can be shipped to enterprise customers without breaking down.
+Development Discipline: Sunny defines the phase, data contract, test cases. Claude reviews and understands these documents. Claude gives advice to Sunny, and discuss the plan until both agree. Claude develops and tests until all pass.
+Development Process: Design, plan and develop locally. Then move code and data to Fabric. 
 
 ## THE CHANGE PROCESS — mandatory, before ANY code change
-
-Full process: `AIVIA_Design/Ruling_Change_Process.md`. Contracts:
-`AIVIA_Design/Contract_*.md`. Do not rely on memory — READ THEM.
-
-1. **CLASSIFY** the change: planned addition (fills a declared
-   OPEN slot) · unplanned addition (needs a ruling first) ·
-   update (to something DECIDED) · fix (code returns to design).
-   Fits none cleanly → that is an ambiguity → Sunny rules first.
-2. **QUERY the contract tables** (the planning questions — ask
-   ALL of them, every time):
-   - Which design sections GOVERN the thing I'm changing? Do any
-     OTHER ruled sections already cover this behavior? (conflict
-     row → Sunny decides)
-   - Who is the ONE writer of each field touched?
-   - Who CONSUMES it — which surfaces, which exports, which
-     renderers? Does each consumer see the change?
-   - Does served/Fabric data change? (→ Sunny's load, his hand)
-   - Which tests re-verify each consumer? Which tests are written
-     FIRST for the new behavior?
-   - Is any real source not ready yet? → THE PLACEHOLDER LAW: the
-     placeholder ships WITH a test that fails when the real
-     source arrives. Never naked.
-3. **BRIEF** — present to Sunny before code: class, claims (ds
-   ids), computed impacts, every ambiguity. Template:
-   `AIVIA_Design/briefs/Brief_TEMPLATE.md`.
-4. **SUNNY RULES every ambiguity.** An OPEN ambiguity blocks
-   code. Never code under assumption; never take a shortcut in
-   place of a ruling. Quote his words in the brief.
-5. **BUILD in fixed order**: registry/contract rows (via the
-   converter) → tests first → code → full suite + lint → export
-   regen if store data changed → Sunny's load if served data
-   changed → close with declared-vs-actual file diff.
+All work is done in the sunnyzheng/sql-query-agent/AIVIA_01_* folders.
+Sunny is the only author for AIVIA_01_Design/, AIVIA_01_Data/ folders.
+Claude can edit or author in AIVIA_01_Code/, AIVIA_01_Test/ folders.
+Claude needs permission from Sunny to create, update any files and folders.
 
 ## Standing laws (bind every change)
-
-- **Verbatim law**: stored text == recomputed text, byte-exact.
-- **One home of meaning**: one writer per field; a new answer to
-  a ruled question lands IN the ruled row, never beside it.
-- **Derivable is never stored.**
-- **Same breath**: registry rows, INDEX lines, doc stamps, and
-  contract rows move in the SAME commit as the change.
-- **Registry JSONs are GENERATED** — edit
-  `AIVIA_Design/registries/convert_from_xlsx.py`, rerun it; never
-  hand-edit the JSONs (a determinism test enforces this).
-- **Test-first**: pins authored before the mechanism, expected to
-  fail, then green.
-- **No Fabric/capacity operation without Sunny's explicit go** —
-  one refresh per batch, his hand or his word. Same for any
-  paid API call (embedding recording: `AISQL_RECORD=1`, his run).
-- **Verdicts land immediately**: a ruling made in conversation is
-  written to the ledger/registries/docs the moment it's made.
-- **Findings are rows**: anything discovered while populating or
-  querying contracts lands in a FINDINGS table, never only chat.
+In chat session, Sunny gives instruction on which phase to build.
+Before building a phase, Sunny and Claude plan together to document and agree on:
+- AIVIA_01_Design/##_<phase name>.md: documents all design decisions. Claude reviews and asks questions to fully understand what to build.
+- AIVIA_01_Design/##_<phase name>_data_contract.md: documents input, output, definitions and authorship.
+- AIVIA_01_Test/test_##_<data_contract>.py: documents all Claude created tests.
+- AIVIA_01_Test/test_##_<data_contract>_sunny.md: documents Sunny's hand written test cases. Claude updates with the manual test command Sunny needs to use to run these tests after build.
+Claude writes one code file at a time.
+Claude writes pseudo code as comments in AIVIA_01_Code/ folder code file first.
+Sunny reviews the pseudo code and approves or asks questions until both agree.
+Claude writes the actual code right after the commented pseudo code.
+Tests red before code, verbatim pytest results, Sunny validates by running the same command and eyeballing the artifacts.
+Claude tests the two test suites (Sunny's and Claude's) and code until all test results are green.
+Chat rulings land in the phase docs the same day.
+All LLM calls use paid API calls, no fake calls.
 
 ## Where truth lives
 
-| what | where |
-|---|---|
-| the change process | AIVIA_Design/Ruling_Change_Process.md |
-| data + surface contracts (queryable rows) | AIVIA_Design/Contract_Technical_Layer.md · Contract_Logic_Layer.md (more layers to come) |
-| briefs (one per change) | AIVIA_Design/briefs/ |
-| the chronological ledger (history, never current law) | AIVIA_Design/Manifest_Build.md |
-| ruled design (state) | AIVIA_Design/Design_Graph_Engine.md · Design_Chatbot.md · Grammar_Floor.md |
-| registries (code-consumed) | AIVIA_Design/registries/*.json ← generated by convert_from_xlsx.py |
-| Fabric gate queries + answer key | AIVIA_Test/GQL_Gates.md · AIVIA_Product/estates/ed_sepsis_dev/expected_m_gates.json |
-| doc naming law + doc index | AIVIA_Design/INDEX.md (new design file → new INDEX line, same breath) |
 
 ## Working with Sunny
 
-- **Plain words, always. No jargon. NO METAPHORS** — use the
-  actual names of actual things and quote real stored text.
-- He asks exhaustive follow-up questions, one item at a time —
-  guide him until he has no further questions; never rush to the
-  next item; answer the exact question asked first.
-- Anything he executes by hand: plain NUMBERED steps, one action
-  per step, say what "good" looks like.
-- Model the interactions of design/data/registries as keyed
-  tables; his plans run as queries over them.
-- Announce anything that runs >1 minute before running it.
 
 ## Operational facts
+- The one Python: /opt/homebrew/bin/python3.11 runs all tests and scripts — never Apple's Python, never a venv.
+- The test command: /opt/homebrew/bin/python3.11 -m pytest AIVIA_01_Test/ -v
+- Installed packages, pinned: openai 3.19.2, pytest 9.1.1, ruff 0.16.3, pythonnet 3.1.0.
+- ScriptDom (ADR 0001, the only T-SQL parser): DLL at libs/Microsoft.SqlServer.TransactSql.ScriptDom.dll (18.0.78.1, tracked in git); .NET 8 runtime at ~/.dotnet (the loader asserts DOTNET_ROOT only if that folder exists); the one parse door is AIVIA_01_Code/scriptdom_loader.py — no other file instantiates the parser (test-locked).
+- The OPENAI_API_KEY lives in .env at repo root (local development).
 
-- Tests + anything touching ScriptDom: `/opt/homebrew/bin/python3.11`
-  (never .venv or system python). Full suite ≈ 11 min:
-  `python3.11 -m pytest tests AIVIA_Test -q`.
-- Ruff before any push, ALWAYS UNCACHED (`python3.11 -m ruff
-  check --no-cache`) — a stale cache said "all passed" on files
-  CI failed (F13, 2026-09-20); pytest green ≠ CI green. Two
-  E501s in convert_from_xlsx.py pre-exist.
-- `OPENAI_API_KEY` lives in `.env` at repo root — `_env_key()`
-  reads it automatically; never tell Sunny to "set his key".
-- Tests replay RECORDED embedding vectors
-  (AIVIA_Product/fixtures/embeddings/…json.gz). New searchable
-  sentences → RecordingGap errors → Sunny runs
-  `AISQL_RECORD=1 python3.11 -m pytest tests AIVIA_Test -q`.
-- The graph visual republishes to the SAME artifact URL each
-  ladder step (devtools/graph_visual/generate_m1.py).
-- Branch: work on `dev`. Commit/push only at Sunny's word.

@@ -124,6 +124,19 @@ def test_the_gate_guards_itself(project):
     assert edit(project, "devtools/change_gate.py").returncode == 2
 
 
+def test_aivia_01_estate_is_not_gated(project):
+    """Brief_AIVIA_01_Gate_Carveout (ruled 2026-09-26, option B):
+    AIVIA_01_Code/ and AIVIA_01_Test/ answer to CLAUDE.md's chat-
+    permission process, not the brief gate; the Sunny-only folders
+    AIVIA_01_Design/ and AIVIA_01_Data/ stay covered for code files."""
+    for rel in ("AIVIA_01_Code/build_data_sheet.py",
+                "AIVIA_01_Test/test_data_contract.py",
+                "AIVIA_01_Code/nested/helper.ipynb"):
+        assert edit(project, rel).returncode == 0, rel
+    for rel in ("AIVIA_01_Design/stray.py", "AIVIA_01_Data/stray.py"):
+        assert edit(project, rel).returncode == 2, rel
+
+
 def test_notebook_edits_are_gated(project):
     r = run_gate(project, "NotebookEdit", "notebook_path",
                  str(project / "pipeline.ipynb"))

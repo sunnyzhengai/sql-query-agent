@@ -70,3 +70,8 @@ AIVIA_Product/estates/work_*/
 aisql/_registries/
 aisql/_libs/
 aisql/_source_packs/
+
+# Phase 02 regenerable embedding sheets — too large for git (254MB / 1.1GB),
+# rebuilt from the csvs by build_dictionary_sheets.py (reuse law)
+AIVIA_01_Data/02_emr_data_dictionary/02_emr_data_dictionary_extraction_column.json
+AIVIA_01_Data/02_emr_data_dictionary/02_emr_data_dictionary_extraction_value_embeddings.json
