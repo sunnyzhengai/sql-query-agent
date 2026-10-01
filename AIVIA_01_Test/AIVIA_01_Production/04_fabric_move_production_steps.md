@@ -117,9 +117,13 @@ TROUBLESHOOTING (the failures we have already met)
 STEP E — M03: declare the graph model + run the validation gate
          (capacity: your go; results land in 04_fabric_move.md same-day)
 =====================================================================
-E1. Create the graph model item (one-time, portal):
-    workspace > New item > Graph model (preview). Name it, e.g.,
-    gm_dictionary. Attach the lakehouse AIVIA_01_LH as the source.
+E1. RE-USE the existing graph model item AIVIA_01_GRAPH (ruled
+    2026-09-30): the item is a container for a declaration and its
+    name is phase-neutral — one graph model for the workspace, no
+    estate clutter. Open it and DELETE the phase-01 declaration (the
+    SQL_FILE node; its record lives in git and the docs, not here).
+    The stale "couldn't load your data" banner belongs to the old
+    f01 mapping and dies with it.
 
 E2. Declare the model — THE LAW: only the three graph_* tables, NEVER
     dict_* (their 3,072-number embedding columns break the graph
