@@ -45,10 +45,32 @@ This file carries **M06: the Data Agent scorecard** (design decision 8).
 | 9 | (resolved — no question; one component) | — | — | — |
 | 10 | What values can discharge disposition have? | PASS — ZC_DISCH_DISP values verbatim, 50 of 57 | (not run — Round A terminated) | **MISS, false absence** (2026-10-01): found PAT_ENC_HSP.DISCH_DISP_C, then asserted the value table "is not present" — while ZC_DISCH_DISP and its 57 rows sit in the very tables it queried. Its search used "disch disp" WITH A SPACE vs the underscore in ZC_DISCH_DISP — the folding problem our lane 1 solves; LIKE doesn't fold. Worst failure class: asserts the catalog lacks what it contains |
 | 11 | What departments exist? | PASS — CLARITY_DEP ruled values | (not run — Round A terminated) | **PARTIAL** (2026-10-01): right table with verbatim description — but delivered zero department names, telling the user to query the real database while the 1,275-row list sits in dict_values one query away. Its own step asked only for tableName/tableDescription. Pointed at the shelf, never handed over the book |
-| 12 | What are the category values of CLARITY_ADT? | PASS — honest zero | | |
+| 12 | What are the category values of CLARITY_ADT? | PASS — honest zero | (not run — Round A terminated) | **PASS** (2026-10-01): queried dict_values for CLARITY_ADT, found no rows, said so plainly — no invention. The exclusion guard holds |
 
-Verdict line (lands when both rounds complete): ours N/11 · Agent
-round A N/11 · round B N/11.
+## THE VERDICT (2026-10-01, both rounds complete)
+
+**Ours 11/11 · Agent Round A 0/2 (terminated — structural: cannot
+conceive of data-as-catalog) · Agent Round B 5 clean passes, 5
+partials, 1 false-absence miss of 11.**
+
+The Round-4 succession: the old record was homegrown 13/13 vs Fabric
+8/13; the new estate's record is 11/11 vs 5/11-clean — and this time
+the subject was INSTRUCTED, with the briefing recorded verbatim.
+
+Where the instructed agent held its own: structure and strings —
+honest refusals (3, 12), names containing the question's words (4),
+reading dict_joins rows faithfully (5, 7).
+
+Where it systematically failed — THE THREE EXHIBITS, each an ordinary
+user phrasing defeating string retrieval where our lanes succeed:
+  1. Vocabulary drift: "days in hospital" vs "census days" (shape 2)
+  2. Spelling variance: "payor" vs "payer" (shape 6)
+  3. Tokenization: "disch disp" vs "DISCH_DISP" (shape 10 — and this
+     one produced the worst failure class: a FALSE ABSENCE, asserting
+     the catalog lacks what it contains)
+Plus: semantics misread (8 — absent-from-dictionary became
+blank-description), and non-delivery (11 — pointed at the shelf,
+never handed over the book).
 
 ## Round B instruction (verbatim — recorded 2026-10-01 BEFORE use,
 pasted into the Agent by Sunny the same hour)

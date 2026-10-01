@@ -145,6 +145,14 @@ M05: Models and keys — Azure OpenAI endpoints, Key Vault, Entra;
 
 M06: The Data Agent comparison — decision 8's head-to-head; the
     scorecard recorded.
+    DONE 2026-10-01: both rounds run by Sunny's hand, scorecard in her
+    04 shapes md. Round A (out-of-box) terminated at 0/2 — structural:
+    the agent cannot conceive of data-as-catalog. Round B (instructed,
+    briefing recorded verbatim): 5 clean / 5 partial / 1 false-absence
+    miss of 11, vs ours 11/11. The three exhibits — census-days,
+    payor/payer, disch-disp underscore — are ordinary phrasings that
+    defeat string retrieval where the funnel's lanes succeed. The
+    Round-4 record (13/13 vs 8/13) is succeeded.
 
 M07: Stage B surface — opens only after Sunny's decision-7 ruling.
 

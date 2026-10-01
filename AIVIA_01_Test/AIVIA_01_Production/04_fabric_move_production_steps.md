@@ -396,7 +396,7 @@ Recorded 2026-10-01: cosine **0.999999** — PASS.
 
 ## What comes after (lands here as each step builds)
 
-- **M06** — the Data Agent comparison runs.
+- **M06** — DONE 2026-10-01: scorecard complete in the 04 shapes md (ours 11/11 · Round A 0/2 structural · Round B 5/5/1).
 - **Cleanup (ruled, after the E gate passes):** delete the two phase-01
   leftovers `f01_subject_sql_files_lh_table` and
   `f01_subject_sql_files_graph` — regenerable from local truth; a dated
