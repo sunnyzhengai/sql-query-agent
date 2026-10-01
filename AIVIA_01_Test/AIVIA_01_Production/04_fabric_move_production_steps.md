@@ -114,12 +114,84 @@ TROUBLESHOOTING (the failures we have already met)
   the local sheets are the truth; fix locally, rerun Step B then C.
 
 =====================================================================
+STEP E — M03: declare the graph model + run the validation gate
+         (capacity: your go; results land in 04_fabric_move.md same-day)
+=====================================================================
+E1. Create the graph model item (one-time, portal):
+    workspace > New item > Graph model (preview). Name it, e.g.,
+    gm_dictionary. Attach the lakehouse AIVIA_01_LH as the source.
+
+E2. Declare the model — THE LAW: only the three graph_* tables, NEVER
+    dict_* (their 3,072-number embedding columns break the graph
+    mapping — met live at F12/F13).
+    NODES:
+      label Table   from graph_table_nodes,  key tableId
+      label Column  from graph_column_nodes, key columnId
+    EDGES:
+      label hasColumn  from graph_column_nodes:
+          source tableId -> Table, target columnId -> Column
+          (the same table serves as node table and edge table — its
+          tableId column is the ownership edge)
+      label joins      from graph_join_edges:
+          source sourceTableId -> Table, target destinTableId -> Table
+          properties: kind, edgeKey, rule, columnPairs, conditionalC,
+          mayBeStaleC, isCurrentDataModelYn, isSupplementalYn
+    Build/refresh the model (this is the capacity spend).
+
+E3. THE VALIDATION GATE — run these in the graph query experience and
+    compare to the expected answers (computed from the local engine,
+    the ground truth). GQL syntax may need small portal adjustments;
+    record what you actually ran and got, verbatim.
+
+    Probe 1 — node census:
+      MATCH (t:Table) RETURN count(t)
+        expected: 38
+      MATCH (c:Column) RETURN count(c)
+        expected: 1618
+
+    Probe 2 — edge census by kind (the L08 provenance law intact):
+      MATCH ()-[e:joins]->() RETURN e.kind, count(*)
+        expected: joins_by_fk 210, joins_by_rule 181
+      MATCH ()-[e:hasColumn]->() RETURN count(e)
+        expected: 1618
+
+    Probe 3 — one component of 38 (reachability census from PATIENT):
+      MATCH (a:Table {tableName: 'PATIENT'})-[:joins]-{0,20}(t:Table)
+      RETURN count(DISTINCT t)
+        expected: 38
+        (every table reachable from PATIENT within 20 undirected hops
+        = the whole estate is ONE component, rule edges included —
+        DATE_DIMENSION connects only through joins_by_rule, so this
+        probe also proves the rule edges landed.)
+
+    Probe 4 — ZC_STATE's 9 edges with the FK owners correct:
+      MATCH (src:Table)-[e:joins]->(dst:Table {tableName: 'ZC_STATE'})
+      RETURN src.tableName, e.kind
+        expected: exactly 9 rows, ALL joins_by_fk, ALL with ZC_STATE
+        as the DESTINATION (the owners point AT the category — the
+        stored direction, never flipped):
+          CLARITY_DEP            x1
+          CLARITY_EPM            x2
+          COVERAGE_MEMBER_LIST   x2
+          PATIENT                x2
+          PATIENT_4              x1
+          PAT_RELATIONSHIP_LIST  x1
+      and the reverse direction must be EMPTY:
+      MATCH (src:Table {tableName: 'ZC_STATE'})-[e:joins]->(dst:Table)
+      RETURN count(e)
+        expected: 0
+
+E4. The verdict: all four probes matching = the gate PASSES; paste the
+    verbatim results into the chat session and the pass lands in
+    04_fabric_move.md dated. Any mismatch = STOP, bring the verbatim
+    output — the local engine is the ground truth and the model's
+    declaration (not the data) is the first suspect.
+    Remember: the chat does NOT read this model — it stands validated
+    for the future query-writing phase.
+
+=====================================================================
 WHAT COMES AFTER (lands here as each step builds)
 =====================================================================
-- M03: declare the graph model over graph_table_nodes /
-  graph_column_nodes / graph_join_edges (NEVER over dict_* — the
-  embedding columns break the graph mapping) + run the validation
-  gate. Capacity: your go.
 - M04: the chat reads FROM Fabric (stage A) — command lands here.
 - M05: Azure OpenAI deployments + Key Vault secret names.
 - M06: the Data Agent comparison runs.
