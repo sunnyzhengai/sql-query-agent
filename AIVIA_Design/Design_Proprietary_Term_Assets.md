@@ -1,5 +1,5 @@
 Design_Proprietary_Term_Assets
-Status: DRAFT (Claude, 2026-09-30, at Sunny's ask) — Sunny ratifies.
+Status: RATIFIED (Sunny, 2026-09-30).
 
 THE LAW
 AIVIA's term assets — the vocabularies that map how people speak to
