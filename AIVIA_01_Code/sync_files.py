@@ -110,7 +110,8 @@ SYNC_FILES = [
 ]
 
 
-def chunk_spans(total, chunk=CHUNK):
+def chunk_spans(total, chunk=None):
+    chunk = chunk or CHUNK  # resolved at call time, so tests can shrink it
     return [(offset, min(chunk, total - offset))
             for offset in range(0, total, chunk)]
 
