@@ -121,14 +121,28 @@ def _snake_rows(rows):
     return [{_snake(k): v for k, v in row.items()} for row in rows]
 
 
+def _table_urls(workspace, lakehouse, table):
+    """Schema-enabled lakehouses (ours: the dbo schema, met live
+    2026-10-01) keep tables under Tables/dbo/<name>; legacy ones under
+    Tables/<name>. Try in that order."""
+    base = f"abfss://{workspace}@{ONELAKE_DFS}/{lakehouse}/Tables"
+    return [f"{base}/dbo/{table}", f"{base}/{table}"]
+
+
 def _read_delta_rows(workspace, lakehouse, table, token):
     from deltalake import DeltaTable
 
-    url = (f"abfss://{workspace}@{ONELAKE_DFS}/{lakehouse}"
-           f"/Tables/{table}")
-    dt = DeltaTable(url, storage_options={
-        "bearer_token": token, "use_fabric_endpoint": "true"})
-    return dt.to_pyarrow_table().to_pylist()
+    last_error = None
+    for url in _table_urls(workspace, lakehouse, table):
+        try:
+            dt = DeltaTable(url, storage_options={
+                "bearer_token": token, "use_fabric_endpoint": "true"})
+            return dt.to_pyarrow_table().to_pylist()
+        except Exception as e:  # noqa: BLE001 — the kernel's not-found
+            last_error = e     # types vary; both paths get their try
+    raise SystemExit(
+        f"could not read Delta table {table!r} at either path "
+        f"(Tables/dbo/ or Tables/): {last_error}")
 
 
 def load_assets_fabric(workspace, lakehouse, token):

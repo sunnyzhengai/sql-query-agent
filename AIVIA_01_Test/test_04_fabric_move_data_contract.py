@@ -297,6 +297,15 @@ def test_offline_census_parity_through_the_round_trip(built):
     assert len(rebuilt["abstracts_index"]) == len(local["abstracts_index"])
 
 
+def test_table_urls_try_schema_path_first():
+    # Met live 2026-10-01: schema-enabled lakehouses keep tables under
+    # Tables/dbo/<name>; the legacy path stays as the fallback.
+    urls = fabric_assets._table_urls("ws", "lh", "dict_tables")
+    assert urls == [
+        "abfss://ws@onelake.dfs.fabric.microsoft.com/lh/Tables/dbo/dict_tables",
+        "abfss://ws@onelake.dfs.fabric.microsoft.com/lh/Tables/dict_tables"]
+
+
 def test_fabric_cli_refuses_without_ids():
     proc = subprocess.run(
         [sys.executable, str(CODE_DIR / "chat_bot.py"), "--fabric"],
