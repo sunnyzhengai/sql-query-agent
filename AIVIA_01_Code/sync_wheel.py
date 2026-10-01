@@ -245,7 +245,9 @@ def _fabric(token, method, path, body=None, content_type=None):
     if content_type:
         req.add_header("Content-Type", content_type)
     try:
-        with urllib.request.urlopen(req) as resp:
+        # 60s hard timeout (Echo Law, 2026-09-30): a hung connection
+        # fails fast into the caller's retry, never stalls the watch.
+        with urllib.request.urlopen(req, timeout=60) as resp:
             raw = resp.read()
             return json.loads(raw) if raw else {}
     except urllib.error.HTTPError as e:
@@ -306,6 +308,27 @@ def publish_state(token, workspace, environment):
     env = _fabric(token, "GET", f"workspaces/{workspace}/environments/{environment}")
     details = (env.get("properties") or {}).get("publishDetails") or {}
     return details.get("state", "unknown"), env
+
+
+def publish_state_with_retry(token, workspace, environment,
+                             attempts=20, wait=POLL_SECONDS):
+    """Echo Law build (2026-09-30, from the live Errno 60 mid-watch):
+    transient NETWORK errors retry; Fabric's own answers (including its
+    HTTP errors, which _fabric raises as SystemExit) stay loud. The
+    publish keeps running server-side either way — exhaustion points at
+    the portal instead of pretending failure."""
+    for attempt in range(1, attempts + 1):
+        try:
+            return publish_state(token, workspace, environment)
+        except (urllib.error.URLError, TimeoutError, OSError) as e:
+            print(f"  network blip while polling ({e}) — "
+                  f"retry {attempt}/{attempts}")
+            if attempt < attempts:
+                time.sleep(wait)
+    raise SystemExit(
+        "the network kept failing while watching the publish — the "
+        "publish continues in Fabric regardless; check the Environment "
+        "item in the portal for its state and the libraries list.")
 
 
 def list_libraries(token, workspace, environment):
@@ -373,7 +396,8 @@ def main(argv=None):
     publish(token, args.workspace, args.environment)
     print("publish started")
     while True:
-        state, env = publish_state(token, args.workspace, args.environment)
+        state, env = publish_state_with_retry(
+            token, args.workspace, args.environment)
         print(f"  publish state: {state}")
         if state.lower() == "success":
             print("\ninstalled libraries now:")

@@ -15,8 +15,11 @@ list in the portal).
 
 import subprocess
 import sys
+import urllib.error
 import zipfile
 from pathlib import Path
+
+import pytest
 
 REPO_ROOT = Path(__file__).resolve().parents[1]
 CODE_DIR = REPO_ROOT / "AIVIA_01_Code"
@@ -56,6 +59,63 @@ def test_command_refuses_to_run_without_ids_naming_them():
     assert proc.returncode != 0
     assert "--workspace" in proc.stderr
     assert "--environment" in proc.stderr
+
+
+def test_publish_polling_survives_network_blips(monkeypatch):
+    """Echo Law build (2026-09-30, from Sunny's live Errno 60 mid-watch):
+    a transient network error during the publish poll retries instead of
+    crashing; only Fabric's own answers end the watch."""
+    import sync_wheel
+
+    calls = {"n": 0}
+
+    def flaky(token, method, path, body=None, content_type=None):
+        calls["n"] += 1
+        if calls["n"] < 3:
+            raise urllib.error.URLError(TimeoutError("blip"))
+        return {"properties": {"publishDetails": {"state": "Success"}}}
+
+    monkeypatch.setattr(sync_wheel, "_fabric", flaky)
+    state, _env = sync_wheel.publish_state_with_retry(
+        "t", "w", "e", attempts=5, wait=0)
+    assert state == "Success" and calls["n"] == 3
+
+
+def test_publish_polling_exhaustion_points_at_the_portal(monkeypatch):
+    import sync_wheel
+
+    def always_down(*args, **kwargs):
+        raise urllib.error.URLError(TimeoutError("down"))
+
+    monkeypatch.setattr(sync_wheel, "_fabric", always_down)
+    with pytest.raises(SystemExit, match="portal"):
+        sync_wheel.publish_state_with_retry("t", "w", "e",
+                                            attempts=3, wait=0)
+
+
+def test_fabric_requests_time_out_fast(monkeypatch):
+    # a hung connection must fail fast INTO the retry, never stall
+    import sync_wheel
+
+    seen = {}
+
+    class _Resp:
+        def __enter__(self):
+            return self
+
+        def __exit__(self, *args):
+            return False
+
+        def read(self):
+            return b"{}"
+
+    def fake_urlopen(req, timeout=None):
+        seen["timeout"] = timeout
+        return _Resp()
+
+    monkeypatch.setattr(sync_wheel.urllib.request, "urlopen", fake_urlopen)
+    sync_wheel._fabric("t", "GET", "x")
+    assert seen["timeout"] == 60
 
 
 def test_stale_wheel_names_lists_every_other_aivia01_wheel():
