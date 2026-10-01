@@ -16,6 +16,11 @@ every row), and the ANSWER after confirming. Calibration flags:
 miscalibrated default costs a click, never an answer.
 The suites: /opt/homebrew/bin/python3.11 -m pytest AIVIA_01_Test/ -v
 
+VERDICT (Sunny, 2026-09-30): ALL 12 SHAPES PASSED, run by hand against
+the page. Calibration ruled from the run: match per population — table
+0.40 / column 0.50 / value 0.60; floor 0.25 and margin 0.1 global.
+The values live in the contract and the code defaults.
+
 A. Retrieval — do the lanes find the right rows?
 
 1. Name hit. "Which table has the patient's race?"

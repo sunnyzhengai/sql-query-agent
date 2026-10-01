@@ -69,9 +69,13 @@ What are the search acceptance parameters?
   MATCH_SCORE: at/above = pre-selected by default.
   UNIQUE_MARGIN: a pre-selected hit must be within this of the best hit
   in ITS population to stay pre-selected.
-- Starting values: TBD — calibrated by Sunny's hand shapes
-  (test_03_chat_bot_data_contract_sunny.md); per-population values
-  allowed (tables / columns / values need not share numbers).
+- Values RULED 2026-09-30, calibrated by Sunny's twelve-shape run (all
+  12 passed):
+  CANDIDATE_FLOOR 0.25 (all populations)
+  MATCH_SCORE per population: table 0.40 / column 0.50 / value 0.60
+  UNIQUE_MARGIN 0.1 (all populations)
+  Floor and margin stay global — the shape runs showed no
+  per-population evidence for them. Recalibration is a re-ruling here.
 - With separate name and description embeddings per row: ranking uses
   the sum of the scores that clear the floor; pre-selection uses the
   best single score (the ruled split, carried forward).

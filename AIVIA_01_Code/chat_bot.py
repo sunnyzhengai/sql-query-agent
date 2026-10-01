@@ -186,11 +186,17 @@ from local_chat import load_openai_key, real_embedder
 
 DEFAULT_PORT = 8703
 SHOWN_PER_POPULATION = 12
-# Display DEFAULTS, not gates (03 contract) — placeholders until
-# Sunny's calibration via her twelve shapes.
+# Display DEFAULTS, not gates (03 contract). Calibration RULED
+# 2026-09-30 from Sunny's twelve-shape run (all passed): match is PER
+# POPULATION; floor and margin stay global (no per-population evidence).
 CANDIDATE_FLOOR = 0.25
-MATCH_SCORE = 0.5
+MATCH_DEFAULTS = {"table": 0.40, "column": 0.50, "value": 0.60}
 UNIQUE_MARGIN = 0.1
+
+
+def _match_for(params, kind):
+    m = params["match"]
+    return m[kind] if isinstance(m, dict) else m
 
 POPULATIONS = ["table", "column", "value"]
 TERM_KINDS = {"population", "operation", "property"}
@@ -451,7 +457,7 @@ def _match_id(entry, assets):
 
 
 def resolve(terms, assets, embedder, params=None):
-    p = {"floor": CANDIDATE_FLOOR, "match": MATCH_SCORE,
+    p = {"floor": CANDIDATE_FLOOR, "match": dict(MATCH_DEFAULTS),
          "margin": UNIQUE_MARGIN}
     if params:
         p.update(params)
@@ -499,7 +505,7 @@ def resolve(terms, assets, embedder, params=None):
                 pop_best[e["kind"]] = max(pop_best.get(e["kind"], 0.0),
                                           e["best"])
             for e in shown:
-                pre = (e["best"] >= p["match"]
+                pre = (e["best"] >= _match_for(p, e["kind"])
                        and e["best"] >= pop_best[e["kind"]] - p["margin"])
                 if t["population"] and e["kind"] != t["population"]:
                     pre = False  # the keyword favors — it never hides
@@ -1130,12 +1136,17 @@ def main(argv):
                    if a.startswith("--") and "=" in a)
     if len(positional) < 2:
         print("usage: python3.11 AIVIA_01_Code/chat_bot.py "
-              "<02 sheets dir> <03 data dir> [port] "
-              "[--floor=] [--match=] [--margin=]", file=sys.stderr)
+              "<02 sheets dir> <03 data dir> [port] [--floor=] "
+              "[--margin=] [--match=all | --match-table= "
+              "--match-column= --match-value=]", file=sys.stderr)
         return 2
     port = int(positional[2]) if len(positional) > 2 else DEFAULT_PORT
+    match = {pop: float(options.get(f"match-{pop}", default))
+             for pop, default in MATCH_DEFAULTS.items()}
+    if "match" in options:  # a bare --match= applies to all populations
+        match = float(options["match"])
     params = {"floor": float(options.get("floor", CANDIDATE_FLOOR)),
-              "match": float(options.get("match", MATCH_SCORE)),
+              "match": match,
               "margin": float(options.get("margin", UNIQUE_MARGIN))}
 
     print(f"loading assets from {positional[0]} + {positional[1]} — "

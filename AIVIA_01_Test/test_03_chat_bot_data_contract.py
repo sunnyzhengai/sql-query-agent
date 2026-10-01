@@ -483,6 +483,27 @@ def test_no_match_term_never_preselects(chat_assets):
     assert not any(m["pre_selected"] for m in res["matches"])
 
 
+def test_per_population_match_defaults(chat_assets):
+    # Calibration RULED 2026-09-30 (the twelve-shape run, all passed):
+    # match is per population — table 0.40 / column 0.50 / value 0.60;
+    # floor and margin stay global. A float match still applies to all
+    # populations (the calibration flags keep working).
+    assert chat_bot.MATCH_DEFAULTS == {"table": 0.40, "column": 0.50,
+                                       "value": 0.60}
+    per_pop = {"floor": 0.1, "margin": 0.5,
+               "match": {"table": 0.0, "column": 9.0, "value": 9.0}}
+    [res] = chat_bot.resolve(
+        [{"text": "status information", "population": None}],
+        chat_assets, real_embedder, per_pop)
+    pre = {m["category"] for m in res["matches"] if m["pre_selected"]}
+    assert pre == {"table"}  # only the population whose bar is clearable
+    all_high = dict(per_pop, match=9.0)
+    [res2] = chat_bot.resolve(
+        [{"text": "status information", "population": None}],
+        chat_assets, real_embedder, all_high)
+    assert not any(m["pre_selected"] for m in res2["matches"])
+
+
 def test_composite_term_rescues_a_bad_split(chat_assets):
     # Ruled 2026-09-30 (from the live shape-2 run): with 2+ terms, the
     # joined text is searched as one extra term — the whole-phrase
