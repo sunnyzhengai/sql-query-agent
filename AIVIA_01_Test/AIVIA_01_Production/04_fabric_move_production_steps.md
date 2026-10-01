@@ -4,7 +4,8 @@ Sunny's manual runbook for the phase 04 move. Every file name and
 command exact. Written by Claude 2026-09-30; grows as steps land.
 
 > **Status:** Steps A–C ran clean 2026-09-30 (Sunny) — golden counts to
-> the digit. Step E in progress.
+> the digit. Step E PASSED 2026-09-30 — all four gate probes matched
+> the ground truth. Next: the f01 cleanup, then M04.
 
 ---
 

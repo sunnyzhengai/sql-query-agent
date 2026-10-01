@@ -110,6 +110,17 @@ M02: The Delta loader — the wheel grows a loader that writes the
 
 M03: The graph model — declared over the node/edge tables; the
     decision-2 validation gate runs and its results land in the doc.
+    DONE 2026-09-30: AIVIA_01_GRAPH re-used (SQL_FILE declaration
+    retired), Table/Column nodes + hasColumn/joins edges declared over
+    the three graph_* tables, and ALL FOUR PROBES PASSED by Sunny's
+    hand — 38/1,618 nodes, 210+181 edges by kind + 1,618 hasColumn,
+    one component of 38 at radius TWO from PATIENT (rule edges proven
+    landed), ZC_STATE's 9 inbound with owners correct and the reverse
+    direction empty. Three Fabric GQL dialect laws learned live and
+    recorded in the runbook: AS aliases mandatory, grouped aggregation
+    refused (filtered counts are the form), quantified paths bounded
+    by the real radius. The model stands validated, unconsumed,
+    waiting for the query-writing phase.
 
 M04: Stage A chat — the engine's asset source becomes a parameter;
     the chat runs locally reading Fabric; the twelve shapes rerun.
