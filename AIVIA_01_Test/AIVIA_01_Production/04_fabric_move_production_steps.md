@@ -260,9 +260,36 @@ future query-writing phase.
 
 ---
 
+## Step F — M04 stage A: the chat reads FROM Fabric
+
+The same chat, the Delta tables as its source — browser sign-in, the
+eight chat tables read over OneLake, then the server runs exactly as
+local. Each question still costs one gpt-5-mini call + at most one
+embedding call (OpenAI — M05 moves these to Azure).
+
+**Paste as ONE line:**
+
+```
+/opt/homebrew/bin/python3.11 AIVIA_01_Code/chat_bot.py --fabric --workspace=23112b57-368a-46ed-941b-c10e3baad392 --lakehouse=891d75cb-c87e-4096-9383-9cd7df9d6ef3
+```
+
+(Note: the `--fabric` form uses `--workspace=<id>` with an equals sign.)
+
+**The acceptance:**
+
+1. The startup census prints `assets: fabric` and matches the local
+   census **to the digit**: tables 38, columns 1618, values 14476,
+   abstract_rows 1656, keywords 9, and the map's 122 + 18 edge lines.
+2. The twelve shapes rerun against http://localhost:8703 by your hand
+   — identical behavior to the local runs.
+
+Reading the big embedding tables over the network takes a minute or
+two at startup; the per-table progress prints.
+
+---
+
 ## What comes after (lands here as each step builds)
 
-- **M04** — the chat reads FROM Fabric (stage A); command lands here.
 - **M05** — Azure OpenAI deployments + Key Vault secret names.
 - **M06** — the Data Agent comparison runs.
 - **Cleanup (ruled, after the E gate passes):** delete the two phase-01

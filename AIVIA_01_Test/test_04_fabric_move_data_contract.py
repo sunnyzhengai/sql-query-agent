@@ -249,6 +249,63 @@ def test_sign_in_scope_default_is_unchanged():
     assert sync_files.STORAGE_SCOPE == "https://storage.azure.com/.default"
 
 
+# ---------------------------------------------------------------------------
+# Section 3 — stage A (AIVIA_01_Code/fabric_assets.py, design M04): the
+# chat reads FROM Fabric. RED until the real code lands. The LIVE Delta
+# read is Sunny's hand via the runbook; these pin the name round-trip,
+# the offline census parity, and the refactor's behavior preservation
+# (chat_bot's own tests staying green IS the refactor's acceptance).
+# ---------------------------------------------------------------------------
+
+import fabric_assets  # noqa: E402
+
+
+def test_snake_inverts_camel_for_every_schema_field(built):
+    tables, _ = built
+    seen = set()
+    for rows in tables.values():
+        seen.update(rows[0].keys())
+    assert len(seen) > 40  # the schemas are really covered
+    for camel_key in seen:
+        snake = fabric_assets._snake(camel_key)
+        assert ldt._camel(snake) == camel_key, (camel_key, snake)
+        assert fabric_assets._snake(ldt._camel(snake)) == snake
+
+
+def test_offline_census_parity_through_the_round_trip(built):
+    # The parity law without a network: local assets -> camelCase (what
+    # Fabric stores) -> snake_case (what load_assets_fabric rebuilds)
+    # -> _build_assets must yield the IDENTICAL census.
+    tables, _ = built
+    local = chat_bot.load_assets(DIR02, DIR03)
+
+    def snake_rows(name):
+        return [{fabric_assets._snake(k): v for k, v in row.items()}
+                for row in tables[name]]
+
+    sheets = {"tables": snake_rows("dict_tables"),
+              "columns": snake_rows("dict_columns"),
+              "joins": snake_rows("dict_joins"),
+              "values": snake_rows("dict_values"),
+              "value_embeddings": snake_rows("dict_value_embeddings"),
+              "no_match": snake_rows("dict_no_match")}
+    rebuilt = chat_bot._build_assets(
+        sheets, snake_rows("chat_technical_terms"),
+        snake_rows("chat_abstract_names"))
+    assert rebuilt["census"] == local["census"]
+    assert len(rebuilt["names_index"]) == len(local["names_index"])
+    assert len(rebuilt["abstracts_index"]) == len(local["abstracts_index"])
+
+
+def test_fabric_cli_refuses_without_ids():
+    proc = subprocess.run(
+        [sys.executable, str(CODE_DIR / "chat_bot.py"), "--fabric"],
+        capture_output=True, text=True)
+    assert proc.returncode != 0
+    assert "--workspace" in proc.stderr
+    assert "--lakehouse" in proc.stderr
+
+
 def test_wheel_carries_the_loader():
     pyproject = (CODE_DIR / "pyproject.toml").read_text(encoding="utf-8")
     assert 'version = "0.3.0"' in pyproject

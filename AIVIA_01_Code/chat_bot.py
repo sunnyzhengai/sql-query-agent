@@ -363,12 +363,25 @@ def with_composite(terms):
 
 
 def load_assets(sheets_dir, data03_dir):
+    """The LOCAL frontend — reads the json sheets + terms md +
+    abstracts json, then builds. The Fabric frontend lives in
+    fabric_assets.load_assets_fabric; both call _build_assets (M04:
+    the source is a parameter, never a fork)."""
     sheets = dictionary_graph.load_sheets(sheets_dir)
-    graph = dictionary_graph.build_graph(sheets)
     data03_dir = Path(data03_dir)
+    terms = parse_terms(
+        (data03_dir / "03_chat_technical_terms.md")
+        .read_text(encoding="utf-8"))
+    abstracts_path = data03_dir / "03_chat_abstract_names.json"
+    abstract_rows = (json.loads(abstracts_path.read_text(encoding="utf-8"))
+                     if abstracts_path.exists() else None)
+    return _build_assets(sheets, terms, abstract_rows)
 
-    terms_path = data03_dir / "03_chat_technical_terms.md"
-    terms = parse_terms(terms_path.read_text(encoding="utf-8"))
+
+def _build_assets(sheets, terms, abstract_rows):
+    """Source-blind construction — identical behavior for local json
+    and Fabric Delta rows."""
+    graph = dictionary_graph.build_graph(sheets)
 
     names_index = {}
 
@@ -396,13 +409,10 @@ def load_assets(sheets_dir, data03_dir):
             "table_name": r["table_name"], "code": r["code"],
             "meaning": r["meaning"]})
 
-    abstracts_index, abstract_rows = {}, 0
-    abstracts_path = data03_dir / "03_chat_abstract_names.json"
-    lane2_ready = abstracts_path.exists()
+    abstracts_index = {}
+    lane2_ready = abstract_rows is not None
     if lane2_ready:
-        rows = json.loads(abstracts_path.read_text(encoding="utf-8"))
-        abstract_rows = len(rows)
-        for row in rows:
+        for row in abstract_rows:
             if row["object_kind"] == "table":
                 match = {"category": "table", "id": row["object_id"],
                          "name": row["object_name"],
@@ -421,7 +431,7 @@ def load_assets(sheets_dir, data03_dir):
               "columns": len(sheets["columns"]),
               "values": len(sheets["values"] or []),
               "value_search": sheets["value_embeddings"] is not None,
-              "abstract_rows": abstract_rows,
+              "abstract_rows": len(abstract_rows) if lane2_ready else 0,
               "lane2_ready": lane2_ready,
               "no_match": len(sheets["no_match"]),
               "keywords": len(terms)}
@@ -1134,13 +1144,26 @@ def main(argv):
     positional = [a for a in argv[1:] if not a.startswith("--")]
     options = dict(a[2:].split("=", 1) for a in argv[1:]
                    if a.startswith("--") and "=" in a)
-    if len(positional) < 2:
-        print("usage: python3.11 AIVIA_01_Code/chat_bot.py "
-              "<02 sheets dir> <03 data dir> [port] [--floor=] "
-              "[--margin=] [--match=all | --match-table= "
-              "--match-column= --match-value=]", file=sys.stderr)
+    fabric = "--fabric" in argv[1:]
+    usage = ("usage: python3.11 AIVIA_01_Code/chat_bot.py "
+             "<02 sheets dir> <03 data dir> [port] [flags]\n"
+             "   or: ... chat_bot.py --fabric --workspace=<id> "
+             "--lakehouse=<id> [--tenant=<id>] [port] [flags]\n"
+             "flags: [--floor=] [--margin=] [--match=all | "
+             "--match-table= --match-column= --match-value=]")
+    if fabric:
+        missing = [f"--{k}" for k in ("workspace", "lakehouse")
+                   if k not in options]
+        if missing:
+            print(f"missing for --fabric: {' '.join(missing)}\n{usage}",
+                  file=sys.stderr)
+            return 2
+    elif len(positional) < 2:
+        print(usage, file=sys.stderr)
         return 2
-    port = int(positional[2]) if len(positional) > 2 else DEFAULT_PORT
+    port_arg = positional[0] if fabric and positional else (
+        positional[2] if len(positional) > 2 else None)
+    port = int(port_arg) if port_arg else DEFAULT_PORT
     match = {pop: float(options.get(f"match-{pop}", default))
              for pop, default in MATCH_DEFAULTS.items()}
     if "match" in options:  # a bare --match= applies to all populations
@@ -1149,11 +1172,24 @@ def main(argv):
               "match": match,
               "margin": float(options.get("margin", UNIQUE_MARGIN))}
 
-    print(f"loading assets from {positional[0]} + {positional[1]} — "
-          "the column sheet is large, one moment…")
-    assets = load_assets(positional[0], positional[1])
+    if fabric:
+        from fabric_assets import load_assets_fabric
+        from sync_files import STORAGE_SCOPE
+        from sync_wheel import sign_in
+
+        print("loading assets FROM FABRIC (stage A) — browser "
+              "sign-in, then the Delta reads…")
+        token = sign_in(options.get("tenant", "organizations"),
+                        scope=STORAGE_SCOPE)
+        assets = load_assets_fabric(options["workspace"],
+                                    options["lakehouse"], token)
+    else:
+        print(f"loading assets from {positional[0]} + {positional[1]} "
+              "— the column sheet is large, one moment…")
+        assets = load_assets(positional[0], positional[1])
     census = assets["census"]
     print("chat startup census:")
+    print(f"  assets: {'fabric' if fabric else 'local'}")
     for k in ("tables", "columns", "values", "value_search",
               "abstract_rows", "keywords", "no_match"):
         print(f"  {k}: {census[k]}")

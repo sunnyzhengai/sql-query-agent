@@ -35,7 +35,7 @@ All LLM calls use paid API calls, no fake calls.
 ## Operational facts
 - The one Python: /opt/homebrew/bin/python3.11 runs all tests and scripts — never Apple's Python, never a venv.
 - The test command: /opt/homebrew/bin/python3.11 -m pytest AIVIA_01_Test/ -v
-- Installed packages, pinned: openai 3.19.2, pytest 9.1.1, ruff 0.16.3, pythonnet 3.1.0.
+- Installed packages, pinned: openai 3.19.2, pytest 9.1.1, ruff 0.16.3, pythonnet 3.1.0, deltalake 1.6.3 (ruled 2026-09-30 at M04 — local Delta reads from OneLake; never ships in the wheel, Fabric notebooks keep Spark).
 - ScriptDom (ADR 0001, the only T-SQL parser): DLL at libs/Microsoft.SqlServer.TransactSql.ScriptDom.dll (18.0.78.1, tracked in git); .NET 8 runtime at ~/.dotnet (the loader asserts DOTNET_ROOT only if that folder exists); the one parse door is AIVIA_01_Code/scriptdom_loader.py — no other file instantiates the parser (test-locked).
 - The OPENAI_API_KEY lives in .env at repo root (local development).
 
