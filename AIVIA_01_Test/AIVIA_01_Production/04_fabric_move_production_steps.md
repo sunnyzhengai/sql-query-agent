@@ -1,5 +1,6 @@
 04_fabric_move_production_steps — Sunny's manual runbook for the M02
-load (and the steps that follow). Every file name and command exact.
+load (and the steps that follow).
+STEPS A-C RUN CLEAN 2026-09-30 (Sunny): golden counts to the digit. Every file name and command exact.
 Written by Claude 2026-09-30; grows as the move steps land.
 
 =====================================================================

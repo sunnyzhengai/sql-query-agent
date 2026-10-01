@@ -103,6 +103,10 @@ M01: The data contract: 04_fabric_move_data_contract.md — the Delta
 M02: The Delta loader — the wheel grows a loader that writes the
     sheets to lakehouse tables (F11 pattern extended); counts verified
     against the sheets to the digit; Sunny's eye on the first load.
+    DONE 2026-09-30: wheel 0.3.0 published, eight files synced, the
+    notebook ran, ALL ELEVEN TABLES at the golden counts — Sunny's run
+    and eye. (Two Echo Law builds rode along: publish-watch retry and
+    chunk-upload retry, from the live Errno 60.)
 
 M03: The graph model — declared over the node/edge tables; the
     decision-2 validation gate runs and its results land in the doc.
