@@ -44,7 +44,7 @@ This file carries **M06: the Data Agent scorecard** (design decision 8).
 | 8 | Tell me about CR_STAT_EXECUTION. | PASS — verbatim no-dictionary-match note | (not run — Round A terminated) | **PARTIAL** (2026-10-01): found the name (via dict_no_match per its own query) but MISREPRESENTED the meaning — "appears in the data dictionary… description blank" when the truth is ABSENT from the dictionary, used-but-unmatched in two named procedures; never surfaced the sqlFileNames. A user would believe the dictionary holds an undocumented table |
 | 9 | (resolved — no question; one component) | — | — | — |
 | 10 | What values can discharge disposition have? | PASS — ZC_DISCH_DISP values verbatim, 50 of 57 | (not run — Round A terminated) | **MISS, false absence** (2026-10-01): found PAT_ENC_HSP.DISCH_DISP_C, then asserted the value table "is not present" — while ZC_DISCH_DISP and its 57 rows sit in the very tables it queried. Its search used "disch disp" WITH A SPACE vs the underscore in ZC_DISCH_DISP — the folding problem our lane 1 solves; LIKE doesn't fold. Worst failure class: asserts the catalog lacks what it contains |
-| 11 | What departments exist? | PASS — CLARITY_DEP ruled values | | |
+| 11 | What departments exist? | PASS — CLARITY_DEP ruled values | (not run — Round A terminated) | **PARTIAL** (2026-10-01): right table with verbatim description — but delivered zero department names, telling the user to query the real database while the 1,275-row list sits in dict_values one query away. Its own step asked only for tableName/tableDescription. Pointed at the shelf, never handed over the book |
 | 12 | What are the category values of CLARITY_ADT? | PASS — honest zero | | |
 
 Verdict line (lands when both rounds complete): ours N/11 · Agent
