@@ -289,9 +289,60 @@ two at startup; the per-table progress prints.
 
 ---
 
+## Step G — M05: the Azure OpenAI estate (your portal acts)
+
+The chat's brains move from OpenAI (.env key) to YOUR Azure OpenAI,
+keys in Key Vault — the launch posture. One-time setup, then the build
+follows pseudo-first.
+
+### G1 — re-use the existing resource (found 2026-10-01)
+
+The Azure OpenAI resource **`aivia`** already exists in
+`rg-fabric-prod`, East US 2 — re-use it, do NOT create a second.
+Its endpoint lives on its **Keys and Endpoint** blade
+(`https://aivia.openai.azure.com/` or the cognitiveservices form —
+copy what the blade shows, exactly).
+
+### G2 — the two model deployments
+
+Open `aivia` → **Go to Azure AI Foundry portal** → **Deployments**.
+Check what is already deployed; create what is missing via
+**Deploy model → Deploy base model**:
+
+| model | why | suggested deployment name |
+|---|---|---|
+| `text-embedding-3-large` | THE PARITY LAW — exactly this model or every stored embedding regenerates | `embed-3-large` |
+| `gpt-5-mini` (or the small chat model the catalog offers) | segmentation | `chat-mini` |
+
+Deployment type Standard or Global Standard — either. **Note the
+deployment names you actually choose — the code calls them by name.**
+
+### G3 — the Key Vault and the secret (closes the standing TBDs)
+
+1. Portal → Create a resource → **Key Vault**; same resource group and
+   region; suggested name `aivia01-kv`.
+2. In the vault: **Secrets → Generate/Import** → the ruled secret name
+   (suggested: `aivia01-azure-openai-key`) with the `aivia` resource's
+   key (Keys and Endpoint blade → Key 1) as the value.
+
+### G4 — hand back the four facts
+
+| fact | value |
+|---|---|
+| endpoint URL | (from Keys and Endpoint) |
+| embedding deployment name | |
+| chat deployment name | |
+| vault name + secret name | |
+
+The build then starts: the chat's Azure mode (parameter, never a
+fork), the PARITY CHECK (one known text re-embedded on the Azure
+deployment, compared number-for-number to the stored vector,
+recorded), and the 02/03/04 contracts' secret-name TBDs close.
+
+---
+
 ## What comes after (lands here as each step builds)
 
-- **M05** — Azure OpenAI deployments + Key Vault secret names.
 - **M06** — the Data Agent comparison runs.
 - **Cleanup (ruled, after the E gate passes):** delete the two phase-01
   leftovers `f01_subject_sql_files_lh_table` and
