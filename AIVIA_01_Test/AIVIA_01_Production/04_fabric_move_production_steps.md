@@ -16,8 +16,8 @@ PREREQUISITES — check once before the first run
       lakehouse id   891d75cb-c87e-4096-9383-9cd7df9d6ef3
 [ ] An EMPTY notebook item exists for M02 (create once in the portal:
     workspace > New > Notebook; name it, e.g., nb_m02_load_dictionary;
-    copy its id from the URL: .../synapsenotebooks/<notebook-id> and
-    fill it into Step A below).
+    notebook id filled in 2026-09-30:
+      3fbc2a7d-fb79-4893-8b50-a837614146fb
 [ ] Local suite green first:
       /opt/homebrew/bin/python3.11 -m pytest AIVIA_01_Test/ -v
 [ ] All commands below run from the repo root:
@@ -33,12 +33,7 @@ before publishing (publish = capacity, several minutes):
 PASTE AS ONE LINE (a multi-line paste drops the backslashes and zsh
 splits it into broken commands — met live 2026-09-30):
 
-  /opt/homebrew/bin/python3.11 AIVIA_01_Code/sync_wheel.py --workspace 23112b57-368a-46ed-941b-c10e3baad392 --environment 1b87c0e2-f56c-4253-9933-fb7a60db181d --notebook <notebook-id> --notebook-source AIVIA_01_Code/notebook_m02_load_dictionary_tables.py
-
-  (<notebook-id> = the one id still to fill, after the one-time
-  notebook creation in the prerequisites. Until it exists, run the
-  command WITHOUT the two --notebook* arguments — the wheel syncs
-  alone; add them later and rerun, the re-upload is instant.)
+  /opt/homebrew/bin/python3.11 AIVIA_01_Code/sync_wheel.py --workspace 23112b57-368a-46ed-941b-c10e3baad392 --environment 1b87c0e2-f56c-4253-9933-fb7a60db181d --notebook 3fbc2a7d-fb79-4893-8b50-a837614146fb --notebook-source AIVIA_01_Code/notebook_m02_load_dictionary_tables.py
 
   - At "Publish environment now? [y/N]": answer y when you are ready
     to spend the capacity; N leaves it staged for later.
