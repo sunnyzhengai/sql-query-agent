@@ -5,7 +5,8 @@ command exact. Written by Claude 2026-09-30; grows as steps land.
 
 > **Status:** Steps A–C ran clean 2026-09-30 (Sunny) — golden counts to
 > the digit. Step E PASSED 2026-09-30 — all four gate probes matched
-> the ground truth. Next: the f01 cleanup, then M04.
+> the ground truth. Step F PASSED 2026-10-01 — census matched local to
+> the digit, all twelve shapes green Fabric-backed. Next: M05.
 
 ---
 

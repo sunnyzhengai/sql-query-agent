@@ -124,6 +124,11 @@ M03: The graph model — declared over the node/edge tables; the
 
 M04: Stage A chat — the engine's asset source becomes a parameter;
     the chat runs locally reading Fabric; the twelve shapes rerun.
+    DONE 2026-10-01: --fabric reads the eight chat tables over OneLake
+    (deltalake 1.6.3, schema-enabled Tables/dbo path met live), census
+    matched local TO THE DIGIT, and ALL TWELVE SHAPES PASSED
+    Fabric-backed by Sunny's hand. The data plane is proven end to
+    end; the lakehouse can feed the product.
 
 M05: Models and keys — Azure OpenAI endpoints, Key Vault, Entra;
     the parity law verified (one known embedding re-computed on the
