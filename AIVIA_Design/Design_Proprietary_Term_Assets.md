@@ -52,3 +52,30 @@ DEPLOYMENT MECHANICS (the shape, details per phase)
   or offboarding.
 - Harvest direction: a customer engagement proposes additions to the
   master lists; Sunny's eye admits them; admission is a dated ruling.
+
+THE AGENT POSTURE (ruled by Sunny 2026-10-01, from the M06 evidence):
+NEVER FOUNDATION, ALWAYS BENCHMARK, EVENTUALLY CUSTOMER.
+- Never foundation: AIVIA develops on its own engine. A governance-
+  first product requires provenance (every answer names its mechanism
+  and cites stored rows), determinism (same question, same answer),
+  and honest absence. The Fabric Data Agent architecturally has none
+  of these — M06 recorded a semantics misread and a FALSE ABSENCE,
+  the worst behavior a governance tool can exhibit — and its string-
+  based retrieval ceiling (the three exhibits: census-days,
+  payor/payer, the DISCH_DISP underscore) is the gap the product
+  exists to fill. The standing direction law holds: the Agent is a
+  subject, never a validator.
+- Always benchmark: the M06 scorecard protocol reruns at each major
+  Fabric release — same questions, briefing recorded verbatim, ours
+  as ground truth. The moat is measured against the Agent's best,
+  never its past.
+- Eventually customer: M06 Round B proved an AIVIA briefing took the
+  Agent from structural failure (0/2) to 5 clean passes. The agent
+  briefing is an AIVIA EXPORT ARTIFACT in the making: the curated
+  truth layer (dictionary tables, terms, abstracts) grounding
+  whatever agents the enterprise runs — truth layers, never
+  gatekeeping. Portability per this document's law: the briefing's
+  structure travels as AIVIA's; customer content stays behind.
+- M07 boundary: Fabric-ecosystem packaging decisions are made on
+  marketplace grounds with ZERO architectural dependency on the
+  Agent, either way.
