@@ -30,14 +30,15 @@ One command builds the wheel, signs you in (normal browser sign-in),
 removes stale wheels, uploads, pushes the notebook cell, then ASKS
 before publishing (publish = capacity, several minutes):
 
-  /opt/homebrew/bin/python3.11 AIVIA_01_Code/sync_wheel.py \
-      --workspace 23112b57-368a-46ed-941b-c10e3baad392 \
-      --environment 1b87c0e2-f56c-4253-9933-fb7a60db181d \
-      --notebook <notebook-id> \
-      --notebook-source AIVIA_01_Code/notebook_m02_load_dictionary_tables.py
+PASTE AS ONE LINE (a multi-line paste drops the backslashes and zsh
+splits it into broken commands — met live 2026-09-30):
+
+  /opt/homebrew/bin/python3.11 AIVIA_01_Code/sync_wheel.py --workspace 23112b57-368a-46ed-941b-c10e3baad392 --environment 1b87c0e2-f56c-4253-9933-fb7a60db181d --notebook <notebook-id> --notebook-source AIVIA_01_Code/notebook_m02_load_dictionary_tables.py
 
   (<notebook-id> = the one id still to fill, after the one-time
-  notebook creation in the prerequisites.)
+  notebook creation in the prerequisites. Until it exists, run the
+  command WITHOUT the two --notebook* arguments — the wheel syncs
+  alone; add them later and rerun, the re-upload is instant.)
 
   - At "Publish environment now? [y/N]": answer y when you are ready
     to spend the capacity; N leaves it staged for later.
@@ -49,9 +50,9 @@ STEP B — upload the asset files to the lakehouse Files (the transport)
 =====================================================================
 One command, browser sign-in, then the uploads with progress:
 
-  /opt/homebrew/bin/python3.11 AIVIA_01_Code/sync_files.py \
-      --workspace 23112b57-368a-46ed-941b-c10e3baad392 \
-      --lakehouse 891d75cb-c87e-4096-9383-9cd7df9d6ef3
+PASTE AS ONE LINE:
+
+  /opt/homebrew/bin/python3.11 AIVIA_01_Code/sync_files.py --workspace 23112b57-368a-46ed-941b-c10e3baad392 --lakehouse 891d75cb-c87e-4096-9383-9cd7df9d6ef3
 
 The eight files it ships (local -> Files/Data/..., same names):
   02_emr_data_dictionary_extraction_table.json
