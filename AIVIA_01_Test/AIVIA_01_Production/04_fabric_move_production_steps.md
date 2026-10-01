@@ -189,13 +189,18 @@ MATCH ()-[e:hasColumn]->() RETURN count(e) AS n
 **Probe 3 — one component of 38** (reachability census from PATIENT)
 
 ```
-MATCH (a:Table {tableName: 'PATIENT'})-[:joins]-{0,20}(t:Table)
+MATCH (a:Table {tableName: 'PATIENT'})-[:joins]-{0,2}(t:Table)
 RETURN count(DISTINCT t) AS reachable
 ```
 
-Expected: **38** — every table reachable from PATIENT within 20
-undirected hops = one component. DATE_DIMENSION connects only through
-`joins_by_rule`, so this probe also proves the rule edges landed.
+Expected: **38** — every table reachable from PATIENT within TWO
+undirected hops = one component, and the estate's true radius (the
+local BFS histogram: 1 + 20 at one hop + 17 at two). DATE_DIMENSION
+connects only through `joins_by_rule`, so this probe also proves the
+rule edges landed.
+(Met live 2026-09-30: a {0,20} bound ran for minutes — GQL pattern
+matching ENUMERATES paths, and twenty hops through hub tables
+explodes; bound quantified patterns by the graph's real radius.)
 
 **Probe 4 — ZC_STATE's 9 edges, FK owners correct**
 
@@ -250,6 +255,7 @@ future query-writing phase.
 | GQL `expecting 'AS'` | Every returned expression needs an alias: `count(t) AS n`. |
 | GQL "not part of GROUP BY" | Grouped aggregation unsupported — use filtered counts (Probe 2's form). |
 | Multi-line paste breaks | Paste commands as one line; zsh drops the backslashes. |
+| GQL quantified path runs forever | Pattern matching enumerates paths — bound `{0,n}` by the graph's real radius (2 from PATIENT), never a generous guess. |
 
 ---
 
