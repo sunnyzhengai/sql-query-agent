@@ -42,5 +42,17 @@ Fabric
 /opt/homebrew/bin/python3.11 AIVIA_01_Code/sync_wheel.py --workspace 23112b57-368a-46ed-941b-c10e3baad392 --environment 1b87c0e2-f56c-4253-9933-fb7a60db181d --notebook <notebook-item-id>
 
 # notebook only (no wheel build, no publish question):
+
+SUPERSESSION (2026-09-30, ruled at the 04 M03 gate): the two phase-01
+lakehouse tables — f01_subject_sql_files_lh_table and
+f01_subject_sql_files_graph — are DELETED from AIVIA_01_LH, and the
+AIVIA_01_GRAPH item's SQL_FILE declaration is retired; the item now
+carries the phase-04 dictionary graph model (Table/Column nodes,
+hasColumn/joins edges). The phase-02+ dictionary estate supersedes the
+file-level graph. Nothing is lost: the local data sheet json stays the
+truth, and one run of the F11 notebook recreates both tables if ever
+wanted. This design doc and git remain the record of F11-F21 as built
+and accepted.
+
 /opt/homebrew/bin/python3.11 AIVIA_01_Code/sync_notebook.py --workspace 23112b57-368a-46ed-941b-c10e3baad392 --notebook <notebook-item-id> --source AIVIA_01_Code/notebook_f11_load_lh_table.py
 
