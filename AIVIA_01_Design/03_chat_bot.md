@@ -123,6 +123,10 @@ The ten decisions (ruled 2026-09-29/30):
    PAT_ENC_HSP.ADT_PAT_CLASS_C = 101 "Inpatient"). A confirmed value
    shows its category table's joins in the detail panel — the join the
    filter needs is one of them.
+   RULED 2026-09-30 (from the shape 10/11 run): a confirmed TABLE's
+   detail includes its value rows when it has any — capped at 50 with
+   the total named, never silently truncated. A table without values
+   shows an honest empty list (shape 12's guard).
 
 8. What gets recorded — DEFERRED (ruled 2026-09-30): the question
    record (chosen-vs-shown at both confirmation layers) is ruled in

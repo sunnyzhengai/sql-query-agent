@@ -24298,7 +24298,10 @@
       "inpatient encounter"
     ],
     "sunny_abstract": "",
-    "sunny_synonyms": []
+    "sunny_synonyms": [
+      "inpatient admission",
+      "inpatient admission data"
+    ]
   },
   {
     "object_kind": "table",
@@ -24313,7 +24316,9 @@
       "rla"
     ],
     "sunny_abstract": "",
-    "sunny_synonyms": []
+    "sunny_synonyms": [
+      "patient relationships"
+    ]
   },
   {
     "object_kind": "table",
@@ -24328,7 +24333,9 @@
       "relationship dates"
     ],
     "sunny_abstract": "",
-    "sunny_synonyms": []
+    "sunny_synonyms": [
+      "patient relationships"
+    ]
   },
   {
     "object_kind": "table",
