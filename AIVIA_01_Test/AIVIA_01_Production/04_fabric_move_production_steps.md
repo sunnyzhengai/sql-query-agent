@@ -319,20 +319,48 @@ deployment names you actually choose — the code calls them by name.**
 
 ### G3 — the Key Vault and the secret (closes the standing TBDs)
 
-1. Portal → Create a resource → **Key Vault**; same resource group and
-   region; suggested name `aivia01-kv`.
-2. In the vault: **Secrets → Generate/Import** → the ruled secret name
-   (suggested: `aivia01-azure-openai-key`) with the `aivia` resource's
-   key (Keys and Endpoint blade → Key 1) as the value.
+**1. Create the vault**
 
-### G4 — hand back the four facts
+1. Portal top search → **Key vaults** → **+ Create**.
+2. Basics: subscription `Azure subscription 1`; resource group
+   `rg-fabric-prod`; name **`aivia01-kv`**; region **East US 2**;
+   pricing tier **Standard**.
+3. Access configuration tab: leave **Azure role-based access control
+   (recommended)**.
+4. **Review + create** → **Create** (~30s).
+
+**2. Grant yourself secret-writing rights** — with RBAC, creating the
+vault does NOT grant data-plane rights; the Secrets page refuses until:
+
+1. Vault → **Access control (IAM)** → **+ Add → Add role assignment**.
+2. Role **Key Vault Secrets Officer** → Members: your own account →
+   **Review + assign** (give it a minute).
+
+**3. Fetch the key and endpoint**
+
+`aivia` resource → **Keys and Endpoint** blade → copy **KEY 1** and
+the **Endpoint** URL.
+
+**4. Store the secret**
+
+Vault → **Objects → Secrets** → **+ Generate/Import** → name
+`aivia01-azure-openai-key` → value = KEY 1 → **Create**.
+
+**THE KEY LAW: the key value lives ONLY in the vault and the local
+.env — never in this runbook, never in git.** After storing, rotate:
+`aivia` → Keys and Endpoint → **Regenerate Key 1**, then update the
+vault secret — any copy that traveled through chat or terminal dies.
+
+### G4 — the facts (filled 2026-10-01)
 
 | fact | value |
 |---|---|
-| endpoint URL | (from Keys and Endpoint) |
-| embedding deployment name | |
-| chat deployment name | |
-| vault name + secret name | |
+| endpoint URL | `https://aivia.openai.azure.com/` |
+| embedding deployment name | `text-embedding-3-large` (Foundry default — equals the model name) |
+| chat deployment name | `gpt-5-mini` (same) |
+| vault name | `aivia01-kv` |
+| secret name | `aivia01-azure-openai-key` |
+| the key | NOT RECORDED — vault + local .env only, per the key law |
 
 The build then starts: the chat's Azure mode (parameter, never a
 fork), the PARITY CHECK (one known text re-embedded on the Azure
