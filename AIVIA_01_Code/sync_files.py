@@ -127,8 +127,31 @@ def _onelake(token, method, path, body=b"", extra_headers=None):
         headers={"Authorization": f"Bearer {token}",
                  "x-ms-version": "2021-10-04",
                  **(extra_headers or {})})
-    with urllib.request.urlopen(req) as resp:
+    # 300s hard timeout: a 32MB chunk on a slow uplink fits; a hung
+    # connection fails fast into the retry (the Errno-60 class, fixed
+    # across sync_wheel AND here in one pass — enumerate-all-cases).
+    with urllib.request.urlopen(req, timeout=300) as resp:
         return dict(resp.headers)
+
+
+def _onelake_retry(token, method, path, body=b"", extra_headers=None,
+                   what="", attempts=3):
+    """Transient NETWORK errors retry; OneLake's own HTTP answers
+    (HTTPError) stay loud — a position-mismatch after a half-landed
+    chunk must surface, not loop."""
+    for attempt in range(1, attempts + 1):
+        try:
+            return _onelake(token, method, path, body, extra_headers)
+        except urllib.error.HTTPError:
+            raise
+        except (urllib.error.URLError, TimeoutError, OSError) as e:
+            print(f"    network blip on {what} ({e}) — "
+                  f"retry {attempt}/{attempts}")
+            if attempt == attempts:
+                raise SystemExit(
+                    f"the network kept failing on {what}; rerun the "
+                    "command — this file restarts from its first chunk")
+            time.sleep(5)
 
 
 def _loud(e, what):
@@ -152,17 +175,21 @@ def upload_file(token, workspace, lakehouse, dest, local_path):
     path = urllib.parse.quote(f"{workspace}/{lakehouse}/{dest}")
     total = local_path.stat().st_size
     try:
-        _onelake(token, "PUT", f"{path}?resource=file")
+        _onelake_retry(token, "PUT", f"{path}?resource=file",
+                       what=f"create {dest}")
         with open(local_path, "rb") as f:
             for offset, size in chunk_spans(total):
-                _onelake(
+                _onelake_retry(
                     token, "PATCH",
                     f"{path}?action=append&position={offset}",
                     body=f.read(size),
                     extra_headers={
-                        "Content-Type": "application/octet-stream"})
+                        "Content-Type": "application/octet-stream"},
+                    what=f"chunk at {offset:,} of {dest}")
                 print(f"    …{offset + size:,} / {total:,} bytes")
-        _onelake(token, "PATCH", f"{path}?action=flush&position={total}")
+        _onelake_retry(token, "PATCH",
+                       f"{path}?action=flush&position={total}",
+                       what=f"flush {dest}")
     except urllib.error.HTTPError as e:
         _loud(e, f"upload {dest}")
 

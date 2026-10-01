@@ -198,6 +198,50 @@ def test_skip_rule():
     assert should(100, 100, force=True) is True     # the hammer
 
 
+def test_upload_chunks_survive_network_blips(monkeypatch, tmp_path):
+    # The same Errno-60 class fixed in sync_wheel, fixed here in the
+    # same pass (the enumerate-all-cases law): a transient network
+    # error on one chunk retries; OneLake's own HTTP answers stay loud.
+    import urllib.error
+    local = tmp_path / "f.bin"
+    local.write_bytes(b"x" * (3 * MB))
+    monkeypatch.setattr(sync_files, "CHUNK", MB)
+    calls = {"n": 0, "blipped": False}
+
+    def flaky(token, method, path, body=b"", extra_headers=None):
+        calls["n"] += 1
+        if "action=append&position=1048576" in path and not calls["blipped"]:
+            calls["blipped"] = True
+            raise urllib.error.URLError(TimeoutError("blip"))
+        return {}
+
+    monkeypatch.setattr(sync_files, "_onelake", flaky)
+    sync_files.upload_file("t", "w", "l", "Files/Data/x/f.bin", local)
+    # create + 3 appends (one retried) + flush = 6 calls
+    assert calls["n"] == 6 and calls["blipped"]
+
+
+def test_onelake_requests_time_out(monkeypatch):
+    seen = {}
+
+    class _Resp:
+        headers = {}
+
+        def __enter__(self):
+            return self
+
+        def __exit__(self, *args):
+            return False
+
+    def fake_urlopen(req, timeout=None):
+        seen["timeout"] = timeout
+        return _Resp()
+
+    monkeypatch.setattr(sync_files.urllib.request, "urlopen", fake_urlopen)
+    sync_files._onelake("t", "GET", "x")
+    assert seen["timeout"] == 300  # a 32MB chunk on a slow uplink fits
+
+
 def test_sign_in_scope_default_is_unchanged():
     # the refactor must not change wheel-sync behavior
     sig = inspect.signature(sync_wheel.sign_in)
