@@ -12,6 +12,11 @@ This file carries **M06: the Data Agent scorecard** (design decision 8).
 - Subject: Data Agent item **AIVIA_AGENT** over AIVIA_01_LH, scoped to
   the six `dict_*` tables only.
 - **Round A** — out-of-box: Agent instructions EMPTY. The floor.
+  TERMINATED EARLY (ruled 2026-10-01) after two recorded misses: the
+  failure is STRUCTURAL, not per-question — the agent searches the
+  schema OF the catalog, never the catalog's rows; it has no concept
+  of data-as-dictionary. Ten more questions would copy the same miss.
+  (This structural gap is precisely what the product exists to fill.)
 - **Round B** — lightly instructed: the instruction text recorded
   verbatim below before any Round B question runs (teaches HOW, never
   answers — the standing law).
@@ -25,7 +30,7 @@ This file carries **M06: the Data Agent scorecard** (design decision 8).
 | # | question | ours | Agent round A | Agent round B |
 |---|---|---|---|---|
 | 1 | Which table has the patient's race? | PASS — PATIENT_RACE 0.80 + ZC_PATIENT_RACE 0.71 pre-selected | **MISS** (2026-10-01): "wasn't able to find any tables or columns… no matches for race-related fields" — despite tables literally named PATIENT_RACE / ZC_PATIENT_RACE | |
-| 2 | Where can I find how many days a patient spent in the hospital? | PASS — F_IP_HSP_PAT_DAYS top table | | |
+| 2 | Where can I find how many days a patient spent in the hospital? | PASS — F_IP_HSP_PAT_DAYS top table | **MISS** (2026-10-01): found no length-of-stay columns, then recited generic hospital-data-model advice — while F_IP_HSP_PAT_DAYS's stored description, a ROW in dict_tables, answers verbatim | |
 | 3 | Which table stores medication orders? (honesty) | PASS — nothing confirmed, honest sentence | | |
 | 4 | Where are patient relationships stored? | PASS — both siblings via lane 2 (sunny_synonyms) | | |
 | 5 | Show me the joins between PATIENT and CLARITY_DEP. | PASS — honest "no direct join", shared neighbors shown | | |
@@ -40,7 +45,29 @@ This file carries **M06: the Data Agent scorecard** (design decision 8).
 Verdict line (lands when both rounds complete): ours N/11 · Agent
 round A N/11 · round B N/11.
 
-## Round B instruction (verbatim, recorded before use)
+## Round B instruction (verbatim — recorded 2026-10-01 BEFORE use,
+pasted into the Agent by Sunny the same hour)
 
-(to be drafted by Claude, reviewed by Sunny, pasted here AND into the
-agent — teaching HOW only, no hardcoded answers)
+```
+These six tables ARE a data dictionary — a catalog of an EMR database.
+User questions are about the objects cataloged IN THE ROWS, never
+about this lakehouse's own schema. Always answer by querying the rows.
+
+- dict_tables: one row per cataloged table — tableName,
+  tableDescription.
+- dict_columns: one row per cataloged column — tableName, columnName,
+  dataType, columnDescription, isPrimaryKey.
+- dict_joins: the foreign-key relationships between cataloged tables —
+  sourceTableName.sourceColumnName -> destinTableName.destinColumnName.
+- dict_values: the category code lists — tableName, code, meaning.
+- dict_no_match: objects used in source SQL but absent from the
+  dictionary.
+- Ignore every column whose name ends in Embedding — numeric arrays,
+  not usable in SQL.
+
+Method: match the user's words against names AND descriptions AND
+meanings, case-insensitive and partial. Answer with the cataloged
+object names and their stored descriptions verbatim. For questions
+about joins, read dict_joins rows. If nothing matches, say so plainly
+— and check dict_no_match before concluding an object is unknown.
+```
