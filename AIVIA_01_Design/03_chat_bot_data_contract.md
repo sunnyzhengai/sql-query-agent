@@ -57,7 +57,7 @@ What models are used?
   model as the sheets; a question token is never embedded with a
   different model than the stored rows.
 - Key: OPENAI_API_KEY in .env at repo root (local). Production: Azure
-  Key Vault, secret name TBD at the Fabric move.
+  Key Vault aivia01-kv, secret aivia01-azure-openai-key (RULED 2026-10-01 at 04 M05).
 - Per question: one chat call (segmentation) + one batched embedding
   call (lane-3 tokens). All calls real and paid, never faked.
 

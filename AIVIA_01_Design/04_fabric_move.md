@@ -133,6 +133,15 @@ M04: Stage A chat — the engine's asset source becomes a parameter;
 M05: Models and keys — Azure OpenAI endpoints, Key Vault, Entra;
     the parity law verified (one known embedding re-computed on the
     Azure model and compared to the stored vector).
+    DONE 2026-10-01: the aivia resource (East US 2) carries
+    text-embedding-3-large + gpt-5.4-mini (ADOPTED over the planned
+    gpt-5-mini — newer, no parity constraint on chat); vault
+    aivia01-kv / aivia01-azure-openai-key; THE PARITY CHECK PASSED at
+    cosine 0.999999 and lives on as a standing suite test; --azure
+    composes with --fabric (the full production shape). The
+    wrong-resource detour (deployments landing on
+    founder-9856-resource via the Foundry project default) is in the
+    runbook's troubleshooting.
 
 M06: The Data Agent comparison — decision 8's head-to-head; the
     scorecard recorded.

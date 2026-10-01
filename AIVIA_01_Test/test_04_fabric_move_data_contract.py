@@ -315,6 +315,68 @@ def test_fabric_cli_refuses_without_ids():
     assert "--lakehouse" in proc.stderr
 
 
+# ---------------------------------------------------------------------------
+# Section 4 — M05: the Azure models (AIVIA_01_Code/azure_models.py,
+# design decision 4). RED until the real code lands. The Azure calls
+# are REAL (paid-call law, pennies); the live parity test makes the
+# parity law a STANDING tripwire — deployment drift turns the suite red.
+# ---------------------------------------------------------------------------
+
+import azure_models  # noqa: E402
+from test_03_chat_bot_data_contract import SYNTH_TERMS_MD  # noqa: E402
+
+
+def test_azure_constants_pin_the_g4_facts():
+    assert azure_models.AZURE_ENDPOINT == "https://aivia.openai.azure.com/"
+    assert azure_models.EMBED_DEPLOYMENT == "text-embedding-3-large"
+    assert azure_models.CHAT_DEPLOYMENT == "gpt-5.4-mini"
+    assert azure_models.KEY_VAULT_NAME == "aivia01-kv"
+    assert azure_models.KEY_VAULT_SECRET == "aivia01-azure-openai-key"
+
+
+def test_load_azure_key_reads_env_and_fails_loudly(tmp_path):
+    env = tmp_path / ".env"
+    env.write_text("OPENAI_API_KEY=x\nAZURE_OPENAI_KEY=sekrit\n",
+                   encoding="utf-8")
+    assert azure_models.load_azure_key(env) == "sekrit"
+    bare = tmp_path / "bare.env"
+    bare.write_text("OPENAI_API_KEY=x\n", encoding="utf-8")
+    with pytest.raises(ValueError, match="AZURE_OPENAI_KEY"):
+        azure_models.load_azure_key(bare)
+
+
+def test_live_parity_the_standing_law():
+    # THE PARITY LAW as a regression tripwire: the Azure deployment must
+    # be the exact model that embedded the sheets, forever.
+    sheet = json.loads(
+        (DIR02 / "02_emr_data_dictionary_extraction_table.json")
+        .read_text(encoding="utf-8"))
+    patient = next(r for r in sheet if r["table_name"] == "PATIENT")
+    [vec] = azure_models.azure_embedder(["PATIENT"])
+    from local_chat import cosine_similarity
+    cos = cosine_similarity(vec, patient["table_name_embedding"])
+    assert cos >= 0.999, f"parity broken: cosine {cos}"
+
+
+def test_azure_chat_segments_mechanism_level():
+    tokens = chat_bot.segment("which table has the synth status?",
+                              chat_bot.parse_terms(SYNTH_TERMS_MD),
+                              azure_models.azure_chat)
+    assert any(t["role"] == "keyword" and t["keyword"] == "table"
+               for t in tokens)
+
+
+def test_azure_and_fabric_flags_compose():
+    # --azure rides with --fabric; the only refusal is the missing ids
+    proc = subprocess.run(
+        [sys.executable, str(CODE_DIR / "chat_bot.py"),
+         "--fabric", "--azure"],
+        capture_output=True, text=True)
+    assert proc.returncode != 0
+    assert "--workspace" in proc.stderr and "--lakehouse" in proc.stderr
+    assert "azure" not in proc.stderr.lower()  # --azure itself accepted
+
+
 def test_wheel_carries_the_loader():
     pyproject = (CODE_DIR / "pyproject.toml").read_text(encoding="utf-8")
     assert 'version = "0.3.0"' in pyproject

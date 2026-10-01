@@ -1073,6 +1073,9 @@ def _detail_html(kind, obj_id, assets):
 class ChatBotHandler(BaseHTTPRequestHandler):
     assets = None   # set by main() before the server starts
     params = None
+    embedder = staticmethod(real_embedder)   # --azure swaps the pair
+    chat_llm = staticmethod(real_chat)       # (M05: provider is a
+    #                                          parameter, never a fork)
 
     def _send(self, status, body, content_type):
         self.send_response(status)
@@ -1101,11 +1104,11 @@ class ChatBotHandler(BaseHTTPRequestHandler):
             if self.path == "/segment":
                 question = body["question"]
                 tokens = segment(question, self.assets["terms"],
-                                 real_chat)
+                                 self.chat_llm)
                 terms, _global_pop = associate(tokens,
                                                self.assets["terms"])
                 terms = with_composite(terms)
-                results = resolve(terms, self.assets, real_embedder,
+                results = resolve(terms, self.assets, self.embedder,
                                   self.params)
                 highlight = set()
                 for res in results:
@@ -1187,9 +1190,17 @@ def main(argv):
         print(f"loading assets from {positional[0]} + {positional[1]} "
               "— the column sheet is large, one moment…")
         assets = load_assets(positional[0], positional[1])
+    azure = "--azure" in argv[1:]
+    if azure:
+        from azure_models import AZURE_ENDPOINT, azure_chat, azure_embedder
+
+        ChatBotHandler.embedder = staticmethod(azure_embedder)
+        ChatBotHandler.chat_llm = staticmethod(azure_chat)
     census = assets["census"]
     print("chat startup census:")
     print(f"  assets: {'fabric' if fabric else 'local'}")
+    print("  models: " + (f"azure ({AZURE_ENDPOINT})" if azure
+                          else "openai"))
     for k in ("tables", "columns", "values", "value_search",
               "abstract_rows", "keywords", "no_match"):
         print(f"  {k}: {census[k]}")

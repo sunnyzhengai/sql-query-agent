@@ -181,8 +181,9 @@ What model is used to embed the file names?
 - 3072 numbers per embedding; 
 - key in .env file.
 
-Where does the key live in production? 
-— Azure Key Vault, secret name TBD at the Fabric move.
+Where does the key live in production?
+— Azure Key Vault aivia01-kv, secret aivia01-azure-openai-key
+  (RULED 2026-10-01 at 04 M05; local dev: .env).
 
 What are the search acceptance parameters?
 - Three declared, tunable contract facts — never cliffs:

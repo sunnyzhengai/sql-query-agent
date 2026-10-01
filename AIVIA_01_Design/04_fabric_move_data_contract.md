@@ -100,13 +100,18 @@ What models are used in production?
   embeddings or re-embed everything; never mix. The M05 parity check:
   one known text re-embedded on the Azure endpoint, compared to the
   stored vector, recorded.
-- Segmentation: the Azure-hosted small-model equivalent of gpt-5-mini.
-  TBD (Sunny at M05): the exact Azure deployment names, pinned here.
+- Segmentation: gpt-5.4-mini — ADOPTED 2026-10-01 (newer than the
+  planned gpt-5-mini, already deployed on aivia; chat has no parity
+  law). Deployments on aivia (East US 2), names = model names:
+  text-embedding-3-large and gpt-5.4-mini. Endpoint
+  https://aivia.openai.azure.com/. PARITY VERIFIED 2026-10-01:
+  cosine 0.999999 vs the stored PATIENT vector — and it stands as a
+  LIVE regression test in the suite forever.
 
 Where do the keys live?
 - Local development: OPENAI_API_KEY in .env (unchanged).
-- Production: Azure Key Vault. TBD (Sunny, decision 5): the secret
-  names — closes the standing TBDs in the 02 and 03 contracts.
+- Production: Azure Key Vault aivia01-kv, secret
+  aivia01-azure-openai-key (RULED 2026-10-01 — the 02/03 TBDs close).
 - Identity: Entra ID sign-in (the phase 01 browser sign-in precedent).
 
 What is the refresh story? (decision 6, ruled)

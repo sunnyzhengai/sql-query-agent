@@ -258,6 +258,8 @@ future query-writing phase.
 | GQL "not part of GROUP BY" | Grouped aggregation unsupported — use filtered counts (Probe 2's form). |
 | Multi-line paste breaks | Paste commands as one line; zsh drops the backslashes. |
 | GQL quantified path runs forever | Pattern matching enumerates paths — bound `{0,n}` by the graph's real radius (2 from PATIENT), never a generous guess. |
+| Azure `DeploymentNotFound` | The deployments landed on the WRONG resource — the Foundry portal defaults to its own project (founder-9856-resource). Deploy via: aivia resource → Go to Foundry portal → flip the New Foundry toggle OFF → pick aivia → Deployments. |
+| text-embedding-3-small anywhere | FORBIDDEN near the pipeline (the parity law) — delete the deployment on sight. |
 
 ---
 
@@ -357,7 +359,7 @@ vault secret — any copy that traveled through chat or terminal dies.
 |---|---|
 | endpoint URL | `https://aivia.openai.azure.com/` |
 | embedding deployment name | `text-embedding-3-large` (Foundry default — equals the model name) |
-| chat deployment name | `gpt-5-mini` (same) |
+| chat deployment name | `gpt-5.4-mini` (ADOPTED 2026-10-01 — found already deployed on aivia, newer; chat has no parity law) |
 | vault name | `aivia01-kv` |
 | secret name | `aivia01-azure-openai-key` |
 | the key | NOT RECORDED — vault + local .env only, per the key law |
@@ -366,6 +368,29 @@ The build then starts: the chat's Azure mode (parameter, never a
 fork), the PARITY CHECK (one known text re-embedded on the Azure
 deployment, compared number-for-number to the stored vector,
 recorded), and the 02/03/04 contracts' secret-name TBDs close.
+
+---
+
+## Step H — M05: run with Azure models (the production shape)
+
+The full production shape — data from the lakehouse, brains from your
+Azure, keys governed. **Paste as ONE line:**
+
+```
+/opt/homebrew/bin/python3.11 AIVIA_01_Code/chat_bot.py --fabric --azure --workspace=23112b57-368a-46ed-941b-c10e3baad392 --lakehouse=891d75cb-c87e-4096-9383-9cd7df9d6ef3
+```
+
+The census prints `assets: fabric` and `models: azure
+(https://aivia.openai.azure.com/)`. (--azure also works with local
+assets: the two flags are independent.)
+
+The parity check, rerunnable any time (also a standing suite test):
+
+```
+/opt/homebrew/bin/python3.11 AIVIA_01_Code/azure_models.py --parity AIVIA_01_Data/02_emr_data_dictionary
+```
+
+Recorded 2026-10-01: cosine **0.999999** — PASS.
 
 ---
 
