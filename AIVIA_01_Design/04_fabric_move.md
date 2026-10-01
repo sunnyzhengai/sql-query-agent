@@ -155,9 +155,20 @@ M06: The Data Agent comparison — decision 8's head-to-head; the
     Round-4 record (13/13 vs 8/13) is succeeded.
 
 M07: Stage B surface — opens only after Sunny's decision-7 ruling.
+    BRIEF READY 2026-10-01 (overnight):
+    AIVIA_Design/briefs/Brief_M07_Stage_B_Host.md — the 2026
+    Extensibility Toolkit finding (workload = your own hosted web app
+    + manifest in an iframe; 20-tenant private preview without
+    certification), three shapes costed, recommendation: B1 = the
+    Azure-hosted engine now (the substrate of every future), B2 = the
+    Fabric workload wrapper deferred to the marketplace push. Awaits
+    Sunny's ruling checkboxes.
 
 M08: The kit closes — test_04_* suites green, Sunny's 04 shapes md
     with the run commands, acceptance parity per decision 9.
+    PREPARED 2026-10-01 (overnight): the 04 contract's how-to-test TBD
+    closed (all production commands recorded and accepted), suite
+    green, docs reconciled. CLOSES the moment M07 is ruled.
 
 Standing laws that bind this phase: capacity ops on Sunny's go, one
 refresh per batch; no Fabric Data Agent as validator; verdicts land in

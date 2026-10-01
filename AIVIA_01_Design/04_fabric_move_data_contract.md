@@ -131,8 +131,13 @@ Who can edit these tables?
 
 How to test?
 /opt/homebrew/bin/python3.11 -m pytest AIVIA_01_Test/ -v
-TBD: the load command (M02), the stage-A chat command (M04), and the
-validation-gate run (M03) land here at build.
+
+The production commands all live in the runbook
+(AIVIA_01_Test/AIVIA_01_Production/04_fabric_move_production_steps.md):
+Step A wheel+notebook sync, Step B files sync, Step C the M02 load,
+Step E the M03 graph gate, Step F the stage-A chat, Step H the full
+production shape (--fabric --azure) and the parity check. All run and
+accepted 2026-09-30/10-01.
 
 What are the data contracts:
 
