@@ -144,24 +144,25 @@ E2. Declare the model — THE LAW: only the three graph_* tables, NEVER
 
 E3. THE VALIDATION GATE — run these in the graph query experience and
     compare to the expected answers (computed from the local engine,
-    the ground truth). GQL syntax may need small portal adjustments;
-    record what you actually ran and got, verbatim.
+    the ground truth). Record what you actually ran and got, verbatim.
+    FABRIC GQL LAW (met live 2026-09-30): every returned expression
+    MUST carry an AS alias — count(t) alone is a syntax error.
 
     Probe 1 — node census:
-      MATCH (t:Table) RETURN count(t)
+      MATCH (t:Table) RETURN count(t) AS tableCount
         expected: 38
-      MATCH (c:Column) RETURN count(c)
+      MATCH (c:Column) RETURN count(c) AS columnCount
         expected: 1618
 
     Probe 2 — edge census by kind (the L08 provenance law intact):
-      MATCH ()-[e:joins]->() RETURN e.kind, count(*)
+      MATCH ()-[e:joins]->() RETURN e.kind AS kind, count(e) AS n
         expected: joins_by_fk 210, joins_by_rule 181
-      MATCH ()-[e:hasColumn]->() RETURN count(e)
+      MATCH ()-[e:hasColumn]->() RETURN count(e) AS n
         expected: 1618
 
     Probe 3 — one component of 38 (reachability census from PATIENT):
       MATCH (a:Table {tableName: 'PATIENT'})-[:joins]-{0,20}(t:Table)
-      RETURN count(DISTINCT t)
+      RETURN count(DISTINCT t) AS reachable
         expected: 38
         (every table reachable from PATIENT within 20 undirected hops
         = the whole estate is ONE component, rule edges included —
@@ -170,7 +171,7 @@ E3. THE VALIDATION GATE — run these in the graph query experience and
 
     Probe 4 — ZC_STATE's 9 edges with the FK owners correct:
       MATCH (src:Table)-[e:joins]->(dst:Table {tableName: 'ZC_STATE'})
-      RETURN src.tableName, e.kind
+      RETURN src.tableName AS owner, e.kind AS kind
         expected: exactly 9 rows, ALL joins_by_fk, ALL with ZC_STATE
         as the DESTINATION (the owners point AT the category — the
         stored direction, never flipped):
@@ -182,7 +183,7 @@ E3. THE VALIDATION GATE — run these in the graph query experience and
           PAT_RELATIONSHIP_LIST  x1
       and the reverse direction must be EMPTY:
       MATCH (src:Table {tableName: 'ZC_STATE'})-[e:joins]->(dst:Table)
-      RETURN count(e)
+      RETURN count(e) AS n
         expected: 0
 
 E4. The verdict: all four probes matching = the gate PASSES; paste the
