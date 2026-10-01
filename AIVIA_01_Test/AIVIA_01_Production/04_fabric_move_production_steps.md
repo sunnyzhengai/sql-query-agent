@@ -155,12 +155,14 @@ E3. THE VALIDATION GATE — run these in the graph query experience and
         expected: 1618
 
     Probe 2 — edge census by kind (the L08 provenance law intact):
-      MATCH ()-[e:joins]->() RETURN e.kind AS kind, count(e) AS n GROUP BY e.kind
-        expected: joins_by_fk 210, joins_by_rule 181
-        (Fabric GQL demands the GROUP BY explicitly — met live. If the
-        placement also errors, the fallback is two filtered counts:
-        ... WHERE e.kind = 'joins_by_fk' RETURN count(e) AS n   -> 210
-        ... WHERE e.kind = 'joins_by_rule' RETURN count(e) AS n -> 181)
+      MATCH ()-[e:joins]->() WHERE e.kind = 'joins_by_fk' RETURN count(e) AS n
+        expected: 210
+      MATCH ()-[e:joins]->() WHERE e.kind = 'joins_by_rule' RETURN count(e) AS n
+        expected: 181
+        (RULED by live run 2026-09-30: Fabric GQL accepted neither the
+        implicit grouping nor an explicit GROUP BY — the filtered
+        counts are THE form; grouped aggregation stays off the probe
+        list until the dialect grows it.)
       MATCH ()-[e:hasColumn]->() RETURN count(e) AS n
         expected: 1618
 
