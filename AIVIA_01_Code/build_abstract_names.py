@@ -101,3 +101,181 @@
 #     and counts it; its sunny_* content appears in the census echo.
 #   - the prompt contains no object examples (a test greps the prompt
 #     constant for the synthetic names — none may appear).
+
+import json
+import sys
+from pathlib import Path
+
+import dictionary_graph
+from local_chat import load_openai_key
+
+CHAT_MODEL = "gpt-5-mini"
+BATCH_SIZE = 20
+DESCRIPTION_LIMIT = 1000
+OUT_NAME = "03_chat_abstract_names.json"
+
+# The prompt teaches the SHAPE abstractly — it carries no example
+# objects (prompt-examples-are-data law; test-locked).
+PROMPT = (
+    "You write search aids for a healthcare data dictionary. For each "
+    "object you receive (a database object of a given kind, with its "
+    "stored name and stored description), write:\n"
+    "- abstract: one short plain sentence saying what the object holds "
+    "or means, grounded ONLY in the given name and description — never "
+    "invented knowledge.\n"
+    "- synonyms: a list of up to 8 short words or phrases a technical "
+    "user might type when looking for this object (expansions of "
+    "abbreviations in the name, common alternate words from the "
+    "description). Lowercase. Empty list if none apply.\n"
+    "Return JSON: {\"rows\": [{\"abstract\": ..., \"synonyms\": [...]}"
+    "]} with EXACTLY one entry per input object, in the same order."
+)
+
+
+def real_llm(batch):
+    """One paid gpt-5-mini call for a batch of objects. Returns the
+    parsed rows list, length-checked against the batch."""
+    from openai import OpenAI
+
+    client = OpenAI(api_key=load_openai_key())
+    payload = json.dumps([{"kind": o["kind"], "name": o["name"],
+                           "description": o["description"]}
+                          for o in batch])
+    response = client.chat.completions.create(
+        model=CHAT_MODEL,
+        response_format={"type": "json_object"},
+        messages=[{"role": "system", "content": PROMPT},
+                  {"role": "user", "content": payload}])
+    rows = json.loads(response.choices[0].message.content)["rows"]
+    if len(rows) != len(batch):
+        raise ValueError(
+            f"LLM returned {len(rows)} rows for {len(batch)} objects")
+    return rows
+
+
+def _write_rows(out_path, rows):
+    rows = sorted(rows, key=lambda r: (r["object_kind"], r["object_name"]))
+    with open(out_path, "w", encoding="utf-8") as f:
+        json.dump(rows, f, indent=2)
+
+
+def _objects_from_sheets(sheets):
+    objects = []
+    for r in sheets["tables"]:
+        objects.append({
+            "object_kind": "table", "object_id": r["table_id"],
+            "object_name": r["table_name"],
+            "kind": "table", "name": r["table_name"],
+            "description": r["table_description"][:DESCRIPTION_LIMIT]})
+    for r in sheets["columns"]:
+        objects.append({
+            "object_kind": "column", "object_id": r["column_id"],
+            "object_name": f"{r['table_name']}.{r['column_name']}",
+            "kind": "column",
+            "name": f"{r['table_name']}.{r['column_name']}",
+            "description": r["column_description"][:DESCRIPTION_LIMIT]})
+    return objects
+
+
+def build_abstracts(sheets_dir, out_dir, llm):
+    sheets = dictionary_graph.load_sheets(sheets_dir)
+    objects = _objects_from_sheets(sheets)
+    out_path = Path(out_dir) / OUT_NAME
+
+    existing = {}
+    if out_path.exists():
+        with open(out_path, encoding="utf-8") as f:
+            for row in json.load(f):
+                existing[(row["object_kind"], row["object_id"])] = row
+
+    census = {"tables": sum(1 for o in objects
+                            if o["object_kind"] == "table"),
+              "columns": sum(1 for o in objects
+                             if o["object_kind"] == "column"),
+              "generated_new": 0, "reused": 0, "dropped": []}
+
+    rows, to_generate = [], []
+    for o in objects:
+        key = (o["object_kind"], o["object_id"])
+        prior = existing.get(key)
+        row = {"object_kind": o["object_kind"],
+               "object_id": o["object_id"],
+               "object_name": o["object_name"],
+               "abstract": "", "synonyms": [],
+               "sunny_abstract": "", "sunny_synonyms": []}
+        if prior is not None:
+            # REUSE by key (fingerprint skipped by ruling) + SUNNY
+            # PRESERVATION — both carried verbatim.
+            row["abstract"] = prior["abstract"]
+            row["synonyms"] = prior["synonyms"]
+            row["sunny_abstract"] = prior.get("sunny_abstract", "")
+            row["sunny_synonyms"] = prior.get("sunny_synonyms", [])
+            census["reused"] += 1
+        else:
+            to_generate.append((o, row))
+        rows.append(row)
+
+    for start in range(0, len(to_generate), BATCH_SIZE):
+        chunk = to_generate[start:start + BATCH_SIZE]
+        results = llm([o for o, _ in chunk])
+        for (o, row), result in zip(chunk, results):
+            abstract = result.get("abstract")
+            synonyms = result.get("synonyms")
+            if (not isinstance(abstract, str) or not abstract.strip()
+                    or not isinstance(synonyms, list)
+                    or not all(isinstance(s, str) for s in synonyms)):
+                raise ValueError(
+                    f"malformed LLM row for {o['object_name']}: {result}")
+            row["abstract"] = abstract
+            row["synonyms"] = synonyms
+            census["generated_new"] += 1
+        # CHECKPOINT after every batch (Echo Law build, 2026-09-30, from
+        # the live billing_not_active death): an interruption leaves a
+        # valid partial file; the rerun's reuse-by-key pays only for
+        # the remainder.
+        _write_rows(out_path, [r for r in rows if r["abstract"].strip()])
+
+    # DROPPED objects: counted, sunny_* content echoed — never silent.
+    current_keys = {(o["object_kind"], o["object_id"]) for o in objects}
+    for key, prior in sorted(existing.items()):
+        if key not in current_keys:
+            census["dropped"].append({
+                "object_name": prior["object_name"],
+                "sunny_abstract": prior.get("sunny_abstract", ""),
+                "sunny_synonyms": prior.get("sunny_synonyms", [])})
+
+    # COVERAGE (completion integrity): exactly one row per object.
+    keys = [(r["object_kind"], r["object_id"]) for r in rows]
+    if len(rows) != len(objects) or len(set(keys)) != len(keys):
+        raise ValueError(
+            f"coverage broken: {len(objects)} objects, {len(rows)} rows")
+
+    _write_rows(out_path, rows)
+
+    census["sunny_abstract_rows"] = sum(
+        1 for r in rows if r["sunny_abstract"])
+    census["sunny_synonyms_rows"] = sum(
+        1 for r in rows if r["sunny_synonyms"])
+    return census
+
+
+def main(argv):
+    if len(argv) < 3:
+        print("usage: python3.11 AIVIA_01_Code/build_abstract_names.py "
+              "<02 sheets dir> <03 out dir>", file=sys.stderr)
+        return 2
+    census = build_abstracts(argv[1], argv[2], real_llm)
+    print("abstract names census:")
+    for k in ("tables", "columns", "generated_new", "reused",
+              "sunny_abstract_rows", "sunny_synonyms_rows"):
+        print(f"  {k}: {census[k]}")
+    for d in census["dropped"]:
+        print(f"  DROPPED: {d['object_name']}"
+              + (f" (sunny content echoed: {d['sunny_abstract']!r} "
+                 f"{d['sunny_synonyms']})"
+                 if d["sunny_abstract"] or d["sunny_synonyms"] else ""))
+    return 0
+
+
+if __name__ == "__main__":
+    sys.exit(main(sys.argv))

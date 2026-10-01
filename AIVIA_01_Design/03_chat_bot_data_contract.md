@@ -89,7 +89,15 @@ Who can edit these files?
 
 How to test?
 /opt/homebrew/bin/python3.11 -m pytest AIVIA_01_Test/ -v
-TBD (the chat startup command lands here at build, L06)
+
+The chat (built at L05, 2026-09-30):
+/opt/homebrew/bin/python3.11 AIVIA_01_Code/chat_bot.py \
+    AIVIA_01_Data/02_emr_data_dictionary \
+    AIVIA_01_Data/03_chat_bot
+Open http://localhost:8703. Optional: [port] [--floor=] [--match=]
+[--margin=] for calibration runs. Per question: one gpt-5-mini call +
+at most one batched embedding call (zero when every term resolves in
+lanes 1-2).
 
 What are the data contracts:
 
