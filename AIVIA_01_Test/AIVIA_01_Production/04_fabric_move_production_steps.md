@@ -9,13 +9,15 @@ PREREQUISITES — check once before the first run
 [ ] The Environment item AIVIA_01_ENV exists in it, with openai 3.19.2
     in its public libraries (set once, phase 01).
 [ ] The lakehouse AIVIA_01_LH exists in the workspace.
-[ ] You have THREE ids, all from portal URLs when the item is open:
-      workspace id   .../groups/<workspace-id>/...
-      environment id .../environments/<environment-id>
-      lakehouse id   .../lakehouses/<lakehouse-id>
+[ ] The three ids (filled in 2026-09-30; from portal URLs when each
+    item is open):
+      workspace id   23112b57-368a-46ed-941b-c10e3baad392
+      environment id 1b87c0e2-f56c-4253-9933-fb7a60db181d
+      lakehouse id   891d75cb-c87e-4096-9383-9cd7df9d6ef3
 [ ] An EMPTY notebook item exists for M02 (create once in the portal:
     workspace > New > Notebook; name it, e.g., nb_m02_load_dictionary;
-    copy its id from the URL: .../synapsenotebooks/<notebook-id>).
+    copy its id from the URL: .../synapsenotebooks/<notebook-id> and
+    fill it into Step A below).
 [ ] Local suite green first:
       /opt/homebrew/bin/python3.11 -m pytest AIVIA_01_Test/ -v
 [ ] All commands below run from the repo root:
@@ -29,9 +31,13 @@ removes stale wheels, uploads, pushes the notebook cell, then ASKS
 before publishing (publish = capacity, several minutes):
 
   /opt/homebrew/bin/python3.11 AIVIA_01_Code/sync_wheel.py \
-      --workspace <workspace-id> --environment <environment-id> \
+      --workspace 23112b57-368a-46ed-941b-c10e3baad392 \
+      --environment 1b87c0e2-f56c-4253-9933-fb7a60db181d \
       --notebook <notebook-id> \
       --notebook-source AIVIA_01_Code/notebook_m02_load_dictionary_tables.py
+
+  (<notebook-id> = the one id still to fill, after the one-time
+  notebook creation in the prerequisites.)
 
   - At "Publish environment now? [y/N]": answer y when you are ready
     to spend the capacity; N leaves it staged for later.
@@ -44,7 +50,8 @@ STEP B — upload the asset files to the lakehouse Files (the transport)
 One command, browser sign-in, then the uploads with progress:
 
   /opt/homebrew/bin/python3.11 AIVIA_01_Code/sync_files.py \
-      --workspace <workspace-id> --lakehouse <lakehouse-id>
+      --workspace 23112b57-368a-46ed-941b-c10e3baad392 \
+      --lakehouse 891d75cb-c87e-4096-9383-9cd7df9d6ef3
 
 The eight files it ships (local -> Files/Data/..., same names):
   02_emr_data_dictionary_extraction_table.json
