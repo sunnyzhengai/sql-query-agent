@@ -24,13 +24,18 @@ This file carries **M06: the Data Agent scorecard** (design decision 8).
   the Agent is the subject, never the validator.
 - Ours column = the twelve-shape runs already passed (2026-09-30
   local, 2026-10-01 Fabric-backed).
+- ROUND B FINDING (after shapes 1-2): the instruction BRIDGED the
+  structural gap — the agent now queries the catalog's rows. The
+  remaining difference is retrieval quality: SQL LIKE string-matching
+  vs our semantic layers (embeddings + abstracts + values). Round B
+  continues through all shapes — now informative.
 
 ## The scorecard
 
 | # | question | ours | Agent round A | Agent round B |
 |---|---|---|---|---|
-| 1 | Which table has the patient's race? | PASS — PATIENT_RACE 0.80 + ZC_PATIENT_RACE 0.71 pre-selected | **MISS** (2026-10-01): "wasn't able to find any tables or columns… no matches for race-related fields" — despite tables literally named PATIENT_RACE / ZC_PATIENT_RACE | |
-| 2 | Where can I find how many days a patient spent in the hospital? | PASS — F_IP_HSP_PAT_DAYS top table | **MISS** (2026-10-01): found no length-of-stay columns, then recited generic hospital-data-model advice — while F_IP_HSP_PAT_DAYS's stored description, a ROW in dict_tables, answers verbatim | |
+| 1 | Which table has the patient's race? | PASS — PATIENT_RACE 0.80 + ZC_PATIENT_RACE 0.71 pre-selected | **MISS** (2026-10-01): "wasn't able to find any tables or columns… no matches for race-related fields" — despite tables literally named PATIENT_RACE / ZC_PATIENT_RACE | **HIT, partial** (2026-10-01): found PATIENT_RACE.PATIENT_RACE_C with the verbatim description (+2 related columns) — but MISSED ZC_PATIENT_RACE, the category table with the race values, which ours surfaced |
+| 2 | Where can I find how many days a patient spent in the hospital? | PASS — F_IP_HSP_PAT_DAYS top table | **MISS** (2026-10-01): found no length-of-stay columns, then recited generic hospital-data-model advice — while F_IP_HSP_PAT_DAYS's stored description, a ROW in dict_tables, answers verbatim | **PARTIAL** (2026-10-01): proposed PAT_ENC_HSP admission/discharge + DATEDIFF (competent compute-it-yourself) — but MISSED F_IP_HSP_PAT_DAYS, the purpose-built patient-days table: its description says "census days"/"duration of stay" and the agent's SQL LIKE searched the literal phrase "length of stay". LIKE vs semantics, demonstrated |
 | 3 | Which table stores medication orders? (honesty) | PASS — nothing confirmed, honest sentence | | |
 | 4 | Where are patient relationships stored? | PASS — both siblings via lane 2 (sunny_synonyms) | | |
 | 5 | Show me the joins between PATIENT and CLARITY_DEP. | PASS — honest "no direct join", shared neighbors shown | | |
