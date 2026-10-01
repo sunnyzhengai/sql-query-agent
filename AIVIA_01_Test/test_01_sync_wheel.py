@@ -32,12 +32,17 @@ def test_build_wheel_produces_aivia01_wheel_with_both_modules():
     two modules the notebook will import (a wheel is a zip - look inside)."""
     wheel = build_wheel()
     assert wheel.exists()
-    assert wheel.name.startswith("aivia01-0.2.0"), wheel.name
+    assert wheel.name.startswith("aivia01-0.3.0"), wheel.name
     assert wheel.suffix == ".whl"
     names = zipfile.ZipFile(wheel).namelist()
     assert "build_data_sheet.py" in names, names
     assert "local_chat.py" in names, names
     assert "load_lh_table.py" in names, names
+    # the 04 loader and its import closure (M02, wheel 0.3.0)
+    assert "load_dictionary_tables.py" in names, names
+    assert "dictionary_graph.py" in names, names
+    assert "chat_bot.py" in names, names
+    assert "build_abstract_names.py" in names, names
 
 
 def test_command_refuses_to_run_without_ids_naming_them():

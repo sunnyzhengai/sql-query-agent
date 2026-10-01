@@ -174,7 +174,10 @@ class _SignInHandler(BaseHTTPRequestHandler):
         pass
 
 
-def sign_in(tenant):
+def sign_in(tenant, scope=FABRIC_SCOPE):
+    # scope parameter added at M02 (sync_files needs the Azure Storage
+    # audience for OneLake); the default keeps wheel-sync unchanged
+    # (test-locked).
     # Proof-of-possession pair (PKCE): a secret made fresh for this run;
     # only the process that STARTED the sign-in can finish it.
     verifier = base64.urlsafe_b64encode(os.urandom(32)).rstrip(b"=").decode()
@@ -193,7 +196,7 @@ def sign_in(tenant):
             "client_id": SIGN_IN_CLIENT_ID,
             "response_type": "code",
             "redirect_uri": redirect_uri,
-            "scope": FABRIC_SCOPE,
+            "scope": scope,
             "state": state,
             "code_challenge": challenge,
             "code_challenge_method": "S256",

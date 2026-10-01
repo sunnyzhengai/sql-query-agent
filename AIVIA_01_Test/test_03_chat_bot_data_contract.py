@@ -46,15 +46,15 @@ def _mini_sheets(root):
         ]), encoding="utf-8")
     (root / "02_emr_data_dictionary_extraction_column.json").write_text(
         json.dumps([
-            {"column_id": "C1", "table_id": "T1",
+            {"column_id": "C1", "table_id": "T1", "database_name": "synth", "schema_name": "dbo", "deprecated_yn": "N",
              "table_name": "SYNTH_ENCOUNTER_TBL",
              "column_name": "SYNTH_ENC_ID", "data_type": "VARCHAR",
              "column_description": "The synthetic encounter id."},
-            {"column_id": "C2", "table_id": "T1",
+            {"column_id": "C2", "table_id": "T1", "database_name": "synth", "schema_name": "dbo", "deprecated_yn": "N",
              "table_name": "SYNTH_ENCOUNTER_TBL",
              "column_name": "SYNTH_STATUS_C", "data_type": "INTEGER",
              "column_description": "The synthetic status code."},
-            {"column_id": "C3", "table_id": "T2",
+            {"column_id": "C3", "table_id": "T2", "database_name": "synth", "schema_name": "dbo", "deprecated_yn": "N",
              "table_name": "SYNTH_STATUS_CAT",
              "column_name": "NAME", "data_type": "VARCHAR",
              "column_description": "The status meaning."},
@@ -115,6 +115,8 @@ def test_new_object_generates_only_that_row(tmp_path, built):
         (tmp_path / "02_emr_data_dictionary_extraction_column.json")
         .read_text(encoding="utf-8"))
     cols.append({"column_id": "C4", "table_id": "T2",
+                 "database_name": "synth", "schema_name": "dbo",
+                 "deprecated_yn": "N",
                  "table_name": "SYNTH_STATUS_CAT",
                  "column_name": "SYNTH_ABBR", "data_type": "VARCHAR",
                  "column_description": "The synthetic abbreviation."})
@@ -238,29 +240,32 @@ def _mini_chat_assets(root):
     with sidecar, a terms file and an abstract list."""
     tables = [
         {"table_id": "T1", "table_name": "SYNTH_ENCOUNTER_TBL",
+         "database_name": "synth", "schema_name": "dbo", "deprecated_yn": "N",
          "table_description": "Synthetic encounter records."},
         {"table_id": "T2", "table_name": "SYNTH_STATUS_CAT",
+         "database_name": "synth", "schema_name": "dbo", "deprecated_yn": "N",
          "table_description": "Synthetic status categories."},
         {"table_id": "T3", "table_name": "SYNTH_ISLAND_TBL",
+         "database_name": "synth", "schema_name": "dbo", "deprecated_yn": "N",
          "table_description": "A synthetic island."},
     ]
     columns = [
-        {"column_id": "C1", "table_id": "T1",
+        {"column_id": "C1", "table_id": "T1", "database_name": "synth", "schema_name": "dbo", "deprecated_yn": "N",
          "table_name": "SYNTH_ENCOUNTER_TBL", "column_name": "SYNTH_ENC_ID",
          "data_type": "VARCHAR",
          "column_description": "The synthetic encounter id."},
-        {"column_id": "C2", "table_id": "T1",
+        {"column_id": "C2", "table_id": "T1", "database_name": "synth", "schema_name": "dbo", "deprecated_yn": "N",
          "table_name": "SYNTH_ENCOUNTER_TBL",
          "column_name": "SYNTH_STATUS_C", "data_type": "INTEGER",
          "column_description": "The synthetic status code."},
-        {"column_id": "C3", "table_id": "T2",
+        {"column_id": "C3", "table_id": "T2", "database_name": "synth", "schema_name": "dbo", "deprecated_yn": "N",
          "table_name": "SYNTH_STATUS_CAT", "column_name": "NAME",
          "data_type": "VARCHAR", "column_description": "The status meaning."},
-        {"column_id": "C5", "table_id": "T2",
+        {"column_id": "C5", "table_id": "T2", "database_name": "synth", "schema_name": "dbo", "deprecated_yn": "N",
          "table_name": "SYNTH_STATUS_CAT", "column_name": "SYNTH_STATUS_C",
          "data_type": "INTEGER",
          "column_description": "The category id column."},
-        {"column_id": "C6", "table_id": "T3",
+        {"column_id": "C6", "table_id": "T3", "database_name": "synth", "schema_name": "dbo", "deprecated_yn": "N",
          "table_name": "SYNTH_ISLAND_TBL", "column_name": "SYNTH_ISLAND_ID",
          "data_type": "VARCHAR", "column_description": "The island id."},
     ]

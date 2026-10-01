@@ -7,9 +7,11 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "aivia01"
-version = "0.2.0"
-description = "AIVIA_01 subject-sql-files modules: data sheet builder + embedding chat + table loader"
+version = "0.3.0"
+description = "AIVIA_01 modules: data sheets + chat engine + dictionary Delta loader"
 requires-python = ">=3.11"
 
 [tool.setuptools]
-py-modules = ["build_data_sheet", "local_chat", "load_lh_table"]
+py-modules = ["build_data_sheet", "local_chat", "load_lh_table",
+              "dictionary_graph", "chat_bot", "build_abstract_names",
+              "load_dictionary_tables"]
