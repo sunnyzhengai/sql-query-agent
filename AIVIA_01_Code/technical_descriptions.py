@@ -519,6 +519,11 @@ class _Voice:
             if r["to_kind"] == "member" and depth < 8:
                 return self.subject(r["to_id"], pred_id, depth + 1)
         expr = self.g["exprs"].get(expr_id, {})
+        # a COMPUTED member speaks its author's output name (R12
+        # name-words law) — never the defining expression's raw
+        # tokens (the 'calendar dt))' corpus find, 2026-10-03)
+        if expr.get("output_name"):
+            return _readable(expr["output_name"])
         token = (expr.get("ref") or expr.get("raw_text") or "value")
         return _readable(token.split(".")[-1])
 

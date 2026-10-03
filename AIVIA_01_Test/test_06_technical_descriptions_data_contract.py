@@ -512,6 +512,20 @@ def test_every_function_voicing_row_has_a_renderer(tmp_path):
     assert ops <= covered, ops - covered
 
 
+def test_computed_member_speaks_its_output_name(tmp_path):
+    """A read through a COMPUTED member speaks the author's
+    output name, never the defining expression's raw tokens (the
+    'calendar dt))' corpus find, 2026-10-03)."""
+    rows, _ = _render(tmp_path,
+        "SELECT CAST(T1.ADMIT_DATE AS DATE) AS start_date "
+        "INTO #m FROM T1;\n"
+        "SELECT T1.ID FROM T1 JOIN #m m "
+        "ON m.start_date = T1.ADMIT_DATE;")
+    joined = " ".join(_sentences(rows))
+    assert "The start date is the visit date." in joined
+    assert ")" not in joined.replace("(inclusive)", "")
+
+
 # ------- gap-check rulings 2026-10-03 (five items, red first)
 
 
