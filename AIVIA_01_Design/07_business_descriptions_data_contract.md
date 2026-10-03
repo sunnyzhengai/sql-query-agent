@@ -63,6 +63,23 @@ What is the output of this data contract?
   table.column + code + the reading node; Sunny's 02 value
   growth consumes it.
 
+THE LIVE-RUN HARNESS LAWS (AMENDED 2026-10-03, the first-failure
+build per the Echo Law — the first live run hung 2h22m on a
+wedged socket with zero CPU, nothing written, no progress):
+- TIMEOUT: every API call carries an explicit timeout (120s) and
+  bounded retries; a wedged socket can never hang the build.
+- CHECKPOINT-PER-NODE (the 03 checkpoint-per-batch law carried):
+  07_live_checkpoint.json is rewritten after EVERY node; a rerun
+  RESUMES — completed nodes are never re-proposed, never
+  re-paid. The checkpoint is transient: deleted when the sheet
+  lands whole.
+- PROGRESS: one line per node ([k/N] node -> status, rounds) so
+  a live run is watchable.
+- TEST POSTURE: the harness plumbing (checkpoint, resume, order,
+  progress) is tested with a clearly-labeled deterministic
+  stand-in proposer — plumbing tests, never fake LLM output
+  presented as speech; the paid path stays build-only.
+
 THE GATE (contract law, ruled; no model anywhere in it):
   G-1 LEXICAL WHITELIST: every content token in audience_text
       must trace to the docket (06 sentences + 05 rows + 02

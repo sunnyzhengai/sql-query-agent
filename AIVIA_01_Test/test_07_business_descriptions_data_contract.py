@@ -163,6 +163,53 @@ def test_effective_ladder_blessed_beats_gate_passed_beats_floor():
                         ) == "the floor"
 
 
+def test_live_harness_checkpoints_resumes_and_reports(tmp_path,
+                                                      capsys):
+    """The 2026-10-03 first-failure build (Echo Law): a run that
+    dies mid-flight loses nothing — the checkpoint holds every
+    completed node, the rerun resumes without re-paying, progress
+    is printed per node. Deterministic stand-in proposer: tests
+    the PLUMBING, never model speech."""
+    out = tmp_path / "07"
+    out.mkdir()
+    calls = []
+
+    class Boom(Exception):
+        pass
+
+    def dying_proposer(grain, docket_text, docket, registry):
+        calls.append(grain)
+        if len(calls) >= 5:
+            raise Boom()
+        return "stub", "gate_passed", [], 1
+
+    try:
+        bd.build07(DIR05, DIR06, out, DIR02, no_llm=False,
+                   proposer=dying_proposer)
+    except Boom:
+        pass
+    ck = json.loads((out / "07_live_checkpoint.json").read_text())
+    assert len(ck) == 4  # the completed nodes survived the death
+
+    calls.clear()
+
+    def steady_proposer(grain, docket_text, docket, registry):
+        calls.append(grain)
+        return "stub", "gate_passed", [], 1
+
+    bd.build07(DIR05, DIR06, out, DIR02, no_llm=False,
+               proposer=steady_proposer)
+    rows = json.loads((out / "07_business_sheet.json").read_text())
+    assert len(rows) == 151
+    assert len(calls) == 151 - 4   # resume never re-pays
+    assert not (out / "07_live_checkpoint.json").exists()
+    assert "[5/151]" in capsys.readouterr().out  # progress lines
+
+
+def test_call_timeout_is_law():
+    assert bd.CALL_TIMEOUT_S == 120
+
+
 def test_no_llm_build_conserves_and_registry_stays_untouched(
         tmp_path):
     out = tmp_path / "07"

@@ -362,10 +362,13 @@ def _field_nodes(dir05, dir02, dir01=None):
     return out
 
 
-def build07(dir05, dir06, out07, dir02, no_llm=False):
+def build07(dir05, dir06, out07, dir02, no_llm=False,
+            proposer=None):
     """The build command's door. no_llm=True renders floor-only
-    rows deterministically (the suite's path, zero cost); the
-    paid proposer loop runs only when no_llm is False."""
+    rows deterministically (the suite's path, zero cost). The
+    live path (harness laws, amended 2026-10-03): explicit call
+    timeout, CHECKPOINT-PER-NODE with resume (completed nodes
+    are never re-paid), one progress line per node."""
     dir05, dir06 = Path(dir05), Path(dir06)
     out07, dir02 = Path(out07), Path(dir02)
     six = json.loads((dir06 / "06_description_sheet.json")
@@ -377,41 +380,58 @@ def build07(dir05, dir06, out07, dir02, no_llm=False):
                 if reg_path.exists()
                 else {"names": [], "sentences": []})
 
-    reset_sightings()
-    rows = []
-
-    def add(node_id, grain, docket, floor_text):
-        if no_llm:
-            rows.append({"node_id": node_id, "grain": grain,
-                         "audience_text": floor_text,
-                         "status": "floor", "gate_findings": [],
-                         "rounds_used": 0, "model": None,
-                         "basis_version": BASIS_VERSION})
-            return
-        text, status, findings, used = _propose_loop(
-            grain, _docket_text(docket), docket, registry)
-        rows.append({"node_id": node_id, "grain": grain,
-                     "audience_text": text if status
-                     != "floor" else floor_text,
-                     "status": status,
-                     "gate_findings": findings,
-                     "rounds_used": used,
-                     "model": _MODEL_NAME,
-                     "basis_version": BASIS_VERSION})
-
+    # the ordered node specs: (node_id, grain, docket, floor)
+    specs = []
     for f in files:
         docket = docket_for_file(dir05, dir06, dir02, f)
         floor = next(r["sentence"] for r in six
                      if r["node_id"] == f"file::{f}")
-        add(f"file::{f}", "file", docket, floor)
+        specs.append((f"file::{f}", "file", docket, floor))
     for r in six:
         if r["grain"] == "scope":
-            add(r["node_id"], "scope", r["sentence"],
-                r["sentence"])
+            specs.append((r["node_id"], "scope", r["sentence"],
+                          r["sentence"]))
     for expr_id, scope_id, item in _field_nodes(dir05, dir02):
         owner = next((r["sentence"] for r in six
                       if r["node_id"] == scope_id), "")
-        add(expr_id, "field", owner + "\n" + item, item)
+        specs.append((expr_id, "field", owner + "\n" + item,
+                      item))
+
+    reset_sightings()
+    rows = []
+    if no_llm:
+        for node_id, grain, docket, floor in specs:
+            rows.append({"node_id": node_id, "grain": grain,
+                         "audience_text": floor,
+                         "status": "floor", "gate_findings": [],
+                         "rounds_used": 0, "model": None,
+                         "basis_version": BASIS_VERSION})
+    else:
+        run = proposer or _propose_loop
+        ck_path = out07 / "07_live_checkpoint.json"
+        done = (json.loads(ck_path.read_text())
+                if ck_path.exists() else {})
+        total = len(specs)
+        for i, (node_id, grain, docket, floor) in \
+                enumerate(specs, 1):
+            if node_id in done:
+                rows.append(done[node_id])
+                continue
+            text, status, findings, used = run(
+                grain, _docket_text(docket), docket, registry)
+            row = {"node_id": node_id, "grain": grain,
+                   "audience_text": text if status != "floor"
+                   else floor,
+                   "status": status, "gate_findings": findings,
+                   "rounds_used": used, "model": _MODEL_NAME,
+                   "basis_version": BASIS_VERSION}
+            rows.append(row)
+            done[node_id] = row
+            ck_path.write_text(json.dumps(done, indent=1))
+            print(f"[{i}/{total}] {node_id.split('::')[-1]} -> "
+                  f"{status} ({used})", flush=True)
+        if ck_path.exists():
+            ck_path.unlink()  # the sheet lands whole below
 
     (out07 / "07_business_sheet.json").write_text(
         json.dumps(rows, indent=1))
@@ -439,12 +459,15 @@ def build07(dir05, dir06, out07, dir02, no_llm=False):
 
 _MODEL_NAME = "gpt-5-mini"
 REPAIR_BUDGET = 3
+CALL_TIMEOUT_S = 120  # harness law 2026-10-03: a wedged socket
+#                       can never hang the build
 
 
 def _propose_loop(grain, docket_text, docket, registry):
     from build_abstract_names import load_openai_key
     from openai import OpenAI
-    client = OpenAI(api_key=load_openai_key())
+    client = OpenAI(api_key=load_openai_key(),
+                    timeout=CALL_TIMEOUT_S, max_retries=2)
     findings = []
     text = ""
     for round_no in range(1, REPAIR_BUDGET + 1):
