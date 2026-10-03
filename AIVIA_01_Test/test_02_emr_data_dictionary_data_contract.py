@@ -1059,12 +1059,15 @@ def real_graph():
 
 def test_real_graph_structure_pins_the_corpus(real_graph):
     census = real_graph["census"]
-    assert census["tables"] == 38 and census["columns"] == 1618
+    # Re-based 2026-10-02: the CR_STAT_EXECUTION supplemental entry.
+    assert census["tables"] == 39 and census["columns"] == 1621
     assert census["joins_by_fk"] == 210      # the in-scope join rows
-    assert census["joins_by_rule"] == 181    # DATETIME columns, L08
-    # shape 9 closes: ONE component of 38 with the rule edges built
+    assert census["joins_by_rule"] == 182    # DATETIME columns, L08
+    # (+1 2026-10-02: EXEC_START_TIME's date_dimension rule edge)
+    # shape 9 closes: ONE component with the rule edges built —
+    # CR_STAT_EXECUTION joins the component through its rule edge
     assert len(census["components"]) == 1
-    assert len(census["components"][0]) == 38
+    assert len(census["components"][0]) == 39
 
 
 def test_first_lock_round_rulings_are_mapped(extraction):

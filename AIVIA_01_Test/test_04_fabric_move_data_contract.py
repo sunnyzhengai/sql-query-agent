@@ -37,23 +37,29 @@ def built():
 
 def test_golden_counts_to_the_digit(built):
     tables, census = built
+    # Re-based 2026-10-02: Sunny's CR_STAT_EXECUTION supplemental
+    # entry (05 gap-first gate) — +1 table, +3 columns, no-match 0,
+    # +1 date_dimension rule edge, +4 abstracts.
     assert ldt.GOLDEN_COUNTS == {
-        "dict_tables": 38, "dict_columns": 1618, "dict_joins": 5262,
+        "dict_tables": 39, "dict_columns": 1621, "dict_joins": 5262,
         "dict_values": 14476, "dict_value_embeddings": 14476,
-        "dict_no_match": 1, "chat_abstract_names": 1656,
-        "chat_technical_terms": 9, "graph_join_edges": 391,
-        "graph_table_nodes": 38, "graph_column_nodes": 1618}
+        "dict_no_match": 0, "chat_abstract_names": 1660,
+        "chat_technical_terms": 9, "graph_join_edges": 392,
+        "graph_table_nodes": 39, "graph_column_nodes": 1621}
     assert set(tables) == set(ldt.GOLDEN_COUNTS)
     for name, expected in ldt.GOLDEN_COUNTS.items():
         assert len(tables[name]) == expected, name
         assert census[name] == expected, name
     assert census["joinsByFk"] == 210
-    assert census["joinsByRule"] == 181
+    assert census["joinsByRule"] == 182  # +1: EXEC_START_TIME's
+    # date_dimension rule edge (the 2026-10-02 supplemental entry)
 
 
 def test_every_key_is_camelcase(built):
     tables, _ = built
     for name, rows in tables.items():
+        if not rows:  # dict_no_match empty = the success state
+            continue
         for key in rows[0]:
             assert "_" not in key and key[0].islower(), (
                 f"{name}: non-camelCase key {key!r}")
@@ -98,7 +104,7 @@ def test_graph_join_edges_shape(built):
         assert e["destinTableId"] in node_ids
         pairs = json.loads(e["columnPairs"])
         assert pairs and pairs[0]["source_column_name"]
-    assert kinds == {"joins_by_fk": 210, "joins_by_rule": 181}
+    assert kinds == {"joins_by_fk": 210, "joins_by_rule": 182}
 
 
 def test_terms_table_matches_the_md(built):
@@ -264,6 +270,8 @@ def test_snake_inverts_camel_for_every_schema_field(built):
     tables, _ = built
     seen = set()
     for rows in tables.values():
+        if not rows:  # dict_no_match empty = the success state
+            continue
         seen.update(rows[0].keys())
     assert len(seen) > 40  # the schemas are really covered
     for camel_key in seen:

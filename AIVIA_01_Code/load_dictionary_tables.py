@@ -132,11 +132,15 @@ EMBEDDING_LENGTH = 3072
 # The golden numbers — a law, pinned here AND in the 04 tests; a corpus
 # change updates both by hand, never silently.
 GOLDEN_COUNTS = {
-    "dict_tables": 38, "dict_columns": 1618, "dict_joins": 5262,
+    # Re-based 2026-10-02 (Sunny's CR_STAT_EXECUTION supplemental
+    # entry, 05 gap-first gate): +1 table, +3 columns, no-match
+    # 1 -> 0, +1 date_dimension rule edge (EXEC_START_TIME is a
+    # date column), +4 abstracts.
+    "dict_tables": 39, "dict_columns": 1621, "dict_joins": 5262,
     "dict_values": 14476, "dict_value_embeddings": 14476,
-    "dict_no_match": 1, "chat_abstract_names": 1656,
-    "chat_technical_terms": 9, "graph_join_edges": 391,
-    "graph_table_nodes": 38, "graph_column_nodes": 1618,
+    "dict_no_match": 0, "chat_abstract_names": 1660,
+    "chat_technical_terms": 9, "graph_join_edges": 392,
+    "graph_table_nodes": 39, "graph_column_nodes": 1621,
 }
 
 ABSTRACT_FIELDS = {"object_kind", "object_id", "object_name",

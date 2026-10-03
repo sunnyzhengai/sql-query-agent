@@ -1,0 +1,446 @@
+[
+  {
+    "node_id": "file::COOK_RPT_USP_CCHCS_ADT_MONTHLY_INPATIENT_CENSUS_TOTALS_SSRS::param/@StartDate",
+    "name": "@StartDate",
+    "kind": "procedure_parameter",
+    "data_type": "DATE",
+    "default_text": null,
+    "evidence": {
+      "fragment": "@StartDate DATE",
+      "line": 9,
+      "column": 3
+    }
+  },
+  {
+    "node_id": "file::COOK_RPT_USP_CCHCS_ADT_MONTHLY_INPATIENT_CENSUS_TOTALS_SSRS::param/@EndDate",
+    "name": "@EndDate",
+    "kind": "procedure_parameter",
+    "data_type": "DATE",
+    "default_text": null,
+    "evidence": {
+      "fragment": "@EndDate DATE",
+      "line": 10,
+      "column": 3
+    }
+  },
+  {
+    "node_id": "file::COOK_RPT_USP_CCHCS_ADT_MONTHLY_INPATIENT_CENSUS_TOTALS_SSRS::param/@AsOfDate",
+    "name": "@AsOfDate",
+    "kind": "procedure_parameter",
+    "data_type": "DATE",
+    "default_text": null,
+    "evidence": {
+      "fragment": "@AsOfDate DATE",
+      "line": 11,
+      "column": 3
+    }
+  },
+  {
+    "node_id": "file::COOK_RPT_USP_CCHCS_ADT_MONTHLY_INPATIENT_CENSUS_TOTALS_SSRS::param/@ServiceArea",
+    "name": "@ServiceArea",
+    "kind": "procedure_parameter",
+    "data_type": "VARCHAR(MAX)",
+    "default_text": null,
+    "evidence": {
+      "fragment": "@ServiceArea VARCHAR(MAX)",
+      "line": 12,
+      "column": 3
+    }
+  },
+  {
+    "node_id": "file::COOK_RPT_USP_CCHCS_ADT_MONTHLY_INPATIENT_CENSUS_TOTALS_SSRS::param/@Location",
+    "name": "@Location",
+    "kind": "procedure_parameter",
+    "data_type": "VARCHAR(MAX)",
+    "default_text": null,
+    "evidence": {
+      "fragment": "@Location VARCHAR(MAX)",
+      "line": 13,
+      "column": 3
+    }
+  },
+  {
+    "node_id": "file::COOK_RPT_usp_PTA_CensusDashboard_PBI::param/@StartDate",
+    "name": "@StartDate",
+    "kind": "local_variable",
+    "data_type": "DATE",
+    "default_text": "case when dateadd(m, -24, getdate() - datepart(d, getdate()) + 1) < '03/01/2018' then '03/01/2018' else dateadd(m, -24, getdate() - datepart(d, getdate()) + 1) end",
+    "evidence": {
+      "fragment": "@StartDate DATE =  case when dateadd(m, -24, getdate() - datepart(d, getdate()) + 1) < '03/01/2018' then '03/01/2018' else dateadd(m, -24, getdate() - datepart(d, getdate()) + 1) end",
+      "line": 24,
+      "column": 9
+    }
+  },
+  {
+    "node_id": "file::COOK_RPT_usp_SF_CensusDashboard::param/@StartDate",
+    "name": "@StartDate",
+    "kind": "local_variable",
+    "data_type": "DATE",
+    "default_text": "case when dateadd(m, -24, getdate() - datepart(d, getdate()) + 1) < '03/01/2018' then '03/01/2018' else dateadd(m, -24, getdate() - datepart(d, getdate()) + 1) end",
+    "evidence": {
+      "fragment": "@StartDate DATE =  case when dateadd(m, -24, getdate() - datepart(d, getdate()) + 1) < '03/01/2018' then '03/01/2018' else dateadd(m, -24, getdate() - datepart(d, getdate()) + 1) end",
+      "line": 20,
+      "column": 9
+    }
+  },
+  {
+    "node_id": "file::Reporting_USP_CCHCS_CC_ADT_Monthly_IP_Census_Days_SSRS::param/@GROUP1",
+    "name": "@GROUP1",
+    "kind": "procedure_parameter",
+    "data_type": "Varchar(400)",
+    "default_text": null,
+    "evidence": {
+      "fragment": "@GROUP1 Varchar(400)",
+      "line": 19,
+      "column": 1
+    }
+  },
+  {
+    "node_id": "file::Reporting_USP_CCHCS_CC_ADT_Monthly_IP_Census_Days_SSRS::param/@GROUP2",
+    "name": "@GROUP2",
+    "kind": "procedure_parameter",
+    "data_type": "Varchar(400)",
+    "default_text": null,
+    "evidence": {
+      "fragment": "@GROUP2 Varchar(400)",
+      "line": 20,
+      "column": 1
+    }
+  },
+  {
+    "node_id": "file::Reporting_USP_CCHCS_CC_ADT_Monthly_IP_Census_Days_SSRS::param/@GROUP3",
+    "name": "@GROUP3",
+    "kind": "procedure_parameter",
+    "data_type": "Varchar(400)",
+    "default_text": null,
+    "evidence": {
+      "fragment": "@GROUP3 Varchar(400)",
+      "line": 21,
+      "column": 1
+    }
+  },
+  {
+    "node_id": "file::Reporting_USP_CCHCS_CC_ADT_Monthly_IP_Census_Days_SSRS::param/@Month",
+    "name": "@Month",
+    "kind": "procedure_parameter",
+    "data_type": "varchar(10)",
+    "default_text": null,
+    "evidence": {
+      "fragment": "@Month varchar(10)",
+      "line": 22,
+      "column": 1
+    }
+  },
+  {
+    "node_id": "file::Reporting_USP_CCHCS_CC_ADT_Monthly_IP_Census_Days_SSRS::param/@Year",
+    "name": "@Year",
+    "kind": "procedure_parameter",
+    "data_type": "varchar(10)",
+    "default_text": null,
+    "evidence": {
+      "fragment": "@Year varchar(10)",
+      "line": 23,
+      "column": 1
+    }
+  },
+  {
+    "node_id": "file::Reporting_USP_CCHCS_CC_ADT_Monthly_IP_Census_Days_SSRS::param/@ServiceArea",
+    "name": "@ServiceArea",
+    "kind": "procedure_parameter",
+    "data_type": "varchar(20)",
+    "default_text": null,
+    "evidence": {
+      "fragment": "@ServiceArea  varchar(20)",
+      "line": 24,
+      "column": 1
+    }
+  },
+  {
+    "node_id": "file::Reporting_USP_CCHCS_CC_ADT_Monthly_IP_Census_Days_SSRS::param/@TillDate",
+    "name": "@TillDate",
+    "kind": "procedure_parameter",
+    "data_type": "Date",
+    "default_text": null,
+    "evidence": {
+      "fragment": "@TillDate Date",
+      "line": 25,
+      "column": 1
+    }
+  },
+  {
+    "node_id": "file::Reporting_USP_CCHCS_CC_ADT_Monthly_IP_Census_Days_SSRS::param/@SQL",
+    "name": "@SQL",
+    "kind": "local_variable",
+    "data_type": "VARCHAR(MAX)",
+    "default_text": null,
+    "evidence": {
+      "fragment": "@SQL  VARCHAR(MAX)",
+      "line": 31,
+      "column": 9
+    }
+  },
+  {
+    "node_id": "file::Reporting_USP_CCHCS_CC_ADT_Monthly_IP_Census_Days_SSRS::param/@STillDate",
+    "name": "@STillDate",
+    "kind": "local_variable",
+    "data_type": "VARCHAR(20)",
+    "default_text": null,
+    "evidence": {
+      "fragment": "@STillDate VARCHAR(20)",
+      "line": 32,
+      "column": 3
+    }
+  },
+  {
+    "node_id": "file::Reporting_USP_CCHCS_CC_ADT_Monthly_IP_Census_Days_SSRS::param/@CurrentMonth",
+    "name": "@CurrentMonth",
+    "kind": "local_variable",
+    "data_type": "varchar(10)",
+    "default_text": null,
+    "evidence": {
+      "fragment": "@CurrentMonth varchar(10)",
+      "line": 33,
+      "column": 3
+    }
+  },
+  {
+    "node_id": "file::Reporting_USP_CCHCS_CC_ADT_Monthly_IP_Census_Days_SSRS::param/@NextMonth",
+    "name": "@NextMonth",
+    "kind": "local_variable",
+    "data_type": "varchar(10)",
+    "default_text": null,
+    "evidence": {
+      "fragment": "@NextMonth varchar(10)",
+      "line": 34,
+      "column": 3
+    }
+  },
+  {
+    "node_id": "file::Reporting_USP_CCHCS_CC_ADT_Monthly_IP_Census_Totals_SSRS::param/@GROUP1",
+    "name": "@GROUP1",
+    "kind": "procedure_parameter",
+    "data_type": "Varchar(400)",
+    "default_text": null,
+    "evidence": {
+      "fragment": "@GROUP1 Varchar(400)",
+      "line": 18,
+      "column": 1
+    }
+  },
+  {
+    "node_id": "file::Reporting_USP_CCHCS_CC_ADT_Monthly_IP_Census_Totals_SSRS::param/@GROUP2",
+    "name": "@GROUP2",
+    "kind": "procedure_parameter",
+    "data_type": "Varchar(400)",
+    "default_text": null,
+    "evidence": {
+      "fragment": "@GROUP2 Varchar(400)",
+      "line": 19,
+      "column": 1
+    }
+  },
+  {
+    "node_id": "file::Reporting_USP_CCHCS_CC_ADT_Monthly_IP_Census_Totals_SSRS::param/@GROUP3",
+    "name": "@GROUP3",
+    "kind": "procedure_parameter",
+    "data_type": "Varchar(400)",
+    "default_text": null,
+    "evidence": {
+      "fragment": "@GROUP3 Varchar(400)",
+      "line": 20,
+      "column": 1
+    }
+  },
+  {
+    "node_id": "file::Reporting_USP_CCHCS_CC_ADT_Monthly_IP_Census_Totals_SSRS::param/@Month",
+    "name": "@Month",
+    "kind": "procedure_parameter",
+    "data_type": "varchar(10)",
+    "default_text": null,
+    "evidence": {
+      "fragment": "@Month varchar(10)",
+      "line": 21,
+      "column": 1
+    }
+  },
+  {
+    "node_id": "file::Reporting_USP_CCHCS_CC_ADT_Monthly_IP_Census_Totals_SSRS::param/@Year",
+    "name": "@Year",
+    "kind": "procedure_parameter",
+    "data_type": "varchar(10)",
+    "default_text": null,
+    "evidence": {
+      "fragment": "@Year varchar(10)",
+      "line": 22,
+      "column": 1
+    }
+  },
+  {
+    "node_id": "file::Reporting_USP_CCHCS_CC_ADT_Monthly_IP_Census_Totals_SSRS::param/@ServiceArea",
+    "name": "@ServiceArea",
+    "kind": "procedure_parameter",
+    "data_type": "varchar(20)",
+    "default_text": null,
+    "evidence": {
+      "fragment": "@ServiceArea  varchar(20)",
+      "line": 23,
+      "column": 1
+    }
+  },
+  {
+    "node_id": "file::Reporting_USP_CCHCS_CC_ADT_Monthly_IP_Census_Totals_SSRS::param/@TillDate",
+    "name": "@TillDate",
+    "kind": "procedure_parameter",
+    "data_type": "Date",
+    "default_text": null,
+    "evidence": {
+      "fragment": "@TillDate Date",
+      "line": 24,
+      "column": 1
+    }
+  },
+  {
+    "node_id": "file::Reporting_USP_CCHCS_CC_ADT_Monthly_IP_Census_Totals_SSRS::param/@SQL",
+    "name": "@SQL",
+    "kind": "local_variable",
+    "data_type": "VARCHAR(MAX)",
+    "default_text": null,
+    "evidence": {
+      "fragment": "@SQL  VARCHAR(MAX)",
+      "line": 35,
+      "column": 9
+    }
+  },
+  {
+    "node_id": "file::Reporting_USP_CCHCS_CC_ADT_Monthly_IP_Census_Totals_SSRS::param/@STillDate",
+    "name": "@STillDate",
+    "kind": "local_variable",
+    "data_type": "VARCHAR(20)",
+    "default_text": null,
+    "evidence": {
+      "fragment": "@STillDate VARCHAR(20)",
+      "line": 36,
+      "column": 3
+    }
+  },
+  {
+    "node_id": "file::Reporting_USP_CCHCS_CC_ADT_Monthly_IP_Census_Totals_SSRS::param/@CurrentMonth",
+    "name": "@CurrentMonth",
+    "kind": "local_variable",
+    "data_type": "varchar(10)",
+    "default_text": null,
+    "evidence": {
+      "fragment": "@CurrentMonth varchar(10)",
+      "line": 37,
+      "column": 3
+    }
+  },
+  {
+    "node_id": "file::Reporting_USP_CCHCS_CC_ADT_Monthly_IP_Census_Totals_SSRS::param/@NextMonth",
+    "name": "@NextMonth",
+    "kind": "local_variable",
+    "data_type": "varchar(10)",
+    "default_text": null,
+    "evidence": {
+      "fragment": "@NextMonth varchar(10)",
+      "line": 38,
+      "column": 3
+    }
+  },
+  {
+    "node_id": "file::Reporting_USP_CCMC_LOTE_Census_Interpreter_Services_Detail_PBI::param/@i_vSTART_DATE",
+    "name": "@i_vSTART_DATE",
+    "kind": "procedure_parameter",
+    "data_type": "VARCHAR(20)",
+    "default_text": "null",
+    "evidence": {
+      "fragment": "@i_vSTART_DATE VARCHAR(20) = null",
+      "line": 18,
+      "column": 2
+    }
+  },
+  {
+    "node_id": "file::Reporting_USP_CCMC_LOTE_Census_Interpreter_Services_Detail_PBI::param/@i_vEND_DATE",
+    "name": "@i_vEND_DATE",
+    "kind": "procedure_parameter",
+    "data_type": "VARCHAR(20)",
+    "default_text": "null",
+    "evidence": {
+      "fragment": "@i_vEND_DATE VARCHAR(20) = null",
+      "line": 19,
+      "column": 4
+    }
+  },
+  {
+    "node_id": "file::Reporting_USP_CCMC_LOTE_Census_Interpreter_Services_Detail_PBI::param/@startDate",
+    "name": "@startDate",
+    "kind": "local_variable",
+    "data_type": "DATETIME",
+    "default_text": "[Clarity].EPIC_UTIL.EFN_DIN(COALESCE(@i_vSTART_DATE,'MB-13'))",
+    "evidence": {
+      "fragment": "@startDate DATETIME = [Clarity].EPIC_UTIL.EFN_DIN(COALESCE(@i_vSTART_DATE,'MB-13'))",
+      "line": 28,
+      "column": 9
+    }
+  },
+  {
+    "node_id": "file::Reporting_USP_CCMC_LOTE_Census_Interpreter_Services_Detail_PBI::param/@endDate",
+    "name": "@endDate",
+    "kind": "local_variable",
+    "data_type": "DATETIME",
+    "default_text": "[Clarity].EPIC_UTIL.EFN_DIN(COALESCE(@i_vEND_DATE,'ME-1'))",
+    "evidence": {
+      "fragment": "@endDate DATETIME = [Clarity].EPIC_UTIL.EFN_DIN(COALESCE(@i_vEND_DATE,'ME-1'))",
+      "line": 29,
+      "column": 9
+    }
+  },
+  {
+    "node_id": "file::Reporting_USP_CCMC_LOTE_Census_Interpreter_Services_Summary_PBI::param/@i_vSTART_DATE",
+    "name": "@i_vSTART_DATE",
+    "kind": "procedure_parameter",
+    "data_type": "VARCHAR(20)",
+    "default_text": "null",
+    "evidence": {
+      "fragment": "@i_vSTART_DATE VARCHAR(20) = null",
+      "line": 29,
+      "column": 2
+    }
+  },
+  {
+    "node_id": "file::Reporting_USP_CCMC_LOTE_Census_Interpreter_Services_Summary_PBI::param/@i_vEND_DATE",
+    "name": "@i_vEND_DATE",
+    "kind": "procedure_parameter",
+    "data_type": "VARCHAR(20)",
+    "default_text": "null",
+    "evidence": {
+      "fragment": "@i_vEND_DATE VARCHAR(20) = null",
+      "line": 30,
+      "column": 4
+    }
+  },
+  {
+    "node_id": "file::Reporting_USP_CCMC_LOTE_Census_Interpreter_Services_Summary_PBI::param/@startDate",
+    "name": "@startDate",
+    "kind": "local_variable",
+    "data_type": "DATETIME",
+    "default_text": "[Clarity].EPIC_UTIL.EFN_DIN(COALESCE(@i_vSTART_DATE,'MB-13'))",
+    "evidence": {
+      "fragment": "@startDate DATETIME = [Clarity].EPIC_UTIL.EFN_DIN(COALESCE(@i_vSTART_DATE,'MB-13'))",
+      "line": 39,
+      "column": 9
+    }
+  },
+  {
+    "node_id": "file::Reporting_USP_CCMC_LOTE_Census_Interpreter_Services_Summary_PBI::param/@endDate",
+    "name": "@endDate",
+    "kind": "local_variable",
+    "data_type": "DATETIME",
+    "default_text": "[Clarity].EPIC_UTIL.EFN_DIN(COALESCE(@i_vEND_DATE,'ME-1'))",
+    "evidence": {
+      "fragment": "@endDate DATETIME = [Clarity].EPIC_UTIL.EFN_DIN(COALESCE(@i_vEND_DATE,'ME-1'))",
+      "line": 40,
+      "column": 9
+    }
+  }
+]

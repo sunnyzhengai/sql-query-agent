@@ -1,0 +1,220 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1232" height="2924" font-family="monospace">
+<text x="20" y="28" font-size="15" font-weight="bold">Reporting_USP_CCMC_LOTE_Census_Interpreter_Services_Detail_PBI</text>
+<text x="20" y="48" font-size="12" fill="#777777">(1) [operational_statement]</text>
+<text x="20" y="71" font-size="12" fill="#777777">(2) [operational_statement]</text>
+<text x="20" y="94" font-size="12" fill="#777777">(3) [operational_statement]</text>
+<text x="20" y="117" font-size="12" fill="#777777">(4) [operational_statement]</text>
+<text x="20" y="140" font-size="12" fill="#777777">(5) [operational_statement]</text>
+<text x="20" y="163" font-size="12" fill="#777777">(6) [operational_statement]</text>
+<text x="20" y="186" font-size="12" fill="#777777">(7) [operational_statement]</text>
+<text x="20" y="209" font-size="12" fill="#777777">(8) [operational_statement]</text>
+<text x="20" y="232" font-size="12" fill="#777777">(9) [operational_statement]</text>
+<text x="20" y="255" font-size="12" fill="#777777">(10) [operational_statement]</text>
+<text x="20" y="278" font-size="12" fill="#333333">(11) Builds the census monthly selection.</text>
+<rect x="56" y="295" width="760" height="355" fill="#f7f7f7" stroke="#888888" rx="4"/>
+<text x="64" y="310" font-size="11" font-weight="bold">#census_monthly (temp_table)</text>
+<text x="64" y="325" font-size="11">PROJECTION: 14 members</text>
+<text x="64" y="340" font-size="11">FROM: [Clarity].[dbo].F_IP_HSP_PAT_DAYS	[census], [Clarity].[dbo].CLARITY_DEP				[dep], [Clarity].[dbo].CLARITY_LOC				[</text>
+<text x="64" y="355" font-size="11">JOIN (LeftOuter):</text>
+<text x="64" y="370" font-size="11">  - [census].DEPARTMENT_ID = [dep].DEPARTMENT_ID</text>
+<text x="64" y="385" font-size="11">JOIN (LeftOuter):</text>
+<text x="64" y="400" font-size="11">  - [dep].REV_LOC_ID = [loc].LOC_ID</text>
+<text x="64" y="415" font-size="11">JOIN (LeftOuter):</text>
+<text x="64" y="430" font-size="11">  - [census].ADT_EVENT_ID = [adt].EVENT_ID</text>
+<text x="64" y="445" font-size="11">JOIN (LeftOuter):</text>
+<text x="64" y="460" font-size="11">  - [adt].ADT_BED_ID = [bed].BED_ID</text>
+<text x="64" y="475" font-size="11">  - [adt].ADT_BED_CSN = [bed].BED_CSN_ID</text>
+<text x="64" y="490" font-size="11">JOIN (LeftOuter):</text>
+<text x="64" y="505" font-size="11">  - [adt].ADT_ROOM_ID = [rom].ROOM_ID</text>
+<text x="64" y="520" font-size="11">  - [adt].ADT_ROOM_CSN = [rom].ROOM_CSN_ID</text>
+<text x="64" y="535" font-size="11">JOIN (LeftOuter):</text>
+<text x="64" y="550" font-size="11">  - [census].CALENDAR_DT = [dd].CALENDAR_DT</text>
+<text x="64" y="565" font-size="11">WHERE:</text>
+<text x="64" y="580" font-size="11">  - 1=1</text>
+<text x="64" y="595" font-size="11">  - [census].CALENDAR_DT BETWEEN @StartDate AND @EndDate</text>
+<text x="64" y="610" font-size="11">  - [adt].ADT_SERV_AREA_ID IS NOT NULL</text>
+<text x="64" y="625" font-size="11">  - [dep].REV_LOC_ID IN ( '100108' -- hospital 1 , '100200' -- hospital 2 ) = 'COOK CHILDRENS MEDICAL CENTER PROSPER' (1</text>
+<text x="64" y="640" font-size="11">GROUP BY</text>
+<text x="20" y="666" font-size="12" fill="#333333">(12) Builds the clinic monthly selection.</text>
+<rect x="56" y="683" width="760" height="220" fill="#f7f7f7" stroke="#888888" rx="4"/>
+<text x="64" y="698" font-size="11" font-weight="bold">#clinic_monthly (temp_table)</text>
+<text x="64" y="713" font-size="11">PROJECTION: 14 members</text>
+<text x="64" y="728" font-size="11">FROM: [Clarity].[dbo].PAT_ENC	[enc], [Clarity].[dbo].CLARITY_DEP				[dep], [Clarity].[dbo].CLARITY_LOC				[loc], [Clarit</text>
+<text x="64" y="743" font-size="11">JOIN (LeftOuter):</text>
+<text x="64" y="758" font-size="11">  - [enc].DEPARTMENT_ID = [dep].DEPARTMENT_ID</text>
+<text x="64" y="773" font-size="11">JOIN (LeftOuter):</text>
+<text x="64" y="788" font-size="11">  - [dep].REV_LOC_ID = [loc].LOC_ID</text>
+<text x="64" y="803" font-size="11">JOIN (LeftOuter):</text>
+<text x="64" y="818" font-size="11">  - [enc].CONTACT_DATE = [dd].CALENDAR_DT</text>
+<text x="64" y="833" font-size="11">WHERE:</text>
+<text x="64" y="848" font-size="11">  - 1=1</text>
+<text x="64" y="863" font-size="11">  - [enc].CONTACT_DATE BETWEEN @StartDate AND @EndDate</text>
+<text x="64" y="878" font-size="11">  - [dep].DEPARTMENT_ID IN ( 10101207 --CARDIOTHORACIC SURGERY ,10101209 --ENT ,10101219 --PAL = 'PROSPER PEDI SURGERY' </text>
+<text x="64" y="893" font-size="11">GROUP BY</text>
+<text x="20" y="919" font-size="12" fill="#333333">(13) Builds the combined census selection.</text>
+<rect x="56" y="936" width="760" height="40" fill="#f7f7f7" stroke="#888888" rx="4"/>
+<text x="64" y="951" font-size="11" font-weight="bold">#combined_census (temp_table)</text>
+<text x="64" y="966" font-size="11">COMBINATION</text>
+<rect x="56" y="986" width="760" height="55" fill="#f7f7f7" stroke="#888888" rx="4"/>
+<text x="64" y="1001" font-size="11" font-weight="bold">None (union_arm)</text>
+<text x="64" y="1016" font-size="11">PROJECTION: 2 members, star</text>
+<text x="64" y="1031" font-size="11">FROM: #census_monthly</text>
+<rect x="56" y="1051" width="760" height="55" fill="#f7f7f7" stroke="#888888" rx="4"/>
+<text x="64" y="1066" font-size="11" font-weight="bold">None (union_arm)</text>
+<text x="64" y="1081" font-size="11">PROJECTION: 2 members, star</text>
+<text x="64" y="1096" font-size="11">FROM: #clinic_monthly</text>
+<text x="20" y="1122" font-size="12" fill="#333333">(14) Builds the caregivers selection.</text>
+<rect x="56" y="1139" width="760" height="85" fill="#f7f7f7" stroke="#888888" rx="4"/>
+<text x="64" y="1154" font-size="11" font-weight="bold">#caregivers (temp_table)</text>
+<text x="64" y="1169" font-size="11">PROJECTION: 2 members</text>
+<text x="64" y="1184" font-size="11">FROM: [Clarity].[dbo].PAT_RELATIONSHIP_LIST</text>
+<text x="64" y="1199" font-size="11">WHERE:</text>
+<text x="64" y="1214" font-size="11">  - (SELECT 1 FROM #combined_census WHERE [PAT_RELATIONSHIP_LIST].PAT_ID = [#combined_census].</text>
+<rect x="56" y="1234" width="760" height="85" fill="#f7f7f7" stroke="#888888" rx="4"/>
+<text x="64" y="1249" font-size="11" font-weight="bold">None (subquery)</text>
+<text x="64" y="1264" font-size="11">PROJECTION: 1 members</text>
+<text x="64" y="1279" font-size="11">FROM: #combined_census</text>
+<text x="64" y="1294" font-size="11">WHERE:</text>
+<text x="64" y="1309" font-size="11">  - [PAT_RELATIONSHIP_LIST].PAT_ID = [#combined_census].PAT_ID</text>
+<text x="20" y="1335" font-size="12" fill="#333333">(15) Builds the caregiver languages selection.</text>
+<rect x="56" y="1352" width="760" height="325" fill="#f7f7f7" stroke="#888888" rx="4"/>
+<text x="64" y="1367" font-size="11" font-weight="bold">#caregiver_languages (temp_table)</text>
+<text x="64" y="1382" font-size="11">PROJECTION: 2 members</text>
+<text x="64" y="1397" font-size="11">FROM: [Clarity].[dbo].PAT_REL_LANGUAGES	[lang], #caregivers, [Clarity].[dbo].ZC_LANGUAGE					[zc_lang], [Clarity].[dbo].</text>
+<text x="64" y="1412" font-size="11">JOIN (Inner):</text>
+<text x="64" y="1427" font-size="11">  - [lang].PAT_RELATIONSHIP_ID = [#caregivers].PAT_RELATIONSHIP_ID</text>
+<text x="64" y="1442" font-size="11">JOIN (Inner):</text>
+<text x="64" y="1457" font-size="11">  - [lang].LANGUAGE_C = [zc_lang].LANGUAGE_C</text>
+<text x="64" y="1472" font-size="11">JOIN (LeftOuter):</text>
+<text x="64" y="1487" font-size="11">  - [lang].PAT_RELATIONSHIP_ID = [hx].RELATIONSHIP_ID</text>
+<text x="64" y="1502" font-size="11">JOIN (LeftOuter):</text>
+<text x="64" y="1517" font-size="11">  - [hx].RELATION_TO_PAT_C = [relation].EMERG_PAT_REL_C</text>
+<text x="64" y="1532" font-size="11">WHERE:</text>
+<text x="64" y="1547" font-size="11">  - 1=1</text>
+<text x="64" y="1562" font-size="11">  - [hx].RELATIONSHIP_START_DATE &lt;= @EndDate</text>
+<text x="64" y="1577" font-size="11">  - [hx].RELATIONSHIP_END_DATE &gt;= @StartDate</text>
+<text x="64" y="1592" font-size="11">  - [hx].RELATIONSHIP_START_DATE &lt;= @EndDate</text>
+<text x="64" y="1607" font-size="11">  - [hx].RELATIONSHIP_END_DATE IS NULL</text>
+<text x="64" y="1622" font-size="11">  - [hx].RELATIONSHIP_START_DATE IS NULL</text>
+<text x="64" y="1637" font-size="11">  - [hx].RELATIONSHIP_END_DATE IS NULL</text>
+<text x="64" y="1652" font-size="11">  - [lang].LANGUAGE_TYPE_C = 1</text>
+<text x="64" y="1667" font-size="11">GROUP BY</text>
+<text x="20" y="1693" font-size="12" fill="#333333">(16) Builds the coverage selection, preparing the matching coverages selection first.</text>
+<rect x="56" y="1710" width="760" height="310" fill="#f7f7f7" stroke="#888888" rx="4"/>
+<text x="64" y="1725" font-size="11" font-weight="bold">matching_coverages (cte)</text>
+<text x="64" y="1740" font-size="11">PROJECTION: 7 members</text>
+<text x="64" y="1755" font-size="11">FROM: Clarity.dbo.COVERAGE_MEMBER_LIST	[member], #combined_census, Clarity.dbo.V_COVERAGE_PAYOR_PLAN	[coverage], Clarity</text>
+<text x="64" y="1770" font-size="11">JOIN (Inner):</text>
+<text x="64" y="1785" font-size="11">  - [member].PAT_ID = [#combined_census].PAT_ID</text>
+<text x="64" y="1800" font-size="11">JOIN (Inner):</text>
+<text x="64" y="1815" font-size="11">  - [member].COVERAGE_ID = [coverage].COVERAGE_ID</text>
+<text x="64" y="1830" font-size="11">JOIN (Inner):</text>
+<text x="64" y="1845" font-size="11">  - [coverage].PAYOR_ID = [payor].PAYOR_ID</text>
+<text x="64" y="1860" font-size="11">JOIN (Inner):</text>
+<text x="64" y="1875" font-size="11">  - [member].COVERAGE_ID = [filing].COVERAGE_ID</text>
+<text x="64" y="1890" font-size="11">WHERE:</text>
+<text x="64" y="1905" font-size="11">  - 1=1</text>
+<text x="64" y="1920" font-size="11">  - [member].MEM_EFF_TO_DATE &gt; [#combined_census].[Monthly Census Start Date]</text>
+<text x="64" y="1935" font-size="11">  - [member].MEM_EFF_TO_DATE IS NULL</text>
+<text x="64" y="1950" font-size="11">  - [payor].PAYOR_NAME NOT LIKE 'RX%'</text>
+<text x="64" y="1965" font-size="11">  - [member].MEM_COVERED_YN IN ( 'Y', '3', '4' )</text>
+<text x="64" y="1980" font-size="11">  - [member].MEM_EFF_FROM_DATE &lt;= [#combined_census].[Monthly Census Start Date]</text>
+<text x="64" y="1995" font-size="11">  - [coverage].EFF_DATE &lt;= [#combined_census].[Monthly Census Start Date]</text>
+<text x="64" y="2010" font-size="11">  - [coverage].TERM_DATE &gt; [#combined_census].[Monthly Census Start Date]</text>
+<rect x="56" y="2030" width="760" height="85" fill="#f7f7f7" stroke="#888888" rx="4"/>
+<text x="64" y="2045" font-size="11" font-weight="bold">#coverage (temp_table)</text>
+<text x="64" y="2060" font-size="11">PROJECTION: 1 members, star</text>
+<text x="64" y="2075" font-size="11">FROM: matching_coverages</text>
+<text x="64" y="2090" font-size="11">WHERE:</text>
+<text x="64" y="2105" font-size="11">  - CVG_FILING_ORDER = 1</text>
+<text x="20" y="2131" font-size="12" fill="#333333">(17) Delivers the procedure's result set.</text>
+<rect x="56" y="2148" width="760" height="730" fill="#f7f7f7" stroke="#888888" rx="4"/>
+<text x="64" y="2163" font-size="11" font-weight="bold">delivery (delivery)</text>
+<text x="64" y="2178" font-size="11">PROJECTION: 39 members</text>
+<text x="64" y="2193" font-size="11">FROM: #combined_census, #caregiver_languages, #coverage, [Clarity].[dbo].PATIENT				[pat], [Clarity].[dbo].PATIENT_4				</text>
+<text x="64" y="2208" font-size="11">JOIN (LeftOuter):</text>
+<text x="64" y="2223" font-size="11">  - [#combined_census].PAT_ID = [#caregiver_languages].PAT_ID</text>
+<text x="64" y="2238" font-size="11">JOIN (LeftOuter):</text>
+<text x="64" y="2253" font-size="11">  - [#combined_census].PAT_ID = [#coverage].PAT_ID</text>
+<text x="64" y="2268" font-size="11">  - [#combined_census].[Monthly Census Start Date] = [#coverage].[Monthly Census Start Date]</text>
+<text x="64" y="2283" font-size="11">JOIN (LeftOuter):</text>
+<text x="64" y="2298" font-size="11">  - [#combined_census].PAT_ID = [pat].PAT_ID</text>
+<text x="64" y="2313" font-size="11">JOIN (LeftOuter):</text>
+<text x="64" y="2328" font-size="11">  - [#combined_census].PAT_ID = [pat4].PAT_ID</text>
+<text x="64" y="2343" font-size="11">JOIN (LeftOuter):</text>
+<text x="64" y="2358" font-size="11">  - [#combined_census].PAT_ID = [myc].PAT_ID</text>
+<text x="64" y="2373" font-size="11">JOIN (LeftOuter):</text>
+<text x="64" y="2388" font-size="11">  - [pat].PAT_ID = [race_list].PAT_ID</text>
+<text x="64" y="2403" font-size="11">  - [race_list].LINE = 1</text>
+<text x="64" y="2418" font-size="11">JOIN (LeftOuter):</text>
+<text x="64" y="2433" font-size="11">  - [pat].LANGUAGE_C = [lang_zc].LANGUAGE_C</text>
+<text x="64" y="2448" font-size="11">JOIN (LeftOuter):</text>
+<text x="64" y="2463" font-size="11">  - [myc].MYCHART_STATUS_C = [myc_zc].MYCHART_STATUS_C</text>
+<text x="64" y="2478" font-size="11">JOIN (LeftOuter):</text>
+<text x="64" y="2493" font-size="11">  - [pat].SEX_C = [sex_zc].RCPT_MEM_SEX_C</text>
+<text x="64" y="2508" font-size="11">JOIN (LeftOuter):</text>
+<text x="64" y="2523" font-size="11">  - [pat4].SEX_ASGN_AT_BIRTH_C = [sex_birth_zc].SEX_ASGN_AT_BIRTH_C</text>
+<text x="64" y="2538" font-size="11">JOIN (LeftOuter):</text>
+<text x="64" y="2553" font-size="11">  - [pat].COUNTRY_C = [country_zc].COUNTRY_C</text>
+<text x="64" y="2568" font-size="11">JOIN (LeftOuter):</text>
+<text x="64" y="2583" font-size="11">  - [pat].TMP_COUNTRY_C = [country_tmp_zc].COUNTRY_C</text>
+<text x="64" y="2598" font-size="11">JOIN (LeftOuter):</text>
+<text x="64" y="2613" font-size="11">  - [pat].STATE_C = [state_zc].STATE_C</text>
+<text x="64" y="2628" font-size="11">JOIN (LeftOuter):</text>
+<text x="64" y="2643" font-size="11">  - [pat].TMP_STATE_C = [state_tmp_zc].STATE_C</text>
+<text x="64" y="2658" font-size="11">JOIN (LeftOuter):</text>
+<text x="64" y="2673" font-size="11">  - [pat4].GENDER_IDENTITY_C = [gender_zc].GENDER_IDENTITY_C</text>
+<text x="64" y="2688" font-size="11">JOIN (LeftOuter):</text>
+<text x="64" y="2703" font-size="11">  - [race_list].PATIENT_RACE_C = [race].PATIENT_RACE_C</text>
+<text x="64" y="2718" font-size="11">JOIN (LeftOuter):</text>
+<text x="64" y="2733" font-size="11">  - [pat].ETHNIC_GROUP_C = [ethnicity].ETHNIC_GROUP_C</text>
+<text x="64" y="2748" font-size="11">JOIN (LeftOuter):</text>
+<text x="64" y="2763" font-size="11">  - [pat].COUNTY_C = [county_zc].COUNTY_C</text>
+<text x="64" y="2778" font-size="11">JOIN (LeftOuter):</text>
+<text x="64" y="2793" font-size="11">  - [pat].TMP_COUNTY_C = [county_tmp_zc].COUNTY_C</text>
+<text x="64" y="2808" font-size="11">WHERE:</text>
+<text x="64" y="2823" font-size="11">  - [#caregiver_languages].[Caregiver Languages] NOT LIKE '%ENGLISH%'</text>
+<text x="64" y="2838" font-size="11">  - [#caregiver_languages].[Caregiver Languages] IS NULL</text>
+<text x="64" y="2853" font-size="11">  - [pat].LANGUAGE_C IS NULL</text>
+<text x="64" y="2868" font-size="11">  - [pat].LANGUAGE_C &lt;&gt; 22 = 'English' (22)</text>
+<polyline points="824,1514 832,1514 832,1181 824,1181" fill="none" stroke="#999999" stroke-width="1.2"/>
+<text x="834" y="1178" font-size="9" fill="#999999">fold</text>
+<polyline points="824,1514 846,1514 846,1181 824,1181" fill="none" stroke="#2a7d4f" stroke-width="1.2"/>
+<text x="848" y="1178" font-size="9" fill="#2a7d4f">member</text>
+<polyline points="824,1013 860,1013 860,472 824,472" fill="none" stroke="#999999" stroke-width="1.2"/>
+<text x="862" y="469" font-size="9" fill="#999999">fold</text>
+<polyline points="824,1078 874,1078 874,793 824,793" fill="none" stroke="#999999" stroke-width="1.2"/>
+<text x="876" y="790" font-size="9" fill="#999999">fold</text>
+<polyline points="824,2072 888,2072 888,1865 824,1865" fill="none" stroke="#999999" stroke-width="1.2"/>
+<text x="890" y="1862" font-size="9" fill="#999999">fold</text>
+<polyline points="824,2072 902,2072 902,1865 824,1865" fill="none" stroke="#2a7d4f" stroke-width="1.2"/>
+<text x="904" y="1862" font-size="9" fill="#2a7d4f">member</text>
+<polyline points="824,2513 916,2513 916,1514 824,1514" fill="none" stroke="#999999" stroke-width="1.2"/>
+<text x="918" y="1511" font-size="9" fill="#999999">fold</text>
+<polyline points="824,2513 930,2513 930,1514 824,1514" fill="none" stroke="#2a7d4f" stroke-width="1.2"/>
+<text x="932" y="1511" font-size="9" fill="#2a7d4f">member</text>
+<polyline points="824,2513 944,2513 944,472 824,472" fill="none" stroke="#2a5fbf" stroke-width="1.2"/>
+<text x="946" y="469" font-size="9" fill="#2a5fbf">star_member</text>
+<polyline points="824,2513 958,2513 958,793 824,793" fill="none" stroke="#2a5fbf" stroke-width="1.2"/>
+<text x="960" y="790" font-size="9" fill="#2a5fbf">star_member</text>
+<polyline points="824,2513 972,2513 972,956 824,956" fill="none" stroke="#999999" stroke-width="1.2"/>
+<text x="974" y="953" font-size="9" fill="#999999">fold</text>
+<polyline points="824,2513 986,2513 986,1013 824,1013" fill="none" stroke="#2a7d4f" stroke-width="1.2"/>
+<text x="988" y="1010" font-size="9" fill="#2a7d4f">member</text>
+<polyline points="824,2513 1000,2513 1000,2072 824,2072" fill="none" stroke="#999999" stroke-width="1.2"/>
+<text x="1002" y="2069" font-size="9" fill="#999999">fold</text>
+<polyline points="824,2513 1014,2513 1014,1865 824,1865" fill="none" stroke="#2a5fbf" stroke-width="1.2"/>
+<text x="1016" y="1862" font-size="9" fill="#2a5fbf">star_member</text>
+<polyline points="824,1865 1028,1865 1028,472 824,472" fill="none" stroke="#2a5fbf" stroke-width="1.2"/>
+<text x="1030" y="469" font-size="9" fill="#2a5fbf">star_member</text>
+<polyline points="824,1865 1042,1865 1042,793 824,793" fill="none" stroke="#2a5fbf" stroke-width="1.2"/>
+<text x="1044" y="790" font-size="9" fill="#2a5fbf">star_member</text>
+<polyline points="824,1865 1056,1865 1056,956 824,956" fill="none" stroke="#999999" stroke-width="1.2"/>
+<text x="1058" y="953" font-size="9" fill="#999999">fold</text>
+<polyline points="824,1276 1070,1276 1070,472 824,472" fill="none" stroke="#2a5fbf" stroke-width="1.2"/>
+<text x="1072" y="469" font-size="9" fill="#2a5fbf">star_member</text>
+<polyline points="824,1276 1084,1276 1084,793 824,793" fill="none" stroke="#2a5fbf" stroke-width="1.2"/>
+<text x="1086" y="790" font-size="9" fill="#2a5fbf">star_member</text>
+<polyline points="824,1276 1098,1276 1098,956 824,956" fill="none" stroke="#999999" stroke-width="1.2"/>
+<text x="1100" y="953" font-size="9" fill="#999999">fold</text>
+</svg>

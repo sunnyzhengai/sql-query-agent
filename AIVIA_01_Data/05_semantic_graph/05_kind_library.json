@@ -1,0 +1,727 @@
+{
+ "name": "05_kind_library",
+ "status": "RATIFIED 2026-10-01 (Sunny, in chat). Ported 2026-10-01 by Claude at Sunny's word (one-time mechanical port, from kg2_kind_library v1.52.0). From ratification on, this file grows by Sunny's hand only, one ruled row at a time (dated). L02 PORT 2026-10-02: Statement_Voicings (4 + _ruling) and Function_Voicings (19 + _ruling) ported verbatim at Sunny's word (06 contract L02); the two sheets RATIFIED 2026-10-02 (Sunny, in chat); all prior sheets remain ratified as above. GAP-CHECK ROWS 2026-10-03: six Function_Voicings rows added + ROW_NUMBER re-templated interim, at Sunny's ratification (all five gap-check items).",
+ "source": "AIVIA_Design/registries/kg2_kind_library.json v1.52.0 (the prior estate's ratified closed vocabularies) \u2014 rows ported verbatim",
+ "law": "THE RED-BUILD LAW (05 contract, decision 4): a ScriptDom type the build meets that is not in this file FAILS the build until a row is added here. Adding a row is the ruling.",
+ "omitted_on_port": {
+  "Statement_Voicings": "PORTED 2026-10-02 (06 contract L02, at Sunny's word, rows verbatim incl. the _ruling row) \u2014 was: phase 06 territory",
+  "Function_Voicings": "PORTED 2026-10-02 (06 contract L02, at Sunny's word, rows verbatim incl. the _ruling row) \u2014 was: phase 06 territory",
+  "Meaning_Node_Kinds": "the prior estate's twin graph; not part of the 05 metamodel",
+  "Gap_Classes": "stage 5 (L07) defines the unresolved classes it needs; port rows then if wanted",
+  "ReadMe_Rules/Test_Artifacts/Open_Rulings/Closed_Sets": "prior-estate process sheets, not vocabulary"
+ },
+ "sheets": {
+  "Structure_Kinds": [
+   {
+    "Kind": "AND",
+    "Meaning": "all children must hold",
+    "T-SQL sources": "AND (BooleanBinaryExpression)"
+   },
+   {
+    "Kind": "OR",
+    "Meaning": "any child may hold",
+    "T-SQL sources": "OR (BooleanBinaryExpression)",
+    "Notes": "An OR is a NODE \u2014 no walk can silently read it as AND."
+   },
+   {
+    "Kind": "NOT",
+    "Meaning": "the child's meaning, negated",
+    "T-SQL sources": "NOT (BooleanNotExpression); ALL negated syntax forms",
+    "Notes": "R1 RATIFIED 2026-09-04: NOT LIKE / NOT IN / NOT BETWEEN / IS NOT NULL / NOT EXISTS normalize to NOT over the positive kind; original syntax kept in evidence. One meaning, one kind; 'all pattern-match decisions' is one graph query."
+   },
+   {
+    "Kind": "(parentheses)",
+    "Meaning": "syntax only \u2014 shapes the tree, then dissolves",
+    "T-SQL sources": "BooleanParenthesisExpression",
+    "Notes": "The tree structure IS the grouping."
+   }
+  ],
+  "Structure_Kinds_Grain": [
+   {
+    "Kind": "_ruling",
+    "Meaning": "THE GRAIN-SOURCE CAPTURE (slice E, Brief_Pilot_Build_3, Sunny 'approved, build brief 3' 2026-09-20): ruling (1) named grain's definitional sources \u2014 GROUP BY and DISTINCT \u2014 and NEITHER was graph-held (FL21); the window OVER was a flag (FL17, a recorded deferral whose echo arrived). ONE capture act lands all three + the IF guard's THEN kind. The twin walk and parsed_census stay symmetric (both read the same keys); the metamodel bump 1.50.0 is the re-parse trigger.",
+    "T-SQL sources": "-",
+    "Notes": "-"
+   },
+   {
+    "Kind": "GROUP BY contents",
+    "Meaning": "scope.group_by = the grouping columns as mapped expressions (resolver-bound like every ref) \u2014 grain's first definitional source",
+    "T-SQL sources": "GroupByClause.GroupingSpecifications (ExpressionGroupingSpecification.Expression); other specification kinds -> counted remainder",
+    "Notes": "the string 'GROUP BY' stays in scope.structures (unchanged consumers)"
+   },
+   {
+    "Kind": "DISTINCT",
+    "Meaning": "scope.distinct = True \u2014 grain's second definitional source (one record per distinct combination of the outputs)",
+    "T-SQL sources": "QuerySpecification.UniqueRowFilter == Distinct",
+    "Notes": "absent when not distinct (no empty keys)"
+   },
+   {
+    "Kind": "OVER contents",
+    "Meaning": "function.over = {partition_by: [exprs], order_by: [{expr, descending}]} \u2014 the window's per-what and by-what; rank-filter partition grain and the R12 slotted ROW_NUMBER phrase stand on it",
+    "T-SQL sources": "OverClause.Partitions + OverClause.OrderByClause.OrderByElements (SortOrder Descending -> descending: true)",
+    "Notes": "truthiness preserved (a dict is truthy) \u2014 every over-as-flag consumer unchanged; window frame clauses stay uncaptured (outside the ruled family)"
+   },
+   {
+    "Kind": "IF THEN kind",
+    "Meaning": "statement.then_kind = the THEN statement's ScriptDom type; then_drops = dropped object names when it is DROP TABLE \u2014 the guard idiom's evidence (R11 amendment)",
+    "T-SQL sources": "IfStatement.ThenStatement (DropTableStatement.Objects)",
+    "Notes": "captured for IF only; the ELSE branch stays uncaptured (no ruled consumer)"
+   }
+  ],
+  "Structure_Kinds_Phase_A": [
+   {
+    "Kind": "PROJECTION",
+    "Meaning": "the SELECT list \u2014 what the scope outputs; one member per output column (name + expression subtree, position-ordered)",
+    "T-SQL sources": "SelectScalarExpression per member; SelectStarExpression -> COUNTED remainder (star_projection) until star expansion is ruled; any other select element -> counted remainder (closes the silent-skip hole the Phase A build found)",
+    "Notes": "Phase A build 2026-09-06 (ADR 0077): the A12 deferral lifted by its own planned recovery path \u2014 metamodel bump + re-parse. Lives beside Structure_Kinds (sheet-add keeps the xlsx untouched; merge at next draft-workbook revision)."
+   }
+  ],
+  "Predicate_Kinds": [
+   {
+    "Kind": "COMPARE_EQ",
+    "Meaning (one sentence)": "subject equals comparand",
+    "Roles": "subject, comparand",
+    "T-SQL syntax -> this kind": "="
+   },
+   {
+    "Kind": "COMPARE_NEQ",
+    "Meaning (one sentence)": "subject differs from comparand",
+    "Roles": "subject, comparand",
+    "T-SQL syntax -> this kind": "<>  and  != (two syntaxes, one kind)"
+   },
+   {
+    "Kind": "COMPARE_GT",
+    "Meaning (one sentence)": "subject exceeds comparand",
+    "Roles": "subject, comparand",
+    "T-SQL syntax -> this kind": ">"
+   },
+   {
+    "Kind": "COMPARE_GTE",
+    "Meaning (one sentence)": "subject is at least comparand",
+    "Roles": "subject, comparand",
+    "T-SQL syntax -> this kind": ">=  and  !< (legacy synonym)"
+   },
+   {
+    "Kind": "COMPARE_LT",
+    "Meaning (one sentence)": "subject is below comparand",
+    "Roles": "subject, comparand",
+    "T-SQL syntax -> this kind": "<"
+   },
+   {
+    "Kind": "COMPARE_LTE",
+    "Meaning (one sentence)": "subject is at most comparand",
+    "Roles": "subject, comparand",
+    "T-SQL syntax -> this kind": "<=  and  !> (legacy synonym)"
+   },
+   {
+    "Kind": "PATTERN_MATCH",
+    "Meaning (one sentence)": "subject's text matches a pattern",
+    "Roles": "subject, pattern, escape?",
+    "T-SQL syntax -> this kind": "LIKE (negation via NOT, R1 ratified)"
+   },
+   {
+    "Kind": "IN_LIST",
+    "Meaning (one sentence)": "subject is one of an enumerated set of values",
+    "Roles": "subject, comparand (one per member, ordered by position)",
+    "T-SQL syntax -> this kind": "IN (v1, v2, ...)",
+    "Notes": "A DIFFERENT kind from IN_SELECTION: enumerated values vs delegation to data."
+   },
+   {
+    "Kind": "IN_SELECTION",
+    "Meaning (one sentence)": "subject is a member of another selection's result \u2014 the decision's content lives in DATA (the value-set case)",
+    "Roles": "subject, selection",
+    "T-SQL syntax -> this kind": "IN (SELECT ...)",
+    "Notes": "The clinical value-set pattern; queryable on its own. Detection is STRUCTURAL (the comparand is a subquery_ref), never string-matching."
+   },
+   {
+    "Kind": "RANGE",
+    "Meaning (one sentence)": "subject falls between a lower and an upper bound, inclusive",
+    "Roles": "subject, lower_bound, upper_bound",
+    "T-SQL syntax -> this kind": "BETWEEN ... AND ... (negation via NOT)"
+   },
+   {
+    "Kind": "NULL_CHECK",
+    "Meaning (one sentence)": "subject has no recorded value",
+    "Roles": "subject",
+    "T-SQL syntax -> this kind": "IS NULL (IS NOT NULL via NOT)"
+   },
+   {
+    "Kind": "EXISTS_SELECTION",
+    "Meaning (one sentence)": "at least one row exists in another selection (usually correlated)",
+    "Roles": "selection",
+    "T-SQL syntax -> this kind": "EXISTS (SELECT ...) (NOT EXISTS via NOT)"
+   },
+   {
+    "Kind": "QUANTIFIED_COMPARE",
+    "Meaning (one sentence)": "subject compares against every/any row of a selection",
+    "Roles": "subject, selection",
+    "T-SQL syntax -> this kind": "= ANY (...), > ALL (...), SOME (SubqueryComparisonPredicate)",
+    "Notes": "RG-1 RULED 2026-09-05 (Sunny): comparison-op and quantifier are PROPERTIES of the predicate node, never roles \u2014 roles are edges to expression children, and an operator/quantifier is not an expression. The Roles sheet's quantifier row retires under the same ruling; roles stay a pure edge vocabulary."
+   },
+   {
+    "Kind": "(not kinds)",
+    "Meaning (one sentence)": "Degenerate predicates (1=1): map to their comparison kind; 'decides nothing' is a DERIVED fact (lens). CASE in predicate position: a comparison whose subject is a case expression node. Parameter defaults: IF structure + NULL_CHECK + assignment; 'parameter default' is a derived pattern. Decisions themselves: LENSES, never kinds (graph-leads ruling)."
+   }
+  ],
+  "Roles": [
+   {
+    "Role": "subject",
+    "Meaning": "what the predicate speaks about (the left-hand meaning)"
+   },
+   {
+    "Role": "comparand",
+    "Meaning": "the value/expression compared against; IN-list members are one comparand edge each, ordered by the contains edge's position property (reconciled: the former comparand-list role is retired \u2014 position owns order)"
+   },
+   {
+    "Role": "lower_bound / upper_bound",
+    "Meaning": "the two ends of a RANGE"
+   },
+   {
+    "Role": "pattern / escape",
+    "Meaning": "the match pattern (and optional escape) of PATTERN_MATCH"
+   },
+   {
+    "Role": "selection",
+    "Meaning": "a subquery scope used as the comparand (IN_SELECTION, EXISTS_SELECTION, QUANTIFIED_COMPARE) \u2014 reached via a subquery_ref child's resolves_to"
+   },
+   {
+    "Role": "(why roles)",
+    "Meaning": "Role labels ride the contains edges from predicate to expression children (ratified edge design). Without them a predicate knows which columns participate but not what it SAYS about them \u2014 the recorded misattribution bug class."
+   }
+  ],
+  "Expression_Kinds": [
+   {
+    "Kind": "column_ref",
+    "Meaning": "a MENTION of a column; resolves_to a KG layer 1 column node (or no edge = counted unresolved)"
+   },
+   {
+    "Kind": "table_ref",
+    "Meaning": "a MENTION of a table; resolves_to a KG layer 1 table OR a scope in the same tree (CTE / #temp stage) \u2014 ADDED in the ratified doc (a FROM references tables)"
+   },
+   {
+    "Kind": "literal",
+    "Meaning": "a constant value, owned by the predicate side"
+   },
+   {
+    "Kind": "parameter_ref",
+    "Meaning": "a mention of a parameter; resolves_to the file's parameter node"
+   },
+   {
+    "Kind": "function",
+    "Meaning": "function application over ordered child expressions"
+   },
+   {
+    "Kind": "arithmetic",
+    "Meaning": "arithmetic over child expressions"
+   },
+   {
+    "Kind": "case",
+    "Meaning": "value branching (WHENs hold predicates, THENs hold expressions)"
+   },
+   {
+    "Kind": "cast",
+    "Meaning": "representation change, not meaning change"
+   },
+   {
+    "Kind": "unary",
+    "Meaning": "sign/negation on a value (in the ratified doc list \u2014 R6 ratified 2026-09-04)"
+   },
+   {
+    "Kind": "subquery_ref",
+    "Meaning": "a mention of a nested selection used as a value; resolves_to its scope node"
+   }
+  ],
+  "Operational_Statement_Kinds": [
+   {
+    "ScriptDom type": "_ruling",
+    "Rationale": "T-2 RULED (Sunny, 2026-09-06, Phase B gap-check): these statement kinds carry NO analytic meaning \u2014 they tune the engine, manage staging lifecycle, or declare plumbing; none shapes what the data MEANS. Translated with subkind 'operational', voiced never \u2014 presence is the homomorphism law, silence is policy (the degenerate pattern at statement grain). The list is CLOSED: adding a kind is a ruling, never a code default."
+   },
+   {
+    "ScriptDom type": "CreateIndexStatement",
+    "Rationale": "performance tuning; no data meaning"
+   },
+   {
+    "ScriptDom type": "DropIndexStatement",
+    "Rationale": "performance tuning; no data meaning"
+   },
+   {
+    "ScriptDom type": "DropTableStatement",
+    "Rationale": "staging lifecycle cleanup"
+   },
+   {
+    "ScriptDom type": "TruncateTableStatement",
+    "Rationale": "staging lifecycle cleanup"
+   },
+   {
+    "ScriptDom type": "PredicateSetStatement",
+    "Rationale": "session options (SET NOCOUNT ...)"
+   },
+   {
+    "ScriptDom type": "SetTransactionIsolationLevelStatement",
+    "Rationale": "session options"
+   },
+   {
+    "ScriptDom type": "DeclareVariableStatement",
+    "Rationale": "plumbing declaration; a variable's MEANING arrives where it is assigned/used (SET @var MAPPED 2026-09-06 \u2014 assignments carry logic)"
+   },
+   {
+    "ScriptDom type": "PrintStatement",
+    "Rationale": "diagnostic text to the console; no data meaning (surfaced when WHILE bodies opened, 2026-09-06)"
+   },
+   {
+    "ScriptDom type": "LabelStatement",
+    "Rationale": "a jump marker; the MEANING lives on the GOTO that targets it (ledger close, 2026-09-06)"
+   },
+   {
+    "ScriptDom type": "UseStatement",
+    "Rationale": "USE [db] picks the database; shapes no population. RULED 2026-10-01 (Sunny, in chat \u2014 the L03 census finding: 2 rows in the 8-file corpus)."
+   }
+  ],
+  "TSQL_Denominator": [
+   {
+    "ScriptDom type": "BooleanBinaryExpression",
+    "Disposition": "mapped",
+    "Detail / reason": "AND / OR"
+   },
+   {
+    "ScriptDom type": "BooleanNotExpression",
+    "Disposition": "mapped",
+    "Detail / reason": "NOT (all negated syntax normalizes here \u2014 R1 ratified)"
+   },
+   {
+    "ScriptDom type": "BooleanParenthesisExpression",
+    "Disposition": "mapped",
+    "Detail / reason": "tree shape; node dissolves"
+   },
+   {
+    "ScriptDom type": "BooleanComparisonExpression",
+    "Disposition": "mapped",
+    "Detail / reason": "COMPARE_* \u2014 all 11 enum values: 6 operators + 2 NEQ syntaxes + 2 legacy synonyms; *= / =* deferred (row below)"
+   },
+   {
+    "ScriptDom type": "LikePredicate",
+    "Disposition": "mapped",
+    "Detail / reason": "PATTERN_MATCH"
+   },
+   {
+    "ScriptDom type": "InPredicate",
+    "Disposition": "mapped",
+    "Detail / reason": "IN_LIST / IN_SELECTION (structural split: subquery_ref comparand vs literal members)"
+   },
+   {
+    "ScriptDom type": "BooleanTernaryExpression",
+    "Disposition": "mapped",
+    "Detail / reason": "RANGE"
+   },
+   {
+    "ScriptDom type": "BooleanIsNullExpression",
+    "Disposition": "mapped",
+    "Detail / reason": "NULL_CHECK"
+   },
+   {
+    "ScriptDom type": "ExistsPredicate",
+    "Disposition": "mapped",
+    "Detail / reason": "EXISTS_SELECTION"
+   },
+   {
+    "ScriptDom type": "SubqueryComparisonPredicate",
+    "Disposition": "mapped",
+    "Detail / reason": "QUANTIFIED_COMPARE"
+   },
+   {
+    "ScriptDom type": "BooleanComparisonExpression *= / =*",
+    "Disposition": "DEFERRED",
+    "Detail / reason": "pre-1992 outer-join syntax, removed from modern SQL Server; counted remainder if ever seen"
+   },
+   {
+    "ScriptDom type": "DistinctPredicate",
+    "Disposition": "DEFERRED \u2014 R2 RATIFIED 2026-09-04",
+    "Detail / reason": "SQL 2022 null-safe equality; revisit on first estate sighting. CORRECTED at conversion 2026-09-05: ScriptDom actually emits DistinctPredicate \u2014 the draft's guessed type name would have broken the reflected-denominator check; caught by the F7 remainder case at the slice-2 build."
+   },
+   {
+    "ScriptDom type": "FullTextPredicate (CONTAINS/FREETEXT)",
+    "Disposition": "DEFERRED \u2014 R3 RATIFIED 2026-09-04",
+    "Detail / reason": "full-text search; rare in analytical estates"
+   },
+   {
+    "ScriptDom type": "GraphMatchPredicate (MATCH)",
+    "Disposition": "DEFERRED",
+    "Detail / reason": "SQL graph tables, out of scope"
+   },
+   {
+    "ScriptDom type": "UpdateCall / TSEqualCall",
+    "Disposition": "DEFERRED",
+    "Detail / reason": "trigger-context / legacy constructs, not analytical logic"
+   },
+   {
+    "ScriptDom type": "(anything beyond this table)",
+    "Disposition": "RED BUILD",
+    "Detail / reason": "the reflection check fails until the new type is mapped or deferred here with a reason"
+   },
+   {
+    "ScriptDom type": "EXEC(@sql) dynamic SQL",
+    "Disposition": "permanent counted gap",
+    "Detail / reason": "upstream of predicates entirely"
+   }
+  ],
+  "Statement_Gap_Classes": [
+   {
+    "ScriptDom type": "ExecuteStatement (ExecutableStringList form only \u2014 EXEC of a string; a procedure-call EXEC is NOT this class and stays in the remainder)",
+    "Gap class": "dynamic_sql",
+    "Meaning": "The statement executes SQL built as a string; static parsing sees the EXEC but not inside the string \u2014 the file's logic is partially opaque and its description must say so plainly.",
+    "Ruling": "RULED 2026-10-01 (Sunny, in chat): count it as a named gap class now (the placeholder law \u2014 no naked gaps). The chase \u2014 reconstructing a statically-built @SQL and parsing the reconstruction, marked as reconstructed, never parse-proven \u2014 is recorded as a CANDIDATE FUTURE PHASE in 05_semantic_graph.md."
+   }
+  ],
+  "Clause_Structure_Kinds": [
+   {
+    "Kind": "PROJECTION",
+    "Meaning": "the SELECT list \u2014 what the scope outputs; properties: distinct, member_total (stars counted)",
+    "Ruling": "RULED 2026-10-02 (Sunny, in chat, stage-3 amendment)"
+   },
+   {
+    "Kind": "FROM",
+    "Meaning": "the scope's sources",
+    "Ruling": "RULED 2026-10-02"
+   },
+   {
+    "Kind": "JOIN",
+    "Meaning": "one per join; join_type: Inner | LeftOuter | RightOuter | FullOuter | Cross | comma | CrossApply | OuterApply",
+    "Ruling": "RULED 2026-10-02"
+   },
+   {
+    "Kind": "WHERE",
+    "Meaning": "the population filter clause",
+    "Ruling": "RULED 2026-10-02"
+   },
+   {
+    "Kind": "GROUP BY",
+    "Meaning": "the grain clause (grain ruling, slice E)",
+    "Ruling": "RULED 2026-10-02"
+   },
+   {
+    "Kind": "HAVING",
+    "Meaning": "the post-grouping filter",
+    "Ruling": "RULED 2026-10-02"
+   },
+   {
+    "Kind": "ORDER BY",
+    "Meaning": "ordering of the output",
+    "Ruling": "RULED 2026-10-02"
+   },
+   {
+    "Kind": "TOP",
+    "Meaning": "row limit \u2014 its own kind: shapes the population even without ORDER BY; top_text verbatim until stage 4",
+    "Ruling": "RULED 2026-10-02"
+   },
+   {
+    "Kind": "COMBINATION",
+    "Meaning": "UNION/EXCEPT/INTERSECT; combination_type + all; each arm is a FULL scope (union_arm) \u2014 never an empty combination",
+    "Ruling": "RULED 2026-10-02"
+   },
+   {
+    "Kind": "SET",
+    "Meaning": "UPDATE's assignment clause",
+    "Ruling": "RULED 2026-10-02"
+   },
+   {
+    "Kind": "(not kinds)",
+    "Meaning": "CASE is an expression (stage 4); boolean AND/OR/NOT are the predicate tree's shape (stage 4)",
+    "Ruling": "RULED 2026-10-02"
+   }
+  ],
+  "Resolution_Classes": [
+   {
+    "Class": "unknown_table",
+    "Meaning": "table absent from the dictionary \u2014 the human queue: each row a request-for-metadata; dictionary-growth flywheel ore",
+    "Ruling": "RULED 2026-10-02 (Sunny, in chat, stage-5 amendment)"
+   },
+   {
+    "Class": "unknown_column",
+    "Meaning": "table known, column genuinely absent \u2014 a phase 02 extract-quality signal",
+    "Ruling": "RULED 2026-10-02 (Sunny, in chat, stage-5 amendment)"
+   },
+   {
+    "Class": "blocked_by_unknown_table",
+    "Meaning": "columns whose every candidate table is unknown \u2014 consequences, not causes; no lookup attempted; clear themselves when the table lands",
+    "Ruling": "RULED 2026-10-02 (Sunny, in chat, stage-5 amendment)"
+   },
+   {
+    "Class": "ambiguous_column",
+    "Meaning": "a bare column matching more than one in-scope table \u2014 candidates listed, never a pick",
+    "Ruling": "RULED 2026-10-02 (Sunny, in chat, stage-5 amendment)"
+   },
+   {
+    "Class": "wildcard",
+    "Meaning": "the * references \u2014 nothing to resolve by design; classed so conservation balances",
+    "Ruling": "RULED 2026-10-02 (Sunny, in chat, stage-5 amendment)"
+   },
+   {
+    "Class": "table_function",
+    "Meaning": "a function used as a source (STRING_SPLIT) \u2014 not a table, kept visible",
+    "Ruling": "RULED 2026-10-02 (Sunny, in chat, stage-5 amendment)"
+   },
+   {
+    "Class": "scope_column_missing",
+    "Meaning": "a column read through a scope that is neither an explicit output nor behind a star",
+    "Ruling": "RULED 2026-10-02 (Sunny, in chat, stage-5 amendment)"
+   },
+   {
+    "Class": "value_code_unknown",
+    "Meaning": "a routed comparand code missing from the value estate \u2014 the false-absence lesson",
+    "Ruling": "RULED 2026-10-02 (Sunny, in chat, stage-5 amendment)"
+   },
+   {
+    "Class": "unknown_parameter",
+    "Meaning": "a @name used but never declared",
+    "Ruling": "RULED 2026-10-02 (Sunny, in chat, stage-5 amendment)"
+   },
+   {
+    "Class": "(the gate)",
+    "Meaning": "GAP-FIRST: phase 06 does not open while unknown_table is outstanding \u2014 resolved into a dictionary or accepted by Sunny's named ruling",
+    "Ruling": "RULED 2026-10-02 (Sunny, in chat, stage-5 amendment)"
+   }
+  ],
+  "Statement_Voicings": [
+   {
+    "Statement kind": "_ruling",
+    "Voicing template (DRAFT \u2014 Sunny gap-checks the 36)": "THE STATEMENT-VOICING LIBRARY (Brief_M5_Statement_Layer, Sunny's 'approved' 2026-09-17): statement kinds voice by their row \u2014 a CLOSED, MEASURED set (ed_sepsis_dev census 2026-09-17: SELECT INTO 33 \u00b7 IF 2 \u00b7 delivering SELECT 1). An unlisted data-producing kind stores NOTHING and lands a COUNTED statement_remainders row, never silent (the R12 remainder precedent). OPERATIONAL kinds (T-2, 2026-09-06) voice NEVER \u2014 no description property, the emptiness counted (the (b) ruling 2026-09-17). Selection names speak through the SAME fold _source_phrase uses (author's words, # stripped, underscores to spaces, lowercased \u2014 one home).",
+    "Source": "Brief_M5_Statement_Layer",
+    "Estate count (measured 2026-09-17)": "-"
+   },
+   {
+    "Statement kind": "SELECT INTO",
+    "Voicing template (DRAFT \u2014 Sunny gap-checks the 36)": "Builds the <selection> selection. | with CTE helpers: Builds the <selection> selection, preparing <the A selection[, the B selection] and the C selection> first.",
+    "Source": "authored 2026-09-17",
+    "Estate count (measured 2026-09-17)": "33"
+   },
+   {
+    "Statement kind": "IF",
+    "Voicing template (DRAFT \u2014 Sunny gap-checks the 36)": "A decision step, taken when <condition phrase>. (<condition phrase> = the statement-rooted predicate's R1-R7 render, first letter lowered; a top-level OR/AND composite joins its children's phrases with or/and \u2014 never the structural summary)",
+    "Source": "authored 2026-09-17",
+    "Estate count (measured 2026-09-17)": "2"
+   },
+   {
+    "Statement kind": "SELECT (emits)",
+    "Voicing template (DRAFT \u2014 Sunny gap-checks the 36)": "Delivers the procedure's result set. (the per-step voice; WHICH result stays R10's delivery lead \u2014 one home per meaning)",
+    "Source": "authored 2026-09-17",
+    "Estate count (measured 2026-09-17)": "1"
+   },
+   {
+    "Statement kind": "IF (temp-table-existence guard)",
+    "Voicing template (DRAFT \u2014 Sunny gap-checks the 36)": "A cleanup step: removes the previous <#name> when it already exists. (THE GUARD IDIOM, FL10 family \u2014 Brief_Pilot_Build_3: fires ONLY when BOTH hold in the tree: the predicate is NOT(NULL_CHECK(OBJECT_ID(\u2026))) and the THEN statement is DROP TABLE (then_kind, captured at map time); <#name> = the dropped table's own name, verbatim. Anything else keeps the decision-step voice \u2014 the idiom never guesses)",
+    "Source": "Brief_Pilot_Build_3, Sunny 'approved, build brief 3' 2026-09-20; the object_id raw fragment corpse from the work pilot",
+    "Estate count (measured 2026-09-17)": "-"
+   }
+  ],
+  "Function_Voicings": [
+   {
+    "Operation": "_ruling",
+    "Kind": "-",
+    "Slots": "-",
+    "Voicing template (DRAFT \u2014 Sunny gap-checks phrasing)": "THE FUNCTION-VOICING LIBRARY (Sunny 2026-09-16, M4 planning): operation voicings are a CLOSED set \u2014 a new function is a registry row, never silent (the kind-vs-label posture, R4's total-voicing precedent). Named functions voice by their row; composite kinds (case/cast/unary/arithmetic) voice by rule in Grammar_Floor \u00a7R12; an unlisted operation renders 'a value computed from <operand words>' + a COUNTED REMAINDER row. Slots voice inside-out (children's finished phrases). Estate counts measured 2026-09-16 from the ed_sepsis_dev twin (projection subtrees + condition operands). UDFs join as schema-qualified rows when an estate practices them.",
+    "Source": "Sunny's ruling 2026-09-16; Grammar_Floor \u00a7R12 (RATIFIED v2.10.0 same day)",
+    "Estate count (measured 2026-09-16)": "-"
+   },
+   {
+    "Operation": "DATEDIFF",
+    "Kind": "function",
+    "Slots": "unit, from, to",
+    "Voicing template (DRAFT \u2014 Sunny gap-checks phrasing)": "the number of <unit>s between <from> and <to>",
+    "Source": "authored 2026-09-16",
+    "Estate count (measured 2026-09-16)": "56"
+   },
+   {
+    "Operation": "ROW_NUMBER",
+    "Kind": "function (window)",
+    "Slots": "partition, order (captured contents; slotless fallback when only the flag survives)",
+    "Voicing template (DRAFT \u2014 Sunny gap-checks phrasing)": "INTERIM (until the 05 OVER amendment): its position in an ordered sequence of records",
+    "Source": "RULED 2026-10-03 (Sunny, in chat: 'ratify all five as recommended'; corpus-measured counts)",
+    "Estate count (measured 2026-09-16)": "26"
+   },
+   {
+    "Operation": "DATEADD",
+    "Kind": "function",
+    "Slots": "unit, n, base",
+    "Voicing template (DRAFT \u2014 Sunny gap-checks phrasing)": "<n> <unit>s after <base>; NEGATIVE n (v1.51.0, FL10 C3): <n> <unit>s before <base> \u2014 the guard reads through the unary-minus wrapper, the raw fragment can never print for a negative offset again; GETDATE-relative COMPARISON idiom (law in Grammar_Floor R15): subject >= DATEADD(unit, -N, now) speaks 'is within the last N <unit>s', <= +N 'within the next N <unit>s'",
+    "Source": "ADR 0076 overlay ABSORBED verbatim; negative-offset + idiom riders Brief_Pilot_Build_2 (Sunny 'agree with all seven recommendations, build it' 2026-09-20)",
+    "Estate count (measured 2026-09-16)": "13"
+   },
+   {
+    "Operation": "CHARINDEX",
+    "Kind": "function",
+    "Slots": "find, in",
+    "Voicing template (DRAFT \u2014 Sunny gap-checks phrasing)": "the position of <find> within <in>",
+    "Source": "authored 2026-09-16",
+    "Estate count (measured 2026-09-16)": "6"
+   },
+   {
+    "Operation": "LEFT",
+    "Kind": "function",
+    "Slots": "s, n",
+    "Voicing template (DRAFT \u2014 Sunny gap-checks phrasing)": "the first <n> characters of <s>",
+    "Source": "ADR 0076 overlay ABSORBED verbatim",
+    "Estate count (measured 2026-09-16)": "6"
+   },
+   {
+    "Operation": "MIN",
+    "Kind": "function (aggregate)",
+    "Slots": "arg",
+    "Voicing template (DRAFT \u2014 Sunny gap-checks phrasing)": "the smallest <arg>; when <arg> is temporal (date/time data type from the dictionary), the earliest <arg>",
+    "Source": "authored 2026-09-16; temporal variant RULED (Sunny 2026-09-16: 'yes, say earliest for dates')",
+    "Estate count (measured 2026-09-16)": "4"
+   },
+   {
+    "Operation": "FLOOR",
+    "Kind": "function",
+    "Slots": "arg",
+    "Voicing template (DRAFT \u2014 Sunny gap-checks phrasing)": "<arg>, rounded down to a whole number",
+    "Source": "authored 2026-09-16",
+    "Estate count (measured 2026-09-16)": "3"
+   },
+   {
+    "Operation": "COALESCE",
+    "Kind": "function",
+    "Slots": "args\u2026",
+    "Voicing template (DRAFT \u2014 Sunny gap-checks phrasing)": "the first recorded of <args>",
+    "Source": "ADR 0076 overlay ABSORBED verbatim",
+    "Estate count (measured 2026-09-16)": "3"
+   },
+   {
+    "Operation": "DATENAME",
+    "Kind": "function",
+    "Slots": "part, d",
+    "Voicing template (DRAFT \u2014 Sunny gap-checks phrasing)": "the name of the <part> of <d>",
+    "Source": "authored 2026-09-16",
+    "Estate count (measured 2026-09-16)": "2"
+   },
+   {
+    "Operation": "DATEPART",
+    "Kind": "function",
+    "Slots": "part, d",
+    "Voicing template (DRAFT \u2014 Sunny gap-checks phrasing)": "the <part> of <d>",
+    "Source": "authored 2026-09-16",
+    "Estate count (measured 2026-09-16)": "2"
+   },
+   {
+    "Operation": "STUFF + FOR XML PATH('')",
+    "Kind": "compound idiom (matched FIRST, before the literal STUFF row)",
+    "Slots": "a (the inner selected value), order (optional, from the inner ORDER BY)",
+    "Voicing template (DRAFT \u2014 Sunny gap-checks phrasing)": "every <a> joined into one list \u2014 STRING_AGG's meaning: the pre-2017 spelling of the same list-join; the STUFF is only trimming the leading separator. The <order> slot shares ROW_NUMBER's recorded deferral (ORDER BY is a structure flag, not contents)",
+    "Source": "THE STUFF LIST IDIOM RULED (Sunny 2026-09-16: 'rule the idiom') \u2014 meaning over syntax, the token-link-reduction precedent",
+    "Estate count (measured 2026-09-16)": "2 (both estate STUFF uses are this pattern)"
+   },
+   {
+    "Operation": "STUFF",
+    "Kind": "function",
+    "Slots": "s, start, len, r",
+    "Voicing template (DRAFT \u2014 Sunny gap-checks phrasing)": "<s> with a segment replaced by <r>",
+    "Source": "authored 2026-09-16; stays for non-idiom uses (0 in this estate \u2014 the idiom row above rules its pattern first)",
+    "Estate count (measured 2026-09-16)": "0"
+   },
+   {
+    "Operation": "ISNULL",
+    "Kind": "function",
+    "Slots": "a, b",
+    "Voicing template (DRAFT \u2014 Sunny gap-checks phrasing)": "<a>, or <b> when <a> is not recorded; FAR-FUTURE SENTINEL rider (v1.51.0, FL10 C3): <b> a date literal with year 2900+ speaks '<a>, treating a missing date as open-ended' \u2014 the sentinel is the author's open-ended idiom, never a real date",
+    "Source": "authored 2026-09-16; sentinel rider Brief_Pilot_Build_2 (2026-09-20)",
+    "Estate count (measured 2026-09-16)": "1"
+   },
+   {
+    "Operation": "ROUND",
+    "Kind": "function",
+    "Slots": "a, n",
+    "Voicing template (DRAFT \u2014 Sunny gap-checks phrasing)": "<a> rounded to <n> decimal places",
+    "Source": "authored 2026-09-16",
+    "Estate count (measured 2026-09-16)": "1"
+   },
+   {
+    "Operation": "STRING_AGG",
+    "Kind": "function (aggregate)",
+    "Slots": "a, sep",
+    "Voicing template (DRAFT \u2014 Sunny gap-checks phrasing)": "every <a> joined into one list",
+    "Source": "authored 2026-09-16",
+    "Estate count (measured 2026-09-16)": "1"
+   },
+   {
+    "Operation": "RIGHT",
+    "Kind": "function",
+    "Slots": "s, n",
+    "Voicing template (DRAFT \u2014 Sunny gap-checks phrasing)": "the last <n> characters of <s>",
+    "Source": "ADR 0076 overlay ABSORBED verbatim (rides its LEFT pair)",
+    "Estate count (measured 2026-09-16)": "0"
+   },
+   {
+    "Operation": "GETDATE",
+    "Kind": "function",
+    "Slots": "(none)",
+    "Voicing template (DRAFT \u2014 Sunny gap-checks phrasing)": "the current date and time (the R12 remainder row lands \u2014 FL10 named CONVERT and GETDATE rowless; CONVERT needs none, it maps as the cast kind and cast is TRANSPARENT on both paths since v1.51.0)",
+    "Source": "Brief_Pilot_Build_2 C3 (Sunny 'agree with all seven recommendations, build it' 2026-09-20)",
+    "Estate count (measured 2026-09-16)": "-"
+   },
+   {
+    "Operation": "LAG",
+    "Kind": "function (window)",
+    "Slots": "x, partition, order (captured contents; slotless fallback)",
+    "Voicing template (DRAFT \u2014 Sunny gap-checks phrasing)": "with captured over contents: the previous record's <x> within each <partition>, ordered by <order>; order-only: the previous record's <x>, ordered by <order>; flag-only fallback: the previous record's <x> in its ordered sequence \u2014 the R12 slot form (C5 (a): slice E's capture predates this row; never an empty slot in prose)",
+    "Source": "Brief_Pilot_Build_2 C5 (FL14; 2026-09-20)",
+    "Estate count (measured 2026-09-16)": "-"
+   },
+   {
+    "Operation": "LEAD",
+    "Kind": "function (window)",
+    "Slots": "x, partition, order (captured contents; slotless fallback)",
+    "Voicing template (DRAFT \u2014 Sunny gap-checks phrasing)": "with captured over contents: the next record's <x> within each <partition>, ordered by <order>; order-only: the next record's <x>, ordered by <order>; flag-only fallback: the next record's <x> in its ordered sequence (rides its LAG pair)",
+    "Source": "Brief_Pilot_Build_2 C5 (FL14; 2026-09-20)",
+    "Estate count (measured 2026-09-16)": "-"
+   },
+   {
+    "Operation": "MAX",
+    "Kind": "function (aggregate)",
+    "Slots": "<arg>",
+    "Voicing template (DRAFT \u2014 Sunny gap-checks phrasing)": "the largest <arg>; when <arg> is temporal (date/time/instant words): the latest <arg>",
+    "Source": "RULED 2026-10-03 (Sunny, in chat: 'ratify all five as recommended'; corpus-measured counts)",
+    "Estate count (measured 2026-09-16)": "8"
+   },
+   {
+    "Operation": "COUNT",
+    "Kind": "function (aggregate)",
+    "Slots": "<arg>",
+    "Voicing template (DRAFT \u2014 Sunny gap-checks phrasing)": "the count of <arg>; star argument: the count of records",
+    "Source": "RULED 2026-10-03 (Sunny, in chat: 'ratify all five as recommended'; corpus-measured counts)",
+    "Estate count (measured 2026-09-16)": "6"
+   },
+   {
+    "Operation": "SUM",
+    "Kind": "function (aggregate)",
+    "Slots": "<arg>",
+    "Voicing template (DRAFT \u2014 Sunny gap-checks phrasing)": "the total of <arg>",
+    "Source": "RULED 2026-10-03 (Sunny, in chat: 'ratify all five as recommended'; corpus-measured counts)",
+    "Estate count (measured 2026-09-16)": "2"
+   },
+   {
+    "Operation": "CONCAT",
+    "Kind": "function",
+    "Slots": "<args>",
+    "Voicing template (DRAFT \u2014 Sunny gap-checks phrasing)": "<args> joined into one text",
+    "Source": "RULED 2026-10-03 (Sunny, in chat: 'ratify all five as recommended'; corpus-measured counts)",
+    "Estate count (measured 2026-09-16)": "6"
+   },
+   {
+    "Operation": "FORMAT",
+    "Kind": "function",
+    "Slots": "<arg>, <pattern>",
+    "Voicing template (DRAFT \u2014 Sunny gap-checks phrasing)": "<arg>, formatted as <pattern>",
+    "Source": "RULED 2026-10-03 (Sunny, in chat: 'ratify all five as recommended'; corpus-measured counts)",
+    "Estate count (measured 2026-09-16)": "1"
+   },
+   {
+    "Operation": "CHAR",
+    "Kind": "function",
+    "Slots": "<n>",
+    "Voicing template (DRAFT \u2014 Sunny gap-checks phrasing)": "the character with code <n>",
+    "Source": "RULED 2026-10-03 (Sunny, in chat: 'ratify all five as recommended'; corpus-measured counts)",
+    "Estate count (measured 2026-09-16)": "4"
+   }
+  ]
+ }
+}

@@ -30843,7 +30843,7 @@
       "CLARITY_ROM": "emr",
       "CLARITY_SA": "emr",
       "COVERAGE_MEMBER_LIST": "emr",
-      "CR_STAT_EXECUTION": "no_dictionary_match",
+      "CR_STAT_EXECUTION": "emr",
       "DATE_DIMENSION": "emr",
       "F_IP_HSP_PAT_DAYS": "emr",
       "F_SCHED_APPT": "emr",

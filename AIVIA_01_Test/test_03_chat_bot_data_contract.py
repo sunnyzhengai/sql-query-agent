@@ -544,6 +544,7 @@ def test_real_assets_smoke():
         pytest.skip("abstract list not built yet")
     assets = chat_bot.load_assets(DATA02, DATA03)
     census = assets["census"]
-    assert census["tables"] == 38 and census["columns"] == 1618
-    assert census["abstract_rows"] >= 1656
+    # Re-based 2026-10-02: the CR_STAT_EXECUTION supplemental entry.
+    assert census["tables"] == 39 and census["columns"] == 1621
+    assert census["abstract_rows"] >= 1660
     assert census["lane2_ready"] is True

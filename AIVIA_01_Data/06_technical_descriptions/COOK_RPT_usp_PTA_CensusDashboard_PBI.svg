@@ -1,0 +1,59 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="980" height="902" font-family="monospace">
+<text x="20" y="28" font-size="15" font-weight="bold">COOK_RPT_usp_PTA_CensusDashboard_PBI</text>
+<text x="20" y="48" font-size="12" fill="#777777">(1) [operational_statement]</text>
+<text x="20" y="71" font-size="12" fill="#777777">(2) [operational_statement]</text>
+<text x="20" y="94" font-size="12" fill="#333333">(3) Delivers the procedure's result set.</text>
+<rect x="56" y="111" width="760" height="130" fill="#f7f7f7" stroke="#888888" rx="4"/>
+<text x="64" y="126" font-size="11" font-weight="bold">month_cte (cte)</text>
+<text x="64" y="141" font-size="11">PROJECTION: 1 members</text>
+<text x="64" y="156" font-size="11">FROM: Clarity.dbo.CLARITY_ADT adt</text>
+<text x="64" y="171" font-size="11">WHERE:</text>
+<text x="64" y="186" font-size="11">  - adt.EVENT_TYPE_C = 6</text>
+<text x="64" y="201" font-size="11">  - EFFECTIVE_TIME &gt;= @StartDate</text>
+<text x="64" y="216" font-size="11">  - adt.PAT_ID IS NOT NULL</text>
+<text x="64" y="231" font-size="11">  - adt.EVENT_SUBTYPE_C &lt;&gt; 2</text>
+<rect x="56" y="251" width="760" height="430" fill="#f7f7f7" stroke="#888888" rx="4"/>
+<text x="64" y="266" font-size="11" font-weight="bold">delivery (delivery)</text>
+<text x="64" y="281" font-size="11">PROJECTION: 21 members</text>
+<text x="64" y="296" font-size="11">FROM: Clarity.dbo.CLARITY_ADT adt, Clarity.dbo.CLARITY_BED bed, Clarity.dbo.CLARITY_ROM room, Clarity.dbo.CLARITY_DEP de</text>
+<text x="64" y="311" font-size="11">JOIN (LeftOuter):</text>
+<text x="64" y="326" font-size="11">  - adt.BED_CSN_ID=bed.BED_CSN_ID</text>
+<text x="64" y="341" font-size="11">JOIN (LeftOuter):</text>
+<text x="64" y="356" font-size="11">  - adt.ROOM_CSN_ID=room.ROOM_CSN_ID</text>
+<text x="64" y="371" font-size="11">JOIN (LeftOuter):</text>
+<text x="64" y="386" font-size="11">  - adt.DEPARTMENT_ID=dep.DEPARTMENT_ID</text>
+<text x="64" y="401" font-size="11">JOIN (LeftOuter):</text>
+<text x="64" y="416" font-size="11">  - adt.PAT_CLASS_C=class.ADT_PAT_CLASS_C</text>
+<text x="64" y="431" font-size="11">JOIN (LeftOuter):</text>
+<text x="64" y="446" font-size="11">  - adt.PAT_SERVICE_C=serv.HOSP_SERV_C</text>
+<text x="64" y="461" font-size="11">JOIN (LeftOuter):</text>
+<text x="64" y="476" font-size="11">  - dep.SERV_AREA_ID=sa.SERV_AREA_ID</text>
+<text x="64" y="491" font-size="11">JOIN (LeftOuter):</text>
+<text x="64" y="506" font-size="11">  - adt.PAT_ID = pt.PAT_ID</text>
+<text x="64" y="521" font-size="11">JOIN (LeftOuter):</text>
+<text x="64" y="536" font-size="11">  - adt.PAT_ENC_CSN_ID = hsp.PAT_ENC_CSN_ID</text>
+<text x="64" y="551" font-size="11">JOIN (LeftOuter):</text>
+<text x="64" y="566" font-size="11">  - hsp.DISCH_DISP_C = disp.DISCH_DISP_C</text>
+<text x="64" y="581" font-size="11">WHERE:</text>
+<text x="64" y="596" font-size="11">  - adt.EVENT_TYPE_C = 6</text>
+<text x="64" y="611" font-size="11">  - EFFECTIVE_TIME &gt;= @StartDate</text>
+<text x="64" y="626" font-size="11">  - adt.PAT_ID IS NOT NULL</text>
+<text x="64" y="641" font-size="11">  - adt.EVENT_SUBTYPE_C &lt;&gt; 2</text>
+<text x="64" y="656" font-size="11">  - dep.SERV_AREA_ID = 10 = 'COOK CHILDREN'S SERVICE AREA' (10)</text>
+<text x="64" y="671" font-size="11">ORDER BY</text>
+<rect x="56" y="691" width="760" height="55" fill="#f7f7f7" stroke="#888888" rx="4"/>
+<text x="64" y="706" font-size="11" font-weight="bold">None (subquery)</text>
+<text x="64" y="721" font-size="11">PROJECTION: 1 members</text>
+<text x="64" y="736" font-size="11">FROM: month_cte</text>
+<rect x="56" y="756" width="760" height="100" fill="#f7f7f7" stroke="#888888" rx="4"/>
+<text x="64" y="771" font-size="11" font-weight="bold">None (subquery)</text>
+<text x="64" y="786" font-size="11">PROJECTION: 1 members</text>
+<text x="64" y="801" font-size="11">FROM: clarity.dbo.CR_STAT_EXECUTION</text>
+<text x="64" y="816" font-size="11">WHERE:</text>
+<text x="64" y="831" font-size="11">  - EXEC_SCHEDULED_YN = 'Y'</text>
+<text x="64" y="846" font-size="11">  - EXEC_NAME = 'Daily_ETL'</text>
+<polyline points="824,718 832,718 832,176 824,176" fill="none" stroke="#999999" stroke-width="1.2"/>
+<text x="834" y="173" font-size="9" fill="#999999">fold</text>
+<polyline points="824,718 846,718 846,176 824,176" fill="none" stroke="#2a7d4f" stroke-width="1.2"/>
+<text x="848" y="173" font-size="9" fill="#2a7d4f">member</text>
+</svg>

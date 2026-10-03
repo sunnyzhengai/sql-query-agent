@@ -1,6 +1,9 @@
 # Brief_M07_Stage_B_Host
 
-Status: DRAFT for Sunny's ruling (Claude, overnight 2026-10-01).
+Status: RULED (Sunny, 2026-10-01, in chat): B1 builds in this phase
+(04); B2 deferred to its own later phase; Shape 2 rejected
+(one-engine law). SaaS-offer timing: still open.
+Drafted: Claude, overnight 2026-10-01.
 The question: where does the production chat surface live? (04 design
 decision 7, stage B.)
 
@@ -81,9 +84,10 @@ generation before transactability).
 
 ## For Sunny's ruling
 
-[ ] B1 ruled: Shape 1 builds (in phase 04 / as its own phase — pick)
-[ ] B2 deferred to its own phase, keyed to the marketplace push
-[ ] Shape 2 rejected (one-engine law)
+[x] B1 ruled: Shape 1 builds in phase 04 (Sunny, 2026-10-01)
+[x] B2 deferred to its own phase, keyed to the marketplace push
+    (Sunny, 2026-10-01)
+[x] Shape 2 rejected (one-engine law) (Sunny, 2026-10-01)
 [ ] The SaaS offer's timing — with B1, with B2, or later
 
 ## Sources

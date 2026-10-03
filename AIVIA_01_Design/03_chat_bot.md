@@ -202,6 +202,6 @@ Companion edits when this doc lands (Sunny's hand, other files):
 - 02_emr_data_dictionary.md L06: body replaced with "superseded — the
   chat is its own phase, 03_chat_bot.md".
 - 02 contract: the "search acceptance parameters" section moves here.
-- AIVIA_Design/Design_Proprietary_Term_Assets.md: the moat philosophy —
+- AIVIA_01_Design/Design_Proprietary_Term_Assets.md: the moat philosophy —
   term lists (business, technical, abstracts) are AIVIA assets seeded
   into every deployment; customer names, counts and data never travel.

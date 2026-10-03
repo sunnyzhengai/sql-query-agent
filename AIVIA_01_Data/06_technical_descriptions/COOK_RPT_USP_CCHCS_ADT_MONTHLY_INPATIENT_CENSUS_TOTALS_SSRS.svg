@@ -1,0 +1,45 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="966" height="739" font-family="monospace">
+<text x="20" y="28" font-size="15" font-weight="bold">COOK_RPT_USP_CCHCS_ADT_MONTHLY_INPATIENT_CENSUS_TOTALS_SSRS</text>
+<text x="20" y="48" font-size="12" fill="#777777">(1) [operational_statement]</text>
+<text x="20" y="71" font-size="12" fill="#333333">(2) Delivers the procedure's result set.</text>
+<rect x="56" y="88" width="760" height="415" fill="#f7f7f7" stroke="#888888" rx="4"/>
+<text x="64" y="103" font-size="11" font-weight="bold">delivery (delivery)</text>
+<text x="64" y="118" font-size="11">PROJECTION: 17 members</text>
+<text x="64" y="133" font-size="11">FROM: clarity..CLARITY_ADT adt, clarity..CLARITY_BED bd, clarity..CLARITY_ROM rm, clarity..CLARITY_DEP dep, clarity..ZC_</text>
+<text x="64" y="148" font-size="11">JOIN (LeftOuter):</text>
+<text x="64" y="163" font-size="11">  - adt.BED_CSN_ID = bd.BED_CSN_ID</text>
+<text x="64" y="178" font-size="11">JOIN (LeftOuter):</text>
+<text x="64" y="193" font-size="11">  - adt.ROOM_CSN_ID = rm.ROOM_CSN_ID</text>
+<text x="64" y="208" font-size="11">JOIN (LeftOuter):</text>
+<text x="64" y="223" font-size="11">  - adt.DEPARTMENT_ID = dep.DEPARTMENT_ID</text>
+<text x="64" y="238" font-size="11">JOIN (LeftOuter):</text>
+<text x="64" y="253" font-size="11">  - adt.PAT_CLASS_C = pc.ADT_PAT_CLASS_C</text>
+<text x="64" y="268" font-size="11">JOIN (LeftOuter):</text>
+<text x="64" y="283" font-size="11">  - adt.PAT_SERVICE_C = ps.HOSP_SERV_C</text>
+<text x="64" y="298" font-size="11">JOIN (LeftOuter):</text>
+<text x="64" y="313" font-size="11">  - dep.SERV_AREA_ID = sa.SERV_AREA_ID</text>
+<text x="64" y="328" font-size="11">WHERE:</text>
+<text x="64" y="343" font-size="11">  - adt.EVENT_TYPE_C = '6'</text>
+<text x="64" y="358" font-size="11">  - adt.EVENT_SUBTYPE_C &lt;&gt; '2'</text>
+<text x="64" y="373" font-size="11">  - adt.EVENT_SUBTYPE_C = '2'</text>
+<text x="64" y="388" font-size="11">  - adt.DELETE_TIME &gt;= DATEADD(D, 1, @AsOfDate)</text>
+<text x="64" y="403" font-size="11">  - adt.EFFECTIVE_TIME &gt;= @StartDate</text>
+<text x="64" y="418" font-size="11">  - adt.EFFECTIVE_TIME &lt; DATEADD(D, 1, @EndDate)</text>
+<text x="64" y="433" font-size="11">  - adt.EVENT_TIME &lt; DATEADD(D, 1, @AsOfDate)</text>
+<text x="64" y="448" font-size="11">  - adt.PAT_ID is not null</text>
+<text x="64" y="463" font-size="11">  - (SELECT 1 FROM STRING_SPLIT(@ServiceArea, ',') WHERE [value] IN ('0', dep.SERV_AREA_ID))</text>
+<text x="64" y="478" font-size="11">  - (SELECT 1 FROM STRING_SPLIT(@Location, ',') WHERE [value] IN ('0', dep.REV_LOC_ID))</text>
+<text x="64" y="493" font-size="11">  - adt.DEPARTMENT_ID not in ('100108022','100108034','100108047','100108049','100108068','100 = 'DSC OR' (100639001)</text>
+<rect x="56" y="513" width="760" height="85" fill="#f7f7f7" stroke="#888888" rx="4"/>
+<text x="64" y="528" font-size="11" font-weight="bold">None (subquery)</text>
+<text x="64" y="543" font-size="11">PROJECTION: 1 members</text>
+<text x="64" y="558" font-size="11">FROM: STRING_SPLIT(@ServiceArea, ',')</text>
+<text x="64" y="573" font-size="11">WHERE:</text>
+<text x="64" y="588" font-size="11">  - [value] IN ('0', dep.SERV_AREA_ID)</text>
+<rect x="56" y="608" width="760" height="85" fill="#f7f7f7" stroke="#888888" rx="4"/>
+<text x="64" y="623" font-size="11" font-weight="bold">None (subquery)</text>
+<text x="64" y="638" font-size="11">PROJECTION: 1 members</text>
+<text x="64" y="653" font-size="11">FROM: STRING_SPLIT(@Location, ',')</text>
+<text x="64" y="668" font-size="11">WHERE:</text>
+<text x="64" y="683" font-size="11">  - [value] IN ('0', dep.REV_LOC_ID)</text>
+</svg>

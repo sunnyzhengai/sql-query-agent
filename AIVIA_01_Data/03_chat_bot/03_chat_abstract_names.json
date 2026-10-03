@@ -9731,6 +9731,55 @@
   },
   {
     "object_kind": "column",
+    "object_id": "SUPP::CR_STAT_EXECUTION::EXEC_NAME",
+    "object_name": "CR_STAT_EXECUTION.EXEC_NAME",
+    "abstract": "Name of the executed report or job.",
+    "synonyms": [
+      "exec_name",
+      "execution name",
+      "report name",
+      "job name",
+      "report/job name",
+      "run name",
+      "execution identifier"
+    ],
+    "sunny_abstract": "",
+    "sunny_synonyms": []
+  },
+  {
+    "object_kind": "column",
+    "object_id": "SUPP::CR_STAT_EXECUTION::EXEC_SCHEDULED_YN",
+    "object_name": "CR_STAT_EXECUTION.EXEC_SCHEDULED_YN",
+    "abstract": "Flag indicating whether the execution was a scheduled run (Y) rather than ad hoc.",
+    "synonyms": [
+      "exec_scheduled_yn",
+      "scheduled_yn",
+      "scheduled flag",
+      "is_scheduled",
+      "scheduled run flag",
+      "scheduled indicator"
+    ],
+    "sunny_abstract": "",
+    "sunny_synonyms": []
+  },
+  {
+    "object_kind": "column",
+    "object_id": "SUPP::CR_STAT_EXECUTION::EXEC_START_TIME",
+    "object_name": "CR_STAT_EXECUTION.EXEC_START_TIME",
+    "abstract": "Timestamp recording the moment a report execution started.",
+    "synonyms": [
+      "exec_start_time",
+      "start_time",
+      "execution timestamp",
+      "run start time",
+      "start_datetime",
+      "execution start"
+    ],
+    "sunny_abstract": "",
+    "sunny_synonyms": []
+  },
+  {
+    "object_kind": "column",
     "object_id": "C0000000000015F850B21EAC0FFB60986",
     "object_name": "DATE_DIMENSION.BUS_DAY_CT",
     "abstract": "A count of business (non-weekend, non-holiday) days since 1850-01-01.",
@@ -24143,6 +24192,24 @@
       "coverage id",
       "line number",
       "coverage lines"
+    ],
+    "sunny_abstract": "",
+    "sunny_synonyms": []
+  },
+  {
+    "object_kind": "table",
+    "object_id": "SUPP::CR_STAT_EXECUTION",
+    "object_name": "CR_STAT_EXECUTION",
+    "abstract": "Log of Clarity report executions that records each report run and its timing and serves as the data-freshness (as-of) stamp for the census dashboards.",
+    "synonyms": [
+      "clarity report execution",
+      "execution log",
+      "report run log",
+      "report run history",
+      "data-freshness stamp",
+      "as-of stamp",
+      "reporting infrastructure",
+      "report execution audit"
     ],
     "sunny_abstract": "",
     "sunny_synonyms": []

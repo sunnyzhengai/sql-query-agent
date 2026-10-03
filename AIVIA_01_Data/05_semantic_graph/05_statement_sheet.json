@@ -1,0 +1,847 @@
+[
+  {
+    "node_id": "file::COOK_RPT_USP_CCHCS_ADT_MONTHLY_INPATIENT_CENSUS_TOTALS_SSRS::stmt/1",
+    "position": "1",
+    "scriptdom_type": "PredicateSetStatement",
+    "statement_kind": "PredicateSetStatement",
+    "disposition": "operational",
+    "gap_class": null,
+    "evidence": {
+      "fragment": "SET NOCOUNT ON;",
+      "line": 21,
+      "column": 1
+    }
+  },
+  {
+    "node_id": "file::COOK_RPT_USP_CCHCS_ADT_MONTHLY_INPATIENT_CENSUS_TOTALS_SSRS::stmt/2",
+    "position": "2",
+    "scriptdom_type": "SelectStatement",
+    "statement_kind": "SELECT",
+    "disposition": "handled",
+    "gap_class": null,
+    "evidence": {
+      "fragment": "SELECT adt.EVENT_TYPE_C as\t\t\t\t\t'Event Type',\n\t   adt.EVENT_SUBTYPE_C as\t\t\t\t'Event SubType',\n\t   adt.EFFECTIVE_TIME as\t\t\t\t'Effective Time',\n\t   adt.PAT_ID as\t\t\t\t\t\t'Patient ID',\n\t   pc.ABBR as\t\t\t\t\t\t\t'Patient Class',\n\t   dep.DEPT_ABBREVIATION as\t\t\t\t'Department',\n\t   rm.ROOM_NAME as\t\t\t\t\t\t'Room',\n\t   bd.BED_LABEL as\t\t\t\t\t\t'Bed Label',\n\t   ps.NAME as\t\t\t\t\t\t\t'Patient Servce',\n\t   adt.DELETE_TIME as\t\t\t\t\t'Delete Time',\n\t   adt.EVENT_TIME as\t\t\t\t\t'Event Time',\n\t   sa.SERV_AREA_NAME as\t\t\t\t\t'Service Area',\n\t   dep.DEPARTMENT_ID as\t\t\t\t\t'Department ID',\n\t   rm.ROOM_ID as\t\t\t\t\t\t'Room ID',\n\t   bd.BED_ID as\t\t\t\t\t\t\t'Bed ID',\n\t   adt.EVENT_ID as\t\t\t\t\t\t'Event ID',\n\t   DATEPART(DAY, adt.EFFECTIVE_TIME) as 'Census Day'\n\n\nFROM clarity..CLARITY_ADT adt\n\n\tLEFT JOIN clarity..CLARITY_BED bd\n\tON adt.BED_CSN_ID = bd.BED_CSN_ID\n\n\tLEFT JOIN clarity..CLARITY_ROM rm\n\tON adt.ROOM_CSN_ID = rm.ROOM_CSN_ID\n\n\tLEFT JOIN clarity..CLARITY_DEP dep\n\tON adt.DEPARTMENT_ID = dep.DEPARTMENT_ID\n\n\tLEFT JOIN clarity..ZC_PAT_CLASS pc\n\tON adt.PAT_CLASS_C = pc.ADT_PAT_CLASS_C\n\n\tLEFT JOIN clarity..ZC_PAT_SERVICE ps\n\tON adt.PAT_SERVICE_C = ps.HOSP_SERV_C\n\n\tLEFT JOIN clarity..CLARITY_SA sa\n\tON dep.SERV_AREA_ID = sa.SERV_AREA_ID\n\n\nWHERE adt.EVENT_TYPE_C = '6'\nand adt.EFFECTIVE_TIME >= @StartDate\nand adt.EFFECTIVE_TIME < DATEADD(D, 1, @EndDate)\nand adt.EVENT_TIME < DATEADD(D, 1, @AsOfDate)\nand adt.PAT_ID is not null\nand ((adt.EVENT_SUBTYPE_C <> '2') OR (adt.EVENT_SUBTYPE_C = '2' AND adt.DELETE_TIME >= DATEADD(D, 1, @AsOfDate)))\nAND EXISTS (SELECT 1 FROM STRING_SPLIT(@ServiceArea, ',') WHERE [value] IN ('0', dep.SERV_AREA_ID))\nAND EXISTS (SELECT 1 FROM STRING_SPLIT(@Location, ',') WHERE [value] IN ('0', dep.REV_LOC_ID))\nand adt.DEPARTMENT_ID not in ('100108022','100108034','100108047','100108049','100108068','100108112','100108118','100639001')",
+      "line": 23,
+      "column": 1
+    }
+  },
+  {
+    "node_id": "file::COOK_RPT_usp_PTA_CensusDashboard_PBI::stmt/1",
+    "position": "1",
+    "scriptdom_type": "PredicateSetStatement",
+    "statement_kind": "PredicateSetStatement",
+    "disposition": "operational",
+    "gap_class": null,
+    "evidence": {
+      "fragment": "SET NOCOUNT ON;",
+      "line": 20,
+      "column": 1
+    }
+  },
+  {
+    "node_id": "file::COOK_RPT_usp_PTA_CensusDashboard_PBI::stmt/2",
+    "position": "2",
+    "scriptdom_type": "DeclareVariableStatement",
+    "statement_kind": "DeclareVariableStatement",
+    "disposition": "operational",
+    "gap_class": null,
+    "evidence": {
+      "fragment": "declare @StartDate DATE =  case when dateadd(m, -24, getdate() - datepart(d, getdate()) + 1) < '03/01/2018' then '03/01/2018' else dateadd(m, -24, getdate() - datepart(d, getdate()) + 1) end\n\n\n;",
+      "line": 24,
+      "column": 1
+    }
+  },
+  {
+    "node_id": "file::COOK_RPT_usp_PTA_CensusDashboard_PBI::stmt/3",
+    "position": "3",
+    "scriptdom_type": "SelectStatement",
+    "statement_kind": "SELECT",
+    "disposition": "handled",
+    "gap_class": null,
+    "evidence": {
+      "fragment": "with month_cte as\n(select datepart(day, Max(adt.EFFECTIVE_TIME)) as 'CurrentMonth' \n\tfrom Clarity.dbo.CLARITY_ADT adt\n\twhere adt.EVENT_TYPE_C = 6 --Census\n\t\tand EFFECTIVE_TIME >= @StartDate\n\t\tAND adt.PAT_ID IS NOT NULL  \n\t\tAND adt.EVENT_SUBTYPE_C <> 2 --Canceled\n\t\t)\n\nSELECT --adt.EVENT_TYPE_C\n\t\t--, adt.EVENT_SUBTYPE_C\n\t\t adt.EFFECTIVE_TIME\n\t\t, adt.PAT_ID\n\t\t, pt.PAT_MRN_ID\n\t\t, adt.PAT_ENC_CSN_ID\n\t\t, adt.PAT_CLASS_C\n\t\t, class.ABBR as 'ClassType'\n\t\t, dep.DEPT_ABBREVIATION as 'Dept'\n\t\t, dep.EXTERNAL_NAME as 'DeptName'\n\t\t, room.ROOM_NAME as 'Room'\n\t\t, bed.BED_LABEL as 'Bed'\n\t\t, adt.PAT_SERVICE_C\n\t\t, serv.ABBR  as 'ServiceType'\n\t\t, sa.SERV_AREA_NAME as 'ServiceArea'\n\t\t, adt.EVENT_ID\n\t\t, case when datepart(month, adt.EFFECTIVE_TIME) =  datepart(month, getdate()) \n\t\t\t\t\tand datepart(year, adt.EFFECTIVE_TIME) = datepart(year, getdate())\n\t\t\t\tthen (Select CurrentMonth from month_cte) \n\t\t\t\telse datediff(dd,adt.EFFECTIVE_TIME,dateadd(mm,1,adt.EFFECTIVE_TIME)) end as 'DayinMonth'\n\t\t, /* Get last start time for daily etl job */\n\t\t(select MAX(EXEC_START_TIME)\n\t\t\tfrom clarity.dbo.CR_STAT_EXECUTION\n\t\t\twhere EXEC_SCHEDULED_YN = 'Y'\n\t\t\t\tAND EXEC_NAME = 'Daily_ETL'\t) as  'RefreshDate'\n\t\t, CONVERT(DATE, pt.BIRTH_DATE) [DOB]\n\t\t, CASE WHEN DATEDIFF(DAY, CONVERT(DATE, pt.BIRTH_DATE), adt.EFFECTIVE_TIME) >= 31 THEN 'over 30 days' ELSE 'under 30 days' END [age]\n\t\t, CASE WHEN dep.REV_LOC_ID = 100200 THEN 'PCCMC' ELSE 'CCMC' END [Location]\n\t\t,disp.NAME as Disch_Deposition\n\t\t,hsp.DISCH_DISP_C\nFROM Clarity.dbo.CLARITY_ADT adt\n\tLEFT OUTER JOIN Clarity.dbo.CLARITY_BED bed\n\t\tON adt.BED_CSN_ID=bed.BED_CSN_ID\n\tLEFT OUTER JOIN Clarity.dbo.CLARITY_ROM room \n\t\tON adt.ROOM_CSN_ID=room.ROOM_CSN_ID\n\tLEFT OUTER JOIN Clarity.dbo.CLARITY_DEP dep \n\t\tON adt.DEPARTMENT_ID=dep.DEPARTMENT_ID\n\tLEFT OUTER JOIN Clarity.dbo.ZC_PAT_CLASS class \n\t\tON adt.PAT_CLASS_C=class.ADT_PAT_CLASS_C\n\tLEFT OUTER JOIN Clarity.dbo.ZC_PAT_SERVICE serv \n\t\tON adt.PAT_SERVICE_C=serv.HOSP_SERV_C\n\tLEFT OUTER JOIN Clarity.dbo.CLARITY_SA sa \n\t\tON dep.SERV_AREA_ID=sa.SERV_AREA_ID\n\tLEFT JOIN Clarity.dbo.PATIENT pt\n\t\tON adt.PAT_ID = pt.PAT_ID\n\tLeft Join Clarity.dbo.PAT_ENC_HSP hsp ON adt.PAT_ENC_CSN_ID = hsp.PAT_ENC_CSN_ID  -- Added on 7/6/2026\n\tleft Join Clarity.dbo.ZC_DISCH_DISP  disp ON hsp.DISCH_DISP_C = disp.DISCH_DISP_C -- Added on 7/6/2026\nWHERE  adt.EVENT_TYPE_C = 6 --Census\n\tand EFFECTIVE_TIME >=  @StartDate\n\tAND adt.PAT_ID IS NOT NULL  \n\tAND adt.EVENT_SUBTYPE_C <> 2 --Canceled\n\tAND dep.SERV_AREA_ID = 10\n\norder by adt.EFFECTIVE_TIME, adt.ROOM_ID",
+      "line": 27,
+      "column": 2
+    }
+  },
+  {
+    "node_id": "file::COOK_RPT_usp_SF_CensusDashboard::stmt/1",
+    "position": "1",
+    "scriptdom_type": "PredicateSetStatement",
+    "statement_kind": "PredicateSetStatement",
+    "disposition": "operational",
+    "gap_class": null,
+    "evidence": {
+      "fragment": "SET NOCOUNT ON;",
+      "line": 16,
+      "column": 1
+    }
+  },
+  {
+    "node_id": "file::COOK_RPT_usp_SF_CensusDashboard::stmt/2",
+    "position": "2",
+    "scriptdom_type": "DeclareVariableStatement",
+    "statement_kind": "DeclareVariableStatement",
+    "disposition": "operational",
+    "gap_class": null,
+    "evidence": {
+      "fragment": "declare @StartDate DATE =  case when dateadd(m, -24, getdate() - datepart(d, getdate()) + 1) < '03/01/2018' then '03/01/2018' else dateadd(m, -24, getdate() - datepart(d, getdate()) + 1) end\n\n\n\n;",
+      "line": 20,
+      "column": 1
+    }
+  },
+  {
+    "node_id": "file::COOK_RPT_usp_SF_CensusDashboard::stmt/3",
+    "position": "3",
+    "scriptdom_type": "SelectStatement",
+    "statement_kind": "SELECT",
+    "disposition": "handled",
+    "gap_class": null,
+    "evidence": {
+      "fragment": "with month_cte as\n(select datepart(day, Max(adt.EFFECTIVE_TIME)) as 'CurrentMonth' \n\tfrom Clarity.dbo.CLARITY_ADT adt\n\twhere adt.EVENT_TYPE_C = 6 --Census\n\t\tand EFFECTIVE_TIME >= @StartDate\n\t\tAND adt.PAT_ID IS NOT NULL  \n\t\tAND adt.EVENT_SUBTYPE_C <> 2 --Canceled\n\t\t)\n\nSELECT --adt.EVENT_TYPE_C\n\t\t--, adt.EVENT_SUBTYPE_C\n\t\t adt.EFFECTIVE_TIME\n\t\t, adt.PAT_ID\n\t\t, pt.PAT_MRN_ID\n\t\t, adt.PAT_ENC_CSN_ID\n\t\t, adt.PAT_CLASS_C\n\t\t, class.ABBR as 'ClassType'\n\t\t, dep.DEPT_ABBREVIATION as 'Dept'\n\t\t, dep.EXTERNAL_NAME as 'DeptName'\n\t\t, room.ROOM_NAME as 'Room'\n\t\t, bed.BED_LABEL as 'Bed'\n\t\t, adt.PAT_SERVICE_C\n\t\t, serv.ABBR  as 'ServiceType'\n\t\t, sa.SERV_AREA_NAME as 'ServiceArea'\n\t\t, adt.EVENT_ID\n\t\t, case when datepart(month, adt.EFFECTIVE_TIME) =  datepart(month, getdate()) \n\t\t\t\t\tand datepart(year, adt.EFFECTIVE_TIME) = datepart(year, getdate())\n\t\t\t\tthen (Select CurrentMonth from month_cte) \n\t\t\t\telse datediff(dd,adt.EFFECTIVE_TIME,dateadd(mm,1,adt.EFFECTIVE_TIME)) end as 'DayinMonth'\n\t\t, /* Get last start time for daily etl job */\n\t\t(select MAX(EXEC_START_TIME)\n\t\t\tfrom clarity.dbo.CR_STAT_EXECUTION\n\t\t\twhere EXEC_SCHEDULED_YN = 'Y'\n\t\t\t\tAND EXEC_NAME = 'Daily_ETL'\t) as  'RefreshDate'\nFROM Clarity.dbo.CLARITY_ADT adt\n\tLEFT OUTER JOIN Clarity.dbo.CLARITY_BED bed\n\t\tON adt.BED_CSN_ID=bed.BED_CSN_ID\n\tLEFT OUTER JOIN Clarity.dbo.CLARITY_ROM room \n\t\tON adt.ROOM_CSN_ID=room.ROOM_CSN_ID\n\tLEFT OUTER JOIN Clarity.dbo.CLARITY_DEP dep \n\t\tON adt.DEPARTMENT_ID=dep.DEPARTMENT_ID\n\tLEFT OUTER JOIN Clarity.dbo.ZC_PAT_CLASS class \n\t\tON adt.PAT_CLASS_C=class.ADT_PAT_CLASS_C\n\tLEFT OUTER JOIN Clarity.dbo.ZC_PAT_SERVICE serv \n\t\tON adt.PAT_SERVICE_C=serv.HOSP_SERV_C\n\tLEFT OUTER JOIN Clarity.dbo.CLARITY_SA sa \n\t\tON dep.SERV_AREA_ID=sa.SERV_AREA_ID\n\tLEFT JOIN Clarity.dbo.PATIENT pt\n\t\tON adt.PAT_ID = pt.PAT_ID\nWHERE  adt.EVENT_TYPE_C = 6 --Census\n\tand EFFECTIVE_TIME >=  @StartDate\n\tAND adt.PAT_ID IS NOT NULL  \n\tAND adt.EVENT_SUBTYPE_C <> 2 --Canceled\n\tAND dep.SERV_AREA_ID = 10\n\n\norder by adt.EFFECTIVE_TIME, adt.ROOM_ID",
+      "line": 24,
+      "column": 2
+    }
+  },
+  {
+    "node_id": "file::Reporting_USP_CCHCS_CC_ADT_Monthly_IP_Census_Days_SSRS::stmt/1",
+    "position": "1",
+    "scriptdom_type": "DeclareVariableStatement",
+    "statement_kind": "DeclareVariableStatement",
+    "disposition": "operational",
+    "gap_class": null,
+    "evidence": {
+      "fragment": "DECLARE @SQL  VARCHAR(MAX) ,\n\t\t@STillDate VARCHAR(20),\n\t\t@CurrentMonth varchar(10),\n\t\t@NextMonth varchar(10)",
+      "line": 31,
+      "column": 1
+    }
+  },
+  {
+    "node_id": "file::Reporting_USP_CCHCS_CC_ADT_Monthly_IP_Census_Days_SSRS::stmt/2",
+    "position": "2",
+    "scriptdom_type": "SetVariableStatement",
+    "statement_kind": "SET",
+    "disposition": "handled",
+    "gap_class": null,
+    "evidence": {
+      "fragment": "SET @STillDate = FORMAT(TRY_CONVERT(DATETIME,@TillDate),'yyyy-MM-dd')",
+      "line": 36,
+      "column": 1
+    }
+  },
+  {
+    "node_id": "file::Reporting_USP_CCHCS_CC_ADT_Monthly_IP_Census_Days_SSRS::stmt/3",
+    "position": "3",
+    "scriptdom_type": "SetVariableStatement",
+    "statement_kind": "SET",
+    "disposition": "handled",
+    "gap_class": null,
+    "evidence": {
+      "fragment": "SET @CurrentMonth = @Year +'-'+@Month+'-01'",
+      "line": 38,
+      "column": 1
+    }
+  },
+  {
+    "node_id": "file::Reporting_USP_CCHCS_CC_ADT_Monthly_IP_Census_Days_SSRS::stmt/4",
+    "position": "4",
+    "scriptdom_type": "SetVariableStatement",
+    "statement_kind": "SET",
+    "disposition": "handled",
+    "gap_class": null,
+    "evidence": {
+      "fragment": "SET @NextMonth = FORMAT(DATEADD(MONTH,1,CONVERT(DATETIME,@CurrentMonth)),'yyyy-MM-dd')",
+      "line": 39,
+      "column": 1
+    }
+  },
+  {
+    "node_id": "file::Reporting_USP_CCHCS_CC_ADT_Monthly_IP_Census_Days_SSRS::stmt/5",
+    "position": "5",
+    "scriptdom_type": "SetVariableStatement",
+    "statement_kind": "SET",
+    "disposition": "handled",
+    "gap_class": null,
+    "evidence": {
+      "fragment": "SET @SQL = '\nSELECT  \n\tDAY(CLARITY_ADT.EFFECTIVE_TIME) EFFECTIVE_DAY,'\n\t+@GROUP1 +' AS Group1,'\n\t+@GROUP2+ +' AS Group2,'\n\t+@GROUP3 +' AS Group3 ,\n\t COUNT(CLARITY_ADT.EVENT_ID) COUNT_EVENT_ID\nFROM Clarity.dbo.CLARITY_ADT CLARITY_ADT \nLEFT OUTER JOIN Clarity.dbo.CLARITY_BED CLARITY_BED ON CLARITY_ADT.BED_CSN_ID = CLARITY_BED.BED_CSN_ID\nLEFT OUTER JOIN Clarity.dbo.CLARITY_ROM CLARITY_ROM ON CLARITY_ADT.ROOM_CSN_ID = CLARITY_ROM.ROOM_CSN_ID\nLEFT OUTER JOIN Clarity.dbo.CLARITY_DEP CLARITY_DEP ON CLARITY_ADT.DEPARTMENT_ID = CLARITY_DEP.DEPARTMENT_ID\nLEFT OUTER JOIN Clarity.dbo.ZC_PAT_CLASS ZC_PAT_CLASS ON CLARITY_ADT.PAT_CLASS_C = ZC_PAT_CLASS.ADT_PAT_CLASS_C\nLEFT OUTER JOIN Clarity.dbo.ZC_PAT_SERVICE ZC_PAT_SERVICE ON CLARITY_ADT.PAT_SERVICE_C = ZC_PAT_SERVICE.HOSP_SERV_C\nLEFT OUTER JOIN Clarity.dbo.CLARITY_SA CLARITY_SA ON CLARITY_DEP.SERV_AREA_ID = CLARITY_SA.SERV_AREA_ID\nWHERE CLARITY_ADT.EVENT_TYPE_C = 6 \n AND  (CLARITY_ADT.EFFECTIVE_TIME>= '''+@CurrentMonth+''' \n AND CLARITY_ADT.EFFECTIVE_TIME< '''+@NextMonth+''')\n AND CLARITY_ADT.EVENT_TIME< '''+@STillDate+''' \n AND CLARITY_ADT.PAT_ID IS  NOT  NULL \n AND ((CLARITY_ADT.EVENT_SUBTYPE_C<>2) \n OR (CLARITY_ADT.EVENT_SUBTYPE_C=2 \n AND CLARITY_ADT.DELETE_TIME>= '''+@STillDate+''')) \n ' +CASE WHEN @ServiceArea <> '0' THEN 'AND CLARITY_DEP.SERV_AREA_ID= '+ CONVERT(VARCHAR(10),@ServiceArea) ELSE '' END\n +' \n GROUP BY DAY(CLARITY_ADT.EFFECTIVE_TIME) , ' + @GROUP1 +','+@GROUP2 + ','+ @GROUP3",
+      "line": 42,
+      "column": 1
+    }
+  },
+  {
+    "node_id": "file::Reporting_USP_CCHCS_CC_ADT_Monthly_IP_Census_Days_SSRS::stmt/6",
+    "position": "6",
+    "scriptdom_type": "ExecuteStatement",
+    "statement_kind": "EXEC",
+    "disposition": "gap",
+    "gap_class": "dynamic_sql",
+    "evidence": {
+      "fragment": "EXEC (@SQL)",
+      "line": 68,
+      "column": 1
+    }
+  },
+  {
+    "node_id": "file::Reporting_USP_CCHCS_CC_ADT_Monthly_IP_Census_Totals_SSRS::stmt/1",
+    "position": "1",
+    "scriptdom_type": "DeclareVariableStatement",
+    "statement_kind": "DeclareVariableStatement",
+    "disposition": "operational",
+    "gap_class": null,
+    "evidence": {
+      "fragment": "DECLARE @SQL  VARCHAR(MAX) ,\n\t\t@STillDate VARCHAR(20),\n\t\t@CurrentMonth varchar(10),\n\t\t@NextMonth varchar(10)",
+      "line": 35,
+      "column": 1
+    }
+  },
+  {
+    "node_id": "file::Reporting_USP_CCHCS_CC_ADT_Monthly_IP_Census_Totals_SSRS::stmt/2",
+    "position": "2",
+    "scriptdom_type": "SetVariableStatement",
+    "statement_kind": "SET",
+    "disposition": "handled",
+    "gap_class": null,
+    "evidence": {
+      "fragment": "SET @STillDate = FORMAT(TRY_CONVERT(DATETIME,@TillDate),'yyyy-MM-dd')",
+      "line": 40,
+      "column": 1
+    }
+  },
+  {
+    "node_id": "file::Reporting_USP_CCHCS_CC_ADT_Monthly_IP_Census_Totals_SSRS::stmt/3",
+    "position": "3",
+    "scriptdom_type": "SetVariableStatement",
+    "statement_kind": "SET",
+    "disposition": "handled",
+    "gap_class": null,
+    "evidence": {
+      "fragment": "SET @CurrentMonth = @Year +'-'+@Month+'-01'",
+      "line": 42,
+      "column": 1
+    }
+  },
+  {
+    "node_id": "file::Reporting_USP_CCHCS_CC_ADT_Monthly_IP_Census_Totals_SSRS::stmt/4",
+    "position": "4",
+    "scriptdom_type": "SetVariableStatement",
+    "statement_kind": "SET",
+    "disposition": "handled",
+    "gap_class": null,
+    "evidence": {
+      "fragment": "SET @NextMonth = FORMAT(DATEADD(MONTH,1,CONVERT(DATETIME,@CurrentMonth)),'yyyy-MM-dd')",
+      "line": 43,
+      "column": 1
+    }
+  },
+  {
+    "node_id": "file::Reporting_USP_CCHCS_CC_ADT_Monthly_IP_Census_Totals_SSRS::stmt/5",
+    "position": "5",
+    "scriptdom_type": "SetVariableStatement",
+    "statement_kind": "SET",
+    "disposition": "handled",
+    "gap_class": null,
+    "evidence": {
+      "fragment": "SET @SQL = '\nSELECT  \n\tDAY(CLARITY_ADT.EFFECTIVE_TIME) EFFECTIVE_DAY,'\n\t+@GROUP1 +' AS Group1,'\n\t+@GROUP2+ +' AS Group2,'\n\t+@GROUP3 +' AS Group3 ,\n\t COUNT(CLARITY_ADT.EVENT_ID) COUNT_EVENT_ID\nFROM Clarity.dbo.CLARITY_ADT CLARITY_ADT \nLEFT OUTER JOIN Clarity.dbo.CLARITY_BED CLARITY_BED ON CLARITY_ADT.BED_CSN_ID = CLARITY_BED.BED_CSN_ID\nLEFT OUTER JOIN Clarity.dbo.CLARITY_ROM CLARITY_ROM ON CLARITY_ADT.ROOM_CSN_ID = CLARITY_ROM.ROOM_CSN_ID\nLEFT OUTER JOIN Clarity.dbo.CLARITY_DEP CLARITY_DEP ON CLARITY_ADT.DEPARTMENT_ID = CLARITY_DEP.DEPARTMENT_ID\nLEFT OUTER JOIN Clarity.dbo.ZC_PAT_CLASS ZC_PAT_CLASS ON CLARITY_ADT.PAT_CLASS_C = ZC_PAT_CLASS.ADT_PAT_CLASS_C\nLEFT OUTER JOIN Clarity.dbo.ZC_PAT_SERVICE ZC_PAT_SERVICE ON CLARITY_ADT.PAT_SERVICE_C = ZC_PAT_SERVICE.HOSP_SERV_C\nLEFT OUTER JOIN Clarity.dbo.CLARITY_SA CLARITY_SA ON CLARITY_DEP.SERV_AREA_ID = CLARITY_SA.SERV_AREA_ID\nWHERE CLARITY_ADT.EVENT_TYPE_C = 6 \n AND  (CLARITY_ADT.EFFECTIVE_TIME>= '''+@CurrentMonth+''' \n AND CLARITY_ADT.EFFECTIVE_TIME< '''+@NextMonth+''')\n AND CLARITY_ADT.EVENT_TIME< '''+@STillDate+''' \n AND CLARITY_ADT.PAT_ID IS  NOT  NULL \n AND ((CLARITY_ADT.EVENT_SUBTYPE_C<>2) \n OR (CLARITY_ADT.EVENT_SUBTYPE_C=2 \n AND CLARITY_ADT.DELETE_TIME>= '''+@STillDate+''')) \n ' +CASE WHEN @ServiceArea <> '0' THEN 'AND CLARITY_DEP.SERV_AREA_ID= '+ CONVERT(VARCHAR(10),@ServiceArea) ELSE '' END\n +' AND  NOT \n (CLARITY_ADT.DEPARTMENT_ID=100108022 \n OR CLARITY_ADT.DEPARTMENT_ID=100108034 \n OR CLARITY_ADT.DEPARTMENT_ID=100108047 \n OR CLARITY_ADT.DEPARTMENT_ID=100108049 \n OR CLARITY_ADT.DEPARTMENT_ID=100108068 \n OR CLARITY_ADT.DEPARTMENT_ID=100108112\n OR CLARITY_ADT.DEPARTMENT_ID=100108118 \n OR CLARITY_ADT.DEPARTMENT_ID=100639001)\n GROUP BY DAY(CLARITY_ADT.EFFECTIVE_TIME) , ' + @GROUP1 +','+@GROUP2 + ','+ @GROUP3",
+      "line": 46,
+      "column": 1
+    }
+  },
+  {
+    "node_id": "file::Reporting_USP_CCHCS_CC_ADT_Monthly_IP_Census_Totals_SSRS::stmt/6",
+    "position": "6",
+    "scriptdom_type": "ExecuteStatement",
+    "statement_kind": "EXEC",
+    "disposition": "gap",
+    "gap_class": "dynamic_sql",
+    "evidence": {
+      "fragment": "EXEC (@SQL)",
+      "line": 80,
+      "column": 1
+    }
+  },
+  {
+    "node_id": "file::Reporting_USP_CCMC_LOTE_Census_Interpreter_Services_Detail_PBI::stmt/1",
+    "position": "1",
+    "scriptdom_type": "PredicateSetStatement",
+    "statement_kind": "PredicateSetStatement",
+    "disposition": "operational",
+    "gap_class": null,
+    "evidence": {
+      "fragment": "SET NOCOUNT ON;",
+      "line": 24,
+      "column": 1
+    }
+  },
+  {
+    "node_id": "file::Reporting_USP_CCMC_LOTE_Census_Interpreter_Services_Detail_PBI::stmt/2",
+    "position": "2",
+    "scriptdom_type": "SetTransactionIsolationLevelStatement",
+    "statement_kind": "SetTransactionIsolationLevelStatement",
+    "disposition": "operational",
+    "gap_class": null,
+    "evidence": {
+      "fragment": "SET TRANSACTION ISOLATION LEVEL READ UNCOMMITTED;",
+      "line": 25,
+      "column": 1
+    }
+  },
+  {
+    "node_id": "file::Reporting_USP_CCMC_LOTE_Census_Interpreter_Services_Detail_PBI::stmt/3",
+    "position": "3",
+    "scriptdom_type": "DeclareVariableStatement",
+    "statement_kind": "DeclareVariableStatement",
+    "disposition": "operational",
+    "gap_class": null,
+    "evidence": {
+      "fragment": "DECLARE @startDate DATETIME = [Clarity].EPIC_UTIL.EFN_DIN(COALESCE(@i_vSTART_DATE,'MB-13'));",
+      "line": 28,
+      "column": 1
+    }
+  },
+  {
+    "node_id": "file::Reporting_USP_CCMC_LOTE_Census_Interpreter_Services_Detail_PBI::stmt/4",
+    "position": "4",
+    "scriptdom_type": "DeclareVariableStatement",
+    "statement_kind": "DeclareVariableStatement",
+    "disposition": "operational",
+    "gap_class": null,
+    "evidence": {
+      "fragment": "DECLARE @endDate DATETIME = [Clarity].EPIC_UTIL.EFN_DIN(COALESCE(@i_vEND_DATE,'ME-1'));",
+      "line": 29,
+      "column": 1
+    }
+  },
+  {
+    "node_id": "file::Reporting_USP_CCMC_LOTE_Census_Interpreter_Services_Detail_PBI::stmt/5",
+    "position": "5",
+    "scriptdom_type": "DropTableStatement",
+    "statement_kind": "DropTableStatement",
+    "disposition": "operational",
+    "gap_class": null,
+    "evidence": {
+      "fragment": "DROP TABLE IF EXISTS #census_monthly;",
+      "line": 32,
+      "column": 1
+    }
+  },
+  {
+    "node_id": "file::Reporting_USP_CCMC_LOTE_Census_Interpreter_Services_Detail_PBI::stmt/6",
+    "position": "6",
+    "scriptdom_type": "DropTableStatement",
+    "statement_kind": "DropTableStatement",
+    "disposition": "operational",
+    "gap_class": null,
+    "evidence": {
+      "fragment": "DROP TABLE IF EXISTS #clinic_monthly;",
+      "line": 33,
+      "column": 1
+    }
+  },
+  {
+    "node_id": "file::Reporting_USP_CCMC_LOTE_Census_Interpreter_Services_Detail_PBI::stmt/7",
+    "position": "7",
+    "scriptdom_type": "DropTableStatement",
+    "statement_kind": "DropTableStatement",
+    "disposition": "operational",
+    "gap_class": null,
+    "evidence": {
+      "fragment": "DROP TABLE IF EXISTS #combined_census;",
+      "line": 34,
+      "column": 1
+    }
+  },
+  {
+    "node_id": "file::Reporting_USP_CCMC_LOTE_Census_Interpreter_Services_Detail_PBI::stmt/8",
+    "position": "8",
+    "scriptdom_type": "DropTableStatement",
+    "statement_kind": "DropTableStatement",
+    "disposition": "operational",
+    "gap_class": null,
+    "evidence": {
+      "fragment": "DROP TABLE IF EXISTS #caregivers;",
+      "line": 35,
+      "column": 1
+    }
+  },
+  {
+    "node_id": "file::Reporting_USP_CCMC_LOTE_Census_Interpreter_Services_Detail_PBI::stmt/9",
+    "position": "9",
+    "scriptdom_type": "DropTableStatement",
+    "statement_kind": "DropTableStatement",
+    "disposition": "operational",
+    "gap_class": null,
+    "evidence": {
+      "fragment": "DROP TABLE IF EXISTS #caregiver_languages;",
+      "line": 36,
+      "column": 1
+    }
+  },
+  {
+    "node_id": "file::Reporting_USP_CCMC_LOTE_Census_Interpreter_Services_Detail_PBI::stmt/10",
+    "position": "10",
+    "scriptdom_type": "DropTableStatement",
+    "statement_kind": "DropTableStatement",
+    "disposition": "operational",
+    "gap_class": null,
+    "evidence": {
+      "fragment": "DROP TABLE IF EXISTS #coverage;",
+      "line": 37,
+      "column": 1
+    }
+  },
+  {
+    "node_id": "file::Reporting_USP_CCMC_LOTE_Census_Interpreter_Services_Detail_PBI::stmt/11",
+    "position": "11",
+    "scriptdom_type": "SelectStatement",
+    "statement_kind": "SELECT INTO",
+    "disposition": "handled",
+    "gap_class": null,
+    "evidence": {
+      "fragment": "SELECT\n\t[census].PAT_ID\n\t, [dd].[YEAR]\t\t\t\tAS [Year]\n\t, [dd].QUARTER_STR\t\t\tAS [Quarter]\n\t, [dd].MONTH_NAME\t\t\tAS [Month Name]\n\t, [dd].MONTH_NUMBER\t\t\tAS [Month Number]\n\t, [loc].LOCATION_ABBR\t\tAS [Location]\n\t, [dep].DEPARTMENT_NAME\t\tAS [Department]\n\t, [rom].ROOM_NAME\t\t\tAS [Room]\n\t, [bed].BED_LABEL\t\t\tAS [Bed]\n\n\t, CONVERT(DATE, MIN([census].CALENDAR_DT)) AS [Monthly Census Start Date]\n\t, CONVERT(DATE, MAX([census].CALENDAR_DT)) AS [Monthly Census End Date]\n\n\t, COUNT(*) AS [Census Days]\n\n\t, CONCAT(CONVERT(DATE, MIN([census].CALENDAR_DT)),' - ', CONVERT(DATE, MAX([census].CALENDAR_DT)))\tAS [Census Period]\n\n\t, CASE\n\t\tWHEN [dep].DEPARTMENT_ID IN (\n\t\t\t100200053\t--  2 Main PICU\n\t\t\t, 100200055\t--  4 Main\n\t\t\t, 100200045\t--  5 Main\n\t\t\t, 100200007\t--  Main OR\n\t\t\t)\n\t\tTHEN 'Dept 1'\n\n\t\t--WHEN [census].DEPARTMENT_ID = xxxx\t\t-- To be decided\n\t\t--THEN 'Dept 2'\n\n\t\tWHEN [dep].DEPARTMENT_ID = 100200033\t-- 1 Emergency\n\t\tTHEN 'ED 1'\n\n\t\tWHEN [dep].DEPARTMENT_ID = 100108022\t-- 2 Emergency\n\t\tTHEN 'ED 2'\n\n\t\tELSE 'Dept 3'\n\n\t  END AS [Department Label]\n\nINTO #census_monthly\n\nFROM [Clarity].[dbo].F_IP_HSP_PAT_DAYS\t[census]\n\t\n\tLEFT JOIN [Clarity].[dbo].CLARITY_DEP\t\t\t\t[dep]\tON [census].DEPARTMENT_ID = [dep].DEPARTMENT_ID\n\tLEFT JOIN [Clarity].[dbo].CLARITY_LOC\t\t\t\t[loc]\tON [dep].REV_LOC_ID = [loc].LOC_ID\n\tLEFT JOIN [Clarity].[dbo].V_PAT_ADT_LOCATION_HX\t\t[adt]\tON [census].ADT_EVENT_ID = [adt].EVENT_ID\n\tLEFT JOIN [Clarity].[dbo].CLARITY_BED\t\t\t\t[bed]\tON [adt].ADT_BED_ID = [bed].BED_ID\n\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t   AND [adt].ADT_BED_CSN = [bed].BED_CSN_ID\n\tLEFT JOIN [Clarity].[dbo].CLARITY_ROM\t\t\t\t[rom]\tON [adt].ADT_ROOM_ID = [rom].ROOM_ID\n\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t   AND [adt].ADT_ROOM_CSN = [rom].ROOM_CSN_ID\n\tLEFT JOIN [Clarity].[dbo].DATE_DIMENSION\t\t\t[dd]\tON [census].CALENDAR_DT = [dd].CALENDAR_DT\n\t\t\t\nWHERE 1=1\n\tAND [census].CALENDAR_DT BETWEEN @StartDate AND @EndDate\n\tAND [adt].ADT_SERV_AREA_ID IS NOT NULL\t\t\t\t\t-- EXCLUDE 'PRE-ADMISSION' EVENT\n\tAND [dep].REV_LOC_ID IN (\n\t\t'100108'\t\t-- hospital 1\n\t\t, '100200'\t\t-- hospital 2\n\t)\n\nGROUP BY\n\t[census].PAT_ID\n\t, [dd].[YEAR]\n\t, [dd].QUARTER_STR\n\t, [dd].MONTH_NUMBER\n\t, [dd].MONTH_NAME\n\t, [loc].LOCATION_ABBR\n\t, [dep].DEPARTMENT_NAME\n\t, [dep].DEPARTMENT_ID\n\t, [rom].ROOM_NAME\n\t, [bed].BED_LABEL\n;",
+      "line": 43,
+      "column": 1
+    }
+  },
+  {
+    "node_id": "file::Reporting_USP_CCMC_LOTE_Census_Interpreter_Services_Detail_PBI::stmt/12",
+    "position": "12",
+    "scriptdom_type": "SelectStatement",
+    "statement_kind": "SELECT INTO",
+    "disposition": "handled",
+    "gap_class": null,
+    "evidence": {
+      "fragment": "SELECT\n\t[enc].PAT_ID\n\t, [dd].[YEAR]\t\t\t\tAS [Year]\n\t, [dd].QUARTER_STR\t\t\tAS [Quarter]\n\t, [dd].MONTH_NAME\t\t\tAS [Month Name]\n\t, [dd].MONTH_NUMBER\t\t\tAS [Month Number]\n\t, [loc].LOCATION_ABBR\t\tAS [Location]\n\t, [dep].DEPARTMENT_NAME\t\tAS [Department]\n\t, CONVERT(VARCHAR, NULL)\tAS [Room]\n\t, CONVERT(VARCHAR, NULL)\tAS [Bed]\n\n\t, CONVERT(DATE, MIN([enc].CONTACT_DATE)) AS [Monthly Census Start Date]\n\t, CONVERT(DATE, MAX([enc].CONTACT_DATE)) AS [Monthly Census End Date]\n\n\t, COUNT(*) AS [Census Days]\n\n\t, CONCAT(CONVERT(DATE, MIN([enc].CONTACT_DATE)),' - ', CONVERT(DATE, MAX([enc].CONTACT_DATE)))\tAS [Census Period]\n\n\t, 'Ambulatory' AS [Department Label]\n\nINTO #clinic_monthly\n\nFROM [Clarity].[dbo].PAT_ENC\t[enc]\n\t\n\tLEFT JOIN [Clarity].[dbo].CLARITY_DEP\t\t\t\t[dep]\tON [enc].DEPARTMENT_ID = [dep].DEPARTMENT_ID\n\tLEFT JOIN [Clarity].[dbo].CLARITY_LOC\t\t\t\t[loc]\tON [dep].REV_LOC_ID = [loc].LOC_ID\n\tLEFT JOIN [Clarity].[dbo].DATE_DIMENSION\t\t\t[dd]\tON [enc].CONTACT_DATE = [dd].CALENDAR_DT\n\t\t\t\nWHERE 1=1\n\tAND [enc].CONTACT_DATE BETWEEN @StartDate AND @EndDate\n\tAND [dep].DEPARTMENT_ID IN (\n\t\t10101207\t--CARDIOTHORACIC SURGERY\n\t\t,10101209\t--ENT\n\t\t,10101219\t--PALLIATIVE CARE\n\t\t,10120165\t--PEDIATRIC ENT\n\t\t,100050003\t--DMSS PSYCHOLOGY\n\t\t,100063010\t--HMSS PSYCHOLOGY\n\t\t,100063017\t--HMSS HURST SPORT PT\n\t\t,100063019\t--HMSS HURST PT\n\t\t,100063021\t--HMSS HURST AUDIO\n\t\t,100073003\t--SWMS PSYCHOLOGY\n\t\t,100074001\t--MOB PSYCHOLOGY\n\t\t,100106001\t--ARL CARDIOLOGY\n\t\t,100106002\t--ARL DIAGNOSTIC CARDIO\n\t\t,100108067\t--CCMC UC SOUTHLAKE DS\n\t\t,100117001\t--HOGC HEM ONC\n\t\t,100119101\t--RHBSO SOUTH PT\n\t\t,100119104\t--RHBSO SOUTH AUDIO\n\t\t,100119105\t--RHBSO SOUTH SPORT PT\n\t\t,100300005\t--PROSPER PEDI SURGERY\n\t\t,100381011\t--SMSS PSYCHOLOGY\n\t\t,100581001\t--DOD CRANIOFACIAL\n\t\t,100581002\t--DOD ENDOCRINOLOGY\n\t\t,100581003\t--DOD GASTROENTEROLOGY\n\t\t,100581004\t--DOD CARDIOLOGY\n\t\t,100581006\t--DOD HEM ONC\n\t\t,100581007\t--DOD INFECTIOUS DISEASE\n\t\t,100581008\t--DOD NEPHROLOGY\n\t\t,100581009\t--DOD NEUROLOGY\n\t\t,100581010\t--DOD NEUROSURGERY\n\t\t,100581012\t--DOD PAIN MANAGEMENT\n\t\t,100581013\t--DOD PEDIATRIC SURGERY\n\t\t,100581014\t--DOD PULMONOLOGY\n\t\t,100581015\t--DOD MR IMAGING\n\t\t,100581016\t--DOD US IMAGING\n\t\t,100581017\t--DOD X-RAY IMAGING\n\t\t,100581018\t--DOD RHEUMATOLOGY\n\t\t,100581020\t--DOD ORTHO X-RAY\n\t\t,100581022\t--DOD INFUSION\n\t\t,100581023\t--DOD NEST FOLLOW UP\n\t\t,100581032\t--DOD SLEEP MEDICINE\n\t\t,100581033\t--DOD PULMONARY LAB\n\t\t,100581035\t--DOD DIAGNOSTIC CARDIO\n\t\t,100581047\t--DOD IMMUNOLOGY\n\t\t,100581050\t--DOD PSYCHOLOGY\n\t\t,100581052\t--DOD DEVELOPMENTAL PEDS\n\t\t,100581053\t--DOD WOUND CLINIC\n\t\t,100581059\t--DOD DERMATOLOGY\n\t\t,100581060\t--DOD UROLOGY\n\t\t,100581063\t--DOD UROLOGY RADIOLOGY\n\t\t,100581075\t--DOD CARDIAC REHAB\n\t\t,100590009\t--MAN URGENT CARE\n\t\t,100590010\t--MMS MANS PT\n\t\t,100590015\t--MMS MANS AUDIO\n\t\t,100590021\t--MMS MANS SPORT PT\n\t\t,100618001\t--FTW URGENT CARE\n\t\t,100618020\t--FTW URGENT CARE X-RAY\n\t\t,100624020\t--MAN URGENT CARE X-RAY\n\t\t,100624021\t--MAN URGENT CARE\n\t\t,100632010\t--ALMS PSYCHOLOGY\n\t\t,100632022\t--ALMS AUDIO\n\t\t,100635001\t--SLK URGENT CARE\n\t\t,100641001\t--HUR URGENT CARE\n\t\t,100641002\t--HUR URGENT CARE X-RAY\n\t\t,100643001\t--HRC US IMAGING\n\t\t,100643002\t--HRC X-RAY IMAGING\n\t\t,100643003\t--HRC MR IMAGING\n\t\t,100651001\t--ALL URGENT CARE\n\t\t,100657003\t--VIRTUAL CARE\n\t\t,100663001\t--DENTON PSYCHOLOGY\n\t\t,100674003\t--WR SPORT PT\n\t\t,100675001\t--WR URGENT CARE\n\t\t,100675002\t--WR URGENT CARE X-RAY\n\t\t,100676006\t--CSC PSYCHOLOGY\n\t\t,100682001\t--PROSPER URGENT CARE\n\t\t,100683001\t--COOPER NEST FOLLOW UP\n\t\t,100683002\t--COOPER NEUROPSYCH\n\t\t,100685001\t--DENTON PSYCHOLOGY\n\t\t,100700005\t--PROSPER PEDI SURGERY\n\t)\n\nGROUP BY\n\t[enc].PAT_ID\n\t, [dd].[YEAR]\n\t, [dd].QUARTER_STR\n\t, [dd].MONTH_NUMBER\n\t, [dd].MONTH_NAME\n\t, [loc].LOCATION_ABBR\n\t, [dep].DEPARTMENT_NAME\n;",
+      "line": 121,
+      "column": 1
+    }
+  },
+  {
+    "node_id": "file::Reporting_USP_CCMC_LOTE_Census_Interpreter_Services_Detail_PBI::stmt/13",
+    "position": "13",
+    "scriptdom_type": "SelectStatement",
+    "statement_kind": "SELECT INTO",
+    "disposition": "handled",
+    "gap_class": null,
+    "evidence": {
+      "fragment": "SELECT *, 'Inpatient' as [Dept Type]\nINTO #combined_census\nFROM #census_monthly\nUNION\nSELECT *, 'Outpatient' as [Dept Type]\nFROM #clinic_monthly\n;",
+      "line": 246,
+      "column": 1
+    }
+  },
+  {
+    "node_id": "file::Reporting_USP_CCMC_LOTE_Census_Interpreter_Services_Detail_PBI::stmt/14",
+    "position": "14",
+    "scriptdom_type": "SelectStatement",
+    "statement_kind": "SELECT INTO",
+    "disposition": "handled",
+    "gap_class": null,
+    "evidence": {
+      "fragment": "SELECT PAT_ID, PAT_RELATIONSHIP_ID\nINTO #caregivers\nFROM [Clarity].[dbo].PAT_RELATIONSHIP_LIST\nWHERE EXISTS (SELECT 1 FROM #combined_census WHERE [PAT_RELATIONSHIP_LIST].PAT_ID = [#combined_census].PAT_ID)\n;",
+      "line": 259,
+      "column": 1
+    }
+  },
+  {
+    "node_id": "file::Reporting_USP_CCMC_LOTE_Census_Interpreter_Services_Detail_PBI::stmt/15",
+    "position": "15",
+    "scriptdom_type": "SelectStatement",
+    "statement_kind": "SELECT INTO",
+    "disposition": "handled",
+    "gap_class": null,
+    "evidence": {
+      "fragment": "SELECT \n\t[#caregivers].PAT_ID\n\t, STRING_AGG( CONCAT( IIF( [relation].NAME IS NULL, '?', [relation].NAME ), ';', [zc_lang].NAME ), CHAR(10)+CHAR(13)) \n\t\tWITHIN GROUP(ORDER BY [lang].PAT_RELATIONSHIP_ID) AS [Caregiver Languages]\n\t\nINTO #caregiver_languages\n\nFROM [Clarity].[dbo].PAT_REL_LANGUAGES\t[lang]\t\t\n\n\tINNER JOIN #caregivers\t\t\t\t\t\t\t\t\t\t\t\t\tON [lang].PAT_RELATIONSHIP_ID = [#caregivers].PAT_RELATIONSHIP_ID\n\tINNER JOIN [Clarity].[dbo].ZC_LANGUAGE\t\t\t\t\t[zc_lang]\t\tON [lang].LANGUAGE_C = [zc_lang].LANGUAGE_C\n\n\tLEFT JOIN [Clarity].[dbo].PAT_RELATIONSHIP_LIST_HX\t\t[hx]\t\t\tON [lang].PAT_RELATIONSHIP_ID = [hx].RELATIONSHIP_ID\n\tLEFT JOIN [Clarity].[dbo].ZC_EMERG_PAT_REL\t\t\t\t[relation]\t\tON [hx].RELATION_TO_PAT_C = [relation].EMERG_PAT_REL_C\n\nWHERE 1=1\n\tAND [lang].LANGUAGE_TYPE_C = 1\t-- SPOKEN LANGUAGE\n\tAND (\n\t\t( [hx].RELATIONSHIP_START_DATE <= @EndDate AND [hx].RELATIONSHIP_END_DATE >= @StartDate )\t-- Relationship ended after report start but was active during report period\n\t\tOR\t\t\n\t\t( [hx].RELATIONSHIP_START_DATE <= @EndDate AND [hx].RELATIONSHIP_END_DATE IS NULL )\t\t\t-- Relationship has no end date\n\t\tOR\n\t\t( [hx].RELATIONSHIP_START_DATE IS NULL AND [hx].RELATIONSHIP_END_DATE IS NULL )\t\t\t\t-- No dates entered for relationship\n\t\t)\n\nGROUP BY [#caregivers].PAT_ID\n;",
+      "line": 270,
+      "column": 1
+    }
+  },
+  {
+    "node_id": "file::Reporting_USP_CCMC_LOTE_Census_Interpreter_Services_Detail_PBI::stmt/16",
+    "position": "16",
+    "scriptdom_type": "SelectStatement",
+    "statement_kind": "SELECT INTO",
+    "disposition": "handled",
+    "gap_class": null,
+    "evidence": {
+      "fragment": "WITH matching_coverages AS\n(\n\tSELECT \n\t\t[#combined_census].PAT_ID\n\t\t, [#combined_census].[Monthly Census Start Date]\n\t\t, [coverage].PAYOR_NAME\n\t\t, [coverage].BENEFIT_PLAN_ID\n\t\t, [coverage].BENEFIT_PLAN_NAME\n\t\t, [coverage].FIN_CLASS_NAME\n\n\t\t, ROW_NUMBER() OVER(\n\t\t\tPARTITION BY [#combined_census].PAT_ID, [#combined_census].[Monthly Census Start Date]\n\t\t\tORDER BY [FILING].FILING_ORDER ASC\n\t\t  ) AS CVG_FILING_ORDER\n\n\n\t\tFROM Clarity.dbo.COVERAGE_MEMBER_LIST\t[member]\t\t-- Since one coverage record can have multiple members, each row in the table corresponds to one member and is noted by the coverage ID and the line number\n\n\t\t\tINNER JOIN #combined_census\t\t\t\t\t\t\t\t\tON [member].PAT_ID = [#combined_census].PAT_ID\n\t\t\tINNER JOIN Clarity.dbo.V_COVERAGE_PAYOR_PLAN\t[coverage]\tON [member].COVERAGE_ID = [coverage].COVERAGE_ID\n\t\t\tINNER JOIN Clarity.dbo.CLARITY_EPM\t\t\t\t[payor]\t\tON [coverage].PAYOR_ID = [payor].PAYOR_ID\n\t\t\tINNER JOIN Clarity.dbo.PAT_CVG_FILE_ORDER\t\t[filing]\tON [member].COVERAGE_ID = [filing].COVERAGE_ID\n\n\t\tWHERE 1=1\n\t\t\tAND [payor].PAYOR_NAME NOT LIKE 'RX%'\n\t\t\tAND [member].MEM_COVERED_YN IN ( 'Y', '3', '4' )\t-- Y – Verified and in effect\n\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t-- 3 – Pending (not verified, but in effect)\n\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t-- 4 – In Question (was verified, but recent carrier information omitted this coverage)\n\n\t\t\t/* Date on which the coverage (subscription) goes into effect for the member */\n\t\t\tAND [member].MEM_EFF_FROM_DATE <= [#combined_census].[Monthly Census Start Date]\t\n\t\t\tAND ( [member].MEM_EFF_TO_DATE > [#combined_census].[Monthly Census Start Date] OR [member].MEM_EFF_TO_DATE IS NULL )\n\n\t\t\t/* Date on which payor was determined (Managed Care contexts may change based on employer group associated with Coverage */\n\t\t\tAND [coverage].EFF_DATE <= [#combined_census].[Monthly Census Start Date]\n\t\t\tAND [coverage].TERM_DATE > [#combined_census].[Monthly Census Start Date]\n)\n\nSELECT *\nINTO #coverage\nFROM matching_coverages\nWHERE CVG_FILING_ORDER = 1\n;",
+      "line": 302,
+      "column": 1
+    }
+  },
+  {
+    "node_id": "file::Reporting_USP_CCMC_LOTE_Census_Interpreter_Services_Detail_PBI::stmt/17",
+    "position": "17",
+    "scriptdom_type": "SelectStatement",
+    "statement_kind": "SELECT",
+    "disposition": "handled",
+    "gap_class": null,
+    "evidence": {
+      "fragment": "SELECT\n\t[#combined_census].[Year]\n\t, [#combined_census].[Quarter]\n\t, [#combined_census].[Month Name]\n\t, [#combined_census].[Month Number]\n\t, [#combined_census].[Monthly Census Start Date]\n\t, [#combined_census].[Monthly Census End Date]\n\t, [#combined_census].[Location]\n\t, [#combined_census].[Department]\n\t, [#combined_census].[Department Label]\n\t, [#combined_census].[Dept Type]\n\t, [#combined_census].[Room]\n\t, [#combined_census].[Bed]\n\t, [#combined_census].[Census Period]\n\t, [#combined_census].[Census Days]\n\t\n\t, [#caregiver_languages].[Caregiver Languages]\n\n\t, CASE\n\t\tWHEN [#caregiver_languages].[Caregiver Languages] LIKE '%SPANISH%'\n\t\tTHEN 'At least one Spanish-speaking caregiver'\n\n\t\tWHEN [#caregiver_languages].[Caregiver Languages] NOT LIKE '%ENGLISH%'\n\t\tTHEN 'Language other than English and Spanish'\n\t\t\n\t\tWHEN [#caregiver_languages].[Caregiver Languages] LIKE '%ENGLISH%'\n\t\tTHEN 'Only English speaking caregivers'\n\n\t\tELSE 'No language(s) listed'\n\n\t  END AS [Caregiver Language Category]\n\n\t, ISNULL([#coverage].FIN_CLASS_NAME, 'Self-Pay')\t\t\tAS [Financial Class]\n\t, ISNULL([#coverage].PAYOR_NAME, 'SELF-PAY')\t\t\t\tAS [Payor]\n\t, ISNULL([#coverage].BENEFIT_PLAN_NAME, 'SELF-PAY')\t\t\tAS [Benefit Plan]\n\t, IIF([#coverage].BENEFIT_PLAN_ID = '312302', 'Yes', 'No')\tAS [Foster Coverage?]\n\t, CASE\n\t\tWHEN [#coverage].FIN_CLASS_NAME IS NULL \n\t\t\tOR [#coverage].FIN_CLASS_NAME = 'Self-pay' THEN 'Self-pay'\n\t\tELSE 'Has Coverage'\n\t  END AS [Insurance Coverage?]\n\n\t, [pat].PAT_MRN_ID\t\t\t\t\t\tAS [MRN]\n\t, [pat].PAT_NAME\t\t\t\t\t\tAS [Patient Name]\n\t, ISNULL([sex_zc].[NAME], 'Unknown')\tAS [Legal Sex]\n\t, [myc_zc].[NAME]\t\t\t\t\t\tAS [MyChart Status]\n\t, [lang_zc].[NAME]\t\t\t\t\t\tAS [Patient Language]\n\n\t, CASE WHEN [pat4].GENDER_IDENTITY_C = 6 OR [pat4].GENDER_IDENTITY_C IS NULL THEN 'Unknown'\n\t\t   ELSE [gender_zc].[NAME]\n\t  END AS [Gender Identity]\n\t  \n\t, CASE WHEN [pat].ETHNIC_GROUP_C IN (3, 4) OR [pat].ETHNIC_GROUP_C IS NULL THEN 'Unknown'\n\t\t   WHEN [pat].ETHNIC_GROUP_C IN (2, 8) THEN 'Hispanic or Latino'\n\t\t   ELSE [ethnicity].[NAME]\n\t  END AS [Ethnicity]\n\n\t, CASE WHEN [race_list].PATIENT_RACE_C IN (7, 8)\n\t\t\tOR [race_list].PATIENT_RACE_C IS NULL\n\t\t   THEN 'Unknown'\n\t\t   ELSE [race].[NAME]\n\t  END AS [Race]\n\n\t, CASE WHEN [pat4].SEX_ASGN_AT_BIRTH_C IN (3, 4, 5, 6)\n\t\t\tOR [pat4].SEX_ASGN_AT_BIRTH_C IS NULL\n\t\t   THEN 'Unknown'\n\t\t   ELSE [sex_birth_zc].[NAME]\n\t  END AS [Birth Sex]\n\n\t, IIF([pat].INTRPTR_NEEDED_YN = 'Y', 'Yes', 'No') AS [Interpreter Needed?]\n\n\t, ISNULL([country_tmp_zc].[NAME], [country_zc].[NAME])\t\tAS [Country]\n\t, ISNULL([state_tmp_zc].[NAME], [state_zc].[NAME])\t\t\tAS [State]\n\t, ISNULL([county_tmp_zc].[NAME], [county_zc].[NAME])\t\tAS [County]\n\t, ISNULL([pat].TMP_CITY, [pat].CITY)\t\t\t\t\t\tAS [City]\n\t, ISNULL([pat].TMP_ZIP , [pat].ZIP)\t\t\t\t\t\t\tAS [ZIP Code]\n\n\t, DATEDIFF(DAY, [pat].BIRTH_DATE, [#combined_census].[Monthly Census Start Date])/365 AS [Age Yrs]\n\n\t, CASE\n\t\tWHEN DATEDIFF(DAY, [pat].BIRTH_DATE, [#combined_census].[Monthly Census Start Date]) < 365*1\t\tTHEN '< 1 year'\n\t\tWHEN DATEDIFF(DAY, [pat].BIRTH_DATE, [#combined_census].[Monthly Census Start Date]) < 365*6\t\tTHEN '1 - 5 years'\n\t\tWHEN DATEDIFF(DAY, [pat].BIRTH_DATE, [#combined_census].[Monthly Census Start Date]) < 365*12\t\tTHEN '6 - 11 years'\n\t\tWHEN DATEDIFF(DAY, [pat].BIRTH_DATE, [#combined_census].[Monthly Census Start Date]) < 365*18\t\tTHEN '12 - 17 years'\n\t\tWHEN DATEDIFF(DAY, [pat].BIRTH_DATE, [#combined_census].[Monthly Census Start Date]) >= 365*18\t\tTHEN '>= 18 years'\n\t  END AS [Age Group]\n\n\t, CASE\n\t\tWHEN [pat].ETHNIC_GROUP_C IN (3, 4) THEN 'Unknown'\n\t\tWHEN [pat].ETHNIC_GROUP_C <> 1 OR [race_list].PATIENT_RACE_C = 1001 THEN 'Hispanic'\n\n\t\tWHEN [race_list].PATIENT_RACE_C = 1\t\t\t\tTHEN 'NH White'\n\t\tWHEN [race_list].PATIENT_RACE_C = 2\t\t\t\tTHEN 'NH Black'\n\t\tWHEN [race_list].PATIENT_RACE_C IN (4, 1000)\tTHEN 'NH Asian'\n\t\tWHEN [race_list].PATIENT_RACE_C IN (7,8)\t\tTHEN 'NH Unknown'\n\t\tELSE 'NH Other'\n\t  END AS [Race/Ethnicity]\n\n\nFROM #combined_census\n\n\tLEFT JOIN #caregiver_languages\t\t\t\t\t\t\t\t\t\tON [#combined_census].PAT_ID = [#caregiver_languages].PAT_ID\n\tLEFT JOIN #coverage\t\t\t\t\t\t\t\t\t\t\t\t\tON [#combined_census].PAT_ID = [#coverage].PAT_ID\n\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\tAND [#combined_census].[Monthly Census Start Date] = [#coverage].[Monthly Census Start Date]\n\t/* Demographics */\n\tLEFT JOIN [Clarity].[dbo].PATIENT\t\t\t\t[pat]\t\t\t\tON [#combined_census].PAT_ID = [pat].PAT_ID\n\tLEFT JOIN [Clarity].[dbo].PATIENT_4\t\t\t\t[pat4]\t\t\t\tON [#combined_census].PAT_ID = [pat4].PAT_ID\n\tLEFT JOIN [Clarity].[dbo].PATIENT_MYC\t\t\t[myc]\t\t\t\tON [#combined_census].PAT_ID = [myc].PAT_ID\n\tLEFT JOIN [Clarity].[dbo].PATIENT_RACE\t\t\t[race_list]\t\t\tON [pat].PAT_ID = [race_list].PAT_ID\n\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\tAND [race_list].LINE = 1\t-- first race listed\n\n\t/* Categories and Look-ups */\n\tLEFT JOIN [Clarity].[dbo].ZC_LANGUAGE\t\t\t[lang_zc]\t\t\tON [pat].LANGUAGE_C = [lang_zc].LANGUAGE_C\n\tLEFT JOIN [Clarity].[dbo].ZC_MYCHART_STATUS\t\t[myc_zc]\t\t\tON [myc].MYCHART_STATUS_C = [myc_zc].MYCHART_STATUS_C\n\tLEFT JOIN [Clarity].[dbo].ZC_SEX\t\t\t\t[sex_zc]\t\t\tON [pat].SEX_C = [sex_zc].RCPT_MEM_SEX_C\n\tLEFT JOIN [Clarity].[dbo].ZC_SEX_ASGN_AT_BIRTH\t[sex_birth_zc]\t\tON [pat4].SEX_ASGN_AT_BIRTH_C = [sex_birth_zc].SEX_ASGN_AT_BIRTH_C\n\n\tLEFT JOIN [Clarity].[dbo].ZC_COUNTRY\t\t\t[country_zc]\t\tON [pat].COUNTRY_C = [country_zc].COUNTRY_C\n\tLEFT JOIN [Clarity].[dbo].ZC_COUNTRY\t\t\t[country_tmp_zc]\tON [pat].TMP_COUNTRY_C = [country_tmp_zc].COUNTRY_C\n\tLEFT JOIN [Clarity].[dbo].ZC_STATE\t\t\t\t[state_zc]\t\t\tON [pat].STATE_C = [state_zc].STATE_C\n\tLEFT JOIN [Clarity].[dbo].ZC_STATE\t\t\t\t[state_tmp_zc]\t\tON [pat].TMP_STATE_C = [state_tmp_zc].STATE_C\n\tLEFT JOIN [Clarity].[dbo].ZC_GENDER_IDENTITY\t[gender_zc]\t\t\tON [pat4].GENDER_IDENTITY_C = [gender_zc].GENDER_IDENTITY_C\n\tLEFT JOIN [Clarity].[dbo].ZC_PATIENT_RACE\t\t[race]\t\t\t\tON [race_list].PATIENT_RACE_C = [race].PATIENT_RACE_C\n\tLEFT JOIN [Clarity].[dbo].ZC_ETHNIC_GROUP\t\t[ethnicity]\t\t\tON [pat].ETHNIC_GROUP_C = [ethnicity].ETHNIC_GROUP_C\n\tLEFT JOIN [Clarity].[dbo].ZC_COUNTY\t\t\t\t[county_zc]\t\t\tON [pat].COUNTY_C = [county_zc].COUNTY_C\n\tLEFT JOIN [Clarity].[dbo].ZC_COUNTY\t\t\t\t[county_tmp_zc]\t\tON [pat].TMP_COUNTY_C = [county_tmp_zc].COUNTY_C\n\nWHERE [#caregiver_languages].[Caregiver Languages] NOT LIKE '%ENGLISH%'\t\t-- exclude patients with an english-speaking caregiver\n\tOR ([#caregiver_languages].[Caregiver Languages] IS NULL\n\t\tAND ( \n\t\t\t[pat].LANGUAGE_C IS NULL \n\t\t\tOR \n\t\t\t[pat].LANGUAGE_C <> 22 -- exclude if no Caregiver languages but patient language is 'English'\n\t\t\t)\n\t\t)\n;",
+      "line": 350,
+      "column": 1
+    }
+  },
+  {
+    "node_id": "file::Reporting_USP_CCMC_LOTE_Census_Interpreter_Services_Summary_PBI::stmt/1",
+    "position": "1",
+    "scriptdom_type": "UseStatement",
+    "statement_kind": "UseStatement",
+    "disposition": "operational",
+    "gap_class": null,
+    "evidence": {
+      "fragment": "USE [CookClarity]",
+      "line": 1,
+      "column": 1
+    }
+  },
+  {
+    "node_id": "file::Reporting_USP_CCMC_LOTE_Census_Interpreter_Services_Summary_PBI::stmt/2",
+    "position": "2",
+    "scriptdom_type": "PredicateSetStatement",
+    "statement_kind": "PredicateSetStatement",
+    "disposition": "operational",
+    "gap_class": null,
+    "evidence": {
+      "fragment": "SET ANSI_NULLS ON",
+      "line": 5,
+      "column": 1
+    }
+  },
+  {
+    "node_id": "file::Reporting_USP_CCMC_LOTE_Census_Interpreter_Services_Summary_PBI::stmt/3",
+    "position": "3",
+    "scriptdom_type": "PredicateSetStatement",
+    "statement_kind": "PredicateSetStatement",
+    "disposition": "operational",
+    "gap_class": null,
+    "evidence": {
+      "fragment": "SET QUOTED_IDENTIFIER ON",
+      "line": 8,
+      "column": 1
+    }
+  },
+  {
+    "node_id": "file::Reporting_USP_CCMC_LOTE_Census_Interpreter_Services_Summary_PBI::stmt/4",
+    "position": "4",
+    "scriptdom_type": "PredicateSetStatement",
+    "statement_kind": "PredicateSetStatement",
+    "disposition": "operational",
+    "gap_class": null,
+    "evidence": {
+      "fragment": "SET NOCOUNT ON;",
+      "line": 35,
+      "column": 1
+    }
+  },
+  {
+    "node_id": "file::Reporting_USP_CCMC_LOTE_Census_Interpreter_Services_Summary_PBI::stmt/5",
+    "position": "5",
+    "scriptdom_type": "SetTransactionIsolationLevelStatement",
+    "statement_kind": "SetTransactionIsolationLevelStatement",
+    "disposition": "operational",
+    "gap_class": null,
+    "evidence": {
+      "fragment": "SET TRANSACTION ISOLATION LEVEL READ UNCOMMITTED;",
+      "line": 36,
+      "column": 1
+    }
+  },
+  {
+    "node_id": "file::Reporting_USP_CCMC_LOTE_Census_Interpreter_Services_Summary_PBI::stmt/6",
+    "position": "6",
+    "scriptdom_type": "DeclareVariableStatement",
+    "statement_kind": "DeclareVariableStatement",
+    "disposition": "operational",
+    "gap_class": null,
+    "evidence": {
+      "fragment": "DECLARE @startDate DATETIME = [Clarity].EPIC_UTIL.EFN_DIN(COALESCE(@i_vSTART_DATE,'MB-13'));",
+      "line": 39,
+      "column": 1
+    }
+  },
+  {
+    "node_id": "file::Reporting_USP_CCMC_LOTE_Census_Interpreter_Services_Summary_PBI::stmt/7",
+    "position": "7",
+    "scriptdom_type": "DeclareVariableStatement",
+    "statement_kind": "DeclareVariableStatement",
+    "disposition": "operational",
+    "gap_class": null,
+    "evidence": {
+      "fragment": "DECLARE @endDate DATETIME = [Clarity].EPIC_UTIL.EFN_DIN(COALESCE(@i_vEND_DATE,'ME-1'));",
+      "line": 40,
+      "column": 1
+    }
+  },
+  {
+    "node_id": "file::Reporting_USP_CCMC_LOTE_Census_Interpreter_Services_Summary_PBI::stmt/8",
+    "position": "8",
+    "scriptdom_type": "DropTableStatement",
+    "statement_kind": "DropTableStatement",
+    "disposition": "operational",
+    "gap_class": null,
+    "evidence": {
+      "fragment": "DROP TABLE IF EXISTS #census_monthly;",
+      "line": 43,
+      "column": 1
+    }
+  },
+  {
+    "node_id": "file::Reporting_USP_CCMC_LOTE_Census_Interpreter_Services_Summary_PBI::stmt/9",
+    "position": "9",
+    "scriptdom_type": "DropTableStatement",
+    "statement_kind": "DropTableStatement",
+    "disposition": "operational",
+    "gap_class": null,
+    "evidence": {
+      "fragment": "DROP TABLE IF EXISTS #clinic_monthly;",
+      "line": 44,
+      "column": 1
+    }
+  },
+  {
+    "node_id": "file::Reporting_USP_CCMC_LOTE_Census_Interpreter_Services_Summary_PBI::stmt/10",
+    "position": "10",
+    "scriptdom_type": "DropTableStatement",
+    "statement_kind": "DropTableStatement",
+    "disposition": "operational",
+    "gap_class": null,
+    "evidence": {
+      "fragment": "DROP TABLE IF EXISTS #combined_census;",
+      "line": 45,
+      "column": 1
+    }
+  },
+  {
+    "node_id": "file::Reporting_USP_CCMC_LOTE_Census_Interpreter_Services_Summary_PBI::stmt/11",
+    "position": "11",
+    "scriptdom_type": "DropTableStatement",
+    "statement_kind": "DropTableStatement",
+    "disposition": "operational",
+    "gap_class": null,
+    "evidence": {
+      "fragment": "DROP TABLE IF EXISTS #caregivers;",
+      "line": 47,
+      "column": 1
+    }
+  },
+  {
+    "node_id": "file::Reporting_USP_CCMC_LOTE_Census_Interpreter_Services_Summary_PBI::stmt/12",
+    "position": "12",
+    "scriptdom_type": "DropTableStatement",
+    "statement_kind": "DropTableStatement",
+    "disposition": "operational",
+    "gap_class": null,
+    "evidence": {
+      "fragment": "DROP TABLE IF EXISTS #caregiver_languages;",
+      "line": 48,
+      "column": 1
+    }
+  },
+  {
+    "node_id": "file::Reporting_USP_CCMC_LOTE_Census_Interpreter_Services_Summary_PBI::stmt/13",
+    "position": "13",
+    "scriptdom_type": "DropTableStatement",
+    "statement_kind": "DropTableStatement",
+    "disposition": "operational",
+    "gap_class": null,
+    "evidence": {
+      "fragment": "DROP TABLE IF EXISTS #combined_census_with_language;",
+      "line": 49,
+      "column": 1
+    }
+  },
+  {
+    "node_id": "file::Reporting_USP_CCMC_LOTE_Census_Interpreter_Services_Summary_PBI::stmt/14",
+    "position": "14",
+    "scriptdom_type": "DropTableStatement",
+    "statement_kind": "DropTableStatement",
+    "disposition": "operational",
+    "gap_class": null,
+    "evidence": {
+      "fragment": "DROP TABLE IF EXISTS #combined_census_numerators;",
+      "line": 50,
+      "column": 1
+    }
+  },
+  {
+    "node_id": "file::Reporting_USP_CCMC_LOTE_Census_Interpreter_Services_Summary_PBI::stmt/15",
+    "position": "15",
+    "scriptdom_type": "SelectStatement",
+    "statement_kind": "SELECT INTO",
+    "disposition": "handled",
+    "gap_class": null,
+    "evidence": {
+      "fragment": "SELECT\n\t[census].PAT_ID\n\t, [dd].[YEAR]\t\t\t\tAS [Year]\n\t, [dd].QUARTER_STR\t\t\tAS [Quarter]\n\t, [dd].MONTH_NAME\t\t\tAS [Month Name]\n\t, [dd].MONTH_NUMBER\t\t\tAS [Month Number]\n\t, [loc].LOCATION_ABBR\t\tAS [Location]\n\t, [dep].DEPARTMENT_NAME\t\tAS [Department]\n\t, [dep].EXTERNAL_NAME\t\tAS [Dept External Name]\n\n\t, CONVERT(DATE, MIN([census].CALENDAR_DT)) AS [Monthly Census Start Date]\n\n\t, COUNT(*) AS [Census Days]\n\n\t, CASE\n\t\tWHEN [dep].DEPARTMENT_ID IN (\n\t\t\t100200053\t-- PCCMC 2 Main PICU\n\t\t\t, 100200055\t-- PCCMC 4 Main\n\t\t\t, 100200045\t-- PCCMC 5 Main\n\t\t\t, 100200007\t-- PCCMC Main OR\n\t\t\t)\n\t\tTHEN 'Prosper CCMC'\n\n\t\t--WHEN [census].DEPARTMENT_ID = xxxx\t\t-- To be decided\n\t\t--THEN 'Prosper MOB'\n\n\t\tWHEN [dep].DEPARTMENT_ID = 100200033\t-- PCCMC Emergency\n\t\tTHEN 'Prosper ED'\n\n\t\tWHEN [dep].DEPARTMENT_ID = 100108022\t-- CCMC Emergency\n\t\tTHEN 'FW ED'\n\n\t\tELSE 'FW CCMC'\n\n\t  END AS [Department Label]\n\nINTO #census_monthly\n\nFROM [Clarity].[dbo].F_IP_HSP_PAT_DAYS\t[census]\n\t\n\tLEFT JOIN [Clarity].[dbo].CLARITY_DEP\t\t\t\t[dep]\tON [census].DEPARTMENT_ID = [dep].DEPARTMENT_ID\n\tLEFT JOIN [Clarity].[dbo].CLARITY_LOC\t\t\t\t[loc]\tON [dep].REV_LOC_ID = [loc].LOC_ID\n\tLEFT JOIN [Clarity].[dbo].DATE_DIMENSION\t\t\t[dd]\tON [census].CALENDAR_DT = [dd].CALENDAR_DT\n\nWHERE 1=1\n\tAND [census].CALENDAR_DT BETWEEN @StartDate AND @EndDate\n\tAND [dep].REV_LOC_ID IN (\n\t\tN'100108'\t\t-- COOK CHILDRENS MEDICAL CENTER\n\t\t, N'100200'\t\t-- COOK CHILDRENS MEDICAL CENTER PROSPER\n\t)\n\nGROUP BY\n\t[census].PAT_ID\n\t, [dd].[YEAR]\n\t, [dd].QUARTER_STR\n\t, [dd].MONTH_NUMBER\n\t, [dd].MONTH_NAME\n\t, [loc].LOCATION_ABBR\n\t, [dep].DEPARTMENT_ID\n\t, [dep].DEPARTMENT_NAME\n\t, [dep].EXTERNAL_NAME\n;",
+      "line": 57,
+      "column": 1
+    }
+  },
+  {
+    "node_id": "file::Reporting_USP_CCMC_LOTE_Census_Interpreter_Services_Summary_PBI::stmt/16",
+    "position": "16",
+    "scriptdom_type": "DropTableStatement",
+    "statement_kind": "DropTableStatement",
+    "disposition": "operational",
+    "gap_class": null,
+    "evidence": {
+      "fragment": "DROP TABLE IF EXISTS #clinic_monthly;",
+      "line": 124,
+      "column": 1
+    }
+  },
+  {
+    "node_id": "file::Reporting_USP_CCMC_LOTE_Census_Interpreter_Services_Summary_PBI::stmt/17",
+    "position": "17",
+    "scriptdom_type": "SelectStatement",
+    "statement_kind": "SELECT INTO",
+    "disposition": "handled",
+    "gap_class": null,
+    "evidence": {
+      "fragment": "SELECT\n\t[appt].PAT_ID\n\t, [dd].[YEAR]\t\t\t\tAS [Year]\n\t, [dd].QUARTER_STR\t\t\tAS [Quarter]\n\t, [dd].MONTH_NAME\t\t\tAS [Month Name]\n\t, [dd].MONTH_NUMBER\t\t\tAS [Month Number]\n\t, [loc].LOCATION_ABBR\t\tAS [Location]\n\t, [dep].DEPARTMENT_NAME\t\tAS [Department]\n\t, [dep].EXTERNAL_NAME\t\tAS [Dept External Name]\n\n\t, CONVERT(DATE, MIN([appt].CONTACT_DATE)) AS [Monthly Census Start Date]\n\n\t, COUNT(*) AS [Census Days]\n\n\t, 'FW Dodson/TJC Ambulatory' AS [Department Label]\n\nINTO #clinic_monthly\n\nFROM [Clarity].[dbo].F_SCHED_APPT\tappt\n\t\n\tLEFT JOIN [Clarity].[dbo].CLARITY_DEP\t\t\tdep\t\tON [appt].DEPARTMENT_ID = [dep].DEPARTMENT_ID\n\tLEFT JOIN [Clarity].[dbo].CLARITY_LOC\t\t\tloc\t\tON [dep].REV_LOC_ID = [loc].LOC_ID\n\tLEFT JOIN [Clarity].[dbo].DATE_DIMENSION\t\tdd\t\tON [appt].CONTACT_DATE = [dd].CALENDAR_DT\n\nWHERE 1=1\n\tAND [appt].APPT_STATUS_C = 2\t\t\t-- Completed\n\tAND [appt].CONTACT_DATE BETWEEN @StartDate AND @EndDate\n\tAND [dep].DEPARTMENT_ID IN (\n\t\t10101207\t--CARDIOTHORACIC SURGERY\n\t\t,10101209\t--ENT\n\t\t,10101219\t--PALLIATIVE CARE\n\t\t,10120165\t--PEDIATRIC ENT\n\t\t,100050003\t--DMSS PSYCHOLOGY\n\t\t,100063010\t--HMSS PSYCHOLOGY\n\t\t,100063017\t--HMSS HURST SPORT PT\n\t\t,100063019\t--HMSS HURST PT\n\t\t,100063021\t--HMSS HURST AUDIO\n\t\t,100073003\t--SWMS PSYCHOLOGY\n\t\t,100074001\t--MOB PSYCHOLOGY\n\t\t,100106001\t--ARL CARDIOLOGY\n\t\t,100106002\t--ARL DIAGNOSTIC CARDIO\n\t\t,100108067\t--CCMC UC SOUTHLAKE DS\n\t\t,100117001\t--HOGC HEM ONC\n\t\t,100119101\t--RHBSO SOUTH PT\n\t\t,100119104\t--RHBSO SOUTH AUDIO\n\t\t,100119105\t--RHBSO SOUTH SPORT PT\n\t\t,100300005\t--PROSPER PEDI SURGERY\n\t\t,100381011\t--SMSS PSYCHOLOGY\n\t\t,100581001\t--DOD CRANIOFACIAL\n\t\t,100581002\t--DOD ENDOCRINOLOGY\n\t\t,100581003\t--DOD GASTROENTEROLOGY\n\t\t,100581004\t--DOD CARDIOLOGY\n\t\t,100581006\t--DOD HEM ONC\n\t\t,100581007\t--DOD INFECTIOUS DISEASE\n\t\t,100581008\t--DOD NEPHROLOGY\n\t\t,100581009\t--DOD NEUROLOGY\n\t\t,100581010\t--DOD NEUROSURGERY\n\t\t,100581012\t--DOD PAIN MANAGEMENT\n\t\t,100581013\t--DOD PEDIATRIC SURGERY\n\t\t,100581014\t--DOD PULMONOLOGY\n\t\t,100581015\t--DOD MR IMAGING\n\t\t,100581016\t--DOD US IMAGING\n\t\t,100581017\t--DOD X-RAY IMAGING\n\t\t,100581018\t--DOD RHEUMATOLOGY\n\t\t,100581020\t--DOD ORTHO X-RAY\n\t\t,100581022\t--DOD INFUSION\n\t\t,100581023\t--DOD NEST FOLLOW UP\n\t\t,100581032\t--DOD SLEEP MEDICINE\n\t\t,100581033\t--DOD PULMONARY LAB\n\t\t,100581035\t--DOD DIAGNOSTIC CARDIO\n\t\t,100581047\t--DOD IMMUNOLOGY\n\t\t,100581050\t--DOD PSYCHOLOGY\n\t\t,100581052\t--DOD DEVELOPMENTAL PEDS\n\t\t,100581053\t--DOD WOUND CLINIC\n\t\t,100581059\t--DOD DERMATOLOGY\n\t\t,100581060\t--DOD UROLOGY\n\t\t,100581063\t--DOD UROLOGY RADIOLOGY\n\t\t,100581075\t--DOD CARDIAC REHAB\n\t\t,100590009\t--MAN URGENT CARE\n\t\t,100590010\t--MMS MANS PT\n\t\t,100590015\t--MMS MANS AUDIO\n\t\t,100590021\t--MMS MANS SPORT PT\n\t\t,100618001\t--FTW URGENT CARE\n\t\t,100618020\t--FTW URGENT CARE X-RAY\n\t\t,100624020\t--MAN URGENT CARE X-RAY\n\t\t,100624021\t--MAN URGENT CARE\n\t\t,100632010\t--ALMS PSYCHOLOGY\n\t\t,100632022\t--ALMS AUDIO\n\t\t,100635001\t--SLK URGENT CARE\n\t\t,100641001\t--HUR URGENT CARE\n\t\t,100641002\t--HUR URGENT CARE X-RAY\n\t\t,100643001\t--HRC US IMAGING\n\t\t,100643002\t--HRC X-RAY IMAGING\n\t\t,100643003\t--HRC MR IMAGING\n\t\t,100651001\t--ALL URGENT CARE\n\t\t,100657003\t--VIRTUAL CARE\n\t\t,100663001\t--DENTON PSYCHOLOGY\n\t\t,100674003\t--WR SPORT PT\n\t\t,100675001\t--WR URGENT CARE\n\t\t,100675002\t--WR URGENT CARE X-RAY\n\t\t,100676006\t--CSC PSYCHOLOGY\n\t\t,100682001\t--PROSPER URGENT CARE\n\t\t,100683001\t--COOPER NEST FOLLOW UP\n\t\t,100683002\t--COOPER NEUROPSYCH\n\t\t,100685001\t--DENTON PSYCHOLOGY\n\t\t,100700005\t--PROSPER PEDI SURGERY\n\t)\n\nGROUP BY\n\t[appt].PAT_ID\n\t, [dd].[YEAR]\n\t, [dd].QUARTER_STR\n\t, [dd].MONTH_NUMBER\n\t, [dd].MONTH_NAME\n\t, [loc].LOCATION_ABBR\n\t, [dep].DEPARTMENT_ID\n\t, [dep].DEPARTMENT_NAME\n\t, [dep].EXTERNAL_NAME\n;",
+      "line": 125,
+      "column": 1
+    }
+  },
+  {
+    "node_id": "file::Reporting_USP_CCMC_LOTE_Census_Interpreter_Services_Summary_PBI::stmt/18",
+    "position": "18",
+    "scriptdom_type": "SelectStatement",
+    "statement_kind": "SELECT INTO",
+    "disposition": "handled",
+    "gap_class": null,
+    "evidence": {
+      "fragment": "SELECT *, 'Inpatient' as [Dept Type]\nINTO #combined_census\nFROM #census_monthly\nUNION\nSELECT *, 'Outpatient' as [Dept Type]\nFROM #clinic_monthly\n;",
+      "line": 246,
+      "column": 1
+    }
+  },
+  {
+    "node_id": "file::Reporting_USP_CCMC_LOTE_Census_Interpreter_Services_Summary_PBI::stmt/19",
+    "position": "19",
+    "scriptdom_type": "SelectStatement",
+    "statement_kind": "SELECT INTO",
+    "disposition": "handled",
+    "gap_class": null,
+    "evidence": {
+      "fragment": "SELECT PAT_ID, PAT_RELATIONSHIP_ID\nINTO #caregivers\nFROM [Clarity].[dbo].PAT_RELATIONSHIP_LIST\nWHERE EXISTS (SELECT 1 FROM #combined_census WHERE [PAT_RELATIONSHIP_LIST].PAT_ID = [#combined_census].PAT_ID)\n;",
+      "line": 259,
+      "column": 1
+    }
+  },
+  {
+    "node_id": "file::Reporting_USP_CCMC_LOTE_Census_Interpreter_Services_Summary_PBI::stmt/20",
+    "position": "20",
+    "scriptdom_type": "SelectStatement",
+    "statement_kind": "SELECT INTO",
+    "disposition": "handled",
+    "gap_class": null,
+    "evidence": {
+      "fragment": "SELECT \n\t[#caregivers].PAT_ID\n\t, STRING_AGG( CONCAT( IIF( [relation].NAME IS NULL, '?', [relation].NAME ), ';', [zc_lang].NAME ), CHAR(10)+CHAR(13)) \n\t\tWITHIN GROUP(ORDER BY [lang].PAT_RELATIONSHIP_ID) AS [Caregiver Languages]\n\t\nINTO #caregiver_languages\n\nFROM [Clarity].[dbo].PAT_REL_LANGUAGES\t[lang]\t\t\n\n\tINNER JOIN #caregivers\t\t\t\t\t\t\t\t\t\t\t\t\tON [lang].PAT_RELATIONSHIP_ID = [#caregivers].PAT_RELATIONSHIP_ID\n\tLEFT JOIN [Clarity].[dbo].ZC_LANGUAGE\t\t\t\t\t[zc_lang]\t\tON [lang].LANGUAGE_C = [zc_lang].LANGUAGE_C\n\tLEFT JOIN [Clarity].[dbo].PAT_RELATIONSHIP_LIST_HX\t\t[hx]\t\t\tON [lang].PAT_RELATIONSHIP_ID = [hx].RELATIONSHIP_ID\n\tLEFT JOIN [Clarity].[dbo].ZC_EMERG_PAT_REL\t\t\t\t[relation]\t\tON [hx].RELATION_TO_PAT_C = [relation].EMERG_PAT_REL_C\n\nWHERE 1=1\n\tAND [lang].LANGUAGE_TYPE_C = 1\t-- SPOKEN LANGUAGE\n\tAND (\n\t\t( [hx].RELATIONSHIP_START_DATE <= @EndDate AND [hx].RELATIONSHIP_END_DATE >= @StartDate )\t-- Relationship ended after report start but was active during report period\n\t\tOR\t\t\n\t\t( [hx].RELATIONSHIP_START_DATE <= @EndDate AND [hx].RELATIONSHIP_END_DATE IS NULL )\t\t\t-- Relationship has no end date\n\t\tOR\n\t\t( [hx].RELATIONSHIP_START_DATE IS NULL AND [hx].RELATIONSHIP_END_DATE IS NULL )\t\t\t\t-- No dates entered for relationship\n\t\t)\n\nGROUP BY [#caregivers].PAT_ID\n;",
+      "line": 272,
+      "column": 1
+    }
+  },
+  {
+    "node_id": "file::Reporting_USP_CCMC_LOTE_Census_Interpreter_Services_Summary_PBI::stmt/21",
+    "position": "21",
+    "scriptdom_type": "SelectStatement",
+    "statement_kind": "SELECT INTO",
+    "disposition": "handled",
+    "gap_class": null,
+    "evidence": {
+      "fragment": "SELECT\n\t[#combined_census].PAT_ID\n\t, [#combined_census].[Year]\n\t, [#combined_census].[Quarter]\n\t, [#combined_census].[Month Name]\n\t, [#combined_census].[Month Number]\n\t, [#combined_census].[Location]\n\t, [#combined_census].[Department]\n\t, [#combined_census].[Dept External Name]\n\t, [#combined_census].[Department Label]\n\t, [#combined_census].[Dept Type]\n\t--, [#combined_census].[Room]\n\t, [#combined_census].[Census Days]\n\t\n\t, CASE\n\t\tWHEN [#caregiver_languages].[Caregiver Languages] LIKE N'%SPANISH%'\n\t\tTHEN 'At least one Spanish-speaking caregiver'\n\n\t\tWHEN [#caregiver_languages].[Caregiver Languages] NOT LIKE N'%ENGLISH%'\n\t\tTHEN 'Language other than English and Spanish'\n\t\t\n\t\tWHEN [#caregiver_languages].[Caregiver Languages] LIKE N'%ENGLISH%'\n\t\tTHEN 'Only English speaking caregivers'\n\n\t\tELSE 'No language(s) listed'\n\n\t  END AS [Caregiver Language Category]\n\nINTO #combined_census_with_language\n\nFROM #combined_census\n\n\tLEFT JOIN #caregiver_languages\t\tON [#combined_census].PAT_ID = [#caregiver_languages].PAT_ID\n;",
+      "line": 304,
+      "column": 1
+    }
+  },
+  {
+    "node_id": "file::Reporting_USP_CCMC_LOTE_Census_Interpreter_Services_Summary_PBI::stmt/22",
+    "position": "22",
+    "scriptdom_type": "SelectStatement",
+    "statement_kind": "SELECT INTO",
+    "disposition": "handled",
+    "gap_class": null,
+    "evidence": {
+      "fragment": "SELECT \n\t[Year]\n\t, [Quarter]\n\t, [Month Name]\n\t, [Month Number]\n\t, [Location]\n\t, [Department]\n\t, [Dept External Name]\n\t, [Department Label]\n\t, [Dept Type]\n\t, [Caregiver Language Category]\n\n\t, SUM([Census Days])\t\tAS [Census Days]\n\t, COUNT(DISTINCT PAT_ID)\tAS [Patient Count]\n\nINTO #combined_census_numerators\n\nFROM #combined_census_with_language\n\nGROUP BY\n\t[Year]\n\t, [Quarter]\n\t, [Month Name]\n\t, [Month Number]\n\t, [Location]\n\t, [Department]\n\t, [Dept External Name]\n\t, [Department Label]\n\t, [Dept Type]\n\t, [Caregiver Language Category]\n;",
+      "line": 344,
+      "column": 1
+    }
+  },
+  {
+    "node_id": "file::Reporting_USP_CCMC_LOTE_Census_Interpreter_Services_Summary_PBI::stmt/23",
+    "position": "23",
+    "scriptdom_type": "SelectStatement",
+    "statement_kind": "SELECT",
+    "disposition": "handled",
+    "gap_class": null,
+    "evidence": {
+      "fragment": "SELECT\n\t[num].[Year]\n\t, [num].[Quarter]\n\t, [num].[Month Name]\n\t, [num].[Month Number]\n\t, [num].[Location]\n\t, [num].[Department]\n\t, [num].[Dept External Name]\n\t, [num].[Department Label]\n\t, [num].[Dept Type]\n\t, [num].[Caregiver Language Category]\n\t, [num].[Census Days]\n\t, [num].[Patient Count]\n\n\t, [denom].[Census Denominator]\n\t, [denom].[Patient Denominator]\n\nFROM #combined_census_numerators [num]\n\n\t/* Denominators */\n\tINNER JOIN (\n\t\tSELECT \n\t\t\t[Year]\n\t\t\t, [Quarter]\n\t\t\t, [Month Name]\n\t\t\t, [Location]\n\t\t\t, [Dept External Name]\n\t\t\t, [Department Label]\n\t\t\t, [Dept Type]\n\t\t\t, SUM([Census Days])\t\tAS [Census Denominator]\n\t\t\t, COUNT(DISTINCT PAT_ID)\tAS [Patient Denominator]\n\t\t\n\t\tFROM #combined_census\n\n\t\tGROUP BY \n\t\t\t[Year]\n\t\t\t, [Quarter]\n\t\t\t, [Month Name]\n\t\t\t, [Location]\n\t\t\t, [Dept External Name]\n\t\t\t, [Department Label]\n\t\t\t, [Dept Type]\n\n\t) AS denom\n\n\t\tON [num].[Year] = [denom].[Year]\n\t\tAND [num].[Quarter] = [denom].[Quarter]\n\t\tAND [num].[Month Name] = [denom].[Month Name]\n\t\tAND [num].[Location] = [denom].[Location]\n\t\tAND [num].[Dept External Name] = [denom].[Dept External Name]\n\t\tAND [num].[Department Label] = [denom].[Department Label]\n\t\tAND [num].[Dept Type] = [denom].[Dept Type]\n;",
+      "line": 381,
+      "column": 1
+    }
+  },
+  {
+    "node_id": "file::Reporting_USP_Hospitalist_Daily_Census_Report_92a_PBI::stmt/1",
+    "position": "1",
+    "scriptdom_type": "UseStatement",
+    "statement_kind": "UseStatement",
+    "disposition": "operational",
+    "gap_class": null,
+    "evidence": {
+      "fragment": "USE [CookClarity]",
+      "line": 1,
+      "column": 1
+    }
+  },
+  {
+    "node_id": "file::Reporting_USP_Hospitalist_Daily_Census_Report_92a_PBI::stmt/2",
+    "position": "2",
+    "scriptdom_type": "PredicateSetStatement",
+    "statement_kind": "PredicateSetStatement",
+    "disposition": "operational",
+    "gap_class": null,
+    "evidence": {
+      "fragment": "SET ANSI_NULLS ON",
+      "line": 5,
+      "column": 1
+    }
+  },
+  {
+    "node_id": "file::Reporting_USP_Hospitalist_Daily_Census_Report_92a_PBI::stmt/3",
+    "position": "3",
+    "scriptdom_type": "PredicateSetStatement",
+    "statement_kind": "PredicateSetStatement",
+    "disposition": "operational",
+    "gap_class": null,
+    "evidence": {
+      "fragment": "SET QUOTED_IDENTIFIER ON",
+      "line": 8,
+      "column": 1
+    }
+  },
+  {
+    "node_id": "file::Reporting_USP_Hospitalist_Daily_Census_Report_92a_PBI::stmt/4",
+    "position": "4",
+    "scriptdom_type": "PredicateSetStatement",
+    "statement_kind": "PredicateSetStatement",
+    "disposition": "operational",
+    "gap_class": null,
+    "evidence": {
+      "fragment": "SET NOCOUNT ON;",
+      "line": 36,
+      "column": 1
+    }
+  },
+  {
+    "node_id": "file::Reporting_USP_Hospitalist_Daily_Census_Report_92a_PBI::stmt/5",
+    "position": "5",
+    "scriptdom_type": "SelectStatement",
+    "statement_kind": "SELECT",
+    "disposition": "handled",
+    "gap_class": null,
+    "evidence": {
+      "fragment": "WITH ROWNUM AS\n(\n\tSELECT\n\t\t[Run ID] = V_REPORT_RUN_FACT.RUN_ID\n\t\t,[Report ID] = V_REPORT_RUN_FACT.REPORT_INFO_ID\n\t\t,[Report Name] = V_REPORT_RUN_FACT.REPORT_INFO_NAME\n\t\t,[Run YYYYMM] = FORMAT(CONVERT(DATE, V_REPORT_RUN_FACT.RUN_DTTM), 'yyyyMM')\n\t\t,[Run Date] = CONVERT(DATE, V_REPORT_RUN_FACT.RUN_DTTM)\n\t\t,[Run DateTime] = V_REPORT_RUN_FACT.RUN_DTTM\n\t\t,[Run Year] = V_REPORT_RUN_FACT.RUN_YEAR\n\t\t,[Run Month] = V_REPORT_RUN_FACT.RUN_MONTH\n\t\t,[Run Length of Time] = V_REPORT_RUN_FACT.RUN_TIME\n\t\t,[Result Count] = V_REPORT_RUN_FACT.RESULT_COUNT\n\t\t,[Is From Batch? Y/N] = V_REPORT_RUN_FACT.IS_FROM_BATCH_YN\n\t\t,DATE_DIMENSION.WEEKEND_YN\n\t\t,[Year Month] = CONCAT(DATE_DIMENSION.MONTH_NAME, ' ', DATE_DIMENSION.YEAR)\n\t\t,[Week] = CONCAT('Wk #', ' ', DATE_DIMENSION.WEEK_NUMBER)\n\t\t,[ROW] = ROW_NUMBER()OVER(PARTITION BY V_REPORT_RUN_FACT.REPORT_INFO_ID, CONVERT(DATE, V_REPORT_RUN_FACT.RUN_DTTM) ORDER BY V_REPORT_RUN_FACT.RUN_DTTM)\n\n\tFROM Clarity.dbo.V_REPORT_RUN_FACT\n\t\tLEFT JOIN Clarity.dbo.DATE_DIMENSION\n\t\t\tON CONVERT(DATE, V_REPORT_RUN_FACT.RUN_DTTM) = DATE_DIMENSION.CALENDAR_DT\n\n\tWHERE REPORT_INFO_ID = 2106260\n\t\tAND CONVERT(DATE, V_REPORT_RUN_FACT.RUN_DTTM) >= '2026-04-01'\n)\n\nSELECT *\nFROM ROWNUM\nWHERE [ROW] = 1\nORDER BY\n\t[Run DateTime]\n;",
+      "line": 40,
+      "column": 1
+    }
+  }
+]

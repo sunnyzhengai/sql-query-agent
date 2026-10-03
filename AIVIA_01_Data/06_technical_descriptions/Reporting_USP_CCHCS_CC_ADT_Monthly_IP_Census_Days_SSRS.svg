@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="966" height="216" font-family="monospace">
+<text x="20" y="28" font-size="15" font-weight="bold">Reporting_USP_CCHCS_CC_ADT_Monthly_IP_Census_Days_SSRS</text>
+<text x="20" y="48" font-size="12" fill="#777777">(1) [operational_statement]</text>
+<text x="20" y="71" font-size="12" fill="#777777">(2) [unvoiced_statement_kind]</text>
+<text x="20" y="94" font-size="12" fill="#777777">(3) [unvoiced_statement_kind]</text>
+<text x="20" y="117" font-size="12" fill="#777777">(4) [unvoiced_statement_kind]</text>
+<text x="20" y="140" font-size="12" fill="#777777">(5) [unvoiced_statement_kind]</text>
+<text x="20" y="163" font-size="12" fill="#bb0000">(6) [dynamic_sql_gap]</text>
+</svg>

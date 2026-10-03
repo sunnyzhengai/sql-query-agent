@@ -1,0 +1,16 @@
+==== Reporting_USP_CCHCS_CC_ADT_Monthly_IP_Census_Totals_SSRS ====
+basis 06.3.0
+
+-- THE SELECTIONS --
+
+-- THE STEPS --
+(1) [operational_statement]
+(2) [unvoiced_statement_kind]
+(3) [unvoiced_statement_kind]
+(4) [unvoiced_statement_kind]
+(5) [unvoiced_statement_kind]
+(6) [dynamic_sql_gap]
+
+-- THE FILE --
+Part of this file's logic is built as a string at run time and is not described here; it is executed by "EXEC (@SQL)". 1 of 6 statements is in this gap.
+Steps: 6, 0 voiced, 1 operational, 1 gap, 4 awaiting words. Selections: none.

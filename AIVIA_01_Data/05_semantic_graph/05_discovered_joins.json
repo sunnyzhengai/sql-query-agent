@@ -1,0 +1,290 @@
+[
+  {
+    "file_name": "Reporting_USP_CCMC_LOTE_Census_Interpreter_Services_Detail_PBI",
+    "join_type": "LeftOuter",
+    "pairs": [
+      "F_IP_HSP_PAT_DAYS.ADT_EVENT_ID = V_PAT_ADT_LOCATION_HX.EVENT_ID"
+    ],
+    "involves_scope": false,
+    "related_join_id": null,
+    "evidence": {
+      "fragment": "[census].ADT_EVENT_ID = [adt].EVENT_ID",
+      "line": 89,
+      "column": 60
+    }
+  },
+  {
+    "file_name": "Reporting_USP_CCMC_LOTE_Census_Interpreter_Services_Detail_PBI",
+    "join_type": "LeftOuter",
+    "pairs": [
+      "CLARITY_BED.BED_CSN_ID = V_PAT_ADT_LOCATION_HX.ADT_BED_CSN",
+      "CLARITY_BED.BED_ID = V_PAT_ADT_LOCATION_HX.ADT_BED_ID"
+    ],
+    "involves_scope": false,
+    "related_join_id": "C0000000001AC082DF9549832162D1B31:156",
+    "evidence": {
+      "fragment": "[adt].ADT_BED_ID = [bed].BED_ID\n\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t   AND [adt].ADT_BED_CSN = [bed].BED_CSN_ID",
+      "line": 90,
+      "column": 52
+    }
+  },
+  {
+    "file_name": "Reporting_USP_CCMC_LOTE_Census_Interpreter_Services_Detail_PBI",
+    "join_type": "LeftOuter",
+    "pairs": [
+      "CLARITY_ROM.ROOM_CSN_ID = V_PAT_ADT_LOCATION_HX.ADT_ROOM_CSN",
+      "CLARITY_ROM.ROOM_ID = V_PAT_ADT_LOCATION_HX.ADT_ROOM_ID"
+    ],
+    "involves_scope": false,
+    "related_join_id": "C0000000001AC082DF9549832162D1B31:153",
+    "evidence": {
+      "fragment": "[adt].ADT_ROOM_ID = [rom].ROOM_ID\n\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t   AND [adt].ADT_ROOM_CSN = [rom].ROOM_CSN_ID",
+      "line": 92,
+      "column": 52
+    }
+  },
+  {
+    "file_name": "Reporting_USP_CCMC_LOTE_Census_Interpreter_Services_Detail_PBI",
+    "join_type": "LeftOuter",
+    "pairs": [
+      "DATE_DIMENSION.CALENDAR_DT = F_IP_HSP_PAT_DAYS.CALENDAR_DT"
+    ],
+    "involves_scope": false,
+    "related_join_id": null,
+    "evidence": {
+      "fragment": "[census].CALENDAR_DT = [dd].CALENDAR_DT",
+      "line": 94,
+      "column": 53
+    }
+  },
+  {
+    "file_name": "Reporting_USP_CCMC_LOTE_Census_Interpreter_Services_Detail_PBI",
+    "join_type": "LeftOuter",
+    "pairs": [
+      "DATE_DIMENSION.CALENDAR_DT = PAT_ENC.CONTACT_DATE"
+    ],
+    "involves_scope": false,
+    "related_join_id": null,
+    "evidence": {
+      "fragment": "[enc].CONTACT_DATE = [dd].CALENDAR_DT",
+      "line": 147,
+      "column": 53
+    }
+  },
+  {
+    "file_name": "Reporting_USP_CCMC_LOTE_Census_Interpreter_Services_Detail_PBI",
+    "join_type": "Inner",
+    "pairs": [],
+    "involves_scope": true,
+    "related_join_id": null,
+    "evidence": {
+      "fragment": "[lang].PAT_RELATIONSHIP_ID = [#caregivers].PAT_RELATIONSHIP_ID",
+      "line": 279,
+      "column": 40
+    }
+  },
+  {
+    "file_name": "Reporting_USP_CCMC_LOTE_Census_Interpreter_Services_Detail_PBI",
+    "join_type": "LeftOuter",
+    "pairs": [
+      "PAT_RELATIONSHIP_LIST_HX.RELATIONSHIP_ID = PAT_REL_LANGUAGES.PAT_RELATIONSHIP_ID"
+    ],
+    "involves_scope": false,
+    "related_join_id": null,
+    "evidence": {
+      "fragment": "[lang].PAT_RELATIONSHIP_ID = [hx].RELATIONSHIP_ID",
+      "line": 282,
+      "column": 64
+    }
+  },
+  {
+    "file_name": "Reporting_USP_CCMC_LOTE_Census_Interpreter_Services_Detail_PBI",
+    "join_type": "Inner",
+    "pairs": [],
+    "involves_scope": true,
+    "related_join_id": null,
+    "evidence": {
+      "fragment": "[member].PAT_ID = [#combined_census].PAT_ID",
+      "line": 320,
+      "column": 43
+    }
+  },
+  {
+    "file_name": "Reporting_USP_CCMC_LOTE_Census_Interpreter_Services_Detail_PBI",
+    "join_type": "Inner",
+    "pairs": [
+      "COVERAGE_MEMBER_LIST.COVERAGE_ID = V_COVERAGE_PAYOR_PLAN.COVERAGE_ID"
+    ],
+    "involves_scope": false,
+    "related_join_id": null,
+    "evidence": {
+      "fragment": "[member].COVERAGE_ID = [coverage].COVERAGE_ID",
+      "line": 321,
+      "column": 63
+    }
+  },
+  {
+    "file_name": "Reporting_USP_CCMC_LOTE_Census_Interpreter_Services_Detail_PBI",
+    "join_type": "Inner",
+    "pairs": [
+      "COVERAGE_MEMBER_LIST.COVERAGE_ID = PAT_CVG_FILE_ORDER.COVERAGE_ID"
+    ],
+    "involves_scope": false,
+    "related_join_id": null,
+    "evidence": {
+      "fragment": "[member].COVERAGE_ID = [filing].COVERAGE_ID",
+      "line": 323,
+      "column": 59
+    }
+  },
+  {
+    "file_name": "Reporting_USP_CCMC_LOTE_Census_Interpreter_Services_Detail_PBI",
+    "join_type": "LeftOuter",
+    "pairs": [],
+    "involves_scope": true,
+    "related_join_id": null,
+    "evidence": {
+      "fragment": "[#combined_census].PAT_ID = [#caregiver_languages].PAT_ID",
+      "line": 451,
+      "column": 45
+    }
+  },
+  {
+    "file_name": "Reporting_USP_CCMC_LOTE_Census_Interpreter_Services_Detail_PBI",
+    "join_type": "LeftOuter",
+    "pairs": [],
+    "involves_scope": true,
+    "related_join_id": null,
+    "evidence": {
+      "fragment": "[#combined_census].PAT_ID = [#coverage].PAT_ID\n\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\tAND [#combined_census].[Monthly Census Start Date] = [#coverage].[Monthly Census Start Date]",
+      "line": 452,
+      "column": 37
+    }
+  },
+  {
+    "file_name": "Reporting_USP_CCMC_LOTE_Census_Interpreter_Services_Detail_PBI",
+    "join_type": "LeftOuter",
+    "pairs": [],
+    "involves_scope": true,
+    "related_join_id": null,
+    "evidence": {
+      "fragment": "[#combined_census].PAT_ID = [pat].PAT_ID",
+      "line": 455,
+      "column": 51
+    }
+  },
+  {
+    "file_name": "Reporting_USP_CCMC_LOTE_Census_Interpreter_Services_Detail_PBI",
+    "join_type": "LeftOuter",
+    "pairs": [],
+    "involves_scope": true,
+    "related_join_id": null,
+    "evidence": {
+      "fragment": "[#combined_census].PAT_ID = [pat4].PAT_ID",
+      "line": 456,
+      "column": 54
+    }
+  },
+  {
+    "file_name": "Reporting_USP_CCMC_LOTE_Census_Interpreter_Services_Detail_PBI",
+    "join_type": "LeftOuter",
+    "pairs": [],
+    "involves_scope": true,
+    "related_join_id": null,
+    "evidence": {
+      "fragment": "[#combined_census].PAT_ID = [myc].PAT_ID",
+      "line": 457,
+      "column": 54
+    }
+  },
+  {
+    "file_name": "Reporting_USP_CCMC_LOTE_Census_Interpreter_Services_Summary_PBI",
+    "join_type": "LeftOuter",
+    "pairs": [
+      "DATE_DIMENSION.CALENDAR_DT = F_IP_HSP_PAT_DAYS.CALENDAR_DT"
+    ],
+    "involves_scope": false,
+    "related_join_id": null,
+    "evidence": {
+      "fragment": "[census].CALENDAR_DT = [dd].CALENDAR_DT",
+      "line": 99,
+      "column": 53
+    }
+  },
+  {
+    "file_name": "Reporting_USP_CCMC_LOTE_Census_Interpreter_Services_Summary_PBI",
+    "join_type": "LeftOuter",
+    "pairs": [
+      "DATE_DIMENSION.CALENDAR_DT = F_SCHED_APPT.CONTACT_DATE"
+    ],
+    "involves_scope": false,
+    "related_join_id": null,
+    "evidence": {
+      "fragment": "[appt].CONTACT_DATE = [dd].CALENDAR_DT",
+      "line": 147,
+      "column": 51
+    }
+  },
+  {
+    "file_name": "Reporting_USP_CCMC_LOTE_Census_Interpreter_Services_Summary_PBI",
+    "join_type": "Inner",
+    "pairs": [],
+    "involves_scope": true,
+    "related_join_id": null,
+    "evidence": {
+      "fragment": "[lang].PAT_RELATIONSHIP_ID = [#caregivers].PAT_RELATIONSHIP_ID",
+      "line": 281,
+      "column": 40
+    }
+  },
+  {
+    "file_name": "Reporting_USP_CCMC_LOTE_Census_Interpreter_Services_Summary_PBI",
+    "join_type": "LeftOuter",
+    "pairs": [
+      "PAT_RELATIONSHIP_LIST_HX.RELATIONSHIP_ID = PAT_REL_LANGUAGES.PAT_RELATIONSHIP_ID"
+    ],
+    "involves_scope": false,
+    "related_join_id": null,
+    "evidence": {
+      "fragment": "[lang].PAT_RELATIONSHIP_ID = [hx].RELATIONSHIP_ID",
+      "line": 283,
+      "column": 64
+    }
+  },
+  {
+    "file_name": "Reporting_USP_CCMC_LOTE_Census_Interpreter_Services_Summary_PBI",
+    "join_type": "LeftOuter",
+    "pairs": [],
+    "involves_scope": true,
+    "related_join_id": null,
+    "evidence": {
+      "fragment": "[#combined_census].PAT_ID = [#caregiver_languages].PAT_ID",
+      "line": 336,
+      "column": 37
+    }
+  },
+  {
+    "file_name": "Reporting_USP_CCMC_LOTE_Census_Interpreter_Services_Summary_PBI",
+    "join_type": "Inner",
+    "pairs": [],
+    "involves_scope": true,
+    "related_join_id": null,
+    "evidence": {
+      "fragment": "[num].[Year] = [denom].[Year]\n\t\tAND [num].[Quarter] = [denom].[Quarter]\n\t\tAND [num].[Month Name] = [denom].[Month Name]\n\t\tAND [num].[Location] = [denom].[Location]\n\t\tAND [num].[Dept External Name] = [denom].[Dept External Name]\n\t\tAND [num].[Department Label] = [denom].[Department Label]\n\t\tAND [num].[Dept Type] = [denom].[Dept Type]",
+      "line": 426,
+      "column": 6
+    }
+  },
+  {
+    "file_name": "Reporting_USP_Hospitalist_Daily_Census_Report_92a_PBI",
+    "join_type": "LeftOuter",
+    "pairs": [],
+    "involves_scope": false,
+    "related_join_id": null,
+    "evidence": {
+      "fragment": "CONVERT(DATE, V_REPORT_RUN_FACT.RUN_DTTM) = DATE_DIMENSION.CALENDAR_DT",
+      "line": 61,
+      "column": 7
+    }
+  }
+]

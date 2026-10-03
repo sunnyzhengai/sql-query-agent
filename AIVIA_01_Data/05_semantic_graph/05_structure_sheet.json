@@ -1,0 +1,2623 @@
+[
+  {
+    "node_id": "file::COOK_RPT_USP_CCHCS_ADT_MONTHLY_INPATIENT_CENSUS_TOTALS_SSRS::scope/delivery::structure/PROJECTION/1",
+    "structure_kind": "PROJECTION",
+    "position": 1,
+    "owning_scope": "file::COOK_RPT_USP_CCHCS_ADT_MONTHLY_INPATIENT_CENSUS_TOTALS_SSRS::scope/delivery",
+    "evidence": {
+      "fragment": "adt.EVENT_TYPE_C as\t\t\t\t\t'Event Type',\n\t   adt.EVENT_SUBTYPE_C as\t\t\t\t'Event SubType',\n\t   adt.EFFECTIVE_TIME as\t\t\t\t'Effective Time',\n\t   adt.PAT_ID as\t\t\t\t\t\t'Patient ID',\n\t   pc.ABBR as\t\t\t\t\t\t\t'Patient Class',\n\t   dep.DEPT_ABBREVIATION as\t\t\t\t'Department',\n\t   rm.ROOM_NAME as\t\t\t\t\t\t'Room',\n\t   bd.BED_LABEL as\t\t\t\t\t\t'Bed Label',\n\t   ps.NAME as\t\t\t\t\t\t\t'Patient Servce',\n\t   adt.DELETE_TIME as\t\t\t\t\t'Delete Time',\n\t   adt.EVENT_TIME as\t\t\t\t\t'Event Time',\n\t   sa.SERV_AREA_NAME as\t\t\t\t\t'Service Area',\n\t   dep.DEPARTMENT_ID as\t\t\t\t\t'Department ID',\n\t   rm.ROOM_ID as\t\t\t\t\t\t'Room ID',\n\t   bd.BED_ID as\t\t\t\t\t\t\t'Bed ID',\n\t   adt.EVENT_ID as\t\t\t\t\t\t'Event ID',\n\t   DATEPART(DAY, adt.EFFECTIVE_TIME) as 'Census Day'",
+      "line": 23,
+      "column": 8
+    },
+    "distinct": false,
+    "member_total": 17,
+    "star_total": 0,
+    "star_qualifiers": []
+  },
+  {
+    "node_id": "file::COOK_RPT_USP_CCHCS_ADT_MONTHLY_INPATIENT_CENSUS_TOTALS_SSRS::scope/delivery::structure/FROM/1",
+    "structure_kind": "FROM",
+    "position": 2,
+    "owning_scope": "file::COOK_RPT_USP_CCHCS_ADT_MONTHLY_INPATIENT_CENSUS_TOTALS_SSRS::scope/delivery",
+    "evidence": {
+      "fragment": "FROM clarity..CLARITY_ADT adt\n\n\tLEFT JOIN clarity..CLARITY_BED bd\n\tON adt.BED_CSN_ID = bd.BED_CSN_ID\n\n\tLEFT JOIN clarity..CLARITY_ROM rm\n\tON adt.ROOM_CSN_ID = rm.ROOM_CSN_ID\n\n\tLEFT JOIN clarity..CLARITY_DEP dep\n\tON adt.DEPARTMENT_ID = dep.DEPARTMENT_ID\n\n\tLEFT JOIN clarity..ZC_PAT_CLASS pc\n\tON adt.PAT_CLASS_C = pc.ADT_PAT_CLASS_C\n\n\tLEFT JOIN clarity..ZC_PAT_SERVICE ps\n\tON adt.PAT_SERVICE_C = ps.HOSP_SERV_C\n\n\tLEFT JOIN clarity..CLARITY_SA sa\n\tON dep.SERV_AREA_ID = sa.SERV_AREA_ID",
+      "line": 42,
+      "column": 1
+    }
+  },
+  {
+    "node_id": "file::COOK_RPT_USP_CCHCS_ADT_MONTHLY_INPATIENT_CENSUS_TOTALS_SSRS::scope/delivery::structure/JOIN/1",
+    "structure_kind": "JOIN",
+    "position": 3,
+    "owning_scope": "file::COOK_RPT_USP_CCHCS_ADT_MONTHLY_INPATIENT_CENSUS_TOTALS_SSRS::scope/delivery",
+    "evidence": {
+      "fragment": "adt.BED_CSN_ID = bd.BED_CSN_ID",
+      "line": 45,
+      "column": 5
+    },
+    "join_type": "LeftOuter"
+  },
+  {
+    "node_id": "file::COOK_RPT_USP_CCHCS_ADT_MONTHLY_INPATIENT_CENSUS_TOTALS_SSRS::scope/delivery::structure/JOIN/2",
+    "structure_kind": "JOIN",
+    "position": 4,
+    "owning_scope": "file::COOK_RPT_USP_CCHCS_ADT_MONTHLY_INPATIENT_CENSUS_TOTALS_SSRS::scope/delivery",
+    "evidence": {
+      "fragment": "adt.ROOM_CSN_ID = rm.ROOM_CSN_ID",
+      "line": 48,
+      "column": 5
+    },
+    "join_type": "LeftOuter"
+  },
+  {
+    "node_id": "file::COOK_RPT_USP_CCHCS_ADT_MONTHLY_INPATIENT_CENSUS_TOTALS_SSRS::scope/delivery::structure/JOIN/3",
+    "structure_kind": "JOIN",
+    "position": 5,
+    "owning_scope": "file::COOK_RPT_USP_CCHCS_ADT_MONTHLY_INPATIENT_CENSUS_TOTALS_SSRS::scope/delivery",
+    "evidence": {
+      "fragment": "adt.DEPARTMENT_ID = dep.DEPARTMENT_ID",
+      "line": 51,
+      "column": 5
+    },
+    "join_type": "LeftOuter"
+  },
+  {
+    "node_id": "file::COOK_RPT_USP_CCHCS_ADT_MONTHLY_INPATIENT_CENSUS_TOTALS_SSRS::scope/delivery::structure/JOIN/4",
+    "structure_kind": "JOIN",
+    "position": 6,
+    "owning_scope": "file::COOK_RPT_USP_CCHCS_ADT_MONTHLY_INPATIENT_CENSUS_TOTALS_SSRS::scope/delivery",
+    "evidence": {
+      "fragment": "adt.PAT_CLASS_C = pc.ADT_PAT_CLASS_C",
+      "line": 54,
+      "column": 5
+    },
+    "join_type": "LeftOuter"
+  },
+  {
+    "node_id": "file::COOK_RPT_USP_CCHCS_ADT_MONTHLY_INPATIENT_CENSUS_TOTALS_SSRS::scope/delivery::structure/JOIN/5",
+    "structure_kind": "JOIN",
+    "position": 7,
+    "owning_scope": "file::COOK_RPT_USP_CCHCS_ADT_MONTHLY_INPATIENT_CENSUS_TOTALS_SSRS::scope/delivery",
+    "evidence": {
+      "fragment": "adt.PAT_SERVICE_C = ps.HOSP_SERV_C",
+      "line": 57,
+      "column": 5
+    },
+    "join_type": "LeftOuter"
+  },
+  {
+    "node_id": "file::COOK_RPT_USP_CCHCS_ADT_MONTHLY_INPATIENT_CENSUS_TOTALS_SSRS::scope/delivery::structure/JOIN/6",
+    "structure_kind": "JOIN",
+    "position": 8,
+    "owning_scope": "file::COOK_RPT_USP_CCHCS_ADT_MONTHLY_INPATIENT_CENSUS_TOTALS_SSRS::scope/delivery",
+    "evidence": {
+      "fragment": "dep.SERV_AREA_ID = sa.SERV_AREA_ID",
+      "line": 60,
+      "column": 5
+    },
+    "join_type": "LeftOuter"
+  },
+  {
+    "node_id": "file::COOK_RPT_USP_CCHCS_ADT_MONTHLY_INPATIENT_CENSUS_TOTALS_SSRS::scope/delivery::structure/WHERE/1",
+    "structure_kind": "WHERE",
+    "position": 9,
+    "owning_scope": "file::COOK_RPT_USP_CCHCS_ADT_MONTHLY_INPATIENT_CENSUS_TOTALS_SSRS::scope/delivery",
+    "evidence": {
+      "fragment": "WHERE adt.EVENT_TYPE_C = '6'\nand adt.EFFECTIVE_TIME >= @StartDate\nand adt.EFFECTIVE_TIME < DATEADD(D, 1, @EndDate)\nand adt.EVENT_TIME < DATEADD(D, 1, @AsOfDate)\nand adt.PAT_ID is not null\nand ((adt.EVENT_SUBTYPE_C <> '2') OR (adt.EVENT_SUBTYPE_C = '2' AND adt.DELETE_TIME >= DATEADD(D, 1, @AsOfDate)))\nAND EXISTS (SELECT 1 FROM STRING_SPLIT(@ServiceArea, ',') WHERE [value] IN ('0', dep.SERV_AREA_ID))\nAND EXISTS (SELECT 1 FROM STRING_SPLIT(@Location, ',') WHERE [value] IN ('0', dep.REV_LOC_ID))\nand adt.DEPARTMENT_ID not in ('100108022','100108034','100108047','100108049','100108068','100108112','100108118','100639001')",
+      "line": 63,
+      "column": 1
+    }
+  },
+  {
+    "node_id": "file::COOK_RPT_USP_CCHCS_ADT_MONTHLY_INPATIENT_CENSUS_TOTALS_SSRS::scope/delivery::structure/WHERE/1::structure/AND/1",
+    "structure_kind": "AND",
+    "position": 1,
+    "owning_scope": "file::COOK_RPT_USP_CCHCS_ADT_MONTHLY_INPATIENT_CENSUS_TOTALS_SSRS::scope/delivery",
+    "evidence": {
+      "fragment": "adt.EVENT_TYPE_C = '6'\nand adt.EFFECTIVE_TIME >= @StartDate\nand adt.EFFECTIVE_TIME < DATEADD(D, 1, @EndDate)\nand adt.EVENT_TIME < DATEADD(D, 1, @AsOfDate)\nand adt.PAT_ID is not null\nand ((adt.EVENT_SUBTYPE_C <> '2') OR (adt.EVENT_SUBTYPE_C = '2' AND adt.DELETE_TIME >= DATEADD(D, 1, @AsOfDate)))\nAND EXISTS (SELECT 1 FROM STRING_SPLIT(@ServiceArea, ',') WHERE [value] IN ('0', dep.SERV_AREA_ID))\nAND EXISTS (SELECT 1 FROM STRING_SPLIT(@Location, ',') WHERE [value] IN ('0', dep.REV_LOC_ID))\nand adt.DEPARTMENT_ID not in ('100108022','100108034','100108047','100108049','100108068','100108112','100108118','100639001')",
+      "line": 63,
+      "column": 7
+    }
+  },
+  {
+    "node_id": "file::COOK_RPT_USP_CCHCS_ADT_MONTHLY_INPATIENT_CENSUS_TOTALS_SSRS::scope/delivery::structure/WHERE/1::structure/AND/1::structure/OR/1",
+    "structure_kind": "OR",
+    "position": 1,
+    "owning_scope": "file::COOK_RPT_USP_CCHCS_ADT_MONTHLY_INPATIENT_CENSUS_TOTALS_SSRS::scope/delivery",
+    "evidence": {
+      "fragment": "(adt.EVENT_SUBTYPE_C <> '2') OR (adt.EVENT_SUBTYPE_C = '2' AND adt.DELETE_TIME >= DATEADD(D, 1, @AsOfDate))",
+      "line": 68,
+      "column": 6
+    }
+  },
+  {
+    "node_id": "file::COOK_RPT_USP_CCHCS_ADT_MONTHLY_INPATIENT_CENSUS_TOTALS_SSRS::scope/delivery::structure/WHERE/1::structure/AND/1::structure/OR/1::structure/AND/1",
+    "structure_kind": "AND",
+    "position": 1,
+    "owning_scope": "file::COOK_RPT_USP_CCHCS_ADT_MONTHLY_INPATIENT_CENSUS_TOTALS_SSRS::scope/delivery",
+    "evidence": {
+      "fragment": "adt.EVENT_SUBTYPE_C = '2' AND adt.DELETE_TIME >= DATEADD(D, 1, @AsOfDate)",
+      "line": 68,
+      "column": 39
+    }
+  },
+  {
+    "node_id": "file::COOK_RPT_USP_CCHCS_ADT_MONTHLY_INPATIENT_CENSUS_TOTALS_SSRS::stmt/2::scope/sub1::structure/PROJECTION/1",
+    "structure_kind": "PROJECTION",
+    "position": 1,
+    "owning_scope": "file::COOK_RPT_USP_CCHCS_ADT_MONTHLY_INPATIENT_CENSUS_TOTALS_SSRS::stmt/2::scope/sub1",
+    "evidence": {
+      "fragment": "1",
+      "line": 69,
+      "column": 20
+    },
+    "distinct": false,
+    "member_total": 1,
+    "star_total": 0,
+    "star_qualifiers": []
+  },
+  {
+    "node_id": "file::COOK_RPT_USP_CCHCS_ADT_MONTHLY_INPATIENT_CENSUS_TOTALS_SSRS::stmt/2::scope/sub1::structure/FROM/1",
+    "structure_kind": "FROM",
+    "position": 2,
+    "owning_scope": "file::COOK_RPT_USP_CCHCS_ADT_MONTHLY_INPATIENT_CENSUS_TOTALS_SSRS::stmt/2::scope/sub1",
+    "evidence": {
+      "fragment": "FROM STRING_SPLIT(@ServiceArea, ',')",
+      "line": 69,
+      "column": 22
+    }
+  },
+  {
+    "node_id": "file::COOK_RPT_USP_CCHCS_ADT_MONTHLY_INPATIENT_CENSUS_TOTALS_SSRS::stmt/2::scope/sub1::structure/WHERE/1",
+    "structure_kind": "WHERE",
+    "position": 3,
+    "owning_scope": "file::COOK_RPT_USP_CCHCS_ADT_MONTHLY_INPATIENT_CENSUS_TOTALS_SSRS::stmt/2::scope/sub1",
+    "evidence": {
+      "fragment": "WHERE [value] IN ('0', dep.SERV_AREA_ID)",
+      "line": 69,
+      "column": 59
+    }
+  },
+  {
+    "node_id": "file::COOK_RPT_USP_CCHCS_ADT_MONTHLY_INPATIENT_CENSUS_TOTALS_SSRS::stmt/2::scope/sub2::structure/PROJECTION/1",
+    "structure_kind": "PROJECTION",
+    "position": 1,
+    "owning_scope": "file::COOK_RPT_USP_CCHCS_ADT_MONTHLY_INPATIENT_CENSUS_TOTALS_SSRS::stmt/2::scope/sub2",
+    "evidence": {
+      "fragment": "1",
+      "line": 70,
+      "column": 20
+    },
+    "distinct": false,
+    "member_total": 1,
+    "star_total": 0,
+    "star_qualifiers": []
+  },
+  {
+    "node_id": "file::COOK_RPT_USP_CCHCS_ADT_MONTHLY_INPATIENT_CENSUS_TOTALS_SSRS::stmt/2::scope/sub2::structure/FROM/1",
+    "structure_kind": "FROM",
+    "position": 2,
+    "owning_scope": "file::COOK_RPT_USP_CCHCS_ADT_MONTHLY_INPATIENT_CENSUS_TOTALS_SSRS::stmt/2::scope/sub2",
+    "evidence": {
+      "fragment": "FROM STRING_SPLIT(@Location, ',')",
+      "line": 70,
+      "column": 22
+    }
+  },
+  {
+    "node_id": "file::COOK_RPT_USP_CCHCS_ADT_MONTHLY_INPATIENT_CENSUS_TOTALS_SSRS::stmt/2::scope/sub2::structure/WHERE/1",
+    "structure_kind": "WHERE",
+    "position": 3,
+    "owning_scope": "file::COOK_RPT_USP_CCHCS_ADT_MONTHLY_INPATIENT_CENSUS_TOTALS_SSRS::stmt/2::scope/sub2",
+    "evidence": {
+      "fragment": "WHERE [value] IN ('0', dep.REV_LOC_ID)",
+      "line": 70,
+      "column": 56
+    }
+  },
+  {
+    "node_id": "file::COOK_RPT_usp_PTA_CensusDashboard_PBI::scope/month_cte::structure/PROJECTION/1",
+    "structure_kind": "PROJECTION",
+    "position": 1,
+    "owning_scope": "file::COOK_RPT_usp_PTA_CensusDashboard_PBI::scope/month_cte",
+    "evidence": {
+      "fragment": "datepart(day, Max(adt.EFFECTIVE_TIME)) as 'CurrentMonth'",
+      "line": 28,
+      "column": 9
+    },
+    "distinct": false,
+    "member_total": 1,
+    "star_total": 0,
+    "star_qualifiers": []
+  },
+  {
+    "node_id": "file::COOK_RPT_usp_PTA_CensusDashboard_PBI::scope/month_cte::structure/FROM/1",
+    "structure_kind": "FROM",
+    "position": 2,
+    "owning_scope": "file::COOK_RPT_usp_PTA_CensusDashboard_PBI::scope/month_cte",
+    "evidence": {
+      "fragment": "from Clarity.dbo.CLARITY_ADT adt",
+      "line": 29,
+      "column": 2
+    }
+  },
+  {
+    "node_id": "file::COOK_RPT_usp_PTA_CensusDashboard_PBI::scope/month_cte::structure/WHERE/1",
+    "structure_kind": "WHERE",
+    "position": 3,
+    "owning_scope": "file::COOK_RPT_usp_PTA_CensusDashboard_PBI::scope/month_cte",
+    "evidence": {
+      "fragment": "where adt.EVENT_TYPE_C = 6 --Census\n\t\tand EFFECTIVE_TIME >= @StartDate\n\t\tAND adt.PAT_ID IS NOT NULL  \n\t\tAND adt.EVENT_SUBTYPE_C <> 2",
+      "line": 30,
+      "column": 2
+    }
+  },
+  {
+    "node_id": "file::COOK_RPT_usp_PTA_CensusDashboard_PBI::scope/month_cte::structure/WHERE/1::structure/AND/1",
+    "structure_kind": "AND",
+    "position": 1,
+    "owning_scope": "file::COOK_RPT_usp_PTA_CensusDashboard_PBI::scope/month_cte",
+    "evidence": {
+      "fragment": "adt.EVENT_TYPE_C = 6 --Census\n\t\tand EFFECTIVE_TIME >= @StartDate\n\t\tAND adt.PAT_ID IS NOT NULL  \n\t\tAND adt.EVENT_SUBTYPE_C <> 2",
+      "line": 30,
+      "column": 8
+    }
+  },
+  {
+    "node_id": "file::COOK_RPT_usp_PTA_CensusDashboard_PBI::scope/delivery::structure/PROJECTION/1",
+    "structure_kind": "PROJECTION",
+    "position": 1,
+    "owning_scope": "file::COOK_RPT_usp_PTA_CensusDashboard_PBI::scope/delivery",
+    "evidence": {
+      "fragment": "adt.EFFECTIVE_TIME\n\t\t, adt.PAT_ID\n\t\t, pt.PAT_MRN_ID\n\t\t, adt.PAT_ENC_CSN_ID\n\t\t, adt.PAT_CLASS_C\n\t\t, class.ABBR as 'ClassType'\n\t\t, dep.DEPT_ABBREVIATION as 'Dept'\n\t\t, dep.EXTERNAL_NAME as 'DeptName'\n\t\t, room.ROOM_NAME as 'Room'\n\t\t, bed.BED_LABEL as 'Bed'\n\t\t, adt.PAT_SERVICE_C\n\t\t, serv.ABBR  as 'ServiceType'\n\t\t, sa.SERV_AREA_NAME as 'ServiceArea'\n\t\t, adt.EVENT_ID\n\t\t, case when datepart(month, adt.EFFECTIVE_TIME) =  datepart(month, getdate()) \n\t\t\t\t\tand datepart(year, adt.EFFECTIVE_TIME) = datepart(year, getdate())\n\t\t\t\tthen (Select CurrentMonth from month_cte) \n\t\t\t\telse datediff(dd,adt.EFFECTIVE_TIME,dateadd(mm,1,adt.EFFECTIVE_TIME)) end as 'DayinMonth'\n\t\t, /* Get last start time for daily etl job */\n\t\t(select MAX(EXEC_START_TIME)\n\t\t\tfrom clarity.dbo.CR_STAT_EXECUTION\n\t\t\twhere EXEC_SCHEDULED_YN = 'Y'\n\t\t\t\tAND EXEC_NAME = 'Daily_ETL'\t) as  'RefreshDate'\n\t\t, CONVERT(DATE, pt.BIRTH_DATE) [DOB]\n\t\t, CASE WHEN DATEDIFF(DAY, CONVERT(DATE, pt.BIRTH_DATE), adt.EFFECTIVE_TIME) >= 31 THEN 'over 30 days' ELSE 'under 30 days' END [age]\n\t\t, CASE WHEN dep.REV_LOC_ID = 100200 THEN 'PCCMC' ELSE 'CCMC' END [Location]\n\t\t,disp.NAME as Disch_Deposition\n\t\t,hsp.DISCH_DISP_C",
+      "line": 38,
+      "column": 4
+    },
+    "distinct": false,
+    "member_total": 21,
+    "star_total": 0,
+    "star_qualifiers": []
+  },
+  {
+    "node_id": "file::COOK_RPT_usp_PTA_CensusDashboard_PBI::scope/delivery::structure/PROJECTION/1::expr/15::structure/AND/1",
+    "structure_kind": "AND",
+    "position": 1,
+    "owning_scope": "file::COOK_RPT_usp_PTA_CensusDashboard_PBI::scope/delivery",
+    "evidence": {
+      "fragment": "datepart(month, adt.EFFECTIVE_TIME) =  datepart(month, getdate()) \n\t\t\t\t\tand datepart(year, adt.EFFECTIVE_TIME) = datepart(year, getdate())",
+      "line": 52,
+      "column": 15
+    }
+  },
+  {
+    "node_id": "file::COOK_RPT_usp_PTA_CensusDashboard_PBI::stmt/3::scope/sub1::structure/PROJECTION/1",
+    "structure_kind": "PROJECTION",
+    "position": 1,
+    "owning_scope": "file::COOK_RPT_usp_PTA_CensusDashboard_PBI::stmt/3::scope/sub1",
+    "evidence": {
+      "fragment": "CurrentMonth",
+      "line": 54,
+      "column": 18
+    },
+    "distinct": false,
+    "member_total": 1,
+    "star_total": 0,
+    "star_qualifiers": []
+  },
+  {
+    "node_id": "file::COOK_RPT_usp_PTA_CensusDashboard_PBI::stmt/3::scope/sub1::structure/FROM/1",
+    "structure_kind": "FROM",
+    "position": 2,
+    "owning_scope": "file::COOK_RPT_usp_PTA_CensusDashboard_PBI::stmt/3::scope/sub1",
+    "evidence": {
+      "fragment": "from month_cte",
+      "line": 54,
+      "column": 31
+    }
+  },
+  {
+    "node_id": "file::COOK_RPT_usp_PTA_CensusDashboard_PBI::stmt/3::scope/sub2::structure/PROJECTION/1",
+    "structure_kind": "PROJECTION",
+    "position": 1,
+    "owning_scope": "file::COOK_RPT_usp_PTA_CensusDashboard_PBI::stmt/3::scope/sub2",
+    "evidence": {
+      "fragment": "MAX(EXEC_START_TIME)",
+      "line": 57,
+      "column": 11
+    },
+    "distinct": false,
+    "member_total": 1,
+    "star_total": 0,
+    "star_qualifiers": []
+  },
+  {
+    "node_id": "file::COOK_RPT_usp_PTA_CensusDashboard_PBI::stmt/3::scope/sub2::structure/FROM/1",
+    "structure_kind": "FROM",
+    "position": 2,
+    "owning_scope": "file::COOK_RPT_usp_PTA_CensusDashboard_PBI::stmt/3::scope/sub2",
+    "evidence": {
+      "fragment": "from clarity.dbo.CR_STAT_EXECUTION",
+      "line": 58,
+      "column": 4
+    }
+  },
+  {
+    "node_id": "file::COOK_RPT_usp_PTA_CensusDashboard_PBI::stmt/3::scope/sub2::structure/WHERE/1",
+    "structure_kind": "WHERE",
+    "position": 3,
+    "owning_scope": "file::COOK_RPT_usp_PTA_CensusDashboard_PBI::stmt/3::scope/sub2",
+    "evidence": {
+      "fragment": "where EXEC_SCHEDULED_YN = 'Y'\n\t\t\t\tAND EXEC_NAME = 'Daily_ETL'",
+      "line": 59,
+      "column": 4
+    }
+  },
+  {
+    "node_id": "file::COOK_RPT_usp_PTA_CensusDashboard_PBI::stmt/3::scope/sub2::structure/WHERE/1::structure/AND/1",
+    "structure_kind": "AND",
+    "position": 1,
+    "owning_scope": "file::COOK_RPT_usp_PTA_CensusDashboard_PBI::stmt/3::scope/sub2",
+    "evidence": {
+      "fragment": "EXEC_SCHEDULED_YN = 'Y'\n\t\t\t\tAND EXEC_NAME = 'Daily_ETL'",
+      "line": 59,
+      "column": 10
+    }
+  },
+  {
+    "node_id": "file::COOK_RPT_usp_PTA_CensusDashboard_PBI::scope/delivery::structure/FROM/1",
+    "structure_kind": "FROM",
+    "position": 2,
+    "owning_scope": "file::COOK_RPT_usp_PTA_CensusDashboard_PBI::scope/delivery",
+    "evidence": {
+      "fragment": "FROM Clarity.dbo.CLARITY_ADT adt\n\tLEFT OUTER JOIN Clarity.dbo.CLARITY_BED bed\n\t\tON adt.BED_CSN_ID=bed.BED_CSN_ID\n\tLEFT OUTER JOIN Clarity.dbo.CLARITY_ROM room \n\t\tON adt.ROOM_CSN_ID=room.ROOM_CSN_ID\n\tLEFT OUTER JOIN Clarity.dbo.CLARITY_DEP dep \n\t\tON adt.DEPARTMENT_ID=dep.DEPARTMENT_ID\n\tLEFT OUTER JOIN Clarity.dbo.ZC_PAT_CLASS class \n\t\tON adt.PAT_CLASS_C=class.ADT_PAT_CLASS_C\n\tLEFT OUTER JOIN Clarity.dbo.ZC_PAT_SERVICE serv \n\t\tON adt.PAT_SERVICE_C=serv.HOSP_SERV_C\n\tLEFT OUTER JOIN Clarity.dbo.CLARITY_SA sa \n\t\tON dep.SERV_AREA_ID=sa.SERV_AREA_ID\n\tLEFT JOIN Clarity.dbo.PATIENT pt\n\t\tON adt.PAT_ID = pt.PAT_ID\n\tLeft Join Clarity.dbo.PAT_ENC_HSP hsp ON adt.PAT_ENC_CSN_ID = hsp.PAT_ENC_CSN_ID  -- Added on 7/6/2026\n\tleft Join Clarity.dbo.ZC_DISCH_DISP  disp ON hsp.DISCH_DISP_C = disp.DISCH_DISP_C",
+      "line": 66,
+      "column": 1
+    }
+  },
+  {
+    "node_id": "file::COOK_RPT_usp_PTA_CensusDashboard_PBI::scope/delivery::structure/JOIN/1",
+    "structure_kind": "JOIN",
+    "position": 3,
+    "owning_scope": "file::COOK_RPT_usp_PTA_CensusDashboard_PBI::scope/delivery",
+    "evidence": {
+      "fragment": "adt.BED_CSN_ID=bed.BED_CSN_ID",
+      "line": 68,
+      "column": 6
+    },
+    "join_type": "LeftOuter"
+  },
+  {
+    "node_id": "file::COOK_RPT_usp_PTA_CensusDashboard_PBI::scope/delivery::structure/JOIN/2",
+    "structure_kind": "JOIN",
+    "position": 4,
+    "owning_scope": "file::COOK_RPT_usp_PTA_CensusDashboard_PBI::scope/delivery",
+    "evidence": {
+      "fragment": "adt.ROOM_CSN_ID=room.ROOM_CSN_ID",
+      "line": 70,
+      "column": 6
+    },
+    "join_type": "LeftOuter"
+  },
+  {
+    "node_id": "file::COOK_RPT_usp_PTA_CensusDashboard_PBI::scope/delivery::structure/JOIN/3",
+    "structure_kind": "JOIN",
+    "position": 5,
+    "owning_scope": "file::COOK_RPT_usp_PTA_CensusDashboard_PBI::scope/delivery",
+    "evidence": {
+      "fragment": "adt.DEPARTMENT_ID=dep.DEPARTMENT_ID",
+      "line": 72,
+      "column": 6
+    },
+    "join_type": "LeftOuter"
+  },
+  {
+    "node_id": "file::COOK_RPT_usp_PTA_CensusDashboard_PBI::scope/delivery::structure/JOIN/4",
+    "structure_kind": "JOIN",
+    "position": 6,
+    "owning_scope": "file::COOK_RPT_usp_PTA_CensusDashboard_PBI::scope/delivery",
+    "evidence": {
+      "fragment": "adt.PAT_CLASS_C=class.ADT_PAT_CLASS_C",
+      "line": 74,
+      "column": 6
+    },
+    "join_type": "LeftOuter"
+  },
+  {
+    "node_id": "file::COOK_RPT_usp_PTA_CensusDashboard_PBI::scope/delivery::structure/JOIN/5",
+    "structure_kind": "JOIN",
+    "position": 7,
+    "owning_scope": "file::COOK_RPT_usp_PTA_CensusDashboard_PBI::scope/delivery",
+    "evidence": {
+      "fragment": "adt.PAT_SERVICE_C=serv.HOSP_SERV_C",
+      "line": 76,
+      "column": 6
+    },
+    "join_type": "LeftOuter"
+  },
+  {
+    "node_id": "file::COOK_RPT_usp_PTA_CensusDashboard_PBI::scope/delivery::structure/JOIN/6",
+    "structure_kind": "JOIN",
+    "position": 8,
+    "owning_scope": "file::COOK_RPT_usp_PTA_CensusDashboard_PBI::scope/delivery",
+    "evidence": {
+      "fragment": "dep.SERV_AREA_ID=sa.SERV_AREA_ID",
+      "line": 78,
+      "column": 6
+    },
+    "join_type": "LeftOuter"
+  },
+  {
+    "node_id": "file::COOK_RPT_usp_PTA_CensusDashboard_PBI::scope/delivery::structure/JOIN/7",
+    "structure_kind": "JOIN",
+    "position": 9,
+    "owning_scope": "file::COOK_RPT_usp_PTA_CensusDashboard_PBI::scope/delivery",
+    "evidence": {
+      "fragment": "adt.PAT_ID = pt.PAT_ID",
+      "line": 80,
+      "column": 6
+    },
+    "join_type": "LeftOuter"
+  },
+  {
+    "node_id": "file::COOK_RPT_usp_PTA_CensusDashboard_PBI::scope/delivery::structure/JOIN/8",
+    "structure_kind": "JOIN",
+    "position": 10,
+    "owning_scope": "file::COOK_RPT_usp_PTA_CensusDashboard_PBI::scope/delivery",
+    "evidence": {
+      "fragment": "adt.PAT_ENC_CSN_ID = hsp.PAT_ENC_CSN_ID",
+      "line": 81,
+      "column": 43
+    },
+    "join_type": "LeftOuter"
+  },
+  {
+    "node_id": "file::COOK_RPT_usp_PTA_CensusDashboard_PBI::scope/delivery::structure/JOIN/9",
+    "structure_kind": "JOIN",
+    "position": 11,
+    "owning_scope": "file::COOK_RPT_usp_PTA_CensusDashboard_PBI::scope/delivery",
+    "evidence": {
+      "fragment": "hsp.DISCH_DISP_C = disp.DISCH_DISP_C",
+      "line": 82,
+      "column": 47
+    },
+    "join_type": "LeftOuter"
+  },
+  {
+    "node_id": "file::COOK_RPT_usp_PTA_CensusDashboard_PBI::scope/delivery::structure/WHERE/1",
+    "structure_kind": "WHERE",
+    "position": 12,
+    "owning_scope": "file::COOK_RPT_usp_PTA_CensusDashboard_PBI::scope/delivery",
+    "evidence": {
+      "fragment": "WHERE  adt.EVENT_TYPE_C = 6 --Census\n\tand EFFECTIVE_TIME >=  @StartDate\n\tAND adt.PAT_ID IS NOT NULL  \n\tAND adt.EVENT_SUBTYPE_C <> 2 --Canceled\n\tAND dep.SERV_AREA_ID = 10",
+      "line": 83,
+      "column": 1
+    }
+  },
+  {
+    "node_id": "file::COOK_RPT_usp_PTA_CensusDashboard_PBI::scope/delivery::structure/WHERE/1::structure/AND/1",
+    "structure_kind": "AND",
+    "position": 1,
+    "owning_scope": "file::COOK_RPT_usp_PTA_CensusDashboard_PBI::scope/delivery",
+    "evidence": {
+      "fragment": "adt.EVENT_TYPE_C = 6 --Census\n\tand EFFECTIVE_TIME >=  @StartDate\n\tAND adt.PAT_ID IS NOT NULL  \n\tAND adt.EVENT_SUBTYPE_C <> 2 --Canceled\n\tAND dep.SERV_AREA_ID = 10",
+      "line": 83,
+      "column": 8
+    }
+  },
+  {
+    "node_id": "file::COOK_RPT_usp_PTA_CensusDashboard_PBI::scope/delivery::structure/ORDER BY/1",
+    "structure_kind": "ORDER BY",
+    "position": 13,
+    "owning_scope": "file::COOK_RPT_usp_PTA_CensusDashboard_PBI::scope/delivery",
+    "evidence": {
+      "fragment": "order by adt.EFFECTIVE_TIME, adt.ROOM_ID",
+      "line": 89,
+      "column": 1
+    }
+  },
+  {
+    "node_id": "file::COOK_RPT_usp_SF_CensusDashboard::scope/month_cte::structure/PROJECTION/1",
+    "structure_kind": "PROJECTION",
+    "position": 1,
+    "owning_scope": "file::COOK_RPT_usp_SF_CensusDashboard::scope/month_cte",
+    "evidence": {
+      "fragment": "datepart(day, Max(adt.EFFECTIVE_TIME)) as 'CurrentMonth'",
+      "line": 25,
+      "column": 9
+    },
+    "distinct": false,
+    "member_total": 1,
+    "star_total": 0,
+    "star_qualifiers": []
+  },
+  {
+    "node_id": "file::COOK_RPT_usp_SF_CensusDashboard::scope/month_cte::structure/FROM/1",
+    "structure_kind": "FROM",
+    "position": 2,
+    "owning_scope": "file::COOK_RPT_usp_SF_CensusDashboard::scope/month_cte",
+    "evidence": {
+      "fragment": "from Clarity.dbo.CLARITY_ADT adt",
+      "line": 26,
+      "column": 2
+    }
+  },
+  {
+    "node_id": "file::COOK_RPT_usp_SF_CensusDashboard::scope/month_cte::structure/WHERE/1",
+    "structure_kind": "WHERE",
+    "position": 3,
+    "owning_scope": "file::COOK_RPT_usp_SF_CensusDashboard::scope/month_cte",
+    "evidence": {
+      "fragment": "where adt.EVENT_TYPE_C = 6 --Census\n\t\tand EFFECTIVE_TIME >= @StartDate\n\t\tAND adt.PAT_ID IS NOT NULL  \n\t\tAND adt.EVENT_SUBTYPE_C <> 2",
+      "line": 27,
+      "column": 2
+    }
+  },
+  {
+    "node_id": "file::COOK_RPT_usp_SF_CensusDashboard::scope/month_cte::structure/WHERE/1::structure/AND/1",
+    "structure_kind": "AND",
+    "position": 1,
+    "owning_scope": "file::COOK_RPT_usp_SF_CensusDashboard::scope/month_cte",
+    "evidence": {
+      "fragment": "adt.EVENT_TYPE_C = 6 --Census\n\t\tand EFFECTIVE_TIME >= @StartDate\n\t\tAND adt.PAT_ID IS NOT NULL  \n\t\tAND adt.EVENT_SUBTYPE_C <> 2",
+      "line": 27,
+      "column": 8
+    }
+  },
+  {
+    "node_id": "file::COOK_RPT_usp_SF_CensusDashboard::scope/delivery::structure/PROJECTION/1",
+    "structure_kind": "PROJECTION",
+    "position": 1,
+    "owning_scope": "file::COOK_RPT_usp_SF_CensusDashboard::scope/delivery",
+    "evidence": {
+      "fragment": "adt.EFFECTIVE_TIME\n\t\t, adt.PAT_ID\n\t\t, pt.PAT_MRN_ID\n\t\t, adt.PAT_ENC_CSN_ID\n\t\t, adt.PAT_CLASS_C\n\t\t, class.ABBR as 'ClassType'\n\t\t, dep.DEPT_ABBREVIATION as 'Dept'\n\t\t, dep.EXTERNAL_NAME as 'DeptName'\n\t\t, room.ROOM_NAME as 'Room'\n\t\t, bed.BED_LABEL as 'Bed'\n\t\t, adt.PAT_SERVICE_C\n\t\t, serv.ABBR  as 'ServiceType'\n\t\t, sa.SERV_AREA_NAME as 'ServiceArea'\n\t\t, adt.EVENT_ID\n\t\t, case when datepart(month, adt.EFFECTIVE_TIME) =  datepart(month, getdate()) \n\t\t\t\t\tand datepart(year, adt.EFFECTIVE_TIME) = datepart(year, getdate())\n\t\t\t\tthen (Select CurrentMonth from month_cte) \n\t\t\t\telse datediff(dd,adt.EFFECTIVE_TIME,dateadd(mm,1,adt.EFFECTIVE_TIME)) end as 'DayinMonth'\n\t\t, /* Get last start time for daily etl job */\n\t\t(select MAX(EXEC_START_TIME)\n\t\t\tfrom clarity.dbo.CR_STAT_EXECUTION\n\t\t\twhere EXEC_SCHEDULED_YN = 'Y'\n\t\t\t\tAND EXEC_NAME = 'Daily_ETL'\t) as  'RefreshDate'",
+      "line": 35,
+      "column": 4
+    },
+    "distinct": false,
+    "member_total": 16,
+    "star_total": 0,
+    "star_qualifiers": []
+  },
+  {
+    "node_id": "file::COOK_RPT_usp_SF_CensusDashboard::scope/delivery::structure/PROJECTION/1::expr/15::structure/AND/1",
+    "structure_kind": "AND",
+    "position": 1,
+    "owning_scope": "file::COOK_RPT_usp_SF_CensusDashboard::scope/delivery",
+    "evidence": {
+      "fragment": "datepart(month, adt.EFFECTIVE_TIME) =  datepart(month, getdate()) \n\t\t\t\t\tand datepart(year, adt.EFFECTIVE_TIME) = datepart(year, getdate())",
+      "line": 49,
+      "column": 15
+    }
+  },
+  {
+    "node_id": "file::COOK_RPT_usp_SF_CensusDashboard::stmt/3::scope/sub1::structure/PROJECTION/1",
+    "structure_kind": "PROJECTION",
+    "position": 1,
+    "owning_scope": "file::COOK_RPT_usp_SF_CensusDashboard::stmt/3::scope/sub1",
+    "evidence": {
+      "fragment": "CurrentMonth",
+      "line": 51,
+      "column": 18
+    },
+    "distinct": false,
+    "member_total": 1,
+    "star_total": 0,
+    "star_qualifiers": []
+  },
+  {
+    "node_id": "file::COOK_RPT_usp_SF_CensusDashboard::stmt/3::scope/sub1::structure/FROM/1",
+    "structure_kind": "FROM",
+    "position": 2,
+    "owning_scope": "file::COOK_RPT_usp_SF_CensusDashboard::stmt/3::scope/sub1",
+    "evidence": {
+      "fragment": "from month_cte",
+      "line": 51,
+      "column": 31
+    }
+  },
+  {
+    "node_id": "file::COOK_RPT_usp_SF_CensusDashboard::stmt/3::scope/sub2::structure/PROJECTION/1",
+    "structure_kind": "PROJECTION",
+    "position": 1,
+    "owning_scope": "file::COOK_RPT_usp_SF_CensusDashboard::stmt/3::scope/sub2",
+    "evidence": {
+      "fragment": "MAX(EXEC_START_TIME)",
+      "line": 54,
+      "column": 11
+    },
+    "distinct": false,
+    "member_total": 1,
+    "star_total": 0,
+    "star_qualifiers": []
+  },
+  {
+    "node_id": "file::COOK_RPT_usp_SF_CensusDashboard::stmt/3::scope/sub2::structure/FROM/1",
+    "structure_kind": "FROM",
+    "position": 2,
+    "owning_scope": "file::COOK_RPT_usp_SF_CensusDashboard::stmt/3::scope/sub2",
+    "evidence": {
+      "fragment": "from clarity.dbo.CR_STAT_EXECUTION",
+      "line": 55,
+      "column": 4
+    }
+  },
+  {
+    "node_id": "file::COOK_RPT_usp_SF_CensusDashboard::stmt/3::scope/sub2::structure/WHERE/1",
+    "structure_kind": "WHERE",
+    "position": 3,
+    "owning_scope": "file::COOK_RPT_usp_SF_CensusDashboard::stmt/3::scope/sub2",
+    "evidence": {
+      "fragment": "where EXEC_SCHEDULED_YN = 'Y'\n\t\t\t\tAND EXEC_NAME = 'Daily_ETL'",
+      "line": 56,
+      "column": 4
+    }
+  },
+  {
+    "node_id": "file::COOK_RPT_usp_SF_CensusDashboard::stmt/3::scope/sub2::structure/WHERE/1::structure/AND/1",
+    "structure_kind": "AND",
+    "position": 1,
+    "owning_scope": "file::COOK_RPT_usp_SF_CensusDashboard::stmt/3::scope/sub2",
+    "evidence": {
+      "fragment": "EXEC_SCHEDULED_YN = 'Y'\n\t\t\t\tAND EXEC_NAME = 'Daily_ETL'",
+      "line": 56,
+      "column": 10
+    }
+  },
+  {
+    "node_id": "file::COOK_RPT_usp_SF_CensusDashboard::scope/delivery::structure/FROM/1",
+    "structure_kind": "FROM",
+    "position": 2,
+    "owning_scope": "file::COOK_RPT_usp_SF_CensusDashboard::scope/delivery",
+    "evidence": {
+      "fragment": "FROM Clarity.dbo.CLARITY_ADT adt\n\tLEFT OUTER JOIN Clarity.dbo.CLARITY_BED bed\n\t\tON adt.BED_CSN_ID=bed.BED_CSN_ID\n\tLEFT OUTER JOIN Clarity.dbo.CLARITY_ROM room \n\t\tON adt.ROOM_CSN_ID=room.ROOM_CSN_ID\n\tLEFT OUTER JOIN Clarity.dbo.CLARITY_DEP dep \n\t\tON adt.DEPARTMENT_ID=dep.DEPARTMENT_ID\n\tLEFT OUTER JOIN Clarity.dbo.ZC_PAT_CLASS class \n\t\tON adt.PAT_CLASS_C=class.ADT_PAT_CLASS_C\n\tLEFT OUTER JOIN Clarity.dbo.ZC_PAT_SERVICE serv \n\t\tON adt.PAT_SERVICE_C=serv.HOSP_SERV_C\n\tLEFT OUTER JOIN Clarity.dbo.CLARITY_SA sa \n\t\tON dep.SERV_AREA_ID=sa.SERV_AREA_ID\n\tLEFT JOIN Clarity.dbo.PATIENT pt\n\t\tON adt.PAT_ID = pt.PAT_ID",
+      "line": 58,
+      "column": 1
+    }
+  },
+  {
+    "node_id": "file::COOK_RPT_usp_SF_CensusDashboard::scope/delivery::structure/JOIN/1",
+    "structure_kind": "JOIN",
+    "position": 3,
+    "owning_scope": "file::COOK_RPT_usp_SF_CensusDashboard::scope/delivery",
+    "evidence": {
+      "fragment": "adt.BED_CSN_ID=bed.BED_CSN_ID",
+      "line": 60,
+      "column": 6
+    },
+    "join_type": "LeftOuter"
+  },
+  {
+    "node_id": "file::COOK_RPT_usp_SF_CensusDashboard::scope/delivery::structure/JOIN/2",
+    "structure_kind": "JOIN",
+    "position": 4,
+    "owning_scope": "file::COOK_RPT_usp_SF_CensusDashboard::scope/delivery",
+    "evidence": {
+      "fragment": "adt.ROOM_CSN_ID=room.ROOM_CSN_ID",
+      "line": 62,
+      "column": 6
+    },
+    "join_type": "LeftOuter"
+  },
+  {
+    "node_id": "file::COOK_RPT_usp_SF_CensusDashboard::scope/delivery::structure/JOIN/3",
+    "structure_kind": "JOIN",
+    "position": 5,
+    "owning_scope": "file::COOK_RPT_usp_SF_CensusDashboard::scope/delivery",
+    "evidence": {
+      "fragment": "adt.DEPARTMENT_ID=dep.DEPARTMENT_ID",
+      "line": 64,
+      "column": 6
+    },
+    "join_type": "LeftOuter"
+  },
+  {
+    "node_id": "file::COOK_RPT_usp_SF_CensusDashboard::scope/delivery::structure/JOIN/4",
+    "structure_kind": "JOIN",
+    "position": 6,
+    "owning_scope": "file::COOK_RPT_usp_SF_CensusDashboard::scope/delivery",
+    "evidence": {
+      "fragment": "adt.PAT_CLASS_C=class.ADT_PAT_CLASS_C",
+      "line": 66,
+      "column": 6
+    },
+    "join_type": "LeftOuter"
+  },
+  {
+    "node_id": "file::COOK_RPT_usp_SF_CensusDashboard::scope/delivery::structure/JOIN/5",
+    "structure_kind": "JOIN",
+    "position": 7,
+    "owning_scope": "file::COOK_RPT_usp_SF_CensusDashboard::scope/delivery",
+    "evidence": {
+      "fragment": "adt.PAT_SERVICE_C=serv.HOSP_SERV_C",
+      "line": 68,
+      "column": 6
+    },
+    "join_type": "LeftOuter"
+  },
+  {
+    "node_id": "file::COOK_RPT_usp_SF_CensusDashboard::scope/delivery::structure/JOIN/6",
+    "structure_kind": "JOIN",
+    "position": 8,
+    "owning_scope": "file::COOK_RPT_usp_SF_CensusDashboard::scope/delivery",
+    "evidence": {
+      "fragment": "dep.SERV_AREA_ID=sa.SERV_AREA_ID",
+      "line": 70,
+      "column": 6
+    },
+    "join_type": "LeftOuter"
+  },
+  {
+    "node_id": "file::COOK_RPT_usp_SF_CensusDashboard::scope/delivery::structure/JOIN/7",
+    "structure_kind": "JOIN",
+    "position": 9,
+    "owning_scope": "file::COOK_RPT_usp_SF_CensusDashboard::scope/delivery",
+    "evidence": {
+      "fragment": "adt.PAT_ID = pt.PAT_ID",
+      "line": 72,
+      "column": 6
+    },
+    "join_type": "LeftOuter"
+  },
+  {
+    "node_id": "file::COOK_RPT_usp_SF_CensusDashboard::scope/delivery::structure/WHERE/1",
+    "structure_kind": "WHERE",
+    "position": 10,
+    "owning_scope": "file::COOK_RPT_usp_SF_CensusDashboard::scope/delivery",
+    "evidence": {
+      "fragment": "WHERE  adt.EVENT_TYPE_C = 6 --Census\n\tand EFFECTIVE_TIME >=  @StartDate\n\tAND adt.PAT_ID IS NOT NULL  \n\tAND adt.EVENT_SUBTYPE_C <> 2 --Canceled\n\tAND dep.SERV_AREA_ID = 10",
+      "line": 73,
+      "column": 1
+    }
+  },
+  {
+    "node_id": "file::COOK_RPT_usp_SF_CensusDashboard::scope/delivery::structure/WHERE/1::structure/AND/1",
+    "structure_kind": "AND",
+    "position": 1,
+    "owning_scope": "file::COOK_RPT_usp_SF_CensusDashboard::scope/delivery",
+    "evidence": {
+      "fragment": "adt.EVENT_TYPE_C = 6 --Census\n\tand EFFECTIVE_TIME >=  @StartDate\n\tAND adt.PAT_ID IS NOT NULL  \n\tAND adt.EVENT_SUBTYPE_C <> 2 --Canceled\n\tAND dep.SERV_AREA_ID = 10",
+      "line": 73,
+      "column": 8
+    }
+  },
+  {
+    "node_id": "file::COOK_RPT_usp_SF_CensusDashboard::scope/delivery::structure/ORDER BY/1",
+    "structure_kind": "ORDER BY",
+    "position": 11,
+    "owning_scope": "file::COOK_RPT_usp_SF_CensusDashboard::scope/delivery",
+    "evidence": {
+      "fragment": "order by adt.EFFECTIVE_TIME, adt.ROOM_ID",
+      "line": 80,
+      "column": 1
+    }
+  },
+  {
+    "node_id": "file::Reporting_USP_CCMC_LOTE_Census_Interpreter_Services_Detail_PBI::scope/#census_monthly::structure/PROJECTION/1",
+    "structure_kind": "PROJECTION",
+    "position": 1,
+    "owning_scope": "file::Reporting_USP_CCMC_LOTE_Census_Interpreter_Services_Detail_PBI::scope/#census_monthly",
+    "evidence": {
+      "fragment": "[census].PAT_ID\n\t, [dd].[YEAR]\t\t\t\tAS [Year]\n\t, [dd].QUARTER_STR\t\t\tAS [Quarter]\n\t, [dd].MONTH_NAME\t\t\tAS [Month Name]\n\t, [dd].MONTH_NUMBER\t\t\tAS [Month Number]\n\t, [loc].LOCATION_ABBR\t\tAS [Location]\n\t, [dep].DEPARTMENT_NAME\t\tAS [Department]\n\t, [rom].ROOM_NAME\t\t\tAS [Room]\n\t, [bed].BED_LABEL\t\t\tAS [Bed]\n\n\t, CONVERT(DATE, MIN([census].CALENDAR_DT)) AS [Monthly Census Start Date]\n\t, CONVERT(DATE, MAX([census].CALENDAR_DT)) AS [Monthly Census End Date]\n\n\t, COUNT(*) AS [Census Days]\n\n\t, CONCAT(CONVERT(DATE, MIN([census].CALENDAR_DT)),' - ', CONVERT(DATE, MAX([census].CALENDAR_DT)))\tAS [Census Period]\n\n\t, CASE\n\t\tWHEN [dep].DEPARTMENT_ID IN (\n\t\t\t100200053\t--  2 Main PICU\n\t\t\t, 100200055\t--  4 Main\n\t\t\t, 100200045\t--  5 Main\n\t\t\t, 100200007\t--  Main OR\n\t\t\t)\n\t\tTHEN 'Dept 1'\n\n\t\t--WHEN [census].DEPARTMENT_ID = xxxx\t\t-- To be decided\n\t\t--THEN 'Dept 2'\n\n\t\tWHEN [dep].DEPARTMENT_ID = 100200033\t-- 1 Emergency\n\t\tTHEN 'ED 1'\n\n\t\tWHEN [dep].DEPARTMENT_ID = 100108022\t-- 2 Emergency\n\t\tTHEN 'ED 2'\n\n\t\tELSE 'Dept 3'\n\n\t  END AS [Department Label]",
+      "line": 44,
+      "column": 2
+    },
+    "distinct": false,
+    "member_total": 14,
+    "star_total": 0,
+    "star_qualifiers": []
+  },
+  {
+    "node_id": "file::Reporting_USP_CCMC_LOTE_Census_Interpreter_Services_Detail_PBI::scope/#census_monthly::structure/FROM/1",
+    "structure_kind": "FROM",
+    "position": 2,
+    "owning_scope": "file::Reporting_USP_CCMC_LOTE_Census_Interpreter_Services_Detail_PBI::scope/#census_monthly",
+    "evidence": {
+      "fragment": "FROM [Clarity].[dbo].F_IP_HSP_PAT_DAYS\t[census]\n\t\n\tLEFT JOIN [Clarity].[dbo].CLARITY_DEP\t\t\t\t[dep]\tON [census].DEPARTMENT_ID = [dep].DEPARTMENT_ID\n\tLEFT JOIN [Clarity].[dbo].CLARITY_LOC\t\t\t\t[loc]\tON [dep].REV_LOC_ID = [loc].LOC_ID\n\tLEFT JOIN [Clarity].[dbo].V_PAT_ADT_LOCATION_HX\t\t[adt]\tON [census].ADT_EVENT_ID = [adt].EVENT_ID\n\tLEFT JOIN [Clarity].[dbo].CLARITY_BED\t\t\t\t[bed]\tON [adt].ADT_BED_ID = [bed].BED_ID\n\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t   AND [adt].ADT_BED_CSN = [bed].BED_CSN_ID\n\tLEFT JOIN [Clarity].[dbo].CLARITY_ROM\t\t\t\t[rom]\tON [adt].ADT_ROOM_ID = [rom].ROOM_ID\n\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t   AND [adt].ADT_ROOM_CSN = [rom].ROOM_CSN_ID\n\tLEFT JOIN [Clarity].[dbo].DATE_DIMENSION\t\t\t[dd]\tON [census].CALENDAR_DT = [dd].CALENDAR_DT",
+      "line": 85,
+      "column": 1
+    }
+  },
+  {
+    "node_id": "file::Reporting_USP_CCMC_LOTE_Census_Interpreter_Services_Detail_PBI::scope/#census_monthly::structure/JOIN/1",
+    "structure_kind": "JOIN",
+    "position": 3,
+    "owning_scope": "file::Reporting_USP_CCMC_LOTE_Census_Interpreter_Services_Detail_PBI::scope/#census_monthly",
+    "evidence": {
+      "fragment": "[census].DEPARTMENT_ID = [dep].DEPARTMENT_ID",
+      "line": 87,
+      "column": 52
+    },
+    "join_type": "LeftOuter"
+  },
+  {
+    "node_id": "file::Reporting_USP_CCMC_LOTE_Census_Interpreter_Services_Detail_PBI::scope/#census_monthly::structure/JOIN/2",
+    "structure_kind": "JOIN",
+    "position": 4,
+    "owning_scope": "file::Reporting_USP_CCMC_LOTE_Census_Interpreter_Services_Detail_PBI::scope/#census_monthly",
+    "evidence": {
+      "fragment": "[dep].REV_LOC_ID = [loc].LOC_ID",
+      "line": 88,
+      "column": 52
+    },
+    "join_type": "LeftOuter"
+  },
+  {
+    "node_id": "file::Reporting_USP_CCMC_LOTE_Census_Interpreter_Services_Detail_PBI::scope/#census_monthly::structure/JOIN/3",
+    "structure_kind": "JOIN",
+    "position": 5,
+    "owning_scope": "file::Reporting_USP_CCMC_LOTE_Census_Interpreter_Services_Detail_PBI::scope/#census_monthly",
+    "evidence": {
+      "fragment": "[census].ADT_EVENT_ID = [adt].EVENT_ID",
+      "line": 89,
+      "column": 60
+    },
+    "join_type": "LeftOuter"
+  },
+  {
+    "node_id": "file::Reporting_USP_CCMC_LOTE_Census_Interpreter_Services_Detail_PBI::scope/#census_monthly::structure/JOIN/4",
+    "structure_kind": "JOIN",
+    "position": 6,
+    "owning_scope": "file::Reporting_USP_CCMC_LOTE_Census_Interpreter_Services_Detail_PBI::scope/#census_monthly",
+    "evidence": {
+      "fragment": "[adt].ADT_BED_ID = [bed].BED_ID\n\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t   AND [adt].ADT_BED_CSN = [bed].BED_CSN_ID",
+      "line": 90,
+      "column": 52
+    },
+    "join_type": "LeftOuter"
+  },
+  {
+    "node_id": "file::Reporting_USP_CCMC_LOTE_Census_Interpreter_Services_Detail_PBI::scope/#census_monthly::structure/JOIN/4::structure/AND/1",
+    "structure_kind": "AND",
+    "position": 1,
+    "owning_scope": "file::Reporting_USP_CCMC_LOTE_Census_Interpreter_Services_Detail_PBI::scope/#census_monthly",
+    "evidence": {
+      "fragment": "[adt].ADT_BED_ID = [bed].BED_ID\n\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t   AND [adt].ADT_BED_CSN = [bed].BED_CSN_ID",
+      "line": 90,
+      "column": 52
+    }
+  },
+  {
+    "node_id": "file::Reporting_USP_CCMC_LOTE_Census_Interpreter_Services_Detail_PBI::scope/#census_monthly::structure/JOIN/5",
+    "structure_kind": "JOIN",
+    "position": 7,
+    "owning_scope": "file::Reporting_USP_CCMC_LOTE_Census_Interpreter_Services_Detail_PBI::scope/#census_monthly",
+    "evidence": {
+      "fragment": "[adt].ADT_ROOM_ID = [rom].ROOM_ID\n\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t   AND [adt].ADT_ROOM_CSN = [rom].ROOM_CSN_ID",
+      "line": 92,
+      "column": 52
+    },
+    "join_type": "LeftOuter"
+  },
+  {
+    "node_id": "file::Reporting_USP_CCMC_LOTE_Census_Interpreter_Services_Detail_PBI::scope/#census_monthly::structure/JOIN/5::structure/AND/1",
+    "structure_kind": "AND",
+    "position": 1,
+    "owning_scope": "file::Reporting_USP_CCMC_LOTE_Census_Interpreter_Services_Detail_PBI::scope/#census_monthly",
+    "evidence": {
+      "fragment": "[adt].ADT_ROOM_ID = [rom].ROOM_ID\n\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t   AND [adt].ADT_ROOM_CSN = [rom].ROOM_CSN_ID",
+      "line": 92,
+      "column": 52
+    }
+  },
+  {
+    "node_id": "file::Reporting_USP_CCMC_LOTE_Census_Interpreter_Services_Detail_PBI::scope/#census_monthly::structure/JOIN/6",
+    "structure_kind": "JOIN",
+    "position": 8,
+    "owning_scope": "file::Reporting_USP_CCMC_LOTE_Census_Interpreter_Services_Detail_PBI::scope/#census_monthly",
+    "evidence": {
+      "fragment": "[census].CALENDAR_DT = [dd].CALENDAR_DT",
+      "line": 94,
+      "column": 53
+    },
+    "join_type": "LeftOuter"
+  },
+  {
+    "node_id": "file::Reporting_USP_CCMC_LOTE_Census_Interpreter_Services_Detail_PBI::scope/#census_monthly::structure/WHERE/1",
+    "structure_kind": "WHERE",
+    "position": 9,
+    "owning_scope": "file::Reporting_USP_CCMC_LOTE_Census_Interpreter_Services_Detail_PBI::scope/#census_monthly",
+    "evidence": {
+      "fragment": "WHERE 1=1\n\tAND [census].CALENDAR_DT BETWEEN @StartDate AND @EndDate\n\tAND [adt].ADT_SERV_AREA_ID IS NOT NULL\t\t\t\t\t-- EXCLUDE 'PRE-ADMISSION' EVENT\n\tAND [dep].REV_LOC_ID IN (\n\t\t'100108'\t\t-- hospital 1\n\t\t, '100200'\t\t-- hospital 2\n\t)",
+      "line": 96,
+      "column": 1
+    }
+  },
+  {
+    "node_id": "file::Reporting_USP_CCMC_LOTE_Census_Interpreter_Services_Detail_PBI::scope/#census_monthly::structure/WHERE/1::structure/AND/1",
+    "structure_kind": "AND",
+    "position": 1,
+    "owning_scope": "file::Reporting_USP_CCMC_LOTE_Census_Interpreter_Services_Detail_PBI::scope/#census_monthly",
+    "evidence": {
+      "fragment": "1=1\n\tAND [census].CALENDAR_DT BETWEEN @StartDate AND @EndDate\n\tAND [adt].ADT_SERV_AREA_ID IS NOT NULL\t\t\t\t\t-- EXCLUDE 'PRE-ADMISSION' EVENT\n\tAND [dep].REV_LOC_ID IN (\n\t\t'100108'\t\t-- hospital 1\n\t\t, '100200'\t\t-- hospital 2\n\t)",
+      "line": 96,
+      "column": 7
+    }
+  },
+  {
+    "node_id": "file::Reporting_USP_CCMC_LOTE_Census_Interpreter_Services_Detail_PBI::scope/#census_monthly::structure/GROUP BY/1",
+    "structure_kind": "GROUP BY",
+    "position": 10,
+    "owning_scope": "file::Reporting_USP_CCMC_LOTE_Census_Interpreter_Services_Detail_PBI::scope/#census_monthly",
+    "evidence": {
+      "fragment": "GROUP BY\n\t[census].PAT_ID\n\t, [dd].[YEAR]\n\t, [dd].QUARTER_STR\n\t, [dd].MONTH_NUMBER\n\t, [dd].MONTH_NAME\n\t, [loc].LOCATION_ABBR\n\t, [dep].DEPARTMENT_NAME\n\t, [dep].DEPARTMENT_ID\n\t, [rom].ROOM_NAME\n\t, [bed].BED_LABEL",
+      "line": 104,
+      "column": 1
+    }
+  },
+  {
+    "node_id": "file::Reporting_USP_CCMC_LOTE_Census_Interpreter_Services_Detail_PBI::scope/#clinic_monthly::structure/PROJECTION/1",
+    "structure_kind": "PROJECTION",
+    "position": 1,
+    "owning_scope": "file::Reporting_USP_CCMC_LOTE_Census_Interpreter_Services_Detail_PBI::scope/#clinic_monthly",
+    "evidence": {
+      "fragment": "[enc].PAT_ID\n\t, [dd].[YEAR]\t\t\t\tAS [Year]\n\t, [dd].QUARTER_STR\t\t\tAS [Quarter]\n\t, [dd].MONTH_NAME\t\t\tAS [Month Name]\n\t, [dd].MONTH_NUMBER\t\t\tAS [Month Number]\n\t, [loc].LOCATION_ABBR\t\tAS [Location]\n\t, [dep].DEPARTMENT_NAME\t\tAS [Department]\n\t, CONVERT(VARCHAR, NULL)\tAS [Room]\n\t, CONVERT(VARCHAR, NULL)\tAS [Bed]\n\n\t, CONVERT(DATE, MIN([enc].CONTACT_DATE)) AS [Monthly Census Start Date]\n\t, CONVERT(DATE, MAX([enc].CONTACT_DATE)) AS [Monthly Census End Date]\n\n\t, COUNT(*) AS [Census Days]\n\n\t, CONCAT(CONVERT(DATE, MIN([enc].CONTACT_DATE)),' - ', CONVERT(DATE, MAX([enc].CONTACT_DATE)))\tAS [Census Period]\n\n\t, 'Ambulatory' AS [Department Label]",
+      "line": 122,
+      "column": 2
+    },
+    "distinct": false,
+    "member_total": 14,
+    "star_total": 0,
+    "star_qualifiers": []
+  },
+  {
+    "node_id": "file::Reporting_USP_CCMC_LOTE_Census_Interpreter_Services_Detail_PBI::scope/#clinic_monthly::structure/FROM/1",
+    "structure_kind": "FROM",
+    "position": 2,
+    "owning_scope": "file::Reporting_USP_CCMC_LOTE_Census_Interpreter_Services_Detail_PBI::scope/#clinic_monthly",
+    "evidence": {
+      "fragment": "FROM [Clarity].[dbo].PAT_ENC\t[enc]\n\t\n\tLEFT JOIN [Clarity].[dbo].CLARITY_DEP\t\t\t\t[dep]\tON [enc].DEPARTMENT_ID = [dep].DEPARTMENT_ID\n\tLEFT JOIN [Clarity].[dbo].CLARITY_LOC\t\t\t\t[loc]\tON [dep].REV_LOC_ID = [loc].LOC_ID\n\tLEFT JOIN [Clarity].[dbo].DATE_DIMENSION\t\t\t[dd]\tON [enc].CONTACT_DATE = [dd].CALENDAR_DT",
+      "line": 143,
+      "column": 1
+    }
+  },
+  {
+    "node_id": "file::Reporting_USP_CCMC_LOTE_Census_Interpreter_Services_Detail_PBI::scope/#clinic_monthly::structure/JOIN/1",
+    "structure_kind": "JOIN",
+    "position": 3,
+    "owning_scope": "file::Reporting_USP_CCMC_LOTE_Census_Interpreter_Services_Detail_PBI::scope/#clinic_monthly",
+    "evidence": {
+      "fragment": "[enc].DEPARTMENT_ID = [dep].DEPARTMENT_ID",
+      "line": 145,
+      "column": 52
+    },
+    "join_type": "LeftOuter"
+  },
+  {
+    "node_id": "file::Reporting_USP_CCMC_LOTE_Census_Interpreter_Services_Detail_PBI::scope/#clinic_monthly::structure/JOIN/2",
+    "structure_kind": "JOIN",
+    "position": 4,
+    "owning_scope": "file::Reporting_USP_CCMC_LOTE_Census_Interpreter_Services_Detail_PBI::scope/#clinic_monthly",
+    "evidence": {
+      "fragment": "[dep].REV_LOC_ID = [loc].LOC_ID",
+      "line": 146,
+      "column": 52
+    },
+    "join_type": "LeftOuter"
+  },
+  {
+    "node_id": "file::Reporting_USP_CCMC_LOTE_Census_Interpreter_Services_Detail_PBI::scope/#clinic_monthly::structure/JOIN/3",
+    "structure_kind": "JOIN",
+    "position": 5,
+    "owning_scope": "file::Reporting_USP_CCMC_LOTE_Census_Interpreter_Services_Detail_PBI::scope/#clinic_monthly",
+    "evidence": {
+      "fragment": "[enc].CONTACT_DATE = [dd].CALENDAR_DT",
+      "line": 147,
+      "column": 53
+    },
+    "join_type": "LeftOuter"
+  },
+  {
+    "node_id": "file::Reporting_USP_CCMC_LOTE_Census_Interpreter_Services_Detail_PBI::scope/#clinic_monthly::structure/WHERE/1",
+    "structure_kind": "WHERE",
+    "position": 6,
+    "owning_scope": "file::Reporting_USP_CCMC_LOTE_Census_Interpreter_Services_Detail_PBI::scope/#clinic_monthly",
+    "evidence": {
+      "fragment": "WHERE 1=1\n\tAND [enc].CONTACT_DATE BETWEEN @StartDate AND @EndDate\n\tAND [dep].DEPARTMENT_ID IN (\n\t\t10101207\t--CARDIOTHORACIC SURGERY\n\t\t,10101209\t--ENT\n\t\t,10101219\t--PALLIATIVE CARE\n\t\t,10120165\t--PEDIATRIC ENT\n\t\t,100050003\t--DMSS PSYCHOLOGY\n\t\t,100063010\t--HMSS PSYCHOLOGY\n\t\t,100063017\t--HMSS HURST SPORT PT\n\t\t,100063019\t--HMSS HURST PT\n\t\t,100063021\t--HMSS HURST AUDIO\n\t\t,100073003\t--SWMS PSYCHOLOGY\n\t\t,100074001\t--MOB PSYCHOLOGY\n\t\t,100106001\t--ARL CARDIOLOGY\n\t\t,100106002\t--ARL DIAGNOSTIC CARDIO\n\t\t,100108067\t--CCMC UC SOUTHLAKE DS\n\t\t,100117001\t--HOGC HEM ONC\n\t\t,100119101\t--RHBSO SOUTH PT\n\t\t,100119104\t--RHBSO SOUTH AUDIO\n\t\t,100119105\t--RHBSO SOUTH SPORT PT\n\t\t,100300005\t--PROSPER PEDI SURGERY\n\t\t,100381011\t--SMSS PSYCHOLOGY\n\t\t,100581001\t--DOD CRANIOFACIAL\n\t\t,100581002\t--DOD ENDOCRINOLOGY\n\t\t,100581003\t--DOD GASTROENTEROLOGY\n\t\t,100581004\t--DOD CARDIOLOGY\n\t\t,100581006\t--DOD HEM ONC\n\t\t,100581007\t--DOD INFECTIOUS DISEASE\n\t\t,100581008\t--DOD NEPHROLOGY\n\t\t,100581009\t--DOD NEUROLOGY\n\t\t,100581010\t--DOD NEUROSURGERY\n\t\t,100581012\t--DOD PAIN MANAGEMENT\n\t\t,100581013\t--DOD PEDIATRIC SURGERY\n\t\t,100581014\t--DOD PULMONOLOGY\n\t\t,100581015\t--DOD MR IMAGING\n\t\t,100581016\t--DOD US IMAGING\n\t\t,100581017\t--DOD X-RAY IMAGING\n\t\t,100581018\t--DOD RHEUMATOLOGY\n\t\t,100581020\t--DOD ORTHO X-RAY\n\t\t,100581022\t--DOD INFUSION\n\t\t,100581023\t--DOD NEST FOLLOW UP\n\t\t,100581032\t--DOD SLEEP MEDICINE\n\t\t,100581033\t--DOD PULMONARY LAB\n\t\t,100581035\t--DOD DIAGNOSTIC CARDIO\n\t\t,100581047\t--DOD IMMUNOLOGY\n\t\t,100581050\t--DOD PSYCHOLOGY\n\t\t,100581052\t--DOD DEVELOPMENTAL PEDS\n\t\t,100581053\t--DOD WOUND CLINIC\n\t\t,100581059\t--DOD DERMATOLOGY\n\t\t,100581060\t--DOD UROLOGY\n\t\t,100581063\t--DOD UROLOGY RADIOLOGY\n\t\t,100581075\t--DOD CARDIAC REHAB\n\t\t,100590009\t--MAN URGENT CARE\n\t\t,100590010\t--MMS MANS PT\n\t\t,100590015\t--MMS MANS AUDIO\n\t\t,100590021\t--MMS MANS SPORT PT\n\t\t,100618001\t--FTW URGENT CARE\n\t\t,100618020\t--FTW URGENT CARE X-RAY\n\t\t,100624020\t--MAN URGENT CARE X-RAY\n\t\t,100624021\t--MAN URGENT CARE\n\t\t,100632010\t--ALMS PSYCHOLOGY\n\t\t,100632022\t--ALMS AUDIO\n\t\t,100635001\t--SLK URGENT CARE\n\t\t,100641001\t--HUR URGENT CARE\n\t\t,100641002\t--HUR URGENT CARE X-RAY\n\t\t,100643001\t--HRC US IMAGING\n\t\t,100643002\t--HRC X-RAY IMAGING\n\t\t,100643003\t--HRC MR IMAGING\n\t\t,100651001\t--ALL URGENT CARE\n\t\t,100657003\t--VIRTUAL CARE\n\t\t,100663001\t--DENTON PSYCHOLOGY\n\t\t,100674003\t--WR SPORT PT\n\t\t,100675001\t--WR URGENT CARE\n\t\t,100675002\t--WR URGENT CARE X-RAY\n\t\t,100676006\t--CSC PSYCHOLOGY\n\t\t,100682001\t--PROSPER URGENT CARE\n\t\t,100683001\t--COOPER NEST FOLLOW UP\n\t\t,100683002\t--COOPER NEUROPSYCH\n\t\t,100685001\t--DENTON PSYCHOLOGY\n\t\t,100700005\t--PROSPER PEDI SURGERY\n\t)",
+      "line": 149,
+      "column": 1
+    }
+  },
+  {
+    "node_id": "file::Reporting_USP_CCMC_LOTE_Census_Interpreter_Services_Detail_PBI::scope/#clinic_monthly::structure/WHERE/1::structure/AND/1",
+    "structure_kind": "AND",
+    "position": 1,
+    "owning_scope": "file::Reporting_USP_CCMC_LOTE_Census_Interpreter_Services_Detail_PBI::scope/#clinic_monthly",
+    "evidence": {
+      "fragment": "1=1\n\tAND [enc].CONTACT_DATE BETWEEN @StartDate AND @EndDate\n\tAND [dep].DEPARTMENT_ID IN (\n\t\t10101207\t--CARDIOTHORACIC SURGERY\n\t\t,10101209\t--ENT\n\t\t,10101219\t--PALLIATIVE CARE\n\t\t,10120165\t--PEDIATRIC ENT\n\t\t,100050003\t--DMSS PSYCHOLOGY\n\t\t,100063010\t--HMSS PSYCHOLOGY\n\t\t,100063017\t--HMSS HURST SPORT PT\n\t\t,100063019\t--HMSS HURST PT\n\t\t,100063021\t--HMSS HURST AUDIO\n\t\t,100073003\t--SWMS PSYCHOLOGY\n\t\t,100074001\t--MOB PSYCHOLOGY\n\t\t,100106001\t--ARL CARDIOLOGY\n\t\t,100106002\t--ARL DIAGNOSTIC CARDIO\n\t\t,100108067\t--CCMC UC SOUTHLAKE DS\n\t\t,100117001\t--HOGC HEM ONC\n\t\t,100119101\t--RHBSO SOUTH PT\n\t\t,100119104\t--RHBSO SOUTH AUDIO\n\t\t,100119105\t--RHBSO SOUTH SPORT PT\n\t\t,100300005\t--PROSPER PEDI SURGERY\n\t\t,100381011\t--SMSS PSYCHOLOGY\n\t\t,100581001\t--DOD CRANIOFACIAL\n\t\t,100581002\t--DOD ENDOCRINOLOGY\n\t\t,100581003\t--DOD GASTROENTEROLOGY\n\t\t,100581004\t--DOD CARDIOLOGY\n\t\t,100581006\t--DOD HEM ONC\n\t\t,100581007\t--DOD INFECTIOUS DISEASE\n\t\t,100581008\t--DOD NEPHROLOGY\n\t\t,100581009\t--DOD NEUROLOGY\n\t\t,100581010\t--DOD NEUROSURGERY\n\t\t,100581012\t--DOD PAIN MANAGEMENT\n\t\t,100581013\t--DOD PEDIATRIC SURGERY\n\t\t,100581014\t--DOD PULMONOLOGY\n\t\t,100581015\t--DOD MR IMAGING\n\t\t,100581016\t--DOD US IMAGING\n\t\t,100581017\t--DOD X-RAY IMAGING\n\t\t,100581018\t--DOD RHEUMATOLOGY\n\t\t,100581020\t--DOD ORTHO X-RAY\n\t\t,100581022\t--DOD INFUSION\n\t\t,100581023\t--DOD NEST FOLLOW UP\n\t\t,100581032\t--DOD SLEEP MEDICINE\n\t\t,100581033\t--DOD PULMONARY LAB\n\t\t,100581035\t--DOD DIAGNOSTIC CARDIO\n\t\t,100581047\t--DOD IMMUNOLOGY\n\t\t,100581050\t--DOD PSYCHOLOGY\n\t\t,100581052\t--DOD DEVELOPMENTAL PEDS\n\t\t,100581053\t--DOD WOUND CLINIC\n\t\t,100581059\t--DOD DERMATOLOGY\n\t\t,100581060\t--DOD UROLOGY\n\t\t,100581063\t--DOD UROLOGY RADIOLOGY\n\t\t,100581075\t--DOD CARDIAC REHAB\n\t\t,100590009\t--MAN URGENT CARE\n\t\t,100590010\t--MMS MANS PT\n\t\t,100590015\t--MMS MANS AUDIO\n\t\t,100590021\t--MMS MANS SPORT PT\n\t\t,100618001\t--FTW URGENT CARE\n\t\t,100618020\t--FTW URGENT CARE X-RAY\n\t\t,100624020\t--MAN URGENT CARE X-RAY\n\t\t,100624021\t--MAN URGENT CARE\n\t\t,100632010\t--ALMS PSYCHOLOGY\n\t\t,100632022\t--ALMS AUDIO\n\t\t,100635001\t--SLK URGENT CARE\n\t\t,100641001\t--HUR URGENT CARE\n\t\t,100641002\t--HUR URGENT CARE X-RAY\n\t\t,100643001\t--HRC US IMAGING\n\t\t,100643002\t--HRC X-RAY IMAGING\n\t\t,100643003\t--HRC MR IMAGING\n\t\t,100651001\t--ALL URGENT CARE\n\t\t,100657003\t--VIRTUAL CARE\n\t\t,100663001\t--DENTON PSYCHOLOGY\n\t\t,100674003\t--WR SPORT PT\n\t\t,100675001\t--WR URGENT CARE\n\t\t,100675002\t--WR URGENT CARE X-RAY\n\t\t,100676006\t--CSC PSYCHOLOGY\n\t\t,100682001\t--PROSPER URGENT CARE\n\t\t,100683001\t--COOPER NEST FOLLOW UP\n\t\t,100683002\t--COOPER NEUROPSYCH\n\t\t,100685001\t--DENTON PSYCHOLOGY\n\t\t,100700005\t--PROSPER PEDI SURGERY\n\t)",
+      "line": 149,
+      "column": 7
+    }
+  },
+  {
+    "node_id": "file::Reporting_USP_CCMC_LOTE_Census_Interpreter_Services_Detail_PBI::scope/#clinic_monthly::structure/GROUP BY/1",
+    "structure_kind": "GROUP BY",
+    "position": 7,
+    "owning_scope": "file::Reporting_USP_CCMC_LOTE_Census_Interpreter_Services_Detail_PBI::scope/#clinic_monthly",
+    "evidence": {
+      "fragment": "GROUP BY\n\t[enc].PAT_ID\n\t, [dd].[YEAR]\n\t, [dd].QUARTER_STR\n\t, [dd].MONTH_NUMBER\n\t, [dd].MONTH_NAME\n\t, [loc].LOCATION_ABBR\n\t, [dep].DEPARTMENT_NAME",
+      "line": 232,
+      "column": 1
+    }
+  },
+  {
+    "node_id": "file::Reporting_USP_CCMC_LOTE_Census_Interpreter_Services_Detail_PBI::scope/#combined_census::structure/COMBINATION/1",
+    "structure_kind": "COMBINATION",
+    "position": 1,
+    "owning_scope": "file::Reporting_USP_CCMC_LOTE_Census_Interpreter_Services_Detail_PBI::scope/#combined_census",
+    "evidence": {
+      "fragment": "SELECT *, 'Inpatient' as [Dept Type]\nINTO #combined_census\nFROM #census_monthly\nUNION\nSELECT *, 'Outpatient' as [Dept Type]\nFROM #clinic_monthly",
+      "line": 246,
+      "column": 1
+    },
+    "combination_type": "Union",
+    "all": false
+  },
+  {
+    "node_id": "file::Reporting_USP_CCMC_LOTE_Census_Interpreter_Services_Detail_PBI::scope/#combined_census::arm1::structure/PROJECTION/1",
+    "structure_kind": "PROJECTION",
+    "position": 1,
+    "owning_scope": "file::Reporting_USP_CCMC_LOTE_Census_Interpreter_Services_Detail_PBI::scope/#combined_census::arm1",
+    "evidence": {
+      "fragment": "*, 'Inpatient' as [Dept Type]",
+      "line": 246,
+      "column": 8
+    },
+    "distinct": false,
+    "member_total": 2,
+    "star_total": 1,
+    "star_qualifiers": [
+      null
+    ]
+  },
+  {
+    "node_id": "file::Reporting_USP_CCMC_LOTE_Census_Interpreter_Services_Detail_PBI::scope/#combined_census::arm1::structure/FROM/1",
+    "structure_kind": "FROM",
+    "position": 2,
+    "owning_scope": "file::Reporting_USP_CCMC_LOTE_Census_Interpreter_Services_Detail_PBI::scope/#combined_census::arm1",
+    "evidence": {
+      "fragment": "FROM #census_monthly",
+      "line": 248,
+      "column": 1
+    }
+  },
+  {
+    "node_id": "file::Reporting_USP_CCMC_LOTE_Census_Interpreter_Services_Detail_PBI::scope/#combined_census::arm2::structure/PROJECTION/1",
+    "structure_kind": "PROJECTION",
+    "position": 1,
+    "owning_scope": "file::Reporting_USP_CCMC_LOTE_Census_Interpreter_Services_Detail_PBI::scope/#combined_census::arm2",
+    "evidence": {
+      "fragment": "*, 'Outpatient' as [Dept Type]",
+      "line": 250,
+      "column": 8
+    },
+    "distinct": false,
+    "member_total": 2,
+    "star_total": 1,
+    "star_qualifiers": [
+      null
+    ]
+  },
+  {
+    "node_id": "file::Reporting_USP_CCMC_LOTE_Census_Interpreter_Services_Detail_PBI::scope/#combined_census::arm2::structure/FROM/1",
+    "structure_kind": "FROM",
+    "position": 2,
+    "owning_scope": "file::Reporting_USP_CCMC_LOTE_Census_Interpreter_Services_Detail_PBI::scope/#combined_census::arm2",
+    "evidence": {
+      "fragment": "FROM #clinic_monthly",
+      "line": 251,
+      "column": 1
+    }
+  },
+  {
+    "node_id": "file::Reporting_USP_CCMC_LOTE_Census_Interpreter_Services_Detail_PBI::scope/#caregivers::structure/PROJECTION/1",
+    "structure_kind": "PROJECTION",
+    "position": 1,
+    "owning_scope": "file::Reporting_USP_CCMC_LOTE_Census_Interpreter_Services_Detail_PBI::scope/#caregivers",
+    "evidence": {
+      "fragment": "PAT_ID, PAT_RELATIONSHIP_ID",
+      "line": 259,
+      "column": 8
+    },
+    "distinct": false,
+    "member_total": 2,
+    "star_total": 0,
+    "star_qualifiers": []
+  },
+  {
+    "node_id": "file::Reporting_USP_CCMC_LOTE_Census_Interpreter_Services_Detail_PBI::scope/#caregivers::structure/FROM/1",
+    "structure_kind": "FROM",
+    "position": 2,
+    "owning_scope": "file::Reporting_USP_CCMC_LOTE_Census_Interpreter_Services_Detail_PBI::scope/#caregivers",
+    "evidence": {
+      "fragment": "FROM [Clarity].[dbo].PAT_RELATIONSHIP_LIST",
+      "line": 261,
+      "column": 1
+    }
+  },
+  {
+    "node_id": "file::Reporting_USP_CCMC_LOTE_Census_Interpreter_Services_Detail_PBI::scope/#caregivers::structure/WHERE/1",
+    "structure_kind": "WHERE",
+    "position": 3,
+    "owning_scope": "file::Reporting_USP_CCMC_LOTE_Census_Interpreter_Services_Detail_PBI::scope/#caregivers",
+    "evidence": {
+      "fragment": "WHERE EXISTS (SELECT 1 FROM #combined_census WHERE [PAT_RELATIONSHIP_LIST].PAT_ID = [#combined_census].PAT_ID)",
+      "line": 262,
+      "column": 1
+    }
+  },
+  {
+    "node_id": "file::Reporting_USP_CCMC_LOTE_Census_Interpreter_Services_Detail_PBI::stmt/14::scope/sub1::structure/PROJECTION/1",
+    "structure_kind": "PROJECTION",
+    "position": 1,
+    "owning_scope": "file::Reporting_USP_CCMC_LOTE_Census_Interpreter_Services_Detail_PBI::stmt/14::scope/sub1",
+    "evidence": {
+      "fragment": "1",
+      "line": 262,
+      "column": 22
+    },
+    "distinct": false,
+    "member_total": 1,
+    "star_total": 0,
+    "star_qualifiers": []
+  },
+  {
+    "node_id": "file::Reporting_USP_CCMC_LOTE_Census_Interpreter_Services_Detail_PBI::stmt/14::scope/sub1::structure/FROM/1",
+    "structure_kind": "FROM",
+    "position": 2,
+    "owning_scope": "file::Reporting_USP_CCMC_LOTE_Census_Interpreter_Services_Detail_PBI::stmt/14::scope/sub1",
+    "evidence": {
+      "fragment": "FROM #combined_census",
+      "line": 262,
+      "column": 24
+    }
+  },
+  {
+    "node_id": "file::Reporting_USP_CCMC_LOTE_Census_Interpreter_Services_Detail_PBI::stmt/14::scope/sub1::structure/WHERE/1",
+    "structure_kind": "WHERE",
+    "position": 3,
+    "owning_scope": "file::Reporting_USP_CCMC_LOTE_Census_Interpreter_Services_Detail_PBI::stmt/14::scope/sub1",
+    "evidence": {
+      "fragment": "WHERE [PAT_RELATIONSHIP_LIST].PAT_ID = [#combined_census].PAT_ID",
+      "line": 262,
+      "column": 46
+    }
+  },
+  {
+    "node_id": "file::Reporting_USP_CCMC_LOTE_Census_Interpreter_Services_Detail_PBI::scope/#caregiver_languages::structure/PROJECTION/1",
+    "structure_kind": "PROJECTION",
+    "position": 1,
+    "owning_scope": "file::Reporting_USP_CCMC_LOTE_Census_Interpreter_Services_Detail_PBI::scope/#caregiver_languages",
+    "evidence": {
+      "fragment": "[#caregivers].PAT_ID\n\t, STRING_AGG( CONCAT( IIF( [relation].NAME IS NULL, '?', [relation].NAME ), ';', [zc_lang].NAME ), CHAR(10)+CHAR(13)) \n\t\tWITHIN GROUP(ORDER BY [lang].PAT_RELATIONSHIP_ID) AS [Caregiver Languages]",
+      "line": 271,
+      "column": 2
+    },
+    "distinct": false,
+    "member_total": 2,
+    "star_total": 0,
+    "star_qualifiers": []
+  },
+  {
+    "node_id": "file::Reporting_USP_CCMC_LOTE_Census_Interpreter_Services_Detail_PBI::scope/#caregiver_languages::structure/FROM/1",
+    "structure_kind": "FROM",
+    "position": 2,
+    "owning_scope": "file::Reporting_USP_CCMC_LOTE_Census_Interpreter_Services_Detail_PBI::scope/#caregiver_languages",
+    "evidence": {
+      "fragment": "FROM [Clarity].[dbo].PAT_REL_LANGUAGES\t[lang]\t\t\n\n\tINNER JOIN #caregivers\t\t\t\t\t\t\t\t\t\t\t\t\tON [lang].PAT_RELATIONSHIP_ID = [#caregivers].PAT_RELATIONSHIP_ID\n\tINNER JOIN [Clarity].[dbo].ZC_LANGUAGE\t\t\t\t\t[zc_lang]\t\tON [lang].LANGUAGE_C = [zc_lang].LANGUAGE_C\n\n\tLEFT JOIN [Clarity].[dbo].PAT_RELATIONSHIP_LIST_HX\t\t[hx]\t\t\tON [lang].PAT_RELATIONSHIP_ID = [hx].RELATIONSHIP_ID\n\tLEFT JOIN [Clarity].[dbo].ZC_EMERG_PAT_REL\t\t\t\t[relation]\t\tON [hx].RELATION_TO_PAT_C = [relation].EMERG_PAT_REL_C",
+      "line": 277,
+      "column": 1
+    }
+  },
+  {
+    "node_id": "file::Reporting_USP_CCMC_LOTE_Census_Interpreter_Services_Detail_PBI::scope/#caregiver_languages::structure/JOIN/1",
+    "structure_kind": "JOIN",
+    "position": 3,
+    "owning_scope": "file::Reporting_USP_CCMC_LOTE_Census_Interpreter_Services_Detail_PBI::scope/#caregiver_languages",
+    "evidence": {
+      "fragment": "[lang].PAT_RELATIONSHIP_ID = [#caregivers].PAT_RELATIONSHIP_ID",
+      "line": 279,
+      "column": 40
+    },
+    "join_type": "Inner"
+  },
+  {
+    "node_id": "file::Reporting_USP_CCMC_LOTE_Census_Interpreter_Services_Detail_PBI::scope/#caregiver_languages::structure/JOIN/2",
+    "structure_kind": "JOIN",
+    "position": 4,
+    "owning_scope": "file::Reporting_USP_CCMC_LOTE_Census_Interpreter_Services_Detail_PBI::scope/#caregiver_languages",
+    "evidence": {
+      "fragment": "[lang].LANGUAGE_C = [zc_lang].LANGUAGE_C",
+      "line": 280,
+      "column": 59
+    },
+    "join_type": "Inner"
+  },
+  {
+    "node_id": "file::Reporting_USP_CCMC_LOTE_Census_Interpreter_Services_Detail_PBI::scope/#caregiver_languages::structure/JOIN/3",
+    "structure_kind": "JOIN",
+    "position": 5,
+    "owning_scope": "file::Reporting_USP_CCMC_LOTE_Census_Interpreter_Services_Detail_PBI::scope/#caregiver_languages",
+    "evidence": {
+      "fragment": "[lang].PAT_RELATIONSHIP_ID = [hx].RELATIONSHIP_ID",
+      "line": 282,
+      "column": 64
+    },
+    "join_type": "LeftOuter"
+  },
+  {
+    "node_id": "file::Reporting_USP_CCMC_LOTE_Census_Interpreter_Services_Detail_PBI::scope/#caregiver_languages::structure/JOIN/4",
+    "structure_kind": "JOIN",
+    "position": 6,
+    "owning_scope": "file::Reporting_USP_CCMC_LOTE_Census_Interpreter_Services_Detail_PBI::scope/#caregiver_languages",
+    "evidence": {
+      "fragment": "[hx].RELATION_TO_PAT_C = [relation].EMERG_PAT_REL_C",
+      "line": 283,
+      "column": 63
+    },
+    "join_type": "LeftOuter"
+  },
+  {
+    "node_id": "file::Reporting_USP_CCMC_LOTE_Census_Interpreter_Services_Detail_PBI::scope/#caregiver_languages::structure/WHERE/1",
+    "structure_kind": "WHERE",
+    "position": 7,
+    "owning_scope": "file::Reporting_USP_CCMC_LOTE_Census_Interpreter_Services_Detail_PBI::scope/#caregiver_languages",
+    "evidence": {
+      "fragment": "WHERE 1=1\n\tAND [lang].LANGUAGE_TYPE_C = 1\t-- SPOKEN LANGUAGE\n\tAND (\n\t\t( [hx].RELATIONSHIP_START_DATE <= @EndDate AND [hx].RELATIONSHIP_END_DATE >= @StartDate )\t-- Relationship ended after report start but was active during report period\n\t\tOR\t\t\n\t\t( [hx].RELATIONSHIP_START_DATE <= @EndDate AND [hx].RELATIONSHIP_END_DATE IS NULL )\t\t\t-- Relationship has no end date\n\t\tOR\n\t\t( [hx].RELATIONSHIP_START_DATE IS NULL AND [hx].RELATIONSHIP_END_DATE IS NULL )\t\t\t\t-- No dates entered for relationship\n\t\t)",
+      "line": 285,
+      "column": 1
+    }
+  },
+  {
+    "node_id": "file::Reporting_USP_CCMC_LOTE_Census_Interpreter_Services_Detail_PBI::scope/#caregiver_languages::structure/WHERE/1::structure/AND/1",
+    "structure_kind": "AND",
+    "position": 1,
+    "owning_scope": "file::Reporting_USP_CCMC_LOTE_Census_Interpreter_Services_Detail_PBI::scope/#caregiver_languages",
+    "evidence": {
+      "fragment": "1=1\n\tAND [lang].LANGUAGE_TYPE_C = 1\t-- SPOKEN LANGUAGE\n\tAND (\n\t\t( [hx].RELATIONSHIP_START_DATE <= @EndDate AND [hx].RELATIONSHIP_END_DATE >= @StartDate )\t-- Relationship ended after report start but was active during report period\n\t\tOR\t\t\n\t\t( [hx].RELATIONSHIP_START_DATE <= @EndDate AND [hx].RELATIONSHIP_END_DATE IS NULL )\t\t\t-- Relationship has no end date\n\t\tOR\n\t\t( [hx].RELATIONSHIP_START_DATE IS NULL AND [hx].RELATIONSHIP_END_DATE IS NULL )\t\t\t\t-- No dates entered for relationship\n\t\t)",
+      "line": 285,
+      "column": 7
+    }
+  },
+  {
+    "node_id": "file::Reporting_USP_CCMC_LOTE_Census_Interpreter_Services_Detail_PBI::scope/#caregiver_languages::structure/WHERE/1::structure/AND/1::structure/OR/1",
+    "structure_kind": "OR",
+    "position": 1,
+    "owning_scope": "file::Reporting_USP_CCMC_LOTE_Census_Interpreter_Services_Detail_PBI::scope/#caregiver_languages",
+    "evidence": {
+      "fragment": "( [hx].RELATIONSHIP_START_DATE <= @EndDate AND [hx].RELATIONSHIP_END_DATE >= @StartDate )\t-- Relationship ended after report start but was active during report period\n\t\tOR\t\t\n\t\t( [hx].RELATIONSHIP_START_DATE <= @EndDate AND [hx].RELATIONSHIP_END_DATE IS NULL )\t\t\t-- Relationship has no end date\n\t\tOR\n\t\t( [hx].RELATIONSHIP_START_DATE IS NULL AND [hx].RELATIONSHIP_END_DATE IS NULL )",
+      "line": 288,
+      "column": 3
+    }
+  },
+  {
+    "node_id": "file::Reporting_USP_CCMC_LOTE_Census_Interpreter_Services_Detail_PBI::scope/#caregiver_languages::structure/WHERE/1::structure/AND/1::structure/OR/1::structure/AND/1",
+    "structure_kind": "AND",
+    "position": 1,
+    "owning_scope": "file::Reporting_USP_CCMC_LOTE_Census_Interpreter_Services_Detail_PBI::scope/#caregiver_languages",
+    "evidence": {
+      "fragment": "[hx].RELATIONSHIP_START_DATE <= @EndDate AND [hx].RELATIONSHIP_END_DATE >= @StartDate",
+      "line": 288,
+      "column": 5
+    }
+  },
+  {
+    "node_id": "file::Reporting_USP_CCMC_LOTE_Census_Interpreter_Services_Detail_PBI::scope/#caregiver_languages::structure/WHERE/1::structure/AND/1::structure/OR/1::structure/AND/2",
+    "structure_kind": "AND",
+    "position": 2,
+    "owning_scope": "file::Reporting_USP_CCMC_LOTE_Census_Interpreter_Services_Detail_PBI::scope/#caregiver_languages",
+    "evidence": {
+      "fragment": "[hx].RELATIONSHIP_START_DATE <= @EndDate AND [hx].RELATIONSHIP_END_DATE IS NULL",
+      "line": 290,
+      "column": 5
+    }
+  },
+  {
+    "node_id": "file::Reporting_USP_CCMC_LOTE_Census_Interpreter_Services_Detail_PBI::scope/#caregiver_languages::structure/WHERE/1::structure/AND/1::structure/OR/1::structure/AND/3",
+    "structure_kind": "AND",
+    "position": 3,
+    "owning_scope": "file::Reporting_USP_CCMC_LOTE_Census_Interpreter_Services_Detail_PBI::scope/#caregiver_languages",
+    "evidence": {
+      "fragment": "[hx].RELATIONSHIP_START_DATE IS NULL AND [hx].RELATIONSHIP_END_DATE IS NULL",
+      "line": 292,
+      "column": 5
+    }
+  },
+  {
+    "node_id": "file::Reporting_USP_CCMC_LOTE_Census_Interpreter_Services_Detail_PBI::scope/#caregiver_languages::structure/GROUP BY/1",
+    "structure_kind": "GROUP BY",
+    "position": 8,
+    "owning_scope": "file::Reporting_USP_CCMC_LOTE_Census_Interpreter_Services_Detail_PBI::scope/#caregiver_languages",
+    "evidence": {
+      "fragment": "GROUP BY [#caregivers].PAT_ID",
+      "line": 295,
+      "column": 1
+    }
+  },
+  {
+    "node_id": "file::Reporting_USP_CCMC_LOTE_Census_Interpreter_Services_Detail_PBI::scope/matching_coverages::structure/PROJECTION/1",
+    "structure_kind": "PROJECTION",
+    "position": 1,
+    "owning_scope": "file::Reporting_USP_CCMC_LOTE_Census_Interpreter_Services_Detail_PBI::scope/matching_coverages",
+    "evidence": {
+      "fragment": "[#combined_census].PAT_ID\n\t\t, [#combined_census].[Monthly Census Start Date]\n\t\t, [coverage].PAYOR_NAME\n\t\t, [coverage].BENEFIT_PLAN_ID\n\t\t, [coverage].BENEFIT_PLAN_NAME\n\t\t, [coverage].FIN_CLASS_NAME\n\n\t\t, ROW_NUMBER() OVER(\n\t\t\tPARTITION BY [#combined_census].PAT_ID, [#combined_census].[Monthly Census Start Date]\n\t\t\tORDER BY [FILING].FILING_ORDER ASC\n\t\t  ) AS CVG_FILING_ORDER",
+      "line": 305,
+      "column": 3
+    },
+    "distinct": false,
+    "member_total": 7,
+    "star_total": 0,
+    "star_qualifiers": []
+  },
+  {
+    "node_id": "file::Reporting_USP_CCMC_LOTE_Census_Interpreter_Services_Detail_PBI::scope/matching_coverages::structure/FROM/1",
+    "structure_kind": "FROM",
+    "position": 2,
+    "owning_scope": "file::Reporting_USP_CCMC_LOTE_Census_Interpreter_Services_Detail_PBI::scope/matching_coverages",
+    "evidence": {
+      "fragment": "FROM Clarity.dbo.COVERAGE_MEMBER_LIST\t[member]\t\t-- Since one coverage record can have multiple members, each row in the table corresponds to one member and is noted by the coverage ID and the line number\n\n\t\t\tINNER JOIN #combined_census\t\t\t\t\t\t\t\t\tON [member].PAT_ID = [#combined_census].PAT_ID\n\t\t\tINNER JOIN Clarity.dbo.V_COVERAGE_PAYOR_PLAN\t[coverage]\tON [member].COVERAGE_ID = [coverage].COVERAGE_ID\n\t\t\tINNER JOIN Clarity.dbo.CLARITY_EPM\t\t\t\t[payor]\t\tON [coverage].PAYOR_ID = [payor].PAYOR_ID\n\t\t\tINNER JOIN Clarity.dbo.PAT_CVG_FILE_ORDER\t\t[filing]\tON [member].COVERAGE_ID = [filing].COVERAGE_ID",
+      "line": 318,
+      "column": 3
+    }
+  },
+  {
+    "node_id": "file::Reporting_USP_CCMC_LOTE_Census_Interpreter_Services_Detail_PBI::scope/matching_coverages::structure/JOIN/1",
+    "structure_kind": "JOIN",
+    "position": 3,
+    "owning_scope": "file::Reporting_USP_CCMC_LOTE_Census_Interpreter_Services_Detail_PBI::scope/matching_coverages",
+    "evidence": {
+      "fragment": "[member].PAT_ID = [#combined_census].PAT_ID",
+      "line": 320,
+      "column": 43
+    },
+    "join_type": "Inner"
+  },
+  {
+    "node_id": "file::Reporting_USP_CCMC_LOTE_Census_Interpreter_Services_Detail_PBI::scope/matching_coverages::structure/JOIN/2",
+    "structure_kind": "JOIN",
+    "position": 4,
+    "owning_scope": "file::Reporting_USP_CCMC_LOTE_Census_Interpreter_Services_Detail_PBI::scope/matching_coverages",
+    "evidence": {
+      "fragment": "[member].COVERAGE_ID = [coverage].COVERAGE_ID",
+      "line": 321,
+      "column": 63
+    },
+    "join_type": "Inner"
+  },
+  {
+    "node_id": "file::Reporting_USP_CCMC_LOTE_Census_Interpreter_Services_Detail_PBI::scope/matching_coverages::structure/JOIN/3",
+    "structure_kind": "JOIN",
+    "position": 5,
+    "owning_scope": "file::Reporting_USP_CCMC_LOTE_Census_Interpreter_Services_Detail_PBI::scope/matching_coverages",
+    "evidence": {
+      "fragment": "[coverage].PAYOR_ID = [payor].PAYOR_ID",
+      "line": 322,
+      "column": 54
+    },
+    "join_type": "Inner"
+  },
+  {
+    "node_id": "file::Reporting_USP_CCMC_LOTE_Census_Interpreter_Services_Detail_PBI::scope/matching_coverages::structure/JOIN/4",
+    "structure_kind": "JOIN",
+    "position": 6,
+    "owning_scope": "file::Reporting_USP_CCMC_LOTE_Census_Interpreter_Services_Detail_PBI::scope/matching_coverages",
+    "evidence": {
+      "fragment": "[member].COVERAGE_ID = [filing].COVERAGE_ID",
+      "line": 323,
+      "column": 59
+    },
+    "join_type": "Inner"
+  },
+  {
+    "node_id": "file::Reporting_USP_CCMC_LOTE_Census_Interpreter_Services_Detail_PBI::scope/matching_coverages::structure/WHERE/1",
+    "structure_kind": "WHERE",
+    "position": 7,
+    "owning_scope": "file::Reporting_USP_CCMC_LOTE_Census_Interpreter_Services_Detail_PBI::scope/matching_coverages",
+    "evidence": {
+      "fragment": "WHERE 1=1\n\t\t\tAND [payor].PAYOR_NAME NOT LIKE 'RX%'\n\t\t\tAND [member].MEM_COVERED_YN IN ( 'Y', '3', '4' )\t-- Y – Verified and in effect\n\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t-- 3 – Pending (not verified, but in effect)\n\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t-- 4 – In Question (was verified, but recent carrier information omitted this coverage)\n\n\t\t\t/* Date on which the coverage (subscription) goes into effect for the member */\n\t\t\tAND [member].MEM_EFF_FROM_DATE <= [#combined_census].[Monthly Census Start Date]\t\n\t\t\tAND ( [member].MEM_EFF_TO_DATE > [#combined_census].[Monthly Census Start Date] OR [member].MEM_EFF_TO_DATE IS NULL )\n\n\t\t\t/* Date on which payor was determined (Managed Care contexts may change based on employer group associated with Coverage */\n\t\t\tAND [coverage].EFF_DATE <= [#combined_census].[Monthly Census Start Date]\n\t\t\tAND [coverage].TERM_DATE > [#combined_census].[Monthly Census Start Date]",
+      "line": 325,
+      "column": 3
+    }
+  },
+  {
+    "node_id": "file::Reporting_USP_CCMC_LOTE_Census_Interpreter_Services_Detail_PBI::scope/matching_coverages::structure/WHERE/1::structure/AND/1",
+    "structure_kind": "AND",
+    "position": 1,
+    "owning_scope": "file::Reporting_USP_CCMC_LOTE_Census_Interpreter_Services_Detail_PBI::scope/matching_coverages",
+    "evidence": {
+      "fragment": "1=1\n\t\t\tAND [payor].PAYOR_NAME NOT LIKE 'RX%'\n\t\t\tAND [member].MEM_COVERED_YN IN ( 'Y', '3', '4' )\t-- Y – Verified and in effect\n\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t-- 3 – Pending (not verified, but in effect)\n\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t-- 4 – In Question (was verified, but recent carrier information omitted this coverage)\n\n\t\t\t/* Date on which the coverage (subscription) goes into effect for the member */\n\t\t\tAND [member].MEM_EFF_FROM_DATE <= [#combined_census].[Monthly Census Start Date]\t\n\t\t\tAND ( [member].MEM_EFF_TO_DATE > [#combined_census].[Monthly Census Start Date] OR [member].MEM_EFF_TO_DATE IS NULL )\n\n\t\t\t/* Date on which payor was determined (Managed Care contexts may change based on employer group associated with Coverage */\n\t\t\tAND [coverage].EFF_DATE <= [#combined_census].[Monthly Census Start Date]\n\t\t\tAND [coverage].TERM_DATE > [#combined_census].[Monthly Census Start Date]",
+      "line": 325,
+      "column": 9
+    }
+  },
+  {
+    "node_id": "file::Reporting_USP_CCMC_LOTE_Census_Interpreter_Services_Detail_PBI::scope/matching_coverages::structure/WHERE/1::structure/AND/1::structure/OR/1",
+    "structure_kind": "OR",
+    "position": 1,
+    "owning_scope": "file::Reporting_USP_CCMC_LOTE_Census_Interpreter_Services_Detail_PBI::scope/matching_coverages",
+    "evidence": {
+      "fragment": "[member].MEM_EFF_TO_DATE > [#combined_census].[Monthly Census Start Date] OR [member].MEM_EFF_TO_DATE IS NULL",
+      "line": 333,
+      "column": 10
+    }
+  },
+  {
+    "node_id": "file::Reporting_USP_CCMC_LOTE_Census_Interpreter_Services_Detail_PBI::scope/#coverage::structure/PROJECTION/1",
+    "structure_kind": "PROJECTION",
+    "position": 1,
+    "owning_scope": "file::Reporting_USP_CCMC_LOTE_Census_Interpreter_Services_Detail_PBI::scope/#coverage",
+    "evidence": {
+      "fragment": "*",
+      "line": 340,
+      "column": 8
+    },
+    "distinct": false,
+    "member_total": 1,
+    "star_total": 1,
+    "star_qualifiers": [
+      null
+    ]
+  },
+  {
+    "node_id": "file::Reporting_USP_CCMC_LOTE_Census_Interpreter_Services_Detail_PBI::scope/#coverage::structure/FROM/1",
+    "structure_kind": "FROM",
+    "position": 2,
+    "owning_scope": "file::Reporting_USP_CCMC_LOTE_Census_Interpreter_Services_Detail_PBI::scope/#coverage",
+    "evidence": {
+      "fragment": "FROM matching_coverages",
+      "line": 342,
+      "column": 1
+    }
+  },
+  {
+    "node_id": "file::Reporting_USP_CCMC_LOTE_Census_Interpreter_Services_Detail_PBI::scope/#coverage::structure/WHERE/1",
+    "structure_kind": "WHERE",
+    "position": 3,
+    "owning_scope": "file::Reporting_USP_CCMC_LOTE_Census_Interpreter_Services_Detail_PBI::scope/#coverage",
+    "evidence": {
+      "fragment": "WHERE CVG_FILING_ORDER = 1",
+      "line": 343,
+      "column": 1
+    }
+  },
+  {
+    "node_id": "file::Reporting_USP_CCMC_LOTE_Census_Interpreter_Services_Detail_PBI::scope/delivery::structure/PROJECTION/1",
+    "structure_kind": "PROJECTION",
+    "position": 1,
+    "owning_scope": "file::Reporting_USP_CCMC_LOTE_Census_Interpreter_Services_Detail_PBI::scope/delivery",
+    "evidence": {
+      "fragment": "[#combined_census].[Year]\n\t, [#combined_census].[Quarter]\n\t, [#combined_census].[Month Name]\n\t, [#combined_census].[Month Number]\n\t, [#combined_census].[Monthly Census Start Date]\n\t, [#combined_census].[Monthly Census End Date]\n\t, [#combined_census].[Location]\n\t, [#combined_census].[Department]\n\t, [#combined_census].[Department Label]\n\t, [#combined_census].[Dept Type]\n\t, [#combined_census].[Room]\n\t, [#combined_census].[Bed]\n\t, [#combined_census].[Census Period]\n\t, [#combined_census].[Census Days]\n\t\n\t, [#caregiver_languages].[Caregiver Languages]\n\n\t, CASE\n\t\tWHEN [#caregiver_languages].[Caregiver Languages] LIKE '%SPANISH%'\n\t\tTHEN 'At least one Spanish-speaking caregiver'\n\n\t\tWHEN [#caregiver_languages].[Caregiver Languages] NOT LIKE '%ENGLISH%'\n\t\tTHEN 'Language other than English and Spanish'\n\t\t\n\t\tWHEN [#caregiver_languages].[Caregiver Languages] LIKE '%ENGLISH%'\n\t\tTHEN 'Only English speaking caregivers'\n\n\t\tELSE 'No language(s) listed'\n\n\t  END AS [Caregiver Language Category]\n\n\t, ISNULL([#coverage].FIN_CLASS_NAME, 'Self-Pay')\t\t\tAS [Financial Class]\n\t, ISNULL([#coverage].PAYOR_NAME, 'SELF-PAY')\t\t\t\tAS [Payor]\n\t, ISNULL([#coverage].BENEFIT_PLAN_NAME, 'SELF-PAY')\t\t\tAS [Benefit Plan]\n\t, IIF([#coverage].BENEFIT_PLAN_ID = '312302', 'Yes', 'No')\tAS [Foster Coverage?]\n\t, CASE\n\t\tWHEN [#coverage].FIN_CLASS_NAME IS NULL \n\t\t\tOR [#coverage].FIN_CLASS_NAME = 'Self-pay' THEN 'Self-pay'\n\t\tELSE 'Has Coverage'\n\t  END AS [Insurance Coverage?]\n\n\t, [pat].PAT_MRN_ID\t\t\t\t\t\tAS [MRN]\n\t, [pat].PAT_NAME\t\t\t\t\t\tAS [Patient Name]\n\t, ISNULL([sex_zc].[NAME], 'Unknown')\tAS [Legal Sex]\n\t, [myc_zc].[NAME]\t\t\t\t\t\tAS [MyChart Status]\n\t, [lang_zc].[NAME]\t\t\t\t\t\tAS [Patient Language]\n\n\t, CASE WHEN [pat4].GENDER_IDENTITY_C = 6 OR [pat4].GENDER_IDENTITY_C IS NULL THEN 'Unknown'\n\t\t   ELSE [gender_zc].[NAME]\n\t  END AS [Gender Identity]\n\t  \n\t, CASE WHEN [pat].ETHNIC_GROUP_C IN (3, 4) OR [pat].ETHNIC_GROUP_C IS NULL THEN 'Unknown'\n\t\t   WHEN [pat].ETHNIC_GROUP_C IN (2, 8) THEN 'Hispanic or Latino'\n\t\t   ELSE [ethnicity].[NAME]\n\t  END AS [Ethnicity]\n\n\t, CASE WHEN [race_list].PATIENT_RACE_C IN (7, 8)\n\t\t\tOR [race_list].PATIENT_RACE_C IS NULL\n\t\t   THEN 'Unknown'\n\t\t   ELSE [race].[NAME]\n\t  END AS [Race]\n\n\t, CASE WHEN [pat4].SEX_ASGN_AT_BIRTH_C IN (3, 4, 5, 6)\n\t\t\tOR [pat4].SEX_ASGN_AT_BIRTH_C IS NULL\n\t\t   THEN 'Unknown'\n\t\t   ELSE [sex_birth_zc].[NAME]\n\t  END AS [Birth Sex]\n\n\t, IIF([pat].INTRPTR_NEEDED_YN = 'Y', 'Yes', 'No') AS [Interpreter Needed?]\n\n\t, ISNULL([country_tmp_zc].[NAME], [country_zc].[NAME])\t\tAS [Country]\n\t, ISNULL([state_tmp_zc].[NAME], [state_zc].[NAME])\t\t\tAS [State]\n\t, ISNULL([county_tmp_zc].[NAME], [county_zc].[NAME])\t\tAS [County]\n\t, ISNULL([pat].TMP_CITY, [pat].CITY)\t\t\t\t\t\tAS [City]\n\t, ISNULL([pat].TMP_ZIP , [pat].ZIP)\t\t\t\t\t\t\tAS [ZIP Code]\n\n\t, DATEDIFF(DAY, [pat].BIRTH_DATE, [#combined_census].[Monthly Census Start Date])/365 AS [Age Yrs]\n\n\t, CASE\n\t\tWHEN DATEDIFF(DAY, [pat].BIRTH_DATE, [#combined_census].[Monthly Census Start Date]) < 365*1\t\tTHEN '< 1 year'\n\t\tWHEN DATEDIFF(DAY, [pat].BIRTH_DATE, [#combined_census].[Monthly Census Start Date]) < 365*6\t\tTHEN '1 - 5 years'\n\t\tWHEN DATEDIFF(DAY, [pat].BIRTH_DATE, [#combined_census].[Monthly Census Start Date]) < 365*12\t\tTHEN '6 - 11 years'\n\t\tWHEN DATEDIFF(DAY, [pat].BIRTH_DATE, [#combined_census].[Monthly Census Start Date]) < 365*18\t\tTHEN '12 - 17 years'\n\t\tWHEN DATEDIFF(DAY, [pat].BIRTH_DATE, [#combined_census].[Monthly Census Start Date]) >= 365*18\t\tTHEN '>= 18 years'\n\t  END AS [Age Group]\n\n\t, CASE\n\t\tWHEN [pat].ETHNIC_GROUP_C IN (3, 4) THEN 'Unknown'\n\t\tWHEN [pat].ETHNIC_GROUP_C <> 1 OR [race_list].PATIENT_RACE_C = 1001 THEN 'Hispanic'\n\n\t\tWHEN [race_list].PATIENT_RACE_C = 1\t\t\t\tTHEN 'NH White'\n\t\tWHEN [race_list].PATIENT_RACE_C = 2\t\t\t\tTHEN 'NH Black'\n\t\tWHEN [race_list].PATIENT_RACE_C IN (4, 1000)\tTHEN 'NH Asian'\n\t\tWHEN [race_list].PATIENT_RACE_C IN (7,8)\t\tTHEN 'NH Unknown'\n\t\tELSE 'NH Other'\n\t  END AS [Race/Ethnicity]",
+      "line": 351,
+      "column": 2
+    },
+    "distinct": false,
+    "member_total": 39,
+    "star_total": 0,
+    "star_qualifiers": []
+  },
+  {
+    "node_id": "file::Reporting_USP_CCMC_LOTE_Census_Interpreter_Services_Detail_PBI::scope/delivery::structure/PROJECTION/1::expr/21::structure/OR/1",
+    "structure_kind": "OR",
+    "position": 1,
+    "owning_scope": "file::Reporting_USP_CCMC_LOTE_Census_Interpreter_Services_Detail_PBI::scope/delivery",
+    "evidence": {
+      "fragment": "[#coverage].FIN_CLASS_NAME IS NULL \n\t\t\tOR [#coverage].FIN_CLASS_NAME = 'Self-pay'",
+      "line": 387,
+      "column": 8
+    }
+  },
+  {
+    "node_id": "file::Reporting_USP_CCMC_LOTE_Census_Interpreter_Services_Detail_PBI::scope/delivery::structure/PROJECTION/1::expr/27::structure/OR/1",
+    "structure_kind": "OR",
+    "position": 1,
+    "owning_scope": "file::Reporting_USP_CCMC_LOTE_Census_Interpreter_Services_Detail_PBI::scope/delivery",
+    "evidence": {
+      "fragment": "[pat4].GENDER_IDENTITY_C = 6 OR [pat4].GENDER_IDENTITY_C IS NULL",
+      "line": 398,
+      "column": 14
+    }
+  },
+  {
+    "node_id": "file::Reporting_USP_CCMC_LOTE_Census_Interpreter_Services_Detail_PBI::scope/delivery::structure/PROJECTION/1::expr/28::structure/OR/1",
+    "structure_kind": "OR",
+    "position": 1,
+    "owning_scope": "file::Reporting_USP_CCMC_LOTE_Census_Interpreter_Services_Detail_PBI::scope/delivery",
+    "evidence": {
+      "fragment": "[pat].ETHNIC_GROUP_C IN (3, 4) OR [pat].ETHNIC_GROUP_C IS NULL",
+      "line": 402,
+      "column": 14
+    }
+  },
+  {
+    "node_id": "file::Reporting_USP_CCMC_LOTE_Census_Interpreter_Services_Detail_PBI::scope/delivery::structure/PROJECTION/1::expr/29::structure/OR/1",
+    "structure_kind": "OR",
+    "position": 1,
+    "owning_scope": "file::Reporting_USP_CCMC_LOTE_Census_Interpreter_Services_Detail_PBI::scope/delivery",
+    "evidence": {
+      "fragment": "[race_list].PATIENT_RACE_C IN (7, 8)\n\t\t\tOR [race_list].PATIENT_RACE_C IS NULL",
+      "line": 407,
+      "column": 14
+    }
+  },
+  {
+    "node_id": "file::Reporting_USP_CCMC_LOTE_Census_Interpreter_Services_Detail_PBI::scope/delivery::structure/PROJECTION/1::expr/30::structure/OR/1",
+    "structure_kind": "OR",
+    "position": 1,
+    "owning_scope": "file::Reporting_USP_CCMC_LOTE_Census_Interpreter_Services_Detail_PBI::scope/delivery",
+    "evidence": {
+      "fragment": "[pat4].SEX_ASGN_AT_BIRTH_C IN (3, 4, 5, 6)\n\t\t\tOR [pat4].SEX_ASGN_AT_BIRTH_C IS NULL",
+      "line": 413,
+      "column": 14
+    }
+  },
+  {
+    "node_id": "file::Reporting_USP_CCMC_LOTE_Census_Interpreter_Services_Detail_PBI::scope/delivery::structure/PROJECTION/1::expr/39::structure/OR/1",
+    "structure_kind": "OR",
+    "position": 1,
+    "owning_scope": "file::Reporting_USP_CCMC_LOTE_Census_Interpreter_Services_Detail_PBI::scope/delivery",
+    "evidence": {
+      "fragment": "[pat].ETHNIC_GROUP_C <> 1 OR [race_list].PATIENT_RACE_C = 1001",
+      "line": 439,
+      "column": 8
+    }
+  },
+  {
+    "node_id": "file::Reporting_USP_CCMC_LOTE_Census_Interpreter_Services_Detail_PBI::scope/delivery::structure/FROM/1",
+    "structure_kind": "FROM",
+    "position": 2,
+    "owning_scope": "file::Reporting_USP_CCMC_LOTE_Census_Interpreter_Services_Detail_PBI::scope/delivery",
+    "evidence": {
+      "fragment": "FROM #combined_census\n\n\tLEFT JOIN #caregiver_languages\t\t\t\t\t\t\t\t\t\tON [#combined_census].PAT_ID = [#caregiver_languages].PAT_ID\n\tLEFT JOIN #coverage\t\t\t\t\t\t\t\t\t\t\t\t\tON [#combined_census].PAT_ID = [#coverage].PAT_ID\n\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\tAND [#combined_census].[Monthly Census Start Date] = [#coverage].[Monthly Census Start Date]\n\t/* Demographics */\n\tLEFT JOIN [Clarity].[dbo].PATIENT\t\t\t\t[pat]\t\t\t\tON [#combined_census].PAT_ID = [pat].PAT_ID\n\tLEFT JOIN [Clarity].[dbo].PATIENT_4\t\t\t\t[pat4]\t\t\t\tON [#combined_census].PAT_ID = [pat4].PAT_ID\n\tLEFT JOIN [Clarity].[dbo].PATIENT_MYC\t\t\t[myc]\t\t\t\tON [#combined_census].PAT_ID = [myc].PAT_ID\n\tLEFT JOIN [Clarity].[dbo].PATIENT_RACE\t\t\t[race_list]\t\t\tON [pat].PAT_ID = [race_list].PAT_ID\n\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\tAND [race_list].LINE = 1\t-- first race listed\n\n\t/* Categories and Look-ups */\n\tLEFT JOIN [Clarity].[dbo].ZC_LANGUAGE\t\t\t[lang_zc]\t\t\tON [pat].LANGUAGE_C = [lang_zc].LANGUAGE_C\n\tLEFT JOIN [Clarity].[dbo].ZC_MYCHART_STATUS\t\t[myc_zc]\t\t\tON [myc].MYCHART_STATUS_C = [myc_zc].MYCHART_STATUS_C\n\tLEFT JOIN [Clarity].[dbo].ZC_SEX\t\t\t\t[sex_zc]\t\t\tON [pat].SEX_C = [sex_zc].RCPT_MEM_SEX_C\n\tLEFT JOIN [Clarity].[dbo].ZC_SEX_ASGN_AT_BIRTH\t[sex_birth_zc]\t\tON [pat4].SEX_ASGN_AT_BIRTH_C = [sex_birth_zc].SEX_ASGN_AT_BIRTH_C\n\n\tLEFT JOIN [Clarity].[dbo].ZC_COUNTRY\t\t\t[country_zc]\t\tON [pat].COUNTRY_C = [country_zc].COUNTRY_C\n\tLEFT JOIN [Clarity].[dbo].ZC_COUNTRY\t\t\t[country_tmp_zc]\tON [pat].TMP_COUNTRY_C = [country_tmp_zc].COUNTRY_C\n\tLEFT JOIN [Clarity].[dbo].ZC_STATE\t\t\t\t[state_zc]\t\t\tON [pat].STATE_C = [state_zc].STATE_C\n\tLEFT JOIN [Clarity].[dbo].ZC_STATE\t\t\t\t[state_tmp_zc]\t\tON [pat].TMP_STATE_C = [state_tmp_zc].STATE_C\n\tLEFT JOIN [Clarity].[dbo].ZC_GENDER_IDENTITY\t[gender_zc]\t\t\tON [pat4].GENDER_IDENTITY_C = [gender_zc].GENDER_IDENTITY_C\n\tLEFT JOIN [Clarity].[dbo].ZC_PATIENT_RACE\t\t[race]\t\t\t\tON [race_list].PATIENT_RACE_C = [race].PATIENT_RACE_C\n\tLEFT JOIN [Clarity].[dbo].ZC_ETHNIC_GROUP\t\t[ethnicity]\t\t\tON [pat].ETHNIC_GROUP_C = [ethnicity].ETHNIC_GROUP_C\n\tLEFT JOIN [Clarity].[dbo].ZC_COUNTY\t\t\t\t[county_zc]\t\t\tON [pat].COUNTY_C = [county_zc].COUNTY_C\n\tLEFT JOIN [Clarity].[dbo].ZC_COUNTY\t\t\t\t[county_tmp_zc]\t\tON [pat].TMP_COUNTY_C = [county_tmp_zc].COUNTY_C",
+      "line": 449,
+      "column": 1
+    }
+  },
+  {
+    "node_id": "file::Reporting_USP_CCMC_LOTE_Census_Interpreter_Services_Detail_PBI::scope/delivery::structure/JOIN/1",
+    "structure_kind": "JOIN",
+    "position": 3,
+    "owning_scope": "file::Reporting_USP_CCMC_LOTE_Census_Interpreter_Services_Detail_PBI::scope/delivery",
+    "evidence": {
+      "fragment": "[#combined_census].PAT_ID = [#caregiver_languages].PAT_ID",
+      "line": 451,
+      "column": 45
+    },
+    "join_type": "LeftOuter"
+  },
+  {
+    "node_id": "file::Reporting_USP_CCMC_LOTE_Census_Interpreter_Services_Detail_PBI::scope/delivery::structure/JOIN/2",
+    "structure_kind": "JOIN",
+    "position": 4,
+    "owning_scope": "file::Reporting_USP_CCMC_LOTE_Census_Interpreter_Services_Detail_PBI::scope/delivery",
+    "evidence": {
+      "fragment": "[#combined_census].PAT_ID = [#coverage].PAT_ID\n\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\tAND [#combined_census].[Monthly Census Start Date] = [#coverage].[Monthly Census Start Date]",
+      "line": 452,
+      "column": 37
+    },
+    "join_type": "LeftOuter"
+  },
+  {
+    "node_id": "file::Reporting_USP_CCMC_LOTE_Census_Interpreter_Services_Detail_PBI::scope/delivery::structure/JOIN/2::structure/AND/1",
+    "structure_kind": "AND",
+    "position": 1,
+    "owning_scope": "file::Reporting_USP_CCMC_LOTE_Census_Interpreter_Services_Detail_PBI::scope/delivery",
+    "evidence": {
+      "fragment": "[#combined_census].PAT_ID = [#coverage].PAT_ID\n\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\tAND [#combined_census].[Monthly Census Start Date] = [#coverage].[Monthly Census Start Date]",
+      "line": 452,
+      "column": 37
+    }
+  },
+  {
+    "node_id": "file::Reporting_USP_CCMC_LOTE_Census_Interpreter_Services_Detail_PBI::scope/delivery::structure/JOIN/3",
+    "structure_kind": "JOIN",
+    "position": 5,
+    "owning_scope": "file::Reporting_USP_CCMC_LOTE_Census_Interpreter_Services_Detail_PBI::scope/delivery",
+    "evidence": {
+      "fragment": "[#combined_census].PAT_ID = [pat].PAT_ID",
+      "line": 455,
+      "column": 51
+    },
+    "join_type": "LeftOuter"
+  },
+  {
+    "node_id": "file::Reporting_USP_CCMC_LOTE_Census_Interpreter_Services_Detail_PBI::scope/delivery::structure/JOIN/4",
+    "structure_kind": "JOIN",
+    "position": 6,
+    "owning_scope": "file::Reporting_USP_CCMC_LOTE_Census_Interpreter_Services_Detail_PBI::scope/delivery",
+    "evidence": {
+      "fragment": "[#combined_census].PAT_ID = [pat4].PAT_ID",
+      "line": 456,
+      "column": 54
+    },
+    "join_type": "LeftOuter"
+  },
+  {
+    "node_id": "file::Reporting_USP_CCMC_LOTE_Census_Interpreter_Services_Detail_PBI::scope/delivery::structure/JOIN/5",
+    "structure_kind": "JOIN",
+    "position": 7,
+    "owning_scope": "file::Reporting_USP_CCMC_LOTE_Census_Interpreter_Services_Detail_PBI::scope/delivery",
+    "evidence": {
+      "fragment": "[#combined_census].PAT_ID = [myc].PAT_ID",
+      "line": 457,
+      "column": 54
+    },
+    "join_type": "LeftOuter"
+  },
+  {
+    "node_id": "file::Reporting_USP_CCMC_LOTE_Census_Interpreter_Services_Detail_PBI::scope/delivery::structure/JOIN/6",
+    "structure_kind": "JOIN",
+    "position": 8,
+    "owning_scope": "file::Reporting_USP_CCMC_LOTE_Census_Interpreter_Services_Detail_PBI::scope/delivery",
+    "evidence": {
+      "fragment": "[pat].PAT_ID = [race_list].PAT_ID\n\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\tAND [race_list].LINE = 1",
+      "line": 458,
+      "column": 60
+    },
+    "join_type": "LeftOuter"
+  },
+  {
+    "node_id": "file::Reporting_USP_CCMC_LOTE_Census_Interpreter_Services_Detail_PBI::scope/delivery::structure/JOIN/6::structure/AND/1",
+    "structure_kind": "AND",
+    "position": 1,
+    "owning_scope": "file::Reporting_USP_CCMC_LOTE_Census_Interpreter_Services_Detail_PBI::scope/delivery",
+    "evidence": {
+      "fragment": "[pat].PAT_ID = [race_list].PAT_ID\n\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\tAND [race_list].LINE = 1",
+      "line": 458,
+      "column": 60
+    }
+  },
+  {
+    "node_id": "file::Reporting_USP_CCMC_LOTE_Census_Interpreter_Services_Detail_PBI::scope/delivery::structure/JOIN/7",
+    "structure_kind": "JOIN",
+    "position": 9,
+    "owning_scope": "file::Reporting_USP_CCMC_LOTE_Census_Interpreter_Services_Detail_PBI::scope/delivery",
+    "evidence": {
+      "fragment": "[pat].LANGUAGE_C = [lang_zc].LANGUAGE_C",
+      "line": 462,
+      "column": 57
+    },
+    "join_type": "LeftOuter"
+  },
+  {
+    "node_id": "file::Reporting_USP_CCMC_LOTE_Census_Interpreter_Services_Detail_PBI::scope/delivery::structure/JOIN/8",
+    "structure_kind": "JOIN",
+    "position": 10,
+    "owning_scope": "file::Reporting_USP_CCMC_LOTE_Census_Interpreter_Services_Detail_PBI::scope/delivery",
+    "evidence": {
+      "fragment": "[myc].MYCHART_STATUS_C = [myc_zc].MYCHART_STATUS_C",
+      "line": 463,
+      "column": 61
+    },
+    "join_type": "LeftOuter"
+  },
+  {
+    "node_id": "file::Reporting_USP_CCMC_LOTE_Census_Interpreter_Services_Detail_PBI::scope/delivery::structure/JOIN/9",
+    "structure_kind": "JOIN",
+    "position": 11,
+    "owning_scope": "file::Reporting_USP_CCMC_LOTE_Census_Interpreter_Services_Detail_PBI::scope/delivery",
+    "evidence": {
+      "fragment": "[pat].SEX_C = [sex_zc].RCPT_MEM_SEX_C",
+      "line": 464,
+      "column": 52
+    },
+    "join_type": "LeftOuter"
+  },
+  {
+    "node_id": "file::Reporting_USP_CCMC_LOTE_Census_Interpreter_Services_Detail_PBI::scope/delivery::structure/JOIN/10",
+    "structure_kind": "JOIN",
+    "position": 12,
+    "owning_scope": "file::Reporting_USP_CCMC_LOTE_Census_Interpreter_Services_Detail_PBI::scope/delivery",
+    "evidence": {
+      "fragment": "[pat4].SEX_ASGN_AT_BIRTH_C = [sex_birth_zc].SEX_ASGN_AT_BIRTH_C",
+      "line": 465,
+      "column": 68
+    },
+    "join_type": "LeftOuter"
+  },
+  {
+    "node_id": "file::Reporting_USP_CCMC_LOTE_Census_Interpreter_Services_Detail_PBI::scope/delivery::structure/JOIN/11",
+    "structure_kind": "JOIN",
+    "position": 13,
+    "owning_scope": "file::Reporting_USP_CCMC_LOTE_Census_Interpreter_Services_Detail_PBI::scope/delivery",
+    "evidence": {
+      "fragment": "[pat].COUNTRY_C = [country_zc].COUNTRY_C",
+      "line": 467,
+      "column": 58
+    },
+    "join_type": "LeftOuter"
+  },
+  {
+    "node_id": "file::Reporting_USP_CCMC_LOTE_Census_Interpreter_Services_Detail_PBI::scope/delivery::structure/JOIN/12",
+    "structure_kind": "JOIN",
+    "position": 14,
+    "owning_scope": "file::Reporting_USP_CCMC_LOTE_Census_Interpreter_Services_Detail_PBI::scope/delivery",
+    "evidence": {
+      "fragment": "[pat].TMP_COUNTRY_C = [country_tmp_zc].COUNTRY_C",
+      "line": 468,
+      "column": 61
+    },
+    "join_type": "LeftOuter"
+  },
+  {
+    "node_id": "file::Reporting_USP_CCMC_LOTE_Census_Interpreter_Services_Detail_PBI::scope/delivery::structure/JOIN/13",
+    "structure_kind": "JOIN",
+    "position": 15,
+    "owning_scope": "file::Reporting_USP_CCMC_LOTE_Census_Interpreter_Services_Detail_PBI::scope/delivery",
+    "evidence": {
+      "fragment": "[pat].STATE_C = [state_zc].STATE_C",
+      "line": 469,
+      "column": 56
+    },
+    "join_type": "LeftOuter"
+  },
+  {
+    "node_id": "file::Reporting_USP_CCMC_LOTE_Census_Interpreter_Services_Detail_PBI::scope/delivery::structure/JOIN/14",
+    "structure_kind": "JOIN",
+    "position": 16,
+    "owning_scope": "file::Reporting_USP_CCMC_LOTE_Census_Interpreter_Services_Detail_PBI::scope/delivery",
+    "evidence": {
+      "fragment": "[pat].TMP_STATE_C = [state_tmp_zc].STATE_C",
+      "line": 470,
+      "column": 59
+    },
+    "join_type": "LeftOuter"
+  },
+  {
+    "node_id": "file::Reporting_USP_CCMC_LOTE_Census_Interpreter_Services_Detail_PBI::scope/delivery::structure/JOIN/15",
+    "structure_kind": "JOIN",
+    "position": 17,
+    "owning_scope": "file::Reporting_USP_CCMC_LOTE_Census_Interpreter_Services_Detail_PBI::scope/delivery",
+    "evidence": {
+      "fragment": "[pat4].GENDER_IDENTITY_C = [gender_zc].GENDER_IDENTITY_C",
+      "line": 471,
+      "column": 64
+    },
+    "join_type": "LeftOuter"
+  },
+  {
+    "node_id": "file::Reporting_USP_CCMC_LOTE_Census_Interpreter_Services_Detail_PBI::scope/delivery::structure/JOIN/16",
+    "structure_kind": "JOIN",
+    "position": 18,
+    "owning_scope": "file::Reporting_USP_CCMC_LOTE_Census_Interpreter_Services_Detail_PBI::scope/delivery",
+    "evidence": {
+      "fragment": "[race_list].PATIENT_RACE_C = [race].PATIENT_RACE_C",
+      "line": 472,
+      "column": 58
+    },
+    "join_type": "LeftOuter"
+  },
+  {
+    "node_id": "file::Reporting_USP_CCMC_LOTE_Census_Interpreter_Services_Detail_PBI::scope/delivery::structure/JOIN/17",
+    "structure_kind": "JOIN",
+    "position": 19,
+    "owning_scope": "file::Reporting_USP_CCMC_LOTE_Census_Interpreter_Services_Detail_PBI::scope/delivery",
+    "evidence": {
+      "fragment": "[pat].ETHNIC_GROUP_C = [ethnicity].ETHNIC_GROUP_C",
+      "line": 473,
+      "column": 62
+    },
+    "join_type": "LeftOuter"
+  },
+  {
+    "node_id": "file::Reporting_USP_CCMC_LOTE_Census_Interpreter_Services_Detail_PBI::scope/delivery::structure/JOIN/18",
+    "structure_kind": "JOIN",
+    "position": 20,
+    "owning_scope": "file::Reporting_USP_CCMC_LOTE_Census_Interpreter_Services_Detail_PBI::scope/delivery",
+    "evidence": {
+      "fragment": "[pat].COUNTY_C = [county_zc].COUNTY_C",
+      "line": 474,
+      "column": 58
+    },
+    "join_type": "LeftOuter"
+  },
+  {
+    "node_id": "file::Reporting_USP_CCMC_LOTE_Census_Interpreter_Services_Detail_PBI::scope/delivery::structure/JOIN/19",
+    "structure_kind": "JOIN",
+    "position": 21,
+    "owning_scope": "file::Reporting_USP_CCMC_LOTE_Census_Interpreter_Services_Detail_PBI::scope/delivery",
+    "evidence": {
+      "fragment": "[pat].TMP_COUNTY_C = [county_tmp_zc].COUNTY_C",
+      "line": 475,
+      "column": 61
+    },
+    "join_type": "LeftOuter"
+  },
+  {
+    "node_id": "file::Reporting_USP_CCMC_LOTE_Census_Interpreter_Services_Detail_PBI::scope/delivery::structure/WHERE/1",
+    "structure_kind": "WHERE",
+    "position": 22,
+    "owning_scope": "file::Reporting_USP_CCMC_LOTE_Census_Interpreter_Services_Detail_PBI::scope/delivery",
+    "evidence": {
+      "fragment": "WHERE [#caregiver_languages].[Caregiver Languages] NOT LIKE '%ENGLISH%'\t\t-- exclude patients with an english-speaking caregiver\n\tOR ([#caregiver_languages].[Caregiver Languages] IS NULL\n\t\tAND ( \n\t\t\t[pat].LANGUAGE_C IS NULL \n\t\t\tOR \n\t\t\t[pat].LANGUAGE_C <> 22 -- exclude if no Caregiver languages but patient language is 'English'\n\t\t\t)\n\t\t)",
+      "line": 477,
+      "column": 1
+    }
+  },
+  {
+    "node_id": "file::Reporting_USP_CCMC_LOTE_Census_Interpreter_Services_Detail_PBI::scope/delivery::structure/WHERE/1::structure/OR/1",
+    "structure_kind": "OR",
+    "position": 1,
+    "owning_scope": "file::Reporting_USP_CCMC_LOTE_Census_Interpreter_Services_Detail_PBI::scope/delivery",
+    "evidence": {
+      "fragment": "[#caregiver_languages].[Caregiver Languages] NOT LIKE '%ENGLISH%'\t\t-- exclude patients with an english-speaking caregiver\n\tOR ([#caregiver_languages].[Caregiver Languages] IS NULL\n\t\tAND ( \n\t\t\t[pat].LANGUAGE_C IS NULL \n\t\t\tOR \n\t\t\t[pat].LANGUAGE_C <> 22 -- exclude if no Caregiver languages but patient language is 'English'\n\t\t\t)\n\t\t)",
+      "line": 477,
+      "column": 7
+    }
+  },
+  {
+    "node_id": "file::Reporting_USP_CCMC_LOTE_Census_Interpreter_Services_Detail_PBI::scope/delivery::structure/WHERE/1::structure/OR/1::structure/AND/1",
+    "structure_kind": "AND",
+    "position": 1,
+    "owning_scope": "file::Reporting_USP_CCMC_LOTE_Census_Interpreter_Services_Detail_PBI::scope/delivery",
+    "evidence": {
+      "fragment": "[#caregiver_languages].[Caregiver Languages] IS NULL\n\t\tAND ( \n\t\t\t[pat].LANGUAGE_C IS NULL \n\t\t\tOR \n\t\t\t[pat].LANGUAGE_C <> 22 -- exclude if no Caregiver languages but patient language is 'English'\n\t\t\t)",
+      "line": 478,
+      "column": 6
+    }
+  },
+  {
+    "node_id": "file::Reporting_USP_CCMC_LOTE_Census_Interpreter_Services_Detail_PBI::scope/delivery::structure/WHERE/1::structure/OR/1::structure/AND/1::structure/OR/1",
+    "structure_kind": "OR",
+    "position": 1,
+    "owning_scope": "file::Reporting_USP_CCMC_LOTE_Census_Interpreter_Services_Detail_PBI::scope/delivery",
+    "evidence": {
+      "fragment": "[pat].LANGUAGE_C IS NULL \n\t\t\tOR \n\t\t\t[pat].LANGUAGE_C <> 22",
+      "line": 480,
+      "column": 4
+    }
+  },
+  {
+    "node_id": "file::Reporting_USP_CCMC_LOTE_Census_Interpreter_Services_Summary_PBI::scope/#census_monthly::structure/PROJECTION/1",
+    "structure_kind": "PROJECTION",
+    "position": 1,
+    "owning_scope": "file::Reporting_USP_CCMC_LOTE_Census_Interpreter_Services_Summary_PBI::scope/#census_monthly",
+    "evidence": {
+      "fragment": "[census].PAT_ID\n\t, [dd].[YEAR]\t\t\t\tAS [Year]\n\t, [dd].QUARTER_STR\t\t\tAS [Quarter]\n\t, [dd].MONTH_NAME\t\t\tAS [Month Name]\n\t, [dd].MONTH_NUMBER\t\t\tAS [Month Number]\n\t, [loc].LOCATION_ABBR\t\tAS [Location]\n\t, [dep].DEPARTMENT_NAME\t\tAS [Department]\n\t, [dep].EXTERNAL_NAME\t\tAS [Dept External Name]\n\n\t, CONVERT(DATE, MIN([census].CALENDAR_DT)) AS [Monthly Census Start Date]\n\n\t, COUNT(*) AS [Census Days]\n\n\t, CASE\n\t\tWHEN [dep].DEPARTMENT_ID IN (\n\t\t\t100200053\t-- PCCMC 2 Main PICU\n\t\t\t, 100200055\t-- PCCMC 4 Main\n\t\t\t, 100200045\t-- PCCMC 5 Main\n\t\t\t, 100200007\t-- PCCMC Main OR\n\t\t\t)\n\t\tTHEN 'Prosper CCMC'\n\n\t\t--WHEN [census].DEPARTMENT_ID = xxxx\t\t-- To be decided\n\t\t--THEN 'Prosper MOB'\n\n\t\tWHEN [dep].DEPARTMENT_ID = 100200033\t-- PCCMC Emergency\n\t\tTHEN 'Prosper ED'\n\n\t\tWHEN [dep].DEPARTMENT_ID = 100108022\t-- CCMC Emergency\n\t\tTHEN 'FW ED'\n\n\t\tELSE 'FW CCMC'\n\n\t  END AS [Department Label]",
+      "line": 58,
+      "column": 2
+    },
+    "distinct": false,
+    "member_total": 11,
+    "star_total": 0,
+    "star_qualifiers": []
+  },
+  {
+    "node_id": "file::Reporting_USP_CCMC_LOTE_Census_Interpreter_Services_Summary_PBI::scope/#census_monthly::structure/FROM/1",
+    "structure_kind": "FROM",
+    "position": 2,
+    "owning_scope": "file::Reporting_USP_CCMC_LOTE_Census_Interpreter_Services_Summary_PBI::scope/#census_monthly",
+    "evidence": {
+      "fragment": "FROM [Clarity].[dbo].F_IP_HSP_PAT_DAYS\t[census]\n\t\n\tLEFT JOIN [Clarity].[dbo].CLARITY_DEP\t\t\t\t[dep]\tON [census].DEPARTMENT_ID = [dep].DEPARTMENT_ID\n\tLEFT JOIN [Clarity].[dbo].CLARITY_LOC\t\t\t\t[loc]\tON [dep].REV_LOC_ID = [loc].LOC_ID\n\tLEFT JOIN [Clarity].[dbo].DATE_DIMENSION\t\t\t[dd]\tON [census].CALENDAR_DT = [dd].CALENDAR_DT",
+      "line": 95,
+      "column": 1
+    }
+  },
+  {
+    "node_id": "file::Reporting_USP_CCMC_LOTE_Census_Interpreter_Services_Summary_PBI::scope/#census_monthly::structure/JOIN/1",
+    "structure_kind": "JOIN",
+    "position": 3,
+    "owning_scope": "file::Reporting_USP_CCMC_LOTE_Census_Interpreter_Services_Summary_PBI::scope/#census_monthly",
+    "evidence": {
+      "fragment": "[census].DEPARTMENT_ID = [dep].DEPARTMENT_ID",
+      "line": 97,
+      "column": 52
+    },
+    "join_type": "LeftOuter"
+  },
+  {
+    "node_id": "file::Reporting_USP_CCMC_LOTE_Census_Interpreter_Services_Summary_PBI::scope/#census_monthly::structure/JOIN/2",
+    "structure_kind": "JOIN",
+    "position": 4,
+    "owning_scope": "file::Reporting_USP_CCMC_LOTE_Census_Interpreter_Services_Summary_PBI::scope/#census_monthly",
+    "evidence": {
+      "fragment": "[dep].REV_LOC_ID = [loc].LOC_ID",
+      "line": 98,
+      "column": 52
+    },
+    "join_type": "LeftOuter"
+  },
+  {
+    "node_id": "file::Reporting_USP_CCMC_LOTE_Census_Interpreter_Services_Summary_PBI::scope/#census_monthly::structure/JOIN/3",
+    "structure_kind": "JOIN",
+    "position": 5,
+    "owning_scope": "file::Reporting_USP_CCMC_LOTE_Census_Interpreter_Services_Summary_PBI::scope/#census_monthly",
+    "evidence": {
+      "fragment": "[census].CALENDAR_DT = [dd].CALENDAR_DT",
+      "line": 99,
+      "column": 53
+    },
+    "join_type": "LeftOuter"
+  },
+  {
+    "node_id": "file::Reporting_USP_CCMC_LOTE_Census_Interpreter_Services_Summary_PBI::scope/#census_monthly::structure/WHERE/1",
+    "structure_kind": "WHERE",
+    "position": 6,
+    "owning_scope": "file::Reporting_USP_CCMC_LOTE_Census_Interpreter_Services_Summary_PBI::scope/#census_monthly",
+    "evidence": {
+      "fragment": "WHERE 1=1\n\tAND [census].CALENDAR_DT BETWEEN @StartDate AND @EndDate\n\tAND [dep].REV_LOC_ID IN (\n\t\tN'100108'\t\t-- COOK CHILDRENS MEDICAL CENTER\n\t\t, N'100200'\t\t-- COOK CHILDRENS MEDICAL CENTER PROSPER\n\t)",
+      "line": 101,
+      "column": 1
+    }
+  },
+  {
+    "node_id": "file::Reporting_USP_CCMC_LOTE_Census_Interpreter_Services_Summary_PBI::scope/#census_monthly::structure/WHERE/1::structure/AND/1",
+    "structure_kind": "AND",
+    "position": 1,
+    "owning_scope": "file::Reporting_USP_CCMC_LOTE_Census_Interpreter_Services_Summary_PBI::scope/#census_monthly",
+    "evidence": {
+      "fragment": "1=1\n\tAND [census].CALENDAR_DT BETWEEN @StartDate AND @EndDate\n\tAND [dep].REV_LOC_ID IN (\n\t\tN'100108'\t\t-- COOK CHILDRENS MEDICAL CENTER\n\t\t, N'100200'\t\t-- COOK CHILDRENS MEDICAL CENTER PROSPER\n\t)",
+      "line": 101,
+      "column": 7
+    }
+  },
+  {
+    "node_id": "file::Reporting_USP_CCMC_LOTE_Census_Interpreter_Services_Summary_PBI::scope/#census_monthly::structure/GROUP BY/1",
+    "structure_kind": "GROUP BY",
+    "position": 7,
+    "owning_scope": "file::Reporting_USP_CCMC_LOTE_Census_Interpreter_Services_Summary_PBI::scope/#census_monthly",
+    "evidence": {
+      "fragment": "GROUP BY\n\t[census].PAT_ID\n\t, [dd].[YEAR]\n\t, [dd].QUARTER_STR\n\t, [dd].MONTH_NUMBER\n\t, [dd].MONTH_NAME\n\t, [loc].LOCATION_ABBR\n\t, [dep].DEPARTMENT_ID\n\t, [dep].DEPARTMENT_NAME\n\t, [dep].EXTERNAL_NAME",
+      "line": 108,
+      "column": 1
+    }
+  },
+  {
+    "node_id": "file::Reporting_USP_CCMC_LOTE_Census_Interpreter_Services_Summary_PBI::scope/#clinic_monthly::structure/PROJECTION/1",
+    "structure_kind": "PROJECTION",
+    "position": 1,
+    "owning_scope": "file::Reporting_USP_CCMC_LOTE_Census_Interpreter_Services_Summary_PBI::scope/#clinic_monthly",
+    "evidence": {
+      "fragment": "[appt].PAT_ID\n\t, [dd].[YEAR]\t\t\t\tAS [Year]\n\t, [dd].QUARTER_STR\t\t\tAS [Quarter]\n\t, [dd].MONTH_NAME\t\t\tAS [Month Name]\n\t, [dd].MONTH_NUMBER\t\t\tAS [Month Number]\n\t, [loc].LOCATION_ABBR\t\tAS [Location]\n\t, [dep].DEPARTMENT_NAME\t\tAS [Department]\n\t, [dep].EXTERNAL_NAME\t\tAS [Dept External Name]\n\n\t, CONVERT(DATE, MIN([appt].CONTACT_DATE)) AS [Monthly Census Start Date]\n\n\t, COUNT(*) AS [Census Days]\n\n\t, 'FW Dodson/TJC Ambulatory' AS [Department Label]",
+      "line": 126,
+      "column": 2
+    },
+    "distinct": false,
+    "member_total": 11,
+    "star_total": 0,
+    "star_qualifiers": []
+  },
+  {
+    "node_id": "file::Reporting_USP_CCMC_LOTE_Census_Interpreter_Services_Summary_PBI::scope/#clinic_monthly::structure/FROM/1",
+    "structure_kind": "FROM",
+    "position": 2,
+    "owning_scope": "file::Reporting_USP_CCMC_LOTE_Census_Interpreter_Services_Summary_PBI::scope/#clinic_monthly",
+    "evidence": {
+      "fragment": "FROM [Clarity].[dbo].F_SCHED_APPT\tappt\n\t\n\tLEFT JOIN [Clarity].[dbo].CLARITY_DEP\t\t\tdep\t\tON [appt].DEPARTMENT_ID = [dep].DEPARTMENT_ID\n\tLEFT JOIN [Clarity].[dbo].CLARITY_LOC\t\t\tloc\t\tON [dep].REV_LOC_ID = [loc].LOC_ID\n\tLEFT JOIN [Clarity].[dbo].DATE_DIMENSION\t\tdd\t\tON [appt].CONTACT_DATE = [dd].CALENDAR_DT",
+      "line": 143,
+      "column": 1
+    }
+  },
+  {
+    "node_id": "file::Reporting_USP_CCMC_LOTE_Census_Interpreter_Services_Summary_PBI::scope/#clinic_monthly::structure/JOIN/1",
+    "structure_kind": "JOIN",
+    "position": 3,
+    "owning_scope": "file::Reporting_USP_CCMC_LOTE_Census_Interpreter_Services_Summary_PBI::scope/#clinic_monthly",
+    "evidence": {
+      "fragment": "[appt].DEPARTMENT_ID = [dep].DEPARTMENT_ID",
+      "line": 145,
+      "column": 50
+    },
+    "join_type": "LeftOuter"
+  },
+  {
+    "node_id": "file::Reporting_USP_CCMC_LOTE_Census_Interpreter_Services_Summary_PBI::scope/#clinic_monthly::structure/JOIN/2",
+    "structure_kind": "JOIN",
+    "position": 4,
+    "owning_scope": "file::Reporting_USP_CCMC_LOTE_Census_Interpreter_Services_Summary_PBI::scope/#clinic_monthly",
+    "evidence": {
+      "fragment": "[dep].REV_LOC_ID = [loc].LOC_ID",
+      "line": 146,
+      "column": 50
+    },
+    "join_type": "LeftOuter"
+  },
+  {
+    "node_id": "file::Reporting_USP_CCMC_LOTE_Census_Interpreter_Services_Summary_PBI::scope/#clinic_monthly::structure/JOIN/3",
+    "structure_kind": "JOIN",
+    "position": 5,
+    "owning_scope": "file::Reporting_USP_CCMC_LOTE_Census_Interpreter_Services_Summary_PBI::scope/#clinic_monthly",
+    "evidence": {
+      "fragment": "[appt].CONTACT_DATE = [dd].CALENDAR_DT",
+      "line": 147,
+      "column": 51
+    },
+    "join_type": "LeftOuter"
+  },
+  {
+    "node_id": "file::Reporting_USP_CCMC_LOTE_Census_Interpreter_Services_Summary_PBI::scope/#clinic_monthly::structure/WHERE/1",
+    "structure_kind": "WHERE",
+    "position": 6,
+    "owning_scope": "file::Reporting_USP_CCMC_LOTE_Census_Interpreter_Services_Summary_PBI::scope/#clinic_monthly",
+    "evidence": {
+      "fragment": "WHERE 1=1\n\tAND [appt].APPT_STATUS_C = 2\t\t\t-- Completed\n\tAND [appt].CONTACT_DATE BETWEEN @StartDate AND @EndDate\n\tAND [dep].DEPARTMENT_ID IN (\n\t\t10101207\t--CARDIOTHORACIC SURGERY\n\t\t,10101209\t--ENT\n\t\t,10101219\t--PALLIATIVE CARE\n\t\t,10120165\t--PEDIATRIC ENT\n\t\t,100050003\t--DMSS PSYCHOLOGY\n\t\t,100063010\t--HMSS PSYCHOLOGY\n\t\t,100063017\t--HMSS HURST SPORT PT\n\t\t,100063019\t--HMSS HURST PT\n\t\t,100063021\t--HMSS HURST AUDIO\n\t\t,100073003\t--SWMS PSYCHOLOGY\n\t\t,100074001\t--MOB PSYCHOLOGY\n\t\t,100106001\t--ARL CARDIOLOGY\n\t\t,100106002\t--ARL DIAGNOSTIC CARDIO\n\t\t,100108067\t--CCMC UC SOUTHLAKE DS\n\t\t,100117001\t--HOGC HEM ONC\n\t\t,100119101\t--RHBSO SOUTH PT\n\t\t,100119104\t--RHBSO SOUTH AUDIO\n\t\t,100119105\t--RHBSO SOUTH SPORT PT\n\t\t,100300005\t--PROSPER PEDI SURGERY\n\t\t,100381011\t--SMSS PSYCHOLOGY\n\t\t,100581001\t--DOD CRANIOFACIAL\n\t\t,100581002\t--DOD ENDOCRINOLOGY\n\t\t,100581003\t--DOD GASTROENTEROLOGY\n\t\t,100581004\t--DOD CARDIOLOGY\n\t\t,100581006\t--DOD HEM ONC\n\t\t,100581007\t--DOD INFECTIOUS DISEASE\n\t\t,100581008\t--DOD NEPHROLOGY\n\t\t,100581009\t--DOD NEUROLOGY\n\t\t,100581010\t--DOD NEUROSURGERY\n\t\t,100581012\t--DOD PAIN MANAGEMENT\n\t\t,100581013\t--DOD PEDIATRIC SURGERY\n\t\t,100581014\t--DOD PULMONOLOGY\n\t\t,100581015\t--DOD MR IMAGING\n\t\t,100581016\t--DOD US IMAGING\n\t\t,100581017\t--DOD X-RAY IMAGING\n\t\t,100581018\t--DOD RHEUMATOLOGY\n\t\t,100581020\t--DOD ORTHO X-RAY\n\t\t,100581022\t--DOD INFUSION\n\t\t,100581023\t--DOD NEST FOLLOW UP\n\t\t,100581032\t--DOD SLEEP MEDICINE\n\t\t,100581033\t--DOD PULMONARY LAB\n\t\t,100581035\t--DOD DIAGNOSTIC CARDIO\n\t\t,100581047\t--DOD IMMUNOLOGY\n\t\t,100581050\t--DOD PSYCHOLOGY\n\t\t,100581052\t--DOD DEVELOPMENTAL PEDS\n\t\t,100581053\t--DOD WOUND CLINIC\n\t\t,100581059\t--DOD DERMATOLOGY\n\t\t,100581060\t--DOD UROLOGY\n\t\t,100581063\t--DOD UROLOGY RADIOLOGY\n\t\t,100581075\t--DOD CARDIAC REHAB\n\t\t,100590009\t--MAN URGENT CARE\n\t\t,100590010\t--MMS MANS PT\n\t\t,100590015\t--MMS MANS AUDIO\n\t\t,100590021\t--MMS MANS SPORT PT\n\t\t,100618001\t--FTW URGENT CARE\n\t\t,100618020\t--FTW URGENT CARE X-RAY\n\t\t,100624020\t--MAN URGENT CARE X-RAY\n\t\t,100624021\t--MAN URGENT CARE\n\t\t,100632010\t--ALMS PSYCHOLOGY\n\t\t,100632022\t--ALMS AUDIO\n\t\t,100635001\t--SLK URGENT CARE\n\t\t,100641001\t--HUR URGENT CARE\n\t\t,100641002\t--HUR URGENT CARE X-RAY\n\t\t,100643001\t--HRC US IMAGING\n\t\t,100643002\t--HRC X-RAY IMAGING\n\t\t,100643003\t--HRC MR IMAGING\n\t\t,100651001\t--ALL URGENT CARE\n\t\t,100657003\t--VIRTUAL CARE\n\t\t,100663001\t--DENTON PSYCHOLOGY\n\t\t,100674003\t--WR SPORT PT\n\t\t,100675001\t--WR URGENT CARE\n\t\t,100675002\t--WR URGENT CARE X-RAY\n\t\t,100676006\t--CSC PSYCHOLOGY\n\t\t,100682001\t--PROSPER URGENT CARE\n\t\t,100683001\t--COOPER NEST FOLLOW UP\n\t\t,100683002\t--COOPER NEUROPSYCH\n\t\t,100685001\t--DENTON PSYCHOLOGY\n\t\t,100700005\t--PROSPER PEDI SURGERY\n\t)",
+      "line": 149,
+      "column": 1
+    }
+  },
+  {
+    "node_id": "file::Reporting_USP_CCMC_LOTE_Census_Interpreter_Services_Summary_PBI::scope/#clinic_monthly::structure/WHERE/1::structure/AND/1",
+    "structure_kind": "AND",
+    "position": 1,
+    "owning_scope": "file::Reporting_USP_CCMC_LOTE_Census_Interpreter_Services_Summary_PBI::scope/#clinic_monthly",
+    "evidence": {
+      "fragment": "1=1\n\tAND [appt].APPT_STATUS_C = 2\t\t\t-- Completed\n\tAND [appt].CONTACT_DATE BETWEEN @StartDate AND @EndDate\n\tAND [dep].DEPARTMENT_ID IN (\n\t\t10101207\t--CARDIOTHORACIC SURGERY\n\t\t,10101209\t--ENT\n\t\t,10101219\t--PALLIATIVE CARE\n\t\t,10120165\t--PEDIATRIC ENT\n\t\t,100050003\t--DMSS PSYCHOLOGY\n\t\t,100063010\t--HMSS PSYCHOLOGY\n\t\t,100063017\t--HMSS HURST SPORT PT\n\t\t,100063019\t--HMSS HURST PT\n\t\t,100063021\t--HMSS HURST AUDIO\n\t\t,100073003\t--SWMS PSYCHOLOGY\n\t\t,100074001\t--MOB PSYCHOLOGY\n\t\t,100106001\t--ARL CARDIOLOGY\n\t\t,100106002\t--ARL DIAGNOSTIC CARDIO\n\t\t,100108067\t--CCMC UC SOUTHLAKE DS\n\t\t,100117001\t--HOGC HEM ONC\n\t\t,100119101\t--RHBSO SOUTH PT\n\t\t,100119104\t--RHBSO SOUTH AUDIO\n\t\t,100119105\t--RHBSO SOUTH SPORT PT\n\t\t,100300005\t--PROSPER PEDI SURGERY\n\t\t,100381011\t--SMSS PSYCHOLOGY\n\t\t,100581001\t--DOD CRANIOFACIAL\n\t\t,100581002\t--DOD ENDOCRINOLOGY\n\t\t,100581003\t--DOD GASTROENTEROLOGY\n\t\t,100581004\t--DOD CARDIOLOGY\n\t\t,100581006\t--DOD HEM ONC\n\t\t,100581007\t--DOD INFECTIOUS DISEASE\n\t\t,100581008\t--DOD NEPHROLOGY\n\t\t,100581009\t--DOD NEUROLOGY\n\t\t,100581010\t--DOD NEUROSURGERY\n\t\t,100581012\t--DOD PAIN MANAGEMENT\n\t\t,100581013\t--DOD PEDIATRIC SURGERY\n\t\t,100581014\t--DOD PULMONOLOGY\n\t\t,100581015\t--DOD MR IMAGING\n\t\t,100581016\t--DOD US IMAGING\n\t\t,100581017\t--DOD X-RAY IMAGING\n\t\t,100581018\t--DOD RHEUMATOLOGY\n\t\t,100581020\t--DOD ORTHO X-RAY\n\t\t,100581022\t--DOD INFUSION\n\t\t,100581023\t--DOD NEST FOLLOW UP\n\t\t,100581032\t--DOD SLEEP MEDICINE\n\t\t,100581033\t--DOD PULMONARY LAB\n\t\t,100581035\t--DOD DIAGNOSTIC CARDIO\n\t\t,100581047\t--DOD IMMUNOLOGY\n\t\t,100581050\t--DOD PSYCHOLOGY\n\t\t,100581052\t--DOD DEVELOPMENTAL PEDS\n\t\t,100581053\t--DOD WOUND CLINIC\n\t\t,100581059\t--DOD DERMATOLOGY\n\t\t,100581060\t--DOD UROLOGY\n\t\t,100581063\t--DOD UROLOGY RADIOLOGY\n\t\t,100581075\t--DOD CARDIAC REHAB\n\t\t,100590009\t--MAN URGENT CARE\n\t\t,100590010\t--MMS MANS PT\n\t\t,100590015\t--MMS MANS AUDIO\n\t\t,100590021\t--MMS MANS SPORT PT\n\t\t,100618001\t--FTW URGENT CARE\n\t\t,100618020\t--FTW URGENT CARE X-RAY\n\t\t,100624020\t--MAN URGENT CARE X-RAY\n\t\t,100624021\t--MAN URGENT CARE\n\t\t,100632010\t--ALMS PSYCHOLOGY\n\t\t,100632022\t--ALMS AUDIO\n\t\t,100635001\t--SLK URGENT CARE\n\t\t,100641001\t--HUR URGENT CARE\n\t\t,100641002\t--HUR URGENT CARE X-RAY\n\t\t,100643001\t--HRC US IMAGING\n\t\t,100643002\t--HRC X-RAY IMAGING\n\t\t,100643003\t--HRC MR IMAGING\n\t\t,100651001\t--ALL URGENT CARE\n\t\t,100657003\t--VIRTUAL CARE\n\t\t,100663001\t--DENTON PSYCHOLOGY\n\t\t,100674003\t--WR SPORT PT\n\t\t,100675001\t--WR URGENT CARE\n\t\t,100675002\t--WR URGENT CARE X-RAY\n\t\t,100676006\t--CSC PSYCHOLOGY\n\t\t,100682001\t--PROSPER URGENT CARE\n\t\t,100683001\t--COOPER NEST FOLLOW UP\n\t\t,100683002\t--COOPER NEUROPSYCH\n\t\t,100685001\t--DENTON PSYCHOLOGY\n\t\t,100700005\t--PROSPER PEDI SURGERY\n\t)",
+      "line": 149,
+      "column": 7
+    }
+  },
+  {
+    "node_id": "file::Reporting_USP_CCMC_LOTE_Census_Interpreter_Services_Summary_PBI::scope/#clinic_monthly::structure/GROUP BY/1",
+    "structure_kind": "GROUP BY",
+    "position": 7,
+    "owning_scope": "file::Reporting_USP_CCMC_LOTE_Census_Interpreter_Services_Summary_PBI::scope/#clinic_monthly",
+    "evidence": {
+      "fragment": "GROUP BY\n\t[appt].PAT_ID\n\t, [dd].[YEAR]\n\t, [dd].QUARTER_STR\n\t, [dd].MONTH_NUMBER\n\t, [dd].MONTH_NAME\n\t, [loc].LOCATION_ABBR\n\t, [dep].DEPARTMENT_ID\n\t, [dep].DEPARTMENT_NAME\n\t, [dep].EXTERNAL_NAME",
+      "line": 233,
+      "column": 1
+    }
+  },
+  {
+    "node_id": "file::Reporting_USP_CCMC_LOTE_Census_Interpreter_Services_Summary_PBI::scope/#combined_census::structure/COMBINATION/1",
+    "structure_kind": "COMBINATION",
+    "position": 1,
+    "owning_scope": "file::Reporting_USP_CCMC_LOTE_Census_Interpreter_Services_Summary_PBI::scope/#combined_census",
+    "evidence": {
+      "fragment": "SELECT *, 'Inpatient' as [Dept Type]\nINTO #combined_census\nFROM #census_monthly\nUNION\nSELECT *, 'Outpatient' as [Dept Type]\nFROM #clinic_monthly",
+      "line": 246,
+      "column": 1
+    },
+    "combination_type": "Union",
+    "all": false
+  },
+  {
+    "node_id": "file::Reporting_USP_CCMC_LOTE_Census_Interpreter_Services_Summary_PBI::scope/#combined_census::arm1::structure/PROJECTION/1",
+    "structure_kind": "PROJECTION",
+    "position": 1,
+    "owning_scope": "file::Reporting_USP_CCMC_LOTE_Census_Interpreter_Services_Summary_PBI::scope/#combined_census::arm1",
+    "evidence": {
+      "fragment": "*, 'Inpatient' as [Dept Type]",
+      "line": 246,
+      "column": 8
+    },
+    "distinct": false,
+    "member_total": 2,
+    "star_total": 1,
+    "star_qualifiers": [
+      null
+    ]
+  },
+  {
+    "node_id": "file::Reporting_USP_CCMC_LOTE_Census_Interpreter_Services_Summary_PBI::scope/#combined_census::arm1::structure/FROM/1",
+    "structure_kind": "FROM",
+    "position": 2,
+    "owning_scope": "file::Reporting_USP_CCMC_LOTE_Census_Interpreter_Services_Summary_PBI::scope/#combined_census::arm1",
+    "evidence": {
+      "fragment": "FROM #census_monthly",
+      "line": 248,
+      "column": 1
+    }
+  },
+  {
+    "node_id": "file::Reporting_USP_CCMC_LOTE_Census_Interpreter_Services_Summary_PBI::scope/#combined_census::arm2::structure/PROJECTION/1",
+    "structure_kind": "PROJECTION",
+    "position": 1,
+    "owning_scope": "file::Reporting_USP_CCMC_LOTE_Census_Interpreter_Services_Summary_PBI::scope/#combined_census::arm2",
+    "evidence": {
+      "fragment": "*, 'Outpatient' as [Dept Type]",
+      "line": 250,
+      "column": 8
+    },
+    "distinct": false,
+    "member_total": 2,
+    "star_total": 1,
+    "star_qualifiers": [
+      null
+    ]
+  },
+  {
+    "node_id": "file::Reporting_USP_CCMC_LOTE_Census_Interpreter_Services_Summary_PBI::scope/#combined_census::arm2::structure/FROM/1",
+    "structure_kind": "FROM",
+    "position": 2,
+    "owning_scope": "file::Reporting_USP_CCMC_LOTE_Census_Interpreter_Services_Summary_PBI::scope/#combined_census::arm2",
+    "evidence": {
+      "fragment": "FROM #clinic_monthly",
+      "line": 251,
+      "column": 1
+    }
+  },
+  {
+    "node_id": "file::Reporting_USP_CCMC_LOTE_Census_Interpreter_Services_Summary_PBI::scope/#caregivers::structure/PROJECTION/1",
+    "structure_kind": "PROJECTION",
+    "position": 1,
+    "owning_scope": "file::Reporting_USP_CCMC_LOTE_Census_Interpreter_Services_Summary_PBI::scope/#caregivers",
+    "evidence": {
+      "fragment": "PAT_ID, PAT_RELATIONSHIP_ID",
+      "line": 259,
+      "column": 8
+    },
+    "distinct": false,
+    "member_total": 2,
+    "star_total": 0,
+    "star_qualifiers": []
+  },
+  {
+    "node_id": "file::Reporting_USP_CCMC_LOTE_Census_Interpreter_Services_Summary_PBI::scope/#caregivers::structure/FROM/1",
+    "structure_kind": "FROM",
+    "position": 2,
+    "owning_scope": "file::Reporting_USP_CCMC_LOTE_Census_Interpreter_Services_Summary_PBI::scope/#caregivers",
+    "evidence": {
+      "fragment": "FROM [Clarity].[dbo].PAT_RELATIONSHIP_LIST",
+      "line": 261,
+      "column": 1
+    }
+  },
+  {
+    "node_id": "file::Reporting_USP_CCMC_LOTE_Census_Interpreter_Services_Summary_PBI::scope/#caregivers::structure/WHERE/1",
+    "structure_kind": "WHERE",
+    "position": 3,
+    "owning_scope": "file::Reporting_USP_CCMC_LOTE_Census_Interpreter_Services_Summary_PBI::scope/#caregivers",
+    "evidence": {
+      "fragment": "WHERE EXISTS (SELECT 1 FROM #combined_census WHERE [PAT_RELATIONSHIP_LIST].PAT_ID = [#combined_census].PAT_ID)",
+      "line": 262,
+      "column": 1
+    }
+  },
+  {
+    "node_id": "file::Reporting_USP_CCMC_LOTE_Census_Interpreter_Services_Summary_PBI::stmt/19::scope/sub1::structure/PROJECTION/1",
+    "structure_kind": "PROJECTION",
+    "position": 1,
+    "owning_scope": "file::Reporting_USP_CCMC_LOTE_Census_Interpreter_Services_Summary_PBI::stmt/19::scope/sub1",
+    "evidence": {
+      "fragment": "1",
+      "line": 262,
+      "column": 22
+    },
+    "distinct": false,
+    "member_total": 1,
+    "star_total": 0,
+    "star_qualifiers": []
+  },
+  {
+    "node_id": "file::Reporting_USP_CCMC_LOTE_Census_Interpreter_Services_Summary_PBI::stmt/19::scope/sub1::structure/FROM/1",
+    "structure_kind": "FROM",
+    "position": 2,
+    "owning_scope": "file::Reporting_USP_CCMC_LOTE_Census_Interpreter_Services_Summary_PBI::stmt/19::scope/sub1",
+    "evidence": {
+      "fragment": "FROM #combined_census",
+      "line": 262,
+      "column": 24
+    }
+  },
+  {
+    "node_id": "file::Reporting_USP_CCMC_LOTE_Census_Interpreter_Services_Summary_PBI::stmt/19::scope/sub1::structure/WHERE/1",
+    "structure_kind": "WHERE",
+    "position": 3,
+    "owning_scope": "file::Reporting_USP_CCMC_LOTE_Census_Interpreter_Services_Summary_PBI::stmt/19::scope/sub1",
+    "evidence": {
+      "fragment": "WHERE [PAT_RELATIONSHIP_LIST].PAT_ID = [#combined_census].PAT_ID",
+      "line": 262,
+      "column": 46
+    }
+  },
+  {
+    "node_id": "file::Reporting_USP_CCMC_LOTE_Census_Interpreter_Services_Summary_PBI::scope/#caregiver_languages::structure/PROJECTION/1",
+    "structure_kind": "PROJECTION",
+    "position": 1,
+    "owning_scope": "file::Reporting_USP_CCMC_LOTE_Census_Interpreter_Services_Summary_PBI::scope/#caregiver_languages",
+    "evidence": {
+      "fragment": "[#caregivers].PAT_ID\n\t, STRING_AGG( CONCAT( IIF( [relation].NAME IS NULL, '?', [relation].NAME ), ';', [zc_lang].NAME ), CHAR(10)+CHAR(13)) \n\t\tWITHIN GROUP(ORDER BY [lang].PAT_RELATIONSHIP_ID) AS [Caregiver Languages]",
+      "line": 273,
+      "column": 2
+    },
+    "distinct": false,
+    "member_total": 2,
+    "star_total": 0,
+    "star_qualifiers": []
+  },
+  {
+    "node_id": "file::Reporting_USP_CCMC_LOTE_Census_Interpreter_Services_Summary_PBI::scope/#caregiver_languages::structure/FROM/1",
+    "structure_kind": "FROM",
+    "position": 2,
+    "owning_scope": "file::Reporting_USP_CCMC_LOTE_Census_Interpreter_Services_Summary_PBI::scope/#caregiver_languages",
+    "evidence": {
+      "fragment": "FROM [Clarity].[dbo].PAT_REL_LANGUAGES\t[lang]\t\t\n\n\tINNER JOIN #caregivers\t\t\t\t\t\t\t\t\t\t\t\t\tON [lang].PAT_RELATIONSHIP_ID = [#caregivers].PAT_RELATIONSHIP_ID\n\tLEFT JOIN [Clarity].[dbo].ZC_LANGUAGE\t\t\t\t\t[zc_lang]\t\tON [lang].LANGUAGE_C = [zc_lang].LANGUAGE_C\n\tLEFT JOIN [Clarity].[dbo].PAT_RELATIONSHIP_LIST_HX\t\t[hx]\t\t\tON [lang].PAT_RELATIONSHIP_ID = [hx].RELATIONSHIP_ID\n\tLEFT JOIN [Clarity].[dbo].ZC_EMERG_PAT_REL\t\t\t\t[relation]\t\tON [hx].RELATION_TO_PAT_C = [relation].EMERG_PAT_REL_C",
+      "line": 279,
+      "column": 1
+    }
+  },
+  {
+    "node_id": "file::Reporting_USP_CCMC_LOTE_Census_Interpreter_Services_Summary_PBI::scope/#caregiver_languages::structure/JOIN/1",
+    "structure_kind": "JOIN",
+    "position": 3,
+    "owning_scope": "file::Reporting_USP_CCMC_LOTE_Census_Interpreter_Services_Summary_PBI::scope/#caregiver_languages",
+    "evidence": {
+      "fragment": "[lang].PAT_RELATIONSHIP_ID = [#caregivers].PAT_RELATIONSHIP_ID",
+      "line": 281,
+      "column": 40
+    },
+    "join_type": "Inner"
+  },
+  {
+    "node_id": "file::Reporting_USP_CCMC_LOTE_Census_Interpreter_Services_Summary_PBI::scope/#caregiver_languages::structure/JOIN/2",
+    "structure_kind": "JOIN",
+    "position": 4,
+    "owning_scope": "file::Reporting_USP_CCMC_LOTE_Census_Interpreter_Services_Summary_PBI::scope/#caregiver_languages",
+    "evidence": {
+      "fragment": "[lang].LANGUAGE_C = [zc_lang].LANGUAGE_C",
+      "line": 282,
+      "column": 58
+    },
+    "join_type": "LeftOuter"
+  },
+  {
+    "node_id": "file::Reporting_USP_CCMC_LOTE_Census_Interpreter_Services_Summary_PBI::scope/#caregiver_languages::structure/JOIN/3",
+    "structure_kind": "JOIN",
+    "position": 5,
+    "owning_scope": "file::Reporting_USP_CCMC_LOTE_Census_Interpreter_Services_Summary_PBI::scope/#caregiver_languages",
+    "evidence": {
+      "fragment": "[lang].PAT_RELATIONSHIP_ID = [hx].RELATIONSHIP_ID",
+      "line": 283,
+      "column": 64
+    },
+    "join_type": "LeftOuter"
+  },
+  {
+    "node_id": "file::Reporting_USP_CCMC_LOTE_Census_Interpreter_Services_Summary_PBI::scope/#caregiver_languages::structure/JOIN/4",
+    "structure_kind": "JOIN",
+    "position": 6,
+    "owning_scope": "file::Reporting_USP_CCMC_LOTE_Census_Interpreter_Services_Summary_PBI::scope/#caregiver_languages",
+    "evidence": {
+      "fragment": "[hx].RELATION_TO_PAT_C = [relation].EMERG_PAT_REL_C",
+      "line": 284,
+      "column": 63
+    },
+    "join_type": "LeftOuter"
+  },
+  {
+    "node_id": "file::Reporting_USP_CCMC_LOTE_Census_Interpreter_Services_Summary_PBI::scope/#caregiver_languages::structure/WHERE/1",
+    "structure_kind": "WHERE",
+    "position": 7,
+    "owning_scope": "file::Reporting_USP_CCMC_LOTE_Census_Interpreter_Services_Summary_PBI::scope/#caregiver_languages",
+    "evidence": {
+      "fragment": "WHERE 1=1\n\tAND [lang].LANGUAGE_TYPE_C = 1\t-- SPOKEN LANGUAGE\n\tAND (\n\t\t( [hx].RELATIONSHIP_START_DATE <= @EndDate AND [hx].RELATIONSHIP_END_DATE >= @StartDate )\t-- Relationship ended after report start but was active during report period\n\t\tOR\t\t\n\t\t( [hx].RELATIONSHIP_START_DATE <= @EndDate AND [hx].RELATIONSHIP_END_DATE IS NULL )\t\t\t-- Relationship has no end date\n\t\tOR\n\t\t( [hx].RELATIONSHIP_START_DATE IS NULL AND [hx].RELATIONSHIP_END_DATE IS NULL )\t\t\t\t-- No dates entered for relationship\n\t\t)",
+      "line": 286,
+      "column": 1
+    }
+  },
+  {
+    "node_id": "file::Reporting_USP_CCMC_LOTE_Census_Interpreter_Services_Summary_PBI::scope/#caregiver_languages::structure/WHERE/1::structure/AND/1",
+    "structure_kind": "AND",
+    "position": 1,
+    "owning_scope": "file::Reporting_USP_CCMC_LOTE_Census_Interpreter_Services_Summary_PBI::scope/#caregiver_languages",
+    "evidence": {
+      "fragment": "1=1\n\tAND [lang].LANGUAGE_TYPE_C = 1\t-- SPOKEN LANGUAGE\n\tAND (\n\t\t( [hx].RELATIONSHIP_START_DATE <= @EndDate AND [hx].RELATIONSHIP_END_DATE >= @StartDate )\t-- Relationship ended after report start but was active during report period\n\t\tOR\t\t\n\t\t( [hx].RELATIONSHIP_START_DATE <= @EndDate AND [hx].RELATIONSHIP_END_DATE IS NULL )\t\t\t-- Relationship has no end date\n\t\tOR\n\t\t( [hx].RELATIONSHIP_START_DATE IS NULL AND [hx].RELATIONSHIP_END_DATE IS NULL )\t\t\t\t-- No dates entered for relationship\n\t\t)",
+      "line": 286,
+      "column": 7
+    }
+  },
+  {
+    "node_id": "file::Reporting_USP_CCMC_LOTE_Census_Interpreter_Services_Summary_PBI::scope/#caregiver_languages::structure/WHERE/1::structure/AND/1::structure/OR/1",
+    "structure_kind": "OR",
+    "position": 1,
+    "owning_scope": "file::Reporting_USP_CCMC_LOTE_Census_Interpreter_Services_Summary_PBI::scope/#caregiver_languages",
+    "evidence": {
+      "fragment": "( [hx].RELATIONSHIP_START_DATE <= @EndDate AND [hx].RELATIONSHIP_END_DATE >= @StartDate )\t-- Relationship ended after report start but was active during report period\n\t\tOR\t\t\n\t\t( [hx].RELATIONSHIP_START_DATE <= @EndDate AND [hx].RELATIONSHIP_END_DATE IS NULL )\t\t\t-- Relationship has no end date\n\t\tOR\n\t\t( [hx].RELATIONSHIP_START_DATE IS NULL AND [hx].RELATIONSHIP_END_DATE IS NULL )",
+      "line": 289,
+      "column": 3
+    }
+  },
+  {
+    "node_id": "file::Reporting_USP_CCMC_LOTE_Census_Interpreter_Services_Summary_PBI::scope/#caregiver_languages::structure/WHERE/1::structure/AND/1::structure/OR/1::structure/AND/1",
+    "structure_kind": "AND",
+    "position": 1,
+    "owning_scope": "file::Reporting_USP_CCMC_LOTE_Census_Interpreter_Services_Summary_PBI::scope/#caregiver_languages",
+    "evidence": {
+      "fragment": "[hx].RELATIONSHIP_START_DATE <= @EndDate AND [hx].RELATIONSHIP_END_DATE >= @StartDate",
+      "line": 289,
+      "column": 5
+    }
+  },
+  {
+    "node_id": "file::Reporting_USP_CCMC_LOTE_Census_Interpreter_Services_Summary_PBI::scope/#caregiver_languages::structure/WHERE/1::structure/AND/1::structure/OR/1::structure/AND/2",
+    "structure_kind": "AND",
+    "position": 2,
+    "owning_scope": "file::Reporting_USP_CCMC_LOTE_Census_Interpreter_Services_Summary_PBI::scope/#caregiver_languages",
+    "evidence": {
+      "fragment": "[hx].RELATIONSHIP_START_DATE <= @EndDate AND [hx].RELATIONSHIP_END_DATE IS NULL",
+      "line": 291,
+      "column": 5
+    }
+  },
+  {
+    "node_id": "file::Reporting_USP_CCMC_LOTE_Census_Interpreter_Services_Summary_PBI::scope/#caregiver_languages::structure/WHERE/1::structure/AND/1::structure/OR/1::structure/AND/3",
+    "structure_kind": "AND",
+    "position": 3,
+    "owning_scope": "file::Reporting_USP_CCMC_LOTE_Census_Interpreter_Services_Summary_PBI::scope/#caregiver_languages",
+    "evidence": {
+      "fragment": "[hx].RELATIONSHIP_START_DATE IS NULL AND [hx].RELATIONSHIP_END_DATE IS NULL",
+      "line": 293,
+      "column": 5
+    }
+  },
+  {
+    "node_id": "file::Reporting_USP_CCMC_LOTE_Census_Interpreter_Services_Summary_PBI::scope/#caregiver_languages::structure/GROUP BY/1",
+    "structure_kind": "GROUP BY",
+    "position": 8,
+    "owning_scope": "file::Reporting_USP_CCMC_LOTE_Census_Interpreter_Services_Summary_PBI::scope/#caregiver_languages",
+    "evidence": {
+      "fragment": "GROUP BY [#caregivers].PAT_ID",
+      "line": 296,
+      "column": 1
+    }
+  },
+  {
+    "node_id": "file::Reporting_USP_CCMC_LOTE_Census_Interpreter_Services_Summary_PBI::scope/#combined_census_with_language::structure/PROJECTION/1",
+    "structure_kind": "PROJECTION",
+    "position": 1,
+    "owning_scope": "file::Reporting_USP_CCMC_LOTE_Census_Interpreter_Services_Summary_PBI::scope/#combined_census_with_language",
+    "evidence": {
+      "fragment": "[#combined_census].PAT_ID\n\t, [#combined_census].[Year]\n\t, [#combined_census].[Quarter]\n\t, [#combined_census].[Month Name]\n\t, [#combined_census].[Month Number]\n\t, [#combined_census].[Location]\n\t, [#combined_census].[Department]\n\t, [#combined_census].[Dept External Name]\n\t, [#combined_census].[Department Label]\n\t, [#combined_census].[Dept Type]\n\t--, [#combined_census].[Room]\n\t, [#combined_census].[Census Days]\n\t\n\t, CASE\n\t\tWHEN [#caregiver_languages].[Caregiver Languages] LIKE N'%SPANISH%'\n\t\tTHEN 'At least one Spanish-speaking caregiver'\n\n\t\tWHEN [#caregiver_languages].[Caregiver Languages] NOT LIKE N'%ENGLISH%'\n\t\tTHEN 'Language other than English and Spanish'\n\t\t\n\t\tWHEN [#caregiver_languages].[Caregiver Languages] LIKE N'%ENGLISH%'\n\t\tTHEN 'Only English speaking caregivers'\n\n\t\tELSE 'No language(s) listed'\n\n\t  END AS [Caregiver Language Category]",
+      "line": 305,
+      "column": 2
+    },
+    "distinct": false,
+    "member_total": 12,
+    "star_total": 0,
+    "star_qualifiers": []
+  },
+  {
+    "node_id": "file::Reporting_USP_CCMC_LOTE_Census_Interpreter_Services_Summary_PBI::scope/#combined_census_with_language::structure/FROM/1",
+    "structure_kind": "FROM",
+    "position": 2,
+    "owning_scope": "file::Reporting_USP_CCMC_LOTE_Census_Interpreter_Services_Summary_PBI::scope/#combined_census_with_language",
+    "evidence": {
+      "fragment": "FROM #combined_census\n\n\tLEFT JOIN #caregiver_languages\t\tON [#combined_census].PAT_ID = [#caregiver_languages].PAT_ID",
+      "line": 334,
+      "column": 1
+    }
+  },
+  {
+    "node_id": "file::Reporting_USP_CCMC_LOTE_Census_Interpreter_Services_Summary_PBI::scope/#combined_census_with_language::structure/JOIN/1",
+    "structure_kind": "JOIN",
+    "position": 3,
+    "owning_scope": "file::Reporting_USP_CCMC_LOTE_Census_Interpreter_Services_Summary_PBI::scope/#combined_census_with_language",
+    "evidence": {
+      "fragment": "[#combined_census].PAT_ID = [#caregiver_languages].PAT_ID",
+      "line": 336,
+      "column": 37
+    },
+    "join_type": "LeftOuter"
+  },
+  {
+    "node_id": "file::Reporting_USP_CCMC_LOTE_Census_Interpreter_Services_Summary_PBI::scope/#combined_census_numerators::structure/PROJECTION/1",
+    "structure_kind": "PROJECTION",
+    "position": 1,
+    "owning_scope": "file::Reporting_USP_CCMC_LOTE_Census_Interpreter_Services_Summary_PBI::scope/#combined_census_numerators",
+    "evidence": {
+      "fragment": "[Year]\n\t, [Quarter]\n\t, [Month Name]\n\t, [Month Number]\n\t, [Location]\n\t, [Department]\n\t, [Dept External Name]\n\t, [Department Label]\n\t, [Dept Type]\n\t, [Caregiver Language Category]\n\n\t, SUM([Census Days])\t\tAS [Census Days]\n\t, COUNT(DISTINCT PAT_ID)\tAS [Patient Count]",
+      "line": 345,
+      "column": 2
+    },
+    "distinct": false,
+    "member_total": 12,
+    "star_total": 0,
+    "star_qualifiers": []
+  },
+  {
+    "node_id": "file::Reporting_USP_CCMC_LOTE_Census_Interpreter_Services_Summary_PBI::scope/#combined_census_numerators::structure/FROM/1",
+    "structure_kind": "FROM",
+    "position": 2,
+    "owning_scope": "file::Reporting_USP_CCMC_LOTE_Census_Interpreter_Services_Summary_PBI::scope/#combined_census_numerators",
+    "evidence": {
+      "fragment": "FROM #combined_census_with_language",
+      "line": 361,
+      "column": 1
+    }
+  },
+  {
+    "node_id": "file::Reporting_USP_CCMC_LOTE_Census_Interpreter_Services_Summary_PBI::scope/#combined_census_numerators::structure/GROUP BY/1",
+    "structure_kind": "GROUP BY",
+    "position": 3,
+    "owning_scope": "file::Reporting_USP_CCMC_LOTE_Census_Interpreter_Services_Summary_PBI::scope/#combined_census_numerators",
+    "evidence": {
+      "fragment": "GROUP BY\n\t[Year]\n\t, [Quarter]\n\t, [Month Name]\n\t, [Month Number]\n\t, [Location]\n\t, [Department]\n\t, [Dept External Name]\n\t, [Department Label]\n\t, [Dept Type]\n\t, [Caregiver Language Category]",
+      "line": 363,
+      "column": 1
+    }
+  },
+  {
+    "node_id": "file::Reporting_USP_CCMC_LOTE_Census_Interpreter_Services_Summary_PBI::stmt/23::scope/sub1::structure/PROJECTION/1",
+    "structure_kind": "PROJECTION",
+    "position": 1,
+    "owning_scope": "file::Reporting_USP_CCMC_LOTE_Census_Interpreter_Services_Summary_PBI::stmt/23::scope/sub1",
+    "evidence": {
+      "fragment": "[Year]\n\t\t\t, [Quarter]\n\t\t\t, [Month Name]\n\t\t\t, [Location]\n\t\t\t, [Dept External Name]\n\t\t\t, [Department Label]\n\t\t\t, [Dept Type]\n\t\t\t, SUM([Census Days])\t\tAS [Census Denominator]\n\t\t\t, COUNT(DISTINCT PAT_ID)\tAS [Patient Denominator]",
+      "line": 403,
+      "column": 4
+    },
+    "distinct": false,
+    "member_total": 9,
+    "star_total": 0,
+    "star_qualifiers": []
+  },
+  {
+    "node_id": "file::Reporting_USP_CCMC_LOTE_Census_Interpreter_Services_Summary_PBI::stmt/23::scope/sub1::structure/FROM/1",
+    "structure_kind": "FROM",
+    "position": 2,
+    "owning_scope": "file::Reporting_USP_CCMC_LOTE_Census_Interpreter_Services_Summary_PBI::stmt/23::scope/sub1",
+    "evidence": {
+      "fragment": "FROM #combined_census",
+      "line": 413,
+      "column": 3
+    }
+  },
+  {
+    "node_id": "file::Reporting_USP_CCMC_LOTE_Census_Interpreter_Services_Summary_PBI::stmt/23::scope/sub1::structure/GROUP BY/1",
+    "structure_kind": "GROUP BY",
+    "position": 3,
+    "owning_scope": "file::Reporting_USP_CCMC_LOTE_Census_Interpreter_Services_Summary_PBI::stmt/23::scope/sub1",
+    "evidence": {
+      "fragment": "GROUP BY \n\t\t\t[Year]\n\t\t\t, [Quarter]\n\t\t\t, [Month Name]\n\t\t\t, [Location]\n\t\t\t, [Dept External Name]\n\t\t\t, [Department Label]\n\t\t\t, [Dept Type]",
+      "line": 415,
+      "column": 3
+    }
+  },
+  {
+    "node_id": "file::Reporting_USP_CCMC_LOTE_Census_Interpreter_Services_Summary_PBI::scope/delivery::structure/PROJECTION/1",
+    "structure_kind": "PROJECTION",
+    "position": 1,
+    "owning_scope": "file::Reporting_USP_CCMC_LOTE_Census_Interpreter_Services_Summary_PBI::scope/delivery",
+    "evidence": {
+      "fragment": "[num].[Year]\n\t, [num].[Quarter]\n\t, [num].[Month Name]\n\t, [num].[Month Number]\n\t, [num].[Location]\n\t, [num].[Department]\n\t, [num].[Dept External Name]\n\t, [num].[Department Label]\n\t, [num].[Dept Type]\n\t, [num].[Caregiver Language Category]\n\t, [num].[Census Days]\n\t, [num].[Patient Count]\n\n\t, [denom].[Census Denominator]\n\t, [denom].[Patient Denominator]",
+      "line": 382,
+      "column": 2
+    },
+    "distinct": false,
+    "member_total": 14,
+    "star_total": 0,
+    "star_qualifiers": []
+  },
+  {
+    "node_id": "file::Reporting_USP_CCMC_LOTE_Census_Interpreter_Services_Summary_PBI::scope/delivery::structure/FROM/1",
+    "structure_kind": "FROM",
+    "position": 2,
+    "owning_scope": "file::Reporting_USP_CCMC_LOTE_Census_Interpreter_Services_Summary_PBI::scope/delivery",
+    "evidence": {
+      "fragment": "FROM #combined_census_numerators [num]\n\n\t/* Denominators */\n\tINNER JOIN (\n\t\tSELECT \n\t\t\t[Year]\n\t\t\t, [Quarter]\n\t\t\t, [Month Name]\n\t\t\t, [Location]\n\t\t\t, [Dept External Name]\n\t\t\t, [Department Label]\n\t\t\t, [Dept Type]\n\t\t\t, SUM([Census Days])\t\tAS [Census Denominator]\n\t\t\t, COUNT(DISTINCT PAT_ID)\tAS [Patient Denominator]\n\t\t\n\t\tFROM #combined_census\n\n\t\tGROUP BY \n\t\t\t[Year]\n\t\t\t, [Quarter]\n\t\t\t, [Month Name]\n\t\t\t, [Location]\n\t\t\t, [Dept External Name]\n\t\t\t, [Department Label]\n\t\t\t, [Dept Type]\n\n\t) AS denom\n\n\t\tON [num].[Year] = [denom].[Year]\n\t\tAND [num].[Quarter] = [denom].[Quarter]\n\t\tAND [num].[Month Name] = [denom].[Month Name]\n\t\tAND [num].[Location] = [denom].[Location]\n\t\tAND [num].[Dept External Name] = [denom].[Dept External Name]\n\t\tAND [num].[Department Label] = [denom].[Department Label]\n\t\tAND [num].[Dept Type] = [denom].[Dept Type]",
+      "line": 398,
+      "column": 1
+    }
+  },
+  {
+    "node_id": "file::Reporting_USP_CCMC_LOTE_Census_Interpreter_Services_Summary_PBI::scope/delivery::structure/JOIN/1",
+    "structure_kind": "JOIN",
+    "position": 3,
+    "owning_scope": "file::Reporting_USP_CCMC_LOTE_Census_Interpreter_Services_Summary_PBI::scope/delivery",
+    "evidence": {
+      "fragment": "[num].[Year] = [denom].[Year]\n\t\tAND [num].[Quarter] = [denom].[Quarter]\n\t\tAND [num].[Month Name] = [denom].[Month Name]\n\t\tAND [num].[Location] = [denom].[Location]\n\t\tAND [num].[Dept External Name] = [denom].[Dept External Name]\n\t\tAND [num].[Department Label] = [denom].[Department Label]\n\t\tAND [num].[Dept Type] = [denom].[Dept Type]",
+      "line": 426,
+      "column": 6
+    },
+    "join_type": "Inner"
+  },
+  {
+    "node_id": "file::Reporting_USP_CCMC_LOTE_Census_Interpreter_Services_Summary_PBI::scope/delivery::structure/JOIN/1::structure/AND/1",
+    "structure_kind": "AND",
+    "position": 1,
+    "owning_scope": "file::Reporting_USP_CCMC_LOTE_Census_Interpreter_Services_Summary_PBI::scope/delivery",
+    "evidence": {
+      "fragment": "[num].[Year] = [denom].[Year]\n\t\tAND [num].[Quarter] = [denom].[Quarter]\n\t\tAND [num].[Month Name] = [denom].[Month Name]\n\t\tAND [num].[Location] = [denom].[Location]\n\t\tAND [num].[Dept External Name] = [denom].[Dept External Name]\n\t\tAND [num].[Department Label] = [denom].[Department Label]\n\t\tAND [num].[Dept Type] = [denom].[Dept Type]",
+      "line": 426,
+      "column": 6
+    }
+  },
+  {
+    "node_id": "file::Reporting_USP_Hospitalist_Daily_Census_Report_92a_PBI::scope/ROWNUM::structure/PROJECTION/1",
+    "structure_kind": "PROJECTION",
+    "position": 1,
+    "owning_scope": "file::Reporting_USP_Hospitalist_Daily_Census_Report_92a_PBI::scope/ROWNUM",
+    "evidence": {
+      "fragment": "[Run ID] = V_REPORT_RUN_FACT.RUN_ID\n\t\t,[Report ID] = V_REPORT_RUN_FACT.REPORT_INFO_ID\n\t\t,[Report Name] = V_REPORT_RUN_FACT.REPORT_INFO_NAME\n\t\t,[Run YYYYMM] = FORMAT(CONVERT(DATE, V_REPORT_RUN_FACT.RUN_DTTM), 'yyyyMM')\n\t\t,[Run Date] = CONVERT(DATE, V_REPORT_RUN_FACT.RUN_DTTM)\n\t\t,[Run DateTime] = V_REPORT_RUN_FACT.RUN_DTTM\n\t\t,[Run Year] = V_REPORT_RUN_FACT.RUN_YEAR\n\t\t,[Run Month] = V_REPORT_RUN_FACT.RUN_MONTH\n\t\t,[Run Length of Time] = V_REPORT_RUN_FACT.RUN_TIME\n\t\t,[Result Count] = V_REPORT_RUN_FACT.RESULT_COUNT\n\t\t,[Is From Batch? Y/N] = V_REPORT_RUN_FACT.IS_FROM_BATCH_YN\n\t\t,DATE_DIMENSION.WEEKEND_YN\n\t\t,[Year Month] = CONCAT(DATE_DIMENSION.MONTH_NAME, ' ', DATE_DIMENSION.YEAR)\n\t\t,[Week] = CONCAT('Wk #', ' ', DATE_DIMENSION.WEEK_NUMBER)\n\t\t,[ROW] = ROW_NUMBER()OVER(PARTITION BY V_REPORT_RUN_FACT.REPORT_INFO_ID, CONVERT(DATE, V_REPORT_RUN_FACT.RUN_DTTM) ORDER BY V_REPORT_RUN_FACT.RUN_DTTM)",
+      "line": 43,
+      "column": 3
+    },
+    "distinct": false,
+    "member_total": 15,
+    "star_total": 0,
+    "star_qualifiers": []
+  },
+  {
+    "node_id": "file::Reporting_USP_Hospitalist_Daily_Census_Report_92a_PBI::scope/ROWNUM::structure/FROM/1",
+    "structure_kind": "FROM",
+    "position": 2,
+    "owning_scope": "file::Reporting_USP_Hospitalist_Daily_Census_Report_92a_PBI::scope/ROWNUM",
+    "evidence": {
+      "fragment": "FROM Clarity.dbo.V_REPORT_RUN_FACT\n\t\tLEFT JOIN Clarity.dbo.DATE_DIMENSION\n\t\t\tON CONVERT(DATE, V_REPORT_RUN_FACT.RUN_DTTM) = DATE_DIMENSION.CALENDAR_DT",
+      "line": 59,
+      "column": 2
+    }
+  },
+  {
+    "node_id": "file::Reporting_USP_Hospitalist_Daily_Census_Report_92a_PBI::scope/ROWNUM::structure/JOIN/1",
+    "structure_kind": "JOIN",
+    "position": 3,
+    "owning_scope": "file::Reporting_USP_Hospitalist_Daily_Census_Report_92a_PBI::scope/ROWNUM",
+    "evidence": {
+      "fragment": "CONVERT(DATE, V_REPORT_RUN_FACT.RUN_DTTM) = DATE_DIMENSION.CALENDAR_DT",
+      "line": 61,
+      "column": 7
+    },
+    "join_type": "LeftOuter"
+  },
+  {
+    "node_id": "file::Reporting_USP_Hospitalist_Daily_Census_Report_92a_PBI::scope/ROWNUM::structure/WHERE/1",
+    "structure_kind": "WHERE",
+    "position": 4,
+    "owning_scope": "file::Reporting_USP_Hospitalist_Daily_Census_Report_92a_PBI::scope/ROWNUM",
+    "evidence": {
+      "fragment": "WHERE REPORT_INFO_ID = 2106260\n\t\tAND CONVERT(DATE, V_REPORT_RUN_FACT.RUN_DTTM) >= '2026-04-01'",
+      "line": 63,
+      "column": 2
+    }
+  },
+  {
+    "node_id": "file::Reporting_USP_Hospitalist_Daily_Census_Report_92a_PBI::scope/ROWNUM::structure/WHERE/1::structure/AND/1",
+    "structure_kind": "AND",
+    "position": 1,
+    "owning_scope": "file::Reporting_USP_Hospitalist_Daily_Census_Report_92a_PBI::scope/ROWNUM",
+    "evidence": {
+      "fragment": "REPORT_INFO_ID = 2106260\n\t\tAND CONVERT(DATE, V_REPORT_RUN_FACT.RUN_DTTM) >= '2026-04-01'",
+      "line": 63,
+      "column": 8
+    }
+  },
+  {
+    "node_id": "file::Reporting_USP_Hospitalist_Daily_Census_Report_92a_PBI::scope/delivery::structure/PROJECTION/1",
+    "structure_kind": "PROJECTION",
+    "position": 1,
+    "owning_scope": "file::Reporting_USP_Hospitalist_Daily_Census_Report_92a_PBI::scope/delivery",
+    "evidence": {
+      "fragment": "*",
+      "line": 67,
+      "column": 8
+    },
+    "distinct": false,
+    "member_total": 1,
+    "star_total": 1,
+    "star_qualifiers": [
+      null
+    ]
+  },
+  {
+    "node_id": "file::Reporting_USP_Hospitalist_Daily_Census_Report_92a_PBI::scope/delivery::structure/FROM/1",
+    "structure_kind": "FROM",
+    "position": 2,
+    "owning_scope": "file::Reporting_USP_Hospitalist_Daily_Census_Report_92a_PBI::scope/delivery",
+    "evidence": {
+      "fragment": "FROM ROWNUM",
+      "line": 68,
+      "column": 1
+    }
+  },
+  {
+    "node_id": "file::Reporting_USP_Hospitalist_Daily_Census_Report_92a_PBI::scope/delivery::structure/WHERE/1",
+    "structure_kind": "WHERE",
+    "position": 3,
+    "owning_scope": "file::Reporting_USP_Hospitalist_Daily_Census_Report_92a_PBI::scope/delivery",
+    "evidence": {
+      "fragment": "WHERE [ROW] = 1",
+      "line": 69,
+      "column": 1
+    }
+  },
+  {
+    "node_id": "file::Reporting_USP_Hospitalist_Daily_Census_Report_92a_PBI::scope/delivery::structure/ORDER BY/1",
+    "structure_kind": "ORDER BY",
+    "position": 4,
+    "owning_scope": "file::Reporting_USP_Hospitalist_Daily_Census_Report_92a_PBI::scope/delivery",
+    "evidence": {
+      "fragment": "ORDER BY\n\t[Run DateTime]",
+      "line": 70,
+      "column": 1
+    }
+  }
+]

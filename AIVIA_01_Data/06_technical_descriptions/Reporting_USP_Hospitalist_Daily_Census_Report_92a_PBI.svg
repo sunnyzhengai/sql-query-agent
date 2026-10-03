@@ -1,0 +1,28 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="980" height="443" font-family="monospace">
+<text x="20" y="28" font-size="15" font-weight="bold">Reporting_USP_Hospitalist_Daily_Census_Report_92a_PBI</text>
+<text x="20" y="48" font-size="12" fill="#777777">(1) [operational_statement]</text>
+<text x="20" y="71" font-size="12" fill="#777777">(2) [operational_statement]</text>
+<text x="20" y="94" font-size="12" fill="#777777">(3) [operational_statement]</text>
+<text x="20" y="117" font-size="12" fill="#777777">(4) [operational_statement]</text>
+<text x="20" y="140" font-size="12" fill="#333333">(5) Delivers the procedure's result set.</text>
+<rect x="56" y="157" width="760" height="130" fill="#f7f7f7" stroke="#888888" rx="4"/>
+<text x="64" y="172" font-size="11" font-weight="bold">ROWNUM (cte)</text>
+<text x="64" y="187" font-size="11">PROJECTION: 15 members</text>
+<text x="64" y="202" font-size="11">FROM: Clarity.dbo.V_REPORT_RUN_FACT, Clarity.dbo.DATE_DIMENSION</text>
+<text x="64" y="217" font-size="11">JOIN (LeftOuter):</text>
+<text x="64" y="232" font-size="11">  - CONVERT(DATE, V_REPORT_RUN_FACT.RUN_DTTM) = DATE_DIMENSION.CALENDAR_DT</text>
+<text x="64" y="247" font-size="11">WHERE:</text>
+<text x="64" y="262" font-size="11">  - REPORT_INFO_ID = 2106260</text>
+<text x="64" y="277" font-size="11">  - CONVERT(DATE, V_REPORT_RUN_FACT.RUN_DTTM) &gt;= '2026-04-01'</text>
+<rect x="56" y="297" width="760" height="100" fill="#f7f7f7" stroke="#888888" rx="4"/>
+<text x="64" y="312" font-size="11" font-weight="bold">delivery (delivery)</text>
+<text x="64" y="327" font-size="11">PROJECTION: 1 members, star</text>
+<text x="64" y="342" font-size="11">FROM: ROWNUM</text>
+<text x="64" y="357" font-size="11">WHERE:</text>
+<text x="64" y="372" font-size="11">  - [ROW] = 1</text>
+<text x="64" y="387" font-size="11">ORDER BY</text>
+<polyline points="824,347 832,347 832,222 824,222" fill="none" stroke="#999999" stroke-width="1.2"/>
+<text x="834" y="219" font-size="9" fill="#999999">fold</text>
+<polyline points="824,347 846,347 846,222 824,222" fill="none" stroke="#2a7d4f" stroke-width="1.2"/>
+<text x="848" y="219" font-size="9" fill="#2a7d4f">member</text>
+</svg>
