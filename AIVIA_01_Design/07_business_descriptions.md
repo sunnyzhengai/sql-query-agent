@@ -164,6 +164,19 @@ business_descriptions.py):
     L05: the effective ladder (blessed > gate_passed > floor) +
          07_business_sheet lands + the field grain via the 06
          renderers.
+         L03+L04+L05 BUILT 2026-10-03 (one slice, her "go" on
+         the pseudo): business_descriptions.py — gate G-1..G-7
+         live (the round-2 semicolon fabrication and the round-4
+         'selects'/'language is 1' are pinned CI regressions;
+         round-5's clean outputs pinned as passes), the
+         plain-word lexicon seeded closed (one growth at green:
+         'configurable', ruled S5 speech), prompt constructor
+         deterministic + example-free, effective ladder,
+         build07 with --no-llm floor path. 11 tests red then
+         green; full suite 263; ruff clean. FLOOR-ONLY TRACKED
+         BUILD LANDED: 151 rows (8 file + 36 scope + 107 field)
+         over 8 files, all status=floor, registry untouched by
+         byte-identity test.
     L06: the per-file business texts (tracked) + the live corpus
          run + Sunny's blessing pass — her eye is the
          acceptance.

@@ -1,0 +1,5 @@
+==== Reporting_USP_CCHCS_CC_ADT_Monthly_IP_Census_Totals_SSRS ====
+basis 07.1.0
+
+[floor] file: Part of this file's logic is built as a string at run time and is not described here; it is executed by "EXEC (@SQL)". 1 of 6 statements is in this gap.
+Steps: 6, 0 voiced, 1 operational, 1 gap, 4 awaiting words. Selections: none.

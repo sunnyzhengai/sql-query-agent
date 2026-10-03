@@ -87,3 +87,373 @@ S1-S11 and the gate checks G-1..G-7 are ruled design law.
 #   .json. The registry is READ-ONLY to the build — a byte-
 #   identity test enforces it.
 # ====================================================================
+# ==== (pseudo code APPROVED 2026-10-03, Sunny: "go" — real code
+#       follows) =====================================================
+
+import json
+import re
+from pathlib import Path
+
+import technical_descriptions as td
+
+BASIS_VERSION = "07.1.0"
+
+# The template labels (S7), in ruled order.
+TEMPLATE_LABELS = ["Who's in it:", "Each row shows:",
+                   "Time window:", "Excludes:"]
+
+BANNED_WORDS = {"join", "select", "query", "table", "temp",
+                "column", "procedure", "parameter"}
+
+RESTRICTION_STEMS = {"only", "exclude", "limited", "restricted"}
+
+# Function words — structural English, never content claims.
+FUNCTION_WORDS = set("""
+a an the and or of for to in on at by with from as is are was
+were be been has have had it its it's this that these those each
+every all any no not when where who whose which while during
+either both than then there their they them he she s t who's
+what how if will can may must into onto over under after before
+between per also such same one two three
+""".split())
+
+# THE PLAIN-WORD LEXICON (S9/G-1) — the CLOSED business
+# vocabulary; growth is a ruled row here, dated, never silent.
+PLAIN_LEXICON = set("""
+shows lists includes include present marked lacking demographics
+context data dataset row rows information kind kinds value values
+apply applies multiple single text combined combine window report
+active entered speaking none stated about recorded
+configurable
+""".split())
+# (ruled 2026-10-03 with the S-set; 'separator' is deliberately
+# ABSENT — the round-2 fabrication must always fail here)
+
+_SIGHTINGS = []
+
+
+def reset_sightings():
+    del _SIGHTINGS[:]
+
+
+def code_sightings():
+    return list(_SIGHTINGS)
+
+
+def _tokens(text):
+    return re.findall(r"[a-z]+", text.lower())
+
+
+def _stem(tok):
+    return tok[:-1] if len(tok) > 3 and tok.endswith("s") else tok
+
+
+def _sentences_of(text, grain):
+    if grain == "file":
+        parts = []
+        for line in text.splitlines():
+            line = line.strip()
+            for label in TEMPLATE_LABELS:
+                if line.startswith(label):
+                    line = line[len(label):].strip()
+            if line:
+                if label == "Excludes:":
+                    parts.extend(p.strip() for p in
+                                 line.split(";") if p.strip())
+                else:
+                    parts.extend(p.strip() for p in
+                                 re.split(r"[.!?]", line)
+                                 if p.strip())
+        return parts
+    return [p.strip() for p in re.split(r"[.!?]", text)
+            if p.strip()]
+
+
+def _docket_text(docket):
+    return docket["text"] if isinstance(docket, dict) else docket
+
+
+def gate(audience_text, docket, grain, registry=None):
+    """G-1..G-7 (contract law): findings list; empty == pass.
+    No model anywhere in here."""
+    findings = []
+    dtext = _docket_text(docket)
+    dtokens = {_stem(t) for t in _tokens(dtext)}
+    rtokens = set()
+    for row in (registry or {}).get("names", []):
+        rtokens |= {_stem(t) for t in
+                    _tokens(str(row.get("blessed_name", "")))}
+
+    # G-1 lexical whitelist — fail NAMES the token
+    quoted = re.findall(r"'[^']*'", audience_text)
+    for q in quoted:
+        if q not in dtext:
+            findings.append(f"G-1: {q} has no stored basis")
+    for tok in _tokens(audience_text):
+        if tok in FUNCTION_WORDS or tok in PLAIN_LEXICON \
+                or _stem(tok) in PLAIN_LEXICON:
+            continue
+        if _stem(tok) in dtokens or _stem(tok) in rtokens:
+            continue
+        findings.append(f"G-1: '{tok}' has no stored basis")
+
+    # G-2 banned vocabulary
+    for tok in _tokens(audience_text):
+        if _stem(tok) in BANNED_WORDS or tok in BANNED_WORDS:
+            findings.append(f"G-2: banned word '{_stem(tok)}'")
+    for m in re.findall(r"@\w+", audience_text):
+        findings.append(f"G-2: banned token '{m}'")
+
+    # G-3 budgets
+    for s in _sentences_of(audience_text, grain):
+        n = len(s.split())
+        if n > 15:
+            findings.append(f"G-3: sentence exceeds 15 words "
+                            f"({n})")
+    if audience_text.count("(") > 1:
+        findings.append("G-3: more than one parenthetical")
+    if re.search(r"\([^)]*\(", audience_text):
+        findings.append("G-3: nested parenthetical")
+
+    # G-4 template (file grain)
+    if grain == "file":
+        lines = [ln.strip() for ln in audience_text.splitlines()
+                 if ln.strip()]
+        shape_ok = (len(lines) == 4 and all(
+            ln.startswith(lab) for ln, lab in
+            zip(lines, TEMPLATE_LABELS)))
+        if not shape_ok:
+            findings.append("G-4: template shape — exactly the "
+                            "four labeled lines")
+
+    # G-5 anchors: restriction speech needs membership rows
+    has_membership = ("Population:" in dtext
+                      or "Excludes" in dtext
+                      or (": " in dtext and
+                          "no membership conditions" not in dtext))
+    if any(_stem(t) in RESTRICTION_STEMS
+           for t in _tokens(audience_text)) and not has_membership:
+        findings.append("G-5: restriction speech without a "
+                        "membership row to anchor it")
+
+    # G-6 must-say (file grain, exactly three members)
+    if grain == "file" and isinstance(docket, dict):
+        low = audience_text.lower()
+        if docket.get("gap") and not any(
+                k in low for k in ("gap", "not described",
+                                   "not covered",
+                                   "built as a string",
+                                   "run time")):
+            findings.append("G-6: the gap must be said")
+        if docket.get("params") and "window" not in low:
+            findings.append("G-6: the window must be said")
+        if docket.get("population") and \
+                "excludes:" not in low:
+            findings.append("G-6: the Excludes line must exist")
+
+    # G-7 unbound codes never surface (S10) — sighting recorded
+    unquoted = re.sub(r"'[^']*'", " ", audience_text)
+    for tok in re.findall(r"\b\d+\b", unquoted):
+        findings.append(f"G-7: raw code '{tok}' must not "
+                        "surface in business prose")
+        _SIGHTINGS.append({"code": tok,
+                           "context": audience_text[:120]})
+    return findings
+
+
+def docket_for_file(dir05, dir06, dir02, fname):
+    rows = json.loads((Path(dir06) /
+                       "06_description_sheet.json").read_text())
+    file_s = next(r["sentence"] for r in rows
+                  if r["node_id"] == f"file::{fname}")
+    scope_s = [r["sentence"] for r in rows
+               if r["grain"] == "scope"
+               and r["node_id"].split("::")[1] == fname]
+    text = "\n".join([file_s] + scope_s)
+    return {"text": text,
+            "gap": "in this gap" in file_s,
+            "params": "Parameters shaping the population"
+                      in file_s,
+            "population": "Population:" in file_s}
+
+
+# ---- the prompt constructor (deterministic; example-free by law)
+
+SYSTEM_PROMPT = (
+ "You write business descriptions of report data for healthcare "
+ "BI consumers. You receive a TECHNICAL description rendered "
+ "mechanically from parsed SQL.\n"
+ "TRUTH RULES (hard): claim only what the technical text states; "
+ "never invent purposes, formats, separators, counts, or "
+ "meanings; 'attaching'/'attachment rule' text ADDS information "
+ "to rows and never restricts who is in the data; do not decode "
+ "system default expressions — say 'a configurable window'; a "
+ "bare code whose meaning the text does not state must never "
+ "appear — say 'a specific recorded type'; translate technical "
+ "phrasing into plain words and never copy uppercase tokens, "
+ "abbreviations, or quoted literals verbatim.\n"
+ "STYLE RULES (hard): one claim per sentence; sentences at most "
+ "15 words; no nested parentheticals and at most one short "
+ "parenthetical; no SQL vocabulary (join, select, query, table, "
+ "temp, column, procedure, parameter); no tokens starting with "
+ "@; no field inventories or abbreviations — name KINDS of "
+ "information; plain present tense, active voice. Output only "
+ "what the template asks — no preamble.")
+
+_GRAIN_INSTRUCTIONS = {
+    "file": ("Grain: a whole report dataset. Produce EXACTLY "
+             "these four labeled lines, nothing else:\n"
+             "Who's in it: <who the rows are about, one "
+             "sentence>\n"
+             "Each row shows: <the KINDS of information one row "
+             "carries, one sentence, no field names>\n"
+             "Time window: <the window, one short phrase>\n"
+             "Excludes: <each exclusion as a short plain-English "
+             "phrase, semicolon-separated>"),
+    "scope": ("Grain: one selection inside the dataset build. "
+              "At most 3 sentences, each at most 15 words, "
+              "describing what this selection contains."),
+    "field": ("Grain: one delivered field. At most 2 sentences, "
+              "each at most 15 words."),
+}
+
+
+def build_prompt(grain, docket_text, findings):
+    parts = [SYSTEM_PROMPT, "", _GRAIN_INSTRUCTIONS[grain], "",
+             "TECHNICAL DESCRIPTION:", docket_text]
+    if findings:
+        parts += ["", "GATE OBJECTIONS (resolve every one):"]
+        parts += [f"- {f}" for f in findings]
+    return "\n".join(parts)
+
+
+# ---- the effective ladder (ported law)
+
+def effective(row, registry):
+    for s in registry.get("sentences", []):
+        if s.get("node_id") == row["node_id"] and \
+                s.get("blessed_text"):
+            return s["blessed_text"]
+    return row["audience_text"]
+
+
+# ---- the build
+
+def _field_nodes(dir05, dir02, dir01=None):
+    """Delivery-scope projection outputs — the report fields
+    (G2a: minted via the importable 06 machinery)."""
+    dir05 = Path(dir05)
+    g = td._load_graph(dir05)
+    words, values = td._load_words(Path(dir02))
+    voice = td._Voice(g, words, values)
+    scopes = td._read(dir05 / "05_scope_sheet.json")
+    out = []
+    for sc in scopes:
+        if sc["scope_kind"] != "delivery":
+            continue
+        for pid_ in td._scope_structures(g, sc["node_id"],
+                                         "PROJECTION"):
+            for k in g["children"].get(pid_, []):
+                if k in g["exprs"]:
+                    voice.refs = []
+                    item = td._payload_item(voice, k,
+                                            sc["node_id"])
+                    out.append((k, sc["node_id"], item))
+    return out
+
+
+def build07(dir05, dir06, out07, dir02, no_llm=False):
+    """The build command's door. no_llm=True renders floor-only
+    rows deterministically (the suite's path, zero cost); the
+    paid proposer loop runs only when no_llm is False."""
+    dir05, dir06 = Path(dir05), Path(dir06)
+    out07, dir02 = Path(out07), Path(dir02)
+    six = json.loads((dir06 / "06_description_sheet.json")
+                     .read_text())
+    files = sorted({r["node_id"].split("::")[1] for r in six
+                    if r["grain"] == "file"})
+    reg_path = out07 / "07_blessing_registry.json"
+    registry = (json.loads(reg_path.read_text())
+                if reg_path.exists()
+                else {"names": [], "sentences": []})
+
+    reset_sightings()
+    rows = []
+
+    def add(node_id, grain, docket, floor_text):
+        if no_llm:
+            rows.append({"node_id": node_id, "grain": grain,
+                         "audience_text": floor_text,
+                         "status": "floor", "gate_findings": [],
+                         "rounds_used": 0, "model": None,
+                         "basis_version": BASIS_VERSION})
+            return
+        text, status, findings, used = _propose_loop(
+            grain, _docket_text(docket), docket, registry)
+        rows.append({"node_id": node_id, "grain": grain,
+                     "audience_text": text if status
+                     != "floor" else floor_text,
+                     "status": status,
+                     "gate_findings": findings,
+                     "rounds_used": used,
+                     "model": _MODEL_NAME,
+                     "basis_version": BASIS_VERSION})
+
+    for f in files:
+        docket = docket_for_file(dir05, dir06, dir02, f)
+        floor = next(r["sentence"] for r in six
+                     if r["node_id"] == f"file::{f}")
+        add(f"file::{f}", "file", docket, floor)
+    for r in six:
+        if r["grain"] == "scope":
+            add(r["node_id"], "scope", r["sentence"],
+                r["sentence"])
+    for expr_id, scope_id, item in _field_nodes(dir05, dir02):
+        owner = next((r["sentence"] for r in six
+                      if r["node_id"] == scope_id), "")
+        add(expr_id, "field", owner + "\n" + item, item)
+
+    (out07 / "07_business_sheet.json").write_text(
+        json.dumps(rows, indent=1))
+    (out07 / "07_code_sightings.json").write_text(
+        json.dumps(code_sightings(), indent=1))
+
+    by_file = {}
+    for r in rows:
+        key = r["node_id"].split("::")[1] if "::" in r["node_id"] \
+            else r["node_id"]
+        by_file.setdefault(key, []).append(r)
+    for f in files:
+        lines = [f"==== {f} ====", f"basis {BASIS_VERSION}", ""]
+        for r in by_file.get(f, []):
+            eff = effective(r, registry)
+            lines.append(f"[{r['status']}] {r['grain']}: {eff}")
+        (out07 / f"{f}.txt").write_text("\n".join(lines) + "\n")
+    print(f"07 build: {len(rows)} rows over {len(files)} files; "
+          f"sightings {len(code_sightings())}; "
+          f"{'floor-only (no-llm)' if no_llm else 'live'}")
+    return rows
+
+
+# ---- the paid proposer loop (build-time only; never in tests)
+
+_MODEL_NAME = "gpt-5-mini"
+REPAIR_BUDGET = 3
+
+
+def _propose_loop(grain, docket_text, docket, registry):
+    from build_abstract_names import load_openai_key
+    from openai import OpenAI
+    client = OpenAI(api_key=load_openai_key())
+    findings = []
+    text = ""
+    for round_no in range(1, REPAIR_BUDGET + 1):
+        prompt = build_prompt(grain, docket_text, findings)
+        r = client.chat.completions.create(
+            model=_MODEL_NAME,
+            messages=[{"role": "user", "content": prompt}])
+        text = r.choices[0].message.content.strip()
+        findings = gate(text, docket, grain, registry)
+        if not findings:
+            return text, "gate_passed", [], round_no
+    return text, "floor", findings, REPAIR_BUDGET

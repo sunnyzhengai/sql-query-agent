@@ -1,0 +1,10 @@
+==== Reporting_USP_Hospitalist_Daily_Census_Report_92a_PBI ====
+basis 07.1.0
+
+[floor] file: Delivers a selection from ROWNUM: the row is 1; carrying every column of the source.
+Pipeline: (5) Delivers the procedure's result set.
+Presents: every column of the source.
+Population: In the delivery: the row is 1. In ROWNUM: the Stores the report (HRX) this run is based on is 2106260 and the run dttm) is at least '2026-04-01'.
+Steps: 5, 1 voiced, 4 operational, 0 gap. Selections: ROWNUM.
+[floor] scope: This is a selection from V_REPORT_RUN_FACT, attaching DATE_DIMENSION (attachment rule: the run dttm) is the date in normal date format): the Stores the report (HRX) this run is based on is 2106260 and the run dttm) is at least '2026-04-01'; carrying the Report Run (HRN) record unique, report id (the Stores the report (HRX) this run is based on), the report name, run yyyymm (the date and time when the report run was created, formatted as 'yyyyMM'), run date (the date and time when the report run was created), run datetime (the date and time when the report run was created), the report run based on the run instant year, the report run based on the run instant month, run length of time (the amount of time it took the report to run in seconds), the report run total, is from batch? y/n (the Indicates whether the report was run from batch or not), the Contains "Y" for weekend days, year month (the month name in long form, ' ', the This column contains the four-digit year joined into one text), week ('Wk #', ' ', the week in the year number joined into one text), row (its position in an ordered sequence of records).
+[floor] scope: This is a selection from ROWNUM: the row is 1; carrying every column of the source.
