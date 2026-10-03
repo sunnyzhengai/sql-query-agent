@@ -1,0 +1,21 @@
+{
+ "_status": "STAGED 2026-10-03 (ladder L02) from 03's sunny_* fields \u2014 candidates ONLY; nothing is blessed until Sunny's dated ruling moves a row into 07_blessing_registry.json",
+ "candidates": [
+  {
+   "sunny_synonyms": [
+    "inpatient admission",
+    "inpatient admission data"
+   ]
+  },
+  {
+   "sunny_synonyms": [
+    "patient relationships"
+   ]
+  },
+  {
+   "sunny_synonyms": [
+    "patient relationships"
+   ]
+  }
+ ]
+}

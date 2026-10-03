@@ -1,12 +1,11 @@
 07_business_descriptions.md
 
-Status: DRAFT (started 2026-10-03, scribed by Claude at Sunny's
-word — "document these decisions in the design docs" — while she
-napped). Sunny owns this doc. The S-rules below were RULED IN THE
-DRY RUN (her explicit go per round, dated); everything else is
-DRAFT awaiting her ratification at the design session. NO CODE
-EXISTS — her standing word: "until i'm good with the output,
-don't code."
+Status: DESIGN RULED 2026-10-03 (Sunny: "go" — the ratification
+section below carries all seven agenda rulings; the dry-run code
+hold LIFTED the same word, round 5's outputs the accepted bar).
+Sunny owns this doc; Claude scribes at her direction. Build
+posture: pseudo first, her stamp, tests red first — the standing
+process, unchanged.
 Product phase: II — the ELOQUENT MACHINE (00_Architecture.md: the
 business description; the second of the two machines).
 Evidence: AIVIA_01_Design/dryruns/phase_II_uses_phase_I.md — the
@@ -104,18 +103,68 @@ THE PRODUCTS (draft):
 - The Collibra sync of R13's three-level field: this phase's
   shipping lane (scope to be ruled).
 
-OPEN FOR SUNNY'S RATIFICATION (the design session's agenda):
-  1. The S-rules re-stamped as a set (S1-S11 above).
-  2. The gate's check list as contract law (incl. the must-say
-     checklist's exact members).
-  3. The products + grains + the blessing registry's contract.
-  4. G2 option (a) confirmed (renderer-import, no 06 reopen).
-  5. The repair-loop budget (how many rounds before the floor
-     stands; dry-run evidence: 3).
-  6. Model seat (gpt-5-mini used in the dry run; gpt-5.4-mini is
-     the adopted Azure production seat — parity law applies).
-  7. The Collibra sync scope and the report-layer question.
+THE RATIFICATION — RULED 2026-10-03 (Sunny: "go", taking Claude's
+recommendations as the rulings; the code hold LIFTED by the same
+word — round 5's outputs are the accepted quality bar):
+  1. S1-S11 RULED AS A SET — the style grammar is law; wording
+     changes bump the 07 grammar constant and re-pin, never
+     drift.
+  2. THE GATE'S CHECKS ARE CONTRACT LAW: the lexical whitelist
+     (fails with the word NAMED), S2 banned scan, S8 budgets,
+     S7 template shape, S4 membership/attachment anchors, and
+     the MUST-SAY checklist with exactly three members: the gap
+     (dynamic-SQL files), the window (population-shaping
+     parameters), the Excludes line (existing exclusions).
+  3. PRODUCTS RULED: 07_business_sheet (grains file | scope |
+     field; status proposed | gate_passed | blessed | floor;
+     gate findings on the row) + THE BLESSING REGISTRY (Sunny's
+     hand only, delta-by-name, seeded from 03 sunny_synonyms at
+     her word) + per-file business texts as tracked build
+     output. Term grain DEFERRED to the glossary milestone.
+  4. G2 OPTION (a) CONFIRMED: field rows mint via the importable
+     06 renderers; 06 stays closed.
+  5. REPAIR BUDGET = 3 rounds (the dry-run evidence); after
+     round 3 the floor stands and the last findings stay on the
+     row for Sunny's eye.
+  6. MODEL SEATS: local development = gpt-5-mini (the dry run's
+     seat, the 03 precedent); production = gpt-5.4-mini on the
+     aivia Azure endpoint (the M05 adoption); the parity law
+     applies at the move.
+  7. COLLIBRA SYNC DEFERRED to this phase's closing milestone —
+     the voice is built and blessed first; the sync ships a
+     field that already passed her eye. The report-layer
+     cherry-pick stays Phase II-later (prior art R13 rider).
 
-Local build steps: TBD at the design session (ladder drafted
-after the decisions are stamped; pseudo code first, tests red
-first, as always). NO CODE until Sunny lifts her hold.
+TEST POSTURE (ruled with the set): Claude's suite is
+DETERMINISTIC — the gate, the docket builder, the prompt
+constructor, the sheet and texts are all testable without a
+model; the dry run's RECORDED REAL outputs (provenance: 14 paid
+gpt-5-mini calls, 2026-10-03, verbatim in the dryruns doc) serve
+as fixtures — recorded real speech replayed as data is not a
+fake call. The proposer's live path is exercised by the build
+command itself and accepted by Sunny's eye, the ED-sepsis law as
+always.
+
+Local build steps (pseudo first, red first, one code file —
+business_descriptions.py):
+    L01: data contract 07_business_descriptions_data_contract.md
+         — complete and stamped BEFORE the first red test (the
+         amendment law).
+    L02: the blessing registry skeleton + the sunny_synonyms
+         seed list staged FOR Sunny's ratifying hand (nothing
+         blessed by machine, ever).
+    L03: THE GATE (no-model): docket builder + the ruled checks;
+         red tests = fabricated proposals + the dry run's real
+         failures pinned as regressions (the semicolon dies in
+         CI forever).
+    L04: THE PROPOSER: the S-grammar prompt constructor
+         (deterministic, byte-tested) + the paid-call seat + the
+         repair loop (budget 3, objections named from gate
+         findings).
+    L05: the effective ladder (blessed > gate_passed > floor) +
+         07_business_sheet lands + the field grain via the 06
+         renderers.
+    L06: the per-file business texts (tracked) + the live corpus
+         run + Sunny's blessing pass — her eye is the
+         acceptance.
+    L07 (closing milestone, deferred): the Collibra sync.
