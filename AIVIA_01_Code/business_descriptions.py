@@ -522,19 +522,31 @@ CALL_TIMEOUT_S = 120  # harness law 2026-10-03: a wedged socket
 #                       can never hang the build
 
 
-def _propose_loop(grain, docket_text, docket, registry):
+def _openai_caller(prompt):
     from build_abstract_names import load_openai_key
     from openai import OpenAI
     client = OpenAI(api_key=load_openai_key(),
                     timeout=CALL_TIMEOUT_S, max_retries=2)
+    r = client.chat.completions.create(
+        model=_MODEL_NAME,
+        messages=[{"role": "user", "content": prompt}])
+    return r.choices[0].message.content.strip()
+
+
+def _propose_loop(grain, docket_text, docket, registry,
+                  caller=None):
+    caller = caller or _openai_caller
     findings = []
     text = ""
     for round_no in range(1, REPAIR_BUDGET + 1):
         prompt = build_prompt(grain, docket_text, findings)
-        r = client.chat.completions.create(
-            model=_MODEL_NAME,
-            messages=[{"role": "user", "content": prompt}])
-        text = r.choices[0].message.content.strip()
+        try:
+            text = caller(prompt)
+        except Exception as exc:  # noqa: BLE001 — ANY call
+            # failure is a failed round, never a dead build
+            # (the 2026-10-03 APITimeoutError crash find)
+            findings = [f"call failed: {type(exc).__name__}"]
+            continue
         findings = gate(text, docket, grain, registry)
         if not findings:
             return text, "gate_passed", [], round_no

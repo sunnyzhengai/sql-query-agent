@@ -224,6 +224,20 @@ def test_floor_rows_keep_the_rejected_card(tmp_path):
     assert r["audience_text"] != "the rejected words"  # floor ships
 
 
+def test_api_failure_floors_the_node_never_crashes():
+    """The re-propose crash find (2026-10-03): a timed-out call
+    is a failed round, never a dead build."""
+    def dying_caller(prompt):
+        raise TimeoutError("boom")
+    text, status, findings, used = bd._propose_loop(
+        "field", "docket", "docket", {"names": [],
+                                      "sentences": []},
+        caller=dying_caller)
+    assert status == "floor"
+    assert any("call failed" in f for f in findings)
+    assert used == bd.REPAIR_BUDGET
+
+
 def test_call_timeout_is_law():
     assert bd.CALL_TIMEOUT_S == 120
 

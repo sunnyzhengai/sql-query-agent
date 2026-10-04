@@ -1,0 +1,203 @@
+{
+ "file::COOK_RPT_USP_CCHCS_ADT_MONTHLY_INPATIENT_CENSUS_TOTALS_SSRS": {
+  "node_id": "file::COOK_RPT_USP_CCHCS_ADT_MONTHLY_INPATIENT_CENSUS_TOTALS_SSRS",
+  "grain": "file",
+  "audience_text": "Delivers a selection from CLARITY_ADT, attaching CLARITY_BED (matched where the bed contact of the event record serial is the bed contact of the bed record serial), attaching CLARITY_ROM (matched where the room contact of the event record serial is the room contact of the room record serial), attaching CLARITY_DEP (matched where the unit of the event record at the effective time ID is the unique ID number assigned to the department record), attaching ZC_PAT_CLASS (matched where the patient of the event record at the effective time category is the patient class for the hospital encounter category), attaching ZC_PAT_SERVICE (matched where the patient of the event record at the effective time category is the hosp serv c), attaching CLARITY_SA (matched where the service area in which this department is located unique is the unique ID number assigned to the service area record): the event record category is '6' and either the category value indicating whether the event record has been changed or deleted is not '2' or the category value indicating whether the event record has been changed or deleted is '2' and the instant when the event record was actually deleted is on or after DATEADD(D, 1, @AsOfDate) and the instant when the event was supposed to have happened is on or after @StartDate and the instant when the event was supposed to have happened is before DATEADD(D, 1, @EndDate) and the instant when the event record was actually created is before DATEADD(D, 1, @AsOfDate) and the pat id is recorded and a matching record exists in a separately defined selection and a matching record exists in a separately defined selection and the unit of the event record at the effective time ID is none of the values 'CCMC EMERGENCY' (100108022), 'CCMC IR IMAGING' (100108034), 'CCMC CATH LAB' (100108047), 'CCMC MAIN OR' (100108049), 'CCMC SPA OR' (100108068), 'CCMC PHP PSYCHIATRY' (100108112), 'CCMC CARDIOVASCULAR OR' (100108118), 'DSC OR' (100639001); carrying event type (the event record category), event subtype (the category value indicating whether the event record has been changed or deleted), the instant when the event was supposed to have happened, patient id (the patient of the event record at the effective time ID), patient class (the category value abbreviation), department (the department name abbreviation), room (the room name), the bed name, patient servce (the name), the instant when the event record was actually deleted, the instant when the event record was actually created, service area (the service area name), the unique ID number assigned to the department record, the room record ID, the bed record ID, the ADT event record unique, census day (the day of the instant when the event was supposed to have happened).\nPipeline: (2) Delivers the procedure's result set.\nPresents: event type (the event record category); event subtype (the category value indicating whether the event record has been changed or deleted); the instant when the event was supposed to have happened; patient id (the patient of the event record at the effective time ID); patient class (the category value abbreviation); department (the department name abbreviation); room (the room name); the bed name; patient servce (the name); the instant when the event record was actually deleted; the instant when the event record was actually created; service area (the service area name); the unique ID number assigned to the department record; the room record ID; the bed record ID; the ADT event record unique; census day (the day of the instant when the event was supposed to have happened).\nPopulation: In the delivery: the event record category is '6' and either the category value indicating whether the event record has been changed or deleted is not '2' or the category value indicating whether the event record has been changed or deleted is '2' and the instant when the event record was actually deleted is on or after DATEADD(D, 1, @AsOfDate) and the instant when the event was supposed to have happened is on or after @StartDate and the instant when the event was supposed to have happened is before DATEADD(D, 1, @EndDate) and the instant when the event record was actually created is before DATEADD(D, 1, @AsOfDate) and the pat id is recorded and a matching record exists in a separately defined selection and a matching record exists in a separately defined selection and the unit of the event record at the effective time ID is none of the values 'CCMC EMERGENCY' (100108022), 'CCMC IR IMAGING' (100108034), 'CCMC CATH LAB' (100108047), 'CCMC MAIN OR' (100108049), 'CCMC SPA OR' (100108068), 'CCMC PHP PSYCHIATRY' (100108112), 'CCMC CARDIOVASCULAR OR' (100108118), 'DSC OR' (100639001).\nParameters shaping the population: @AsOfDate (no default); @EndDate (no default); @StartDate (no default).\nSteps: 2, 1 voiced, 1 operational, 0 gap. Selections: none.",
+  "status": "floor",
+  "gate_findings": [
+   "G-1: 'six' has no stored basis",
+   "G-1: 'external' has no stored basis",
+   "G-1: 'specialty' has no stored basis",
+   "G-1: 'failing' has no stored basis",
+   "G-1: 'criteria' has no stored basis"
+  ],
+  "rounds_used": 3,
+  "model": "gpt-5-mini",
+  "basis_version": "07.1.0",
+  "last_proposal": "Who's in it: Event records of category six with a recorded patient identifier and matching external selections.\nEach row shows: event types, timestamps, patient id and class, location, service, identifiers, census day.\nTime window: a configurable window\nExcludes: Specific specialty units and records failing the date, patient id, deletion, or external-selection criteria."
+ },
+ "file::COOK_RPT_USP_CCHCS_ADT_MONTHLY_INPATIENT_CENSUS_TOTALS_SSRS::scope/delivery": {
+  "node_id": "file::COOK_RPT_USP_CCHCS_ADT_MONTHLY_INPATIENT_CENSUS_TOTALS_SSRS::scope/delivery",
+  "grain": "scope",
+  "audience_text": "This is a selection from CLARITY_ADT, attaching CLARITY_BED (matched where the bed contact of the event record serial is the bed contact of the bed record serial), attaching CLARITY_ROM (matched where the room contact of the event record serial is the room contact of the room record serial), attaching CLARITY_DEP (matched where the unit of the event record at the effective time ID is the unique ID number assigned to the department record), attaching ZC_PAT_CLASS (matched where the patient of the event record at the effective time category is the patient class for the hospital encounter category), attaching ZC_PAT_SERVICE (matched where the patient of the event record at the effective time category is the hosp serv c), attaching CLARITY_SA (matched where the service area in which this department is located unique is the unique ID number assigned to the service area record): the event record category is '6' and either the category value indicating whether the event record has been changed or deleted is not '2' or the category value indicating whether the event record has been changed or deleted is '2' and the instant when the event record was actually deleted is on or after DATEADD(D, 1, @AsOfDate) and the instant when the event was supposed to have happened is on or after @StartDate and the instant when the event was supposed to have happened is before DATEADD(D, 1, @EndDate) and the instant when the event record was actually created is before DATEADD(D, 1, @AsOfDate) and the pat id is recorded and a matching record exists in a separately defined selection and a matching record exists in a separately defined selection and the unit of the event record at the effective time ID is none of the values 'CCMC EMERGENCY' (100108022), 'CCMC IR IMAGING' (100108034), 'CCMC CATH LAB' (100108047), 'CCMC MAIN OR' (100108049), 'CCMC SPA OR' (100108068), 'CCMC PHP PSYCHIATRY' (100108112), 'CCMC CARDIOVASCULAR OR' (100108118), 'DSC OR' (100639001); carrying event type (the event record category), event subtype (the category value indicating whether the event record has been changed or deleted), the instant when the event was supposed to have happened, patient id (the patient of the event record at the effective time ID), patient class (the category value abbreviation), department (the department name abbreviation), room (the room name), the bed name, patient servce (the name), the instant when the event record was actually deleted, the instant when the event record was actually created, service area (the service area name), the unique ID number assigned to the department record, the room record ID, the bed record ID, the ADT event record unique, census day (the day of the instant when the event was supposed to have happened).",
+  "status": "floor",
+  "gate_findings": [
+   "G-1: 'occurrence' has no stored basis",
+   "G-1: 'rows' has no stored basis",
+   "G-1: 'filtered' has no stored basis",
+   "G-1: 'rules' has no stored basis"
+  ],
+  "rounds_used": 3,
+  "model": "gpt-5-mini",
+  "basis_version": "07.1.0",
+  "last_proposal": "Selection adds bed, room, department, patient class, patient service, and service area details.  \nIt contains events of a specific recorded type within a configurable occurrence window.  \nRows are filtered by configurable as-of and matching rules, and exclude several specified units."
+ },
+ "file::COOK_RPT_USP_CCHCS_ADT_MONTHLY_INPATIENT_CENSUS_TOTALS_SSRS::stmt/2::scope/sub1": {
+  "node_id": "file::COOK_RPT_USP_CCHCS_ADT_MONTHLY_INPATIENT_CENSUS_TOTALS_SSRS::stmt/2::scope/sub1",
+  "grain": "scope",
+  "audience_text": "This is a selection from STRING_SPLIT(@ServiceArea, ','): the value is one of the values '0', the service area in which this department is located unique; carrying the constant 1.",
+  "status": "floor",
+  "gate_findings": [
+   "G-1: 'provided' has no stored basis",
+   "G-1: 'entries' has no stored basis",
+   "G-1: 'some' has no stored basis",
+   "G-1: 'zero' has no stored basis"
+  ],
+  "rounds_used": 3,
+  "model": "gpt-5-mini",
+  "basis_version": "07.1.0",
+  "last_proposal": "Each row contains a single value from a provided list of service-area entries.  \nSome values represent a specific zero indicator in the list.  \nEach row also carries a constant indicator with value one attached."
+ },
+ "file::COOK_RPT_USP_CCHCS_ADT_MONTHLY_INPATIENT_CENSUS_TOTALS_SSRS::stmt/2::scope/sub2": {
+  "node_id": "file::COOK_RPT_USP_CCHCS_ADT_MONTHLY_INPATIENT_CENSUS_TOTALS_SSRS::stmt/2::scope/sub2",
+  "grain": "scope",
+  "audience_text": "This is a selection from STRING_SPLIT(@Location, ','): the value is one of the values '0', the revenue location to which the department is linked unique; carrying the constant 1.",
+  "status": "floor",
+  "gate_findings": [
+   "G-1: 'element' has no stored basis",
+   "G-1: 'produced' has no stored basis",
+   "G-1: 'provided' has no stored basis",
+   "G-1: 'commas' has no stored basis",
+   "G-1: 'placeholder' has no stored basis",
+   "G-2: banned word 'select'"
+  ],
+  "rounds_used": 3,
+  "model": "gpt-5-mini",
+  "basis_version": "07.1.0",
+  "last_proposal": "Each selection contains one element produced by splitting the provided location string by commas.\nThe element is either a placeholder representing no location or a recorded revenue-location identifier.\nEach selected element also carries a constant indicator value of one."
+ },
+ "file::COOK_RPT_USP_CCHCS_ADT_MONTHLY_INPATIENT_CENSUS_TOTALS_SSRS::scope/delivery::structure/PROJECTION/1::expr/1": {
+  "node_id": "file::COOK_RPT_USP_CCHCS_ADT_MONTHLY_INPATIENT_CENSUS_TOTALS_SSRS::scope/delivery::structure/PROJECTION/1::expr/1",
+  "grain": "field",
+  "audience_text": "Event type indicates the category assigned to the event record.",
+  "status": "gate_passed",
+  "gate_findings": [],
+  "rounds_used": 1,
+  "model": "gpt-5-mini",
+  "basis_version": "07.1.0"
+ },
+ "file::COOK_RPT_USP_CCHCS_ADT_MONTHLY_INPATIENT_CENSUS_TOTALS_SSRS::scope/delivery::structure/PROJECTION/1::expr/2": {
+  "node_id": "file::COOK_RPT_USP_CCHCS_ADT_MONTHLY_INPATIENT_CENSUS_TOTALS_SSRS::scope/delivery::structure/PROJECTION/1::expr/2",
+  "grain": "field",
+  "audience_text": "Indicates whether a recorded event was changed or deleted.",
+  "status": "gate_passed",
+  "gate_findings": [],
+  "rounds_used": 3,
+  "model": "gpt-5-mini",
+  "basis_version": "07.1.0"
+ },
+ "file::COOK_RPT_USP_CCHCS_ADT_MONTHLY_INPATIENT_CENSUS_TOTALS_SSRS::scope/delivery::structure/PROJECTION/1::expr/3": {
+  "node_id": "file::COOK_RPT_USP_CCHCS_ADT_MONTHLY_INPATIENT_CENSUS_TOTALS_SSRS::scope/delivery::structure/PROJECTION/1::expr/3",
+  "grain": "field",
+  "audience_text": "the instant when the event was supposed to have happened",
+  "status": "floor",
+  "gate_findings": [
+   "G-1: 'rows' has no stored basis",
+   "G-1: 'six' has no stored basis",
+   "G-1: 'fall' has no stored basis",
+   "G-1: 'criteria' has no stored basis"
+  ],
+  "rounds_used": 3,
+  "model": "gpt-5-mini",
+  "basis_version": "07.1.0",
+  "last_proposal": "This field records the instant when the event was supposed to have happened.  \nRows represent events of type six that fall within a configurable window and selection criteria."
+ },
+ "file::COOK_RPT_USP_CCHCS_ADT_MONTHLY_INPATIENT_CENSUS_TOTALS_SSRS::scope/delivery::structure/PROJECTION/1::expr/4": {
+  "node_id": "file::COOK_RPT_USP_CCHCS_ADT_MONTHLY_INPATIENT_CENSUS_TOTALS_SSRS::scope/delivery::structure/PROJECTION/1::expr/4",
+  "grain": "field",
+  "audience_text": "The event record holds the patient identifier at its effective time.  \nA matching record exists in each of two separately defined selections.",
+  "status": "gate_passed",
+  "gate_findings": [],
+  "rounds_used": 2,
+  "model": "gpt-5-mini",
+  "basis_version": "07.1.0"
+ },
+ "file::COOK_RPT_USP_CCHCS_ADT_MONTHLY_INPATIENT_CENSUS_TOTALS_SSRS::scope/delivery::structure/PROJECTION/1::expr/5": {
+  "node_id": "file::COOK_RPT_USP_CCHCS_ADT_MONTHLY_INPATIENT_CENSUS_TOTALS_SSRS::scope/delivery::structure/PROJECTION/1::expr/5",
+  "grain": "field",
+  "audience_text": "This field contains the patient class for the hospital encounter.  \nIt records that class as the category abbreviation.",
+  "status": "gate_passed",
+  "gate_findings": [],
+  "rounds_used": 1,
+  "model": "gpt-5-mini",
+  "basis_version": "07.1.0"
+ },
+ "file::COOK_RPT_USP_CCHCS_ADT_MONTHLY_INPATIENT_CENSUS_TOTALS_SSRS::scope/delivery::structure/PROJECTION/1::expr/6": {
+  "node_id": "file::COOK_RPT_USP_CCHCS_ADT_MONTHLY_INPATIENT_CENSUS_TOTALS_SSRS::scope/delivery::structure/PROJECTION/1::expr/6",
+  "grain": "field",
+  "audience_text": "Department name abbreviation for the event's unit at its effective time.",
+  "status": "gate_passed",
+  "gate_findings": [],
+  "rounds_used": 2,
+  "model": "gpt-5-mini",
+  "basis_version": "07.1.0"
+ },
+ "file::COOK_RPT_USP_CCHCS_ADT_MONTHLY_INPATIENT_CENSUS_TOTALS_SSRS::scope/delivery::structure/PROJECTION/1::expr/7": {
+  "node_id": "file::COOK_RPT_USP_CCHCS_ADT_MONTHLY_INPATIENT_CENSUS_TOTALS_SSRS::scope/delivery::structure/PROJECTION/1::expr/7",
+  "grain": "field",
+  "audience_text": "room (the room name)",
+  "status": "floor",
+  "gate_findings": [
+   "G-1: 'inclusion' has no stored basis",
+   "G-1: 'requires' has no stored basis",
+   "G-2: banned word 'select'"
+  ],
+  "rounds_used": 3,
+  "model": "gpt-5-mini",
+  "basis_version": "07.1.0",
+  "last_proposal": "This field contains the room name from the attached room record for each selected event.  \nInclusion requires a specific recorded type."
+ },
+ "file::COOK_RPT_USP_CCHCS_ADT_MONTHLY_INPATIENT_CENSUS_TOTALS_SSRS::scope/delivery::structure/PROJECTION/1::expr/8": {
+  "node_id": "file::COOK_RPT_USP_CCHCS_ADT_MONTHLY_INPATIENT_CENSUS_TOTALS_SSRS::scope/delivery::structure/PROJECTION/1::expr/8",
+  "grain": "field",
+  "audience_text": "Bed name is the name from the bed record that matches on bed contact.",
+  "status": "gate_passed",
+  "gate_findings": [],
+  "rounds_used": 2,
+  "model": "gpt-5-mini",
+  "basis_version": "07.1.0"
+ },
+ "file::COOK_RPT_USP_CCHCS_ADT_MONTHLY_INPATIENT_CENSUS_TOTALS_SSRS::scope/delivery::structure/PROJECTION/1::expr/9": {
+  "node_id": "file::COOK_RPT_USP_CCHCS_ADT_MONTHLY_INPATIENT_CENSUS_TOTALS_SSRS::scope/delivery::structure/PROJECTION/1::expr/9",
+  "grain": "field",
+  "audience_text": "This field shows the patient service name at the event effective time.",
+  "status": "gate_passed",
+  "gate_findings": [],
+  "rounds_used": 1,
+  "model": "gpt-5-mini",
+  "basis_version": "07.1.0"
+ },
+ "file::COOK_RPT_USP_CCHCS_ADT_MONTHLY_INPATIENT_CENSUS_TOTALS_SSRS::scope/delivery::structure/PROJECTION/1::expr/10": {
+  "node_id": "file::COOK_RPT_USP_CCHCS_ADT_MONTHLY_INPATIENT_CENSUS_TOTALS_SSRS::scope/delivery::structure/PROJECTION/1::expr/10",
+  "grain": "field",
+  "audience_text": "This dataset carries the instant when the event record was actually deleted.  \nIf the event subtype indicates deletion, the instant is on or after a configurable window.",
+  "status": "gate_passed",
+  "gate_findings": [],
+  "rounds_used": 2,
+  "model": "gpt-5-mini",
+  "basis_version": "07.1.0"
+ },
+ "file::COOK_RPT_USP_CCHCS_ADT_MONTHLY_INPATIENT_CENSUS_TOTALS_SSRS::scope/delivery::structure/PROJECTION/1::expr/11": {
+  "node_id": "file::COOK_RPT_USP_CCHCS_ADT_MONTHLY_INPATIENT_CENSUS_TOTALS_SSRS::scope/delivery::structure/PROJECTION/1::expr/11",
+  "grain": "field",
+  "audience_text": "Timestamp that shows when the event record is actually created.",
+  "status": "gate_passed",
+  "gate_findings": [],
+  "rounds_used": 1,
+  "model": "gpt-5-mini",
+  "basis_version": "07.1.0"
+ },
+ "file::COOK_RPT_USP_CCHCS_ADT_MONTHLY_INPATIENT_CENSUS_TOTALS_SSRS::scope/delivery::structure/PROJECTION/1::expr/12": {
+  "node_id": "file::COOK_RPT_USP_CCHCS_ADT_MONTHLY_INPATIENT_CENSUS_TOTALS_SSRS::scope/delivery::structure/PROJECTION/1::expr/12",
+  "grain": "field",
+  "audience_text": "service area (the service area name)",
+  "status": "floor",
+  "gate_findings": [
+   "G-1: 'associated' has no stored basis"
+  ],
+  "rounds_used": 3,
+  "model": "gpt-5-mini",
+  "basis_version": "07.1.0",
+  "last_proposal": "This field shows the service area name for the department associated with the event.  \nThe service area is the area in which the department is located."
+ }
+}
