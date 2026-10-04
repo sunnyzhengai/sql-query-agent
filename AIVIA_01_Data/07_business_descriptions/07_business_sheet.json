@@ -2,17 +2,17 @@
  {
   "node_id": "file::COOK_RPT_USP_CCHCS_ADT_MONTHLY_INPATIENT_CENSUS_TOTALS_SSRS",
   "grain": "file",
-  "audience_text": "One row is: one census ADT event for a patient, representing that patient\u2019s recorded inpatient location status at a point in time.\n\nWho's in it: patients with a recorded patient identifier who had Census ADT events during the chosen date range, in included departments and service areas, and not in these excluded units: CCMC EMERGENCY, CCMC IR IMAGING, CCMC CATH LAB, CCMC MAIN OR, CCMC SPA OR, CCMC PHP PSYCHIATRY, CCMC CARDIOVASCULAR OR, and DSC OR. Service area and location are chosen when running the report, and choosing 0 means All.\n\nEach row shows: the census event status, when it was supposed to occur, who the patient is, where the patient was assigned organizationally and physically, and key encounter location classifications such as patient class and service.\n\nTime window: it includes events whose event time falls from the chosen start date through the chosen end date, with the end date treated inclusively. It shows the data as it stood at the end of the chosen as-of date: the event had to exist by then, and events canceled before that point are left out. If an event was later canceled after the as-of date, it is still included because it was still part of the record as of that date.\n\nExcludes: records without a patient identifier, records outside the chosen service area or location choices, records in the specifically excluded units listed above, records canceled on or before the as-of date, and records that do not have matches in the two separately defined required selection lists.",
+  "audience_text": "One row is: one inpatient census event for one patient at a specific effective date and time, representing where the patient was counted in the hospital census.\n\nWho's in it: patients with a recorded patient identifier who had a Census event during the chosen date range, in departments tied to the chosen service area and chosen location filters. Choosing All for service area includes every service area, and choosing All for location includes every location. The report leaves out events in these departments: CCMC EMERGENCY, CCMC IR IMAGING, CCMC CATH LAB, CCMC MAIN OR, CCMC SPA OR, CCMC PHP PSYCHIATRY, CCMC CARDIOVASCULAR OR, and DSC OR.\n\nEach row shows: the census event details, the patient\u2019s hospital classification and service, the care location where the patient was counted, service area and department identifiers, and the census day within the month.\n\nTime window: it includes census events whose effective date and time fall from the chosen start date through the chosen end date, including the whole end date. It shows the data as it stood at the end of the chosen as-of date: the event had to be created by then, and a canceled event is still included if it was not deleted until after that date.\n\nExcludes: records without a patient linked; canceled census events that had already been deleted by the end of the chosen as-of date; events from the listed emergency, procedural, operating room, and psychiatry departments.",
   "status": "gate_passed",
   "gate_findings": [],
-  "rounds_used": 2,
+  "rounds_used": 1,
   "model": "gpt-5.4",
   "basis_version": "07.2.0"
  },
  {
   "node_id": "file::COOK_RPT_USP_CCHCS_ADT_MONTHLY_INPATIENT_CENSUS_TOTALS_SSRS::scope/delivery",
   "grain": "scope",
-  "audience_text": "This selection contains inpatient census ADT events for patients with a recorded patient ID, during the chosen event date range, using the event\u2019s effective department, room, bed, patient class, patient service, and service area details. It shows the data as it existed on the chosen As Of date, so events must have been created before the day after that date, and canceled events are still included if they were not deleted until that date had passed; the end dates are inclusive. It excludes records not linked to the required related selections and excludes events in these departments: CCMC EMERGENCY, CCMC IR IMAGING, CCMC CATH LAB, CCMC MAIN OR, CCMC SPA OR, CCMC PHP PSYCHIATRY, CCMC CARDIOVASCULAR OR, and DSC OR.",
+  "audience_text": "This selection contains census ADT events for patients, tied to the unit, room, bed, patient class, patient service, and service area in effect for the event. It includes events scheduled to happen from the chosen start date through the chosen end date, treats the end date as inclusive, and shows the data as it stood at the chosen as-of date by keeping records created before the day after that date and keeping canceled records only when they were not deleted until that point or later. It excludes records without a patient, records that do not match the other required selections, and events in these departments: CCMC EMERGENCY, CCMC IR IMAGING, CCMC CATH LAB, CCMC MAIN OR, CCMC SPA OR, CCMC PHP PSYCHIATRY, CCMC CARDIOVASCULAR OR, and DSC OR.",
   "status": "gate_passed",
   "gate_findings": [],
   "rounds_used": 1,
@@ -22,7 +22,7 @@
  {
   "node_id": "file::COOK_RPT_USP_CCHCS_ADT_MONTHLY_INPATIENT_CENSUS_TOTALS_SSRS::stmt/2::scope/sub1",
   "grain": "scope",
-  "audience_text": "This selection keeps departments whose service area was chosen when running the report. If the choice includes All, it keeps every service area; otherwise it keeps only departments in the listed service areas.\n\nIt uses hospital event history together with department, room, bed, service area, and patient class reference information, and it also brings in patient service when available. Each row in this selection simply marks an eligible service area choice for a department.",
+  "audience_text": "This selection keeps departments whose service area was chosen when running the report. If the person running the report chose All, it keeps every service area; otherwise it keeps only departments in the listed service areas.\n\nIt uses department, room, bed, ADT event history, service area, patient class, and patient service reference information to support that service-area filtering. The output from this step is simply a qualifying service-area match for a department, marked with a constant value of 1.",
   "status": "gate_passed",
   "gate_findings": [],
   "rounds_used": 1,
@@ -32,7 +32,7 @@
  {
   "node_id": "file::COOK_RPT_USP_CCHCS_ADT_MONTHLY_INPATIENT_CENSUS_TOTALS_SSRS::stmt/2::scope/sub2",
   "grain": "scope",
-  "audience_text": "This selection is the list of location choices chosen when running the report. It includes either **All** when the choice is **0**, or the revenue location linked to the department on the ADT event.\n\nThe location comes from the department tied to the event, using the related room, bed, and service area details available for that hospital movement history. It carries a constant flag of **1** for each selected item.",
+  "audience_text": "This selection is the list of location choices chosen when running the report. It keeps a location when the choice is **All** using the value **0**, or when the chosen value matches the revenue location linked to the department on the ADT event.\n\nThe location list is built from ADT event history and the related bed, room, department, service area, patient class, and patient service reference information. Each returned choice carries a constant value of **1**.",
   "status": "gate_passed",
   "gate_findings": [],
   "rounds_used": 1,
@@ -42,7 +42,7 @@
  {
   "node_id": "file::COOK_RPT_USP_CCHCS_ADT_MONTHLY_INPATIENT_CENSUS_TOTALS_SSRS::scope/delivery::structure/PROJECTION/1::expr/1",
   "grain": "field",
-  "audience_text": "The field shows the ADT event type for census records; in this extract, that means the value is Census. It is limited to events that happened during the chosen date range, using an inclusive end date, and reflects the data as it stood on the As Of date, excluding records not linked to a patient, records not in the required linked selections, canceled records that were already deleted before that As Of date, and events in these units: CCMC EMERGENCY, CCMC IR IMAGING, CCMC CATH LAB, CCMC MAIN OR, CCMC SPA OR, CCMC PHP PSYCHIATRY, CCMC CARDIOVASCULAR OR, and DSC OR.",
+  "audience_text": "Identifies ADT census events for patients during the chosen date range, using the event date through the end of the end date, and reflects the data as it stood on the As Of date: events must already have been created by then, and canceled events are still included if they were not deleted until after that As Of date. Excludes records without a patient, records that do not match the separate required patient selections, and events in these departments: CCMC EMERGENCY, CCMC IR IMAGING, CCMC CATH LAB, CCMC MAIN OR, CCMC SPA OR, CCMC PHP PSYCHIATRY, CCMC CARDIOVASCULAR OR, and DSC OR.\n\nThis field returns the event type, which in this extract is Census.",
   "status": "gate_passed",
   "gate_findings": [],
   "rounds_used": 1,
@@ -52,7 +52,7 @@
  {
   "node_id": "file::COOK_RPT_USP_CCHCS_ADT_MONTHLY_INPATIENT_CENSUS_TOTALS_SSRS::scope/delivery::structure/PROJECTION/1::expr/2",
   "grain": "field",
-  "audience_text": "Shows the census event\u2019s status, such as active or canceled, for inpatient location census activity during the chosen event date range; the end date is inclusive, and it reflects the data as it stood on the As Of date, so canceled events are still included if they were not deleted until after that date. Excludes records without a patient, records not in the separately defined patient and encounter selections, and events from these units: CCMC EMERGENCY, CCMC IR IMAGING, CCMC CATH LAB, CCMC MAIN OR, CCMC SPA OR, CCMC PHP PSYCHIATRY, CCMC CARDIOVASCULAR OR, and DSC OR.",
+  "audience_text": "Shows the census event\u2019s status for each included bed movement record, such as whether it remained active or was later canceled.\n\nTime window and scope: this comes from census events that were scheduled during the chosen date range, counted through the end of the chosen As Of date, so a canceled event is still included if it was not deleted until after that date; excludes records without a patient, records not matching the report\u2019s other required linked selections, and events in these departments: CCMC EMERGENCY, CCMC IR IMAGING, CCMC CATH LAB, CCMC MAIN OR, CCMC SPA OR, CCMC PHP PSYCHIATRY, CCMC CARDIOVASCULAR OR, and DSC OR.",
   "status": "gate_passed",
   "gate_findings": [],
   "rounds_used": 1,
@@ -62,7 +62,7 @@
  {
   "node_id": "file::COOK_RPT_USP_CCHCS_ADT_MONTHLY_INPATIENT_CENSUS_TOTALS_SSRS::scope/delivery::structure/PROJECTION/1::expr/3",
   "grain": "field",
-  "audience_text": "The field is the date and time when the census ADT event was effective. It includes events during the chosen date range, counts the end date inclusively, reflects the record as it stood on the As Of date, and excludes canceled events unless they were still not canceled as of that date, along with events in these units: CCMC EMERGENCY, CCMC IR IMAGING, CCMC CATH LAB, CCMC MAIN OR, CCMC SPA OR, CCMC PHP PSYCHIATRY, CCMC CARDIOVASCULAR OR, and DSC OR.",
+  "audience_text": "The field is the date and time when the census ADT event was scheduled to occur. It only includes census events during the chosen reporting dates, using an inclusive end date, as they existed as of the chosen As Of date; canceled events are still included if they were not deleted until after that As Of date, and the extract excludes records without a patient, records not linked to the required related selections, and events in these departments: CCMC EMERGENCY, CCMC IR IMAGING, CCMC CATH LAB, CCMC MAIN OR, CCMC SPA OR, CCMC PHP PSYCHIATRY, CCMC CARDIOVASCULAR OR, and DSC OR.",
   "status": "gate_passed",
   "gate_findings": [],
   "rounds_used": 1,
@@ -72,7 +72,7 @@
  {
   "node_id": "file::COOK_RPT_USP_CCHCS_ADT_MONTHLY_INPATIENT_CENSUS_TOTALS_SSRS::scope/delivery::structure/PROJECTION/1::expr/4",
   "grain": "field",
-  "audience_text": "The patient identifier for each census ADT event in the reporting period. Time window: includes events that were supposed to happen from the chosen Start Date through the chosen End Date, counted through the end of that day, and shows the data as it existed on the chosen As Of Date, so canceled events are still included if they were not deleted until after that date. Excludes: records without a patient, records not in the separate required linked selections, and events from these departments: CCMC EMERGENCY, CCMC IR IMAGING, CCMC CATH LAB, CCMC MAIN OR, CCMC SPA OR, CCMC PHP PSYCHIATRY, CCMC CARDIOVASCULAR OR, and DSC OR.",
+  "audience_text": "The patient identifier for each census event that was scheduled to happen during the chosen date range, using data as it existed on the As Of date. Excludes canceled events that were already removed before that As Of date, records without a patient, records not in the required linked selections, and events in these units: CCMC EMERGENCY, CCMC IR IMAGING, CCMC CATH LAB, CCMC MAIN OR, CCMC SPA OR, CCMC PHP PSYCHIATRY, CCMC CARDIOVASCULAR OR, and DSC OR.",
   "status": "gate_passed",
   "gate_findings": [],
   "rounds_used": 1,
@@ -82,7 +82,7 @@
  {
   "node_id": "file::COOK_RPT_USP_CCHCS_ADT_MONTHLY_INPATIENT_CENSUS_TOTALS_SSRS::scope/delivery::structure/PROJECTION/1::expr/5",
   "grain": "field",
-  "audience_text": "The patient class shown is the hospital encounter class attached to each census ADT event, such as the class in effect for that patient movement record.\n\nIt is taken from census events that occurred during the chosen date range, using the data as it stood on the As Of date, including events later canceled only if they were still not deleted by then; it excludes records without a patient, records outside the separately defined linked selections, and events in these departments: CCMC EMERGENCY, CCMC IR IMAGING, CCMC CATH LAB, CCMC MAIN OR, CCMC SPA OR, CCMC PHP PSYCHIATRY, CCMC CARDIOVASCULAR OR, and DSC OR.",
+  "audience_text": "The patient class shown is the hospital encounter class tied to each census ADT event, for patients with a recorded patient identifier whose event fell during the chosen date range, as the data stood on the As Of date; the end date is treated inclusively, and choosing this event set excludes activity in these units: CCMC EMERGENCY, CCMC IR IMAGING, CCMC CATH LAB, CCMC MAIN OR, CCMC SPA OR, CCMC PHP PSYCHIATRY, CCMC CARDIOVASCULAR OR, and DSC OR.  \nIt is based on census events only, and excludes records that were canceled before the As Of date, records not linked to a patient, records outside the two required linked record sets, and the excluded departments listed above.",
   "status": "gate_passed",
   "gate_findings": [],
   "rounds_used": 1,
@@ -92,7 +92,7 @@
  {
   "node_id": "file::COOK_RPT_USP_CCHCS_ADT_MONTHLY_INPATIENT_CENSUS_TOTALS_SSRS::scope/delivery::structure/PROJECTION/1::expr/6",
   "grain": "field",
-  "audience_text": "The patient location census event\u2019s department name abbreviation. It reflects census events that were scheduled during the chosen date range, counted as the data stood on the As Of date, excluding canceled events that had already been deleted by then, events without a patient, events not linked to the required companion records, and events in these departments: CCMC EMERGENCY, CCMC IR IMAGING, CCMC CATH LAB, CCMC MAIN OR, CCMC SPA OR, CCMC PHP PSYCHIATRY, CCMC CARDIOVASCULAR OR, and DSC OR.",
+  "audience_text": "Department abbreviation for each census ADT event in the chosen date range, using the event\u2019s effective unit at the time it occurred. Time window: includes events from Start Date through End Date inclusive, counted as they stood as of the As Of Date, so events created after that date are left out and canceled events are still included only if they were canceled after that date; Excludes: events without a patient, events not in the separately defined required patient selections, and events from these units: CCMC EMERGENCY, CCMC IR IMAGING, CCMC CATH LAB, CCMC MAIN OR, CCMC SPA OR, CCMC PHP PSYCHIATRY, CCMC CARDIOVASCULAR OR, and DSC OR.",
   "status": "gate_passed",
   "gate_findings": [],
   "rounds_used": 1,
@@ -102,7 +102,7 @@
  {
   "node_id": "file::COOK_RPT_USP_CCHCS_ADT_MONTHLY_INPATIENT_CENSUS_TOTALS_SSRS::scope/delivery::structure/PROJECTION/1::expr/7",
   "grain": "field",
-  "audience_text": "The room from the patient census event, for included events that were scheduled to happen during the chosen date range, counted as the data stood on the As Of date, and limited to patients with the required linked records and departments outside these excluded areas: CCMC EMERGENCY, CCMC IR IMAGING, CCMC CATH LAB, CCMC MAIN OR, CCMC SPA OR, CCMC PHP PSYCHIATRY, CCMC CARDIOVASCULAR OR, and DSC OR.  \nExcludes canceled events unless they were still active as of the As Of date, events created after the As Of date, records without a patient ID, records without the required linked records, and events in the excluded departments.",
+  "audience_text": "The patient room from the census ADT event, based on where the patient was assigned at the event\u2019s effective time.\n\nIncludes census events that occurred during the chosen date range, using an inclusive end date, as the data stood on the chosen As Of date; excludes canceled events unless they were still active as of that date, records without a patient, records not linked to the required related records, and events in these departments: CCMC EMERGENCY, CCMC IR IMAGING, CCMC CATH LAB, CCMC MAIN OR, CCMC SPA OR, CCMC PHP PSYCHIATRY, CCMC CARDIOVASCULAR OR, and DSC OR.",
   "status": "gate_passed",
   "gate_findings": [],
   "rounds_used": 1,
@@ -112,7 +112,7 @@
  {
   "node_id": "file::COOK_RPT_USP_CCHCS_ADT_MONTHLY_INPATIENT_CENSUS_TOTALS_SSRS::scope/delivery::structure/PROJECTION/1::expr/8",
   "grain": "field",
-  "audience_text": "The bed attached to each census event, based on the room and bed assignment recorded for that event.\n\nTime window and excludes: includes census events during the chosen date range, using an inclusive end date, as they existed as of the As Of date; it excludes events created after that As Of date, canceled events that were already deleted before then, records without a patient, records not found in the required related selections, and events in these departments: CCMC EMERGENCY, CCMC IR IMAGING, CCMC CATH LAB, CCMC MAIN OR, CCMC SPA OR, CCMC PHP PSYCHIATRY, CCMC CARDIOVASCULAR OR, and DSC OR.",
+  "audience_text": "The bed name for each census event, based on the bed linked to that event at the time it took effect.\n\nTime window and excludes: includes census events that were supposed to happen during the chosen start and end dates, with the end date treated as inclusive, and shows the data as it stood on the chosen as-of date, so canceled events are still included if they were not deleted until after that date. Excludes events without a patient, events not found in the two required related selections, and events in these departments: CCMC EMERGENCY, CCMC IR IMAGING, CCMC CATH LAB, CCMC MAIN OR, CCMC SPA OR, CCMC PHP PSYCHIATRY, CCMC CARDIOVASCULAR OR, and DSC OR.",
   "status": "gate_passed",
   "gate_findings": [],
   "rounds_used": 1,
@@ -122,7 +122,7 @@
  {
   "node_id": "file::COOK_RPT_USP_CCHCS_ADT_MONTHLY_INPATIENT_CENSUS_TOTALS_SSRS::scope/delivery::structure/PROJECTION/1::expr/9",
   "grain": "field",
-  "audience_text": "The patient service is the hospital service attached to each census movement event, such as the clinical service responsible for the patient at that point in the stay.\n\nIt is shown for census events that happened during the chosen date range, using the data as it stood on the As Of date, and excludes canceled events unless they were still active as of that date, records without a patient, events outside the separately defined required patient selections, and events in these units: CCMC EMERGENCY, CCMC IR IMAGING, CCMC CATH LAB, CCMC MAIN OR, CCMC SPA OR, CCMC PHP PSYCHIATRY, CCMC CARDIOVASCULAR OR, and DSC OR.",
+  "audience_text": "The patient service is the hospital service tied to the patient\u2019s census event, such as the clinical service managing the stay. It is shown for census events that happened during the chosen date range, as the data stood on the As Of date, excluding canceled events removed before that date, records without a patient, records not in the required linked selections, and events in these units: CCMC EMERGENCY, CCMC IR IMAGING, CCMC CATH LAB, CCMC MAIN OR, CCMC SPA OR, CCMC PHP PSYCHIATRY, CCMC CARDIOVASCULAR OR, and DSC OR.",
   "status": "gate_passed",
   "gate_findings": [],
   "rounds_used": 1,
@@ -132,7 +132,7 @@
  {
   "node_id": "file::COOK_RPT_USP_CCHCS_ADT_MONTHLY_INPATIENT_CENSUS_TOTALS_SSRS::scope/delivery::structure/PROJECTION/1::expr/10",
   "grain": "field",
-  "audience_text": "When running the report, this field shows when the census event was deleted, if it was later canceled. The report uses census events for patients with event times during the chosen date range, reflects the data as it stood at the end of the As Of date, and excludes records without a patient, records not in the two required linked selections, and events in these departments: CCMC EMERGENCY, CCMC IR IMAGING, CCMC CATH LAB, CCMC MAIN OR, CCMC SPA OR, CCMC PHP PSYCHIATRY, CCMC CARDIOVASCULAR OR, and DSC OR.",
+  "audience_text": "When the report is run, this field shows when the census event record was deleted in the system. It is populated for census events during the chosen date range, using the data as it stood on the As Of date, and it excludes events from these units: CCMC EMERGENCY, CCMC IR IMAGING, CCMC CATH LAB, CCMC MAIN OR, CCMC SPA OR, CCMC PHP PSYCHIATRY, CCMC CARDIOVASCULAR OR, and DSC OR.",
   "status": "gate_passed",
   "gate_findings": [],
   "rounds_used": 1,
@@ -142,7 +142,7 @@
  {
   "node_id": "file::COOK_RPT_USP_CCHCS_ADT_MONTHLY_INPATIENT_CENSUS_TOTALS_SSRS::scope/delivery::structure/PROJECTION/1::expr/11",
   "grain": "field",
-  "audience_text": "When the report is run, this field shows when the census event record was entered into the system. It is drawn only from census-type ADT events for patients in the chosen date range, as the data stood on the As Of date, excluding records without a patient, records not in the separately defined required patient selections, and events in these units: CCMC EMERGENCY, CCMC IR IMAGING, CCMC CATH LAB, CCMC MAIN OR, CCMC SPA OR, CCMC PHP PSYCHIATRY, CCMC CARDIOVASCULAR OR, and DSC OR.",
+  "audience_text": "When the report is run, this field shows when the census ADT event record was entered into the system. It only appears for census events tied to a patient and the required linked records, during the chosen event date range, as the data stood on the As Of date, excluding listed procedural and emergency-style units: CCMC EMERGENCY, CCMC IR IMAGING, CCMC CATH LAB, CCMC MAIN OR, CCMC SPA OR, CCMC PHP PSYCHIATRY, CCMC CARDIOVASCULAR OR, and DSC OR.",
   "status": "gate_passed",
   "gate_findings": [],
   "rounds_used": 1,
@@ -152,7 +152,7 @@
  {
   "node_id": "file::COOK_RPT_USP_CCHCS_ADT_MONTHLY_INPATIENT_CENSUS_TOTALS_SSRS::scope/delivery::structure/PROJECTION/1::expr/12",
   "grain": "field",
-  "audience_text": "The service area is the service area tied to the department on the census event, shown as its service area name.\n\nTime window: this comes from census ADT events that were scheduled to happen during the chosen start and end dates, with the end date treated as inclusive, and it reflects the data as it stood on the chosen As Of date, including canceled events only if they were still not deleted by then. Excludes: events without a patient, events not found in the two required related selections, and events from these departments: CCMC EMERGENCY, CCMC IR IMAGING, CCMC CATH LAB, CCMC MAIN OR, CCMC SPA OR, CCMC PHP PSYCHIATRY, CCMC CARDIOVASCULAR OR, and DSC OR.",
+  "audience_text": "The service area is the service area tied to the department on the census event, shown as the service area name.\n\nIt comes from census ADT events for patients with an event time during the chosen date range, using the data as it stood as of the chosen As Of date; this excludes canceled events that were already canceled by that date, events created after that date, records without a patient, records not in the separately defined required populations, and events in these departments: CCMC EMERGENCY, CCMC IR IMAGING, CCMC CATH LAB, CCMC MAIN OR, CCMC SPA OR, CCMC PHP PSYCHIATRY, CCMC CARDIOVASCULAR OR, and DSC OR.",
   "status": "gate_passed",
   "gate_findings": [],
   "rounds_used": 1,
@@ -162,7 +162,7 @@
  {
   "node_id": "file::COOK_RPT_USP_CCHCS_ADT_MONTHLY_INPATIENT_CENSUS_TOTALS_SSRS::scope/delivery::structure/PROJECTION/1::expr/13",
   "grain": "field",
-  "audience_text": "The field is the unique identifier of the department or unit tied to each census ADT event. It comes from census events for patients with a recorded patient ID, during the chosen event date range including the end date, as the data stood on the As Of date, and excludes records not linked to the required related selections and events in these units: CCMC EMERGENCY, CCMC IR IMAGING, CCMC CATH LAB, CCMC MAIN OR, CCMC SPA OR, CCMC PHP PSYCHIATRY, CCMC CARDIOVASCULAR OR, and DSC OR.",
+  "audience_text": "The field is the unique identifier of the department or unit tied to each census ADT event, based on the unit recorded at the event\u2019s effective time. It is taken for events during the chosen date range, using the data as it stood on the As Of date, and excludes canceled events that were already canceled by then, events not linked to a patient, records failing the report\u2019s other required patient and encounter links, and events from these units: CCMC EMERGENCY, CCMC IR IMAGING, CCMC CATH LAB, CCMC MAIN OR, CCMC SPA OR, CCMC PHP PSYCHIATRY, CCMC CARDIOVASCULAR OR, and DSC OR.",
   "status": "gate_passed",
   "gate_findings": [],
   "rounds_used": 1,
@@ -172,7 +172,7 @@
  {
   "node_id": "file::COOK_RPT_USP_CCHCS_ADT_MONTHLY_INPATIENT_CENSUS_TOTALS_SSRS::scope/delivery::structure/PROJECTION/1::expr/14",
   "grain": "field",
-  "audience_text": "The room identifier for the census event\u2019s location, using the room tied to the patient movement record.\n\nTime window and exclusions: includes census events that occurred during the chosen start and end dates, with the end date treated as inclusive, based on how the data stood as of the chosen As Of date; it excludes events created after that date, events canceled before that date, records without a patient, events outside the separately defined required patient selections, and events in these departments: CCMC EMERGENCY, CCMC IR IMAGING, CCMC CATH LAB, CCMC MAIN OR, CCMC SPA OR, CCMC PHP PSYCHIATRY, CCMC CARDIOVASCULAR OR, and DSC OR.",
+  "audience_text": "The room identifier for the census event\u2019s assigned room, taken from the room attached to that event.\n\nTime window and Excludes are applied at the event level before this is returned: it reflects census events that happened during the chosen date range, using the data as it stood on the As Of date, and excludes canceled events unless they were still not canceled by that As Of date, records without a patient, events outside the separately defined patient selections, and events in these units: CCMC EMERGENCY, CCMC IR IMAGING, CCMC CATH LAB, CCMC MAIN OR, CCMC SPA OR, CCMC PHP PSYCHIATRY, CCMC CARDIOVASCULAR OR, and DSC OR.",
   "status": "gate_passed",
   "gate_findings": [],
   "rounds_used": 1,
@@ -182,7 +182,7 @@
  {
   "node_id": "file::COOK_RPT_USP_CCHCS_ADT_MONTHLY_INPATIENT_CENSUS_TOTALS_SSRS::scope/delivery::structure/PROJECTION/1::expr/15",
   "grain": "field",
-  "audience_text": "Bed record ID for each qualifying census ADT event. Time window: includes events that were supposed to happen during the chosen start and end dates, counting the end date in full, and reflects the data as it stood on the chosen As Of date, so canceled events are still included if they were not deleted until after that date; excludes records without a patient, records not in the required linked selections, and events in these departments: CCMC EMERGENCY, CCMC IR IMAGING, CCMC CATH LAB, CCMC MAIN OR, CCMC SPA OR, CCMC PHP PSYCHIATRY, CCMC CARDIOVASCULAR OR, and DSC OR.",
+  "audience_text": "Bed record ID for each census ADT event in the chosen event date range, using the data as it stood on the As Of date; the end dates are inclusive, so events on the End Date are included, and events canceled before the As Of date are excluded. Excludes records without a patient, records not in the two required linked selections, and events in these departments: CCMC EMERGENCY, CCMC IR IMAGING, CCMC CATH LAB, CCMC MAIN OR, CCMC SPA OR, CCMC PHP PSYCHIATRY, CCMC CARDIOVASCULAR OR, and DSC OR.",
   "status": "gate_passed",
   "gate_findings": [],
   "rounds_used": 1,
@@ -192,7 +192,7 @@
  {
   "node_id": "file::COOK_RPT_USP_CCHCS_ADT_MONTHLY_INPATIENT_CENSUS_TOTALS_SSRS::scope/delivery::structure/PROJECTION/1::expr/16",
   "grain": "field",
-  "audience_text": "The result is the unique identifier of each census ADT event for patients with a recorded patient ID, limited to events that were scheduled to happen during the chosen date range including the end date, and shown as the data stood on the chosen As Of date. It includes events that were not canceled, plus events that were canceled only if they were still present as of that As Of date, and it excludes events in these departments: CCMC EMERGENCY, CCMC IR IMAGING, CCMC CATH LAB, CCMC MAIN OR, CCMC SPA OR, CCMC PHP PSYCHIATRY, CCMC CARDIOVASCULAR OR, and DSC OR, as well as records not linked to the required related records.",
+  "audience_text": "The delivered field is the unique identifier of each census ADT event for patients with a recorded patient ID and matching records in two other required report selections. It includes events that were scheduled to happen during the chosen date range, reflects the data as it existed at the chosen As Of date, keeps canceled events only if they were not deleted until after that As Of date, and excludes events in these departments: CCMC EMERGENCY, CCMC IR IMAGING, CCMC CATH LAB, CCMC MAIN OR, CCMC SPA OR, CCMC PHP PSYCHIATRY, CCMC CARDIOVASCULAR OR, and DSC OR.",
   "status": "gate_passed",
   "gate_findings": [],
   "rounds_used": 1,
@@ -202,7 +202,7 @@
  {
   "node_id": "file::COOK_RPT_USP_CCHCS_ADT_MONTHLY_INPATIENT_CENSUS_TOTALS_SSRS::scope/delivery::structure/PROJECTION/1::expr/17",
   "grain": "field",
-  "audience_text": "The census day is the calendar day of the census event\u2019s effective time, for events during the chosen date range including the end date, as they stood on the As Of date. It includes only patient-linked census events from included patients and encounters, and excludes events in these units: CCMC EMERGENCY, CCMC IR IMAGING, CCMC CATH LAB, CCMC MAIN OR, CCMC SPA OR, CCMC PHP PSYCHIATRY, CCMC CARDIOVASCULAR OR, and DSC OR.",
+  "audience_text": "The patient movement event happened during the chosen reporting dates, using an inclusive end date, and it is counted as the data stood on the As Of date: it includes census events that were created before the day after that As Of date, keeps canceled events only if they were not deleted until that day or later, and excludes events from these departments: CCMC EMERGENCY, CCMC IR IMAGING, CCMC CATH LAB, CCMC MAIN OR, CCMC SPA OR, CCMC PHP PSYCHIATRY, CCMC CARDIOVASCULAR OR, and DSC OR.  \nThis field is the calendar day of that event\u2019s effective time, with only events linked to a patient and to the required related records included.",
   "status": "gate_passed",
   "gate_findings": [],
   "rounds_used": 1,
