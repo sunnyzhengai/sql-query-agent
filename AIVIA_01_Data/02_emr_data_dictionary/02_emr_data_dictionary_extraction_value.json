@@ -69470,6 +69470,71 @@
     "meaning": "Hispanic/Latino(a)"
   },
   {
+    "table_name": "ZC_EVENT_SUBTYPE",
+    "code": "1",
+    "meaning": "Original"
+  },
+  {
+    "table_name": "ZC_EVENT_SUBTYPE",
+    "code": "2",
+    "meaning": "Canceled"
+  },
+  {
+    "table_name": "ZC_EVENT_SUBTYPE",
+    "code": "3",
+    "meaning": "Update"
+  },
+  {
+    "table_name": "ZC_EVENT_TYPE",
+    "code": "1",
+    "meaning": "Admission"
+  },
+  {
+    "table_name": "ZC_EVENT_TYPE",
+    "code": "10",
+    "meaning": "Leave of Absence Census"
+  },
+  {
+    "table_name": "ZC_EVENT_TYPE",
+    "code": "2",
+    "meaning": "Discharge"
+  },
+  {
+    "table_name": "ZC_EVENT_TYPE",
+    "code": "3",
+    "meaning": "Transfer In"
+  },
+  {
+    "table_name": "ZC_EVENT_TYPE",
+    "code": "4",
+    "meaning": "Transfer Out"
+  },
+  {
+    "table_name": "ZC_EVENT_TYPE",
+    "code": "5",
+    "meaning": "Patient Update"
+  },
+  {
+    "table_name": "ZC_EVENT_TYPE",
+    "code": "6",
+    "meaning": "Census"
+  },
+  {
+    "table_name": "ZC_EVENT_TYPE",
+    "code": "7",
+    "meaning": "Hospital Outpatient"
+  },
+  {
+    "table_name": "ZC_EVENT_TYPE",
+    "code": "8",
+    "meaning": "Leave of Absence Out"
+  },
+  {
+    "table_name": "ZC_EVENT_TYPE",
+    "code": "9",
+    "meaning": "Leave of Absence Return"
+  },
+  {
     "table_name": "ZC_GENDER_IDENTITY",
     "code": "1",
     "meaning": "Female"

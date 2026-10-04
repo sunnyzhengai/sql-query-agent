@@ -82,53 +82,10 @@ def test_gate_passes_the_round5_clean_field():
                    "field") == []
 
 
-def test_gate_names_banned_words_and_raw_codes():
-    findings = bd.gate(ROUND4_SCOPE_BANNED_AND_CODE,
-                       _scope_docket(), "scope")
-    assert any("select" in f.lower() for f in findings)  # G-2
-    assert any("code" in f.lower() and "1" in f
-               for f in findings)                        # G-7
 
 
-def test_gate_budget_fails_a_marathon_sentence():
-    long = ("This selection holds patient contact language "
-            "records for every contact whose relationship to the "
-            "patient overlaps the configured reporting window in "
-            "any of several distinct recorded ways.")
-    findings = bd.gate(long, _scope_docket(), "scope")
-    assert any("words" in f.lower() for f in findings)   # G-3
 
 
-def test_gate_template_check_on_the_file_grain():
-    assert bd.gate(ROUND5_FILE_CLEAN,
-                   bd.docket_for_file(DIR05, DIR06, DIR02, LOTE),
-                   "file") == []                          # G-4 ok
-    prose = "This dataset shows monthly census patients."
-    findings = bd.gate(prose,
-                       bd.docket_for_file(DIR05, DIR06, DIR02,
-                                          LOTE), "file")
-    assert any("template" in f.lower() for f in findings)
-
-
-def test_must_say_the_gap_on_the_dynamic_file():
-    fname = "Reporting_USP_CCHCS_CC_ADT_Monthly_IP_Census_Days_SSRS"
-    docket = bd.docket_for_file(DIR05, DIR06, DIR02, fname)
-    no_gap = ("Who's in it: monthly census records.\n"
-              "Each row shows: census day counts.\n"
-              "Time window: a configurable date window\n"
-              "Excludes: none stated")
-    findings = bd.gate(no_gap, docket, "file")
-    assert any("gap" in f.lower() for f in findings)      # G-6
-
-
-def test_unbound_code_sighting_is_recorded():
-    bd.reset_sightings()
-    bd.gate(ROUND4_SCOPE_BANNED_AND_CODE, _scope_docket(),
-            "scope")
-    assert bd.code_sightings()  # the flywheel's second engine
-
-
-# ------------------------------- prompt constructor (byte-exact)
 
 def test_prompt_constructor_is_deterministic_and_example_free():
     p1 = bd.build_prompt("field", "DOCKET TEXT", [])
@@ -238,76 +195,113 @@ def test_api_failure_floors_the_node_never_crashes():
     assert used == bd.REPAIR_BUDGET
 
 
+def test_dockets_carry_the_table_descriptions():
+    """Her find 2026-10-03: the dictionary described CLARITY_ADT
+    all along — the docket must carry it (and the whitelist
+    grounds on it)."""
+    fname = ("COOK_RPT_USP_CCHCS_ADT_MONTHLY_INPATIENT_CENSUS_"
+             "TOTALS_SSRS")
+    docket = bd.docket_for_file(DIR05, DIR06, DIR02, fname)
+    assert "master table for ADT event history" in docket["text"]
+    # and the words become sayable: 'ADT', 'history' now ground
+    findings = bd.gate("Rows are ADT event history records.",
+                       docket, "scope")
+    assert not any("'adt'" in f.lower() or "'history'" in f
+                   for f in findings)
+
+
+
+RUN7_FILE_CLEAN = (
+    "One row is: one census ADT event for one patient at one "
+    "effective date and time, representing where that patient "
+    "was counted for inpatient census purposes.\n"
+    "Who's in it: patients with a recorded patient identifier "
+    "whose census event falls within the requested date range, "
+    "existed in the data as of the requested as-of date, matched "
+    "the separate service area and location selections, and were "
+    "assigned to a unit other than CCMC EMERGENCY, CCMC IR "
+    "IMAGING, CCMC CATH LAB, CCMC MAIN OR, CCMC SPA OR, CCMC PHP "
+    "PSYCHIATRY, CCMC CARDIOVASCULAR OR, or DSC OR.\n"
+    "Each row shows: the census event status, when it occurred, "
+    "the patient and visit classification, the patient's assigned "
+    "care location, and the related service area information.\n"
+    "Time window: the report includes census events whose event "
+    "time is from the start date through the end date inclusive, "
+    "shown as the data stood at the end of the as-of date.\n"
+    "Excludes: records without a patient identifier, records "
+    "outside the selected service area or location filters, and "
+    "events tied to the excluded units.")
+
+TOTALS = "COOK_RPT_USP_CCHCS_ADT_MONTHLY_INPATIENT_CENSUS_TOTALS_SSRS"
+
+
+def test_gate_v2_passes_the_recorded_run7_card():
+    """The RECORDED run-7 card (gpt-5.4, 2026-10-03) is the
+    quality bar: it must pass Gate v2 untouched."""
+    docket = bd.docket_for_file(DIR05, DIR06, DIR02, TOTALS)
+    assert bd.gate(RUN7_FILE_CLEAN, docket, "file") == []
+
+
+def test_gate_v2_template_and_register():
+    docket = bd.docket_for_file(DIR05, DIR06, DIR02, TOTALS)
+    prose = "This dataset shows monthly census patients."
+    f = bd.gate(prose, docket, "file")
+    assert any("template" in x.lower() for x in f)
+    f2 = bd.gate("It selects records with language 99.",
+                 "nothing relevant", "scope")
+    assert any("select" in x.lower() for x in f2)   # V-3
+    assert any("99" in x for x in f2)               # V-1
+
+
+def test_ungrounded_number_lands_a_sighting():
+    bd.reset_sightings()
+    bd.gate("The category is 777 here.", "no numbers stored",
+            "scope")
+    assert any(s["code"] == "777" for s in bd.code_sightings())
+
+
+def test_domain_knowledge_is_free_estate_facts_are_not():
+    """Her ruling: 'this is why we use LLM.' Domain phrasing
+    passes with no docket basis; never-list claim words die on
+    exact token."""
+    ok = bd.gate("Represents where the patient was counted for "
+                 "inpatient census purposes.", "irrelevant",
+                 "scope")
+    assert ok == []
+    dead = bd.gate("The intended purpose is a formatted export.",
+                   "irrelevant", "scope")
+    assert any("'intended'" in x for x in dead)
+    assert any("'purpose'" in x for x in dead)
+    assert any("'formatted'" in x for x in dead)
+
+
+def test_kinds_backstop_names_the_appendix():
+    docket = bd.docket_for_file(DIR05, DIR06, DIR02, TOTALS)
+    listy = RUN7_FILE_CLEAN.replace(
+        "the census event status, when it occurred, the patient "
+        "and visit classification, the patient's assigned care "
+        "location, and the related service area information",
+        "a, b, c, d, e, f, g, h, i, j, k, l, m, n, o, p")
+    f = bd.gate(listy, docket, "file")
+    assert any("appendix" in x for x in f)
+
+
+def test_must_say_the_gap_on_the_dynamic_file():
+    fname = "Reporting_USP_CCHCS_CC_ADT_Monthly_IP_Census_Days_SSRS"
+    docket = bd.docket_for_file(DIR05, DIR06, DIR02, fname)
+    no_gap = ("One row is: a census day count.\n"
+              "Who's in it: monthly census records.\n"
+              "Each row shows: census day counts.\n"
+              "Time window: a configurable date window\n"
+              "Excludes: none stated")
+    f = bd.gate(no_gap, docket, "file")
+    assert any("gap" in x.lower() for x in f)
+
+
 def test_call_timeout_is_law():
     assert bd.CALL_TIMEOUT_S == 120
 
 
-def test_template_label_words_never_fail_the_gate():
-    """The first live run's gate defect: proposals were failed
-    for using OUR OWN template labels ('excludes')."""
-    text = ("Who's in it: records from the recorded source.\n"
-            "Each row shows: recorded values.\n"
-            "Time window: a configurable date window\n"
-            "Excludes: none stated")
-    docket = {"text": "a recorded source with values and a date",
-              "gap": False, "params": False, "population": False}
-    assert bd.gate(text, docket, "file") == []
-
-
-def test_ruled_phrase_words_are_structural():
-    """The single-file probe's bug: 'specific' — S10's OWN
-    commanded phrase — was failing G-1. Ruled-phrase words can
-    never be content findings."""
-    findings = bd.gate("It holds a specific recorded type.",
-                       "nothing relevant here", "field")
-    assert not any("'specific'" in f or "'type'" in f
-                   for f in findings)
-
-
-def test_morphology_variants_match_the_docket():
-    """'location' must clear against a docket saying 'located';
-    'creation' against 'created' (the probe's stemming find)."""
-    docket = ("the service area in which this department is "
-              "located; the instant when the record was created")
-    findings = bd.gate(
-        "The location and creation are recorded.", docket,
-        "scope")
-    assert findings == []
-
-
-def test_probe_lexicon_growth_clears():
-    """Ruled growth 2026-10-03 (the single-file probe): ordinary
-    describing words; 'outside'/'external'/'failing' stay
-    blocked — the gate's catches."""
-    ok = bd.gate("Each field carries attached values configured "
-                 "within the named window.", "irrelevant",
-                 "scope")
-    assert not any(f.startswith("G-1") for f in ok)
-    blocked = bd.gate("It excludes events outside the external "
-                      "window.", "irrelevant", "scope")
-    assert any("'outside'" in f for f in blocked)
-    assert any("'external'" in f for f in blocked)
-
-
-def test_ratified_vocabulary_clears_and_never_list_dies():
-    """S9 appendix RATIFIED 2026-10-03: generic describing
-    English clears without docket basis; the never list stays
-    dead regardless of fluency."""
-    ok = bd.gate("Each record spans a period and reflects the "
-                 "linked source group totals.", "irrelevant",
-                 "scope")
-    assert not any(f.startswith("G-1") for f in ok)
-    dead = bd.gate("The values are formatted with a separator.",
-                   "irrelevant", "scope")
-    assert any("'formatted'" in f for f in dead)
-    assert any("'separator'" in f for f in dead)
-
-
-def test_gate_findings_are_deduped():
-    findings = bd.gate("The widget widget widget is here.",
-                       "nothing relevant", "scope")
-    named = [f for f in findings if "'widget'" in f]
-    assert len(named) == 1
 
 
 def test_single_file_build_scope(tmp_path):

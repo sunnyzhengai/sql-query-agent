@@ -17,7 +17,7 @@ S1-S11 and the gate checks G-1..G-7 are ruled design law.
 # the tests are red now. L02's registry seed is staged separately
 # for her ratifying hand.)
 #
-# BASIS_VERSION = "07.1.0" — the 07 grammar constant: the S-rule
+# BASIS_VERSION = "07.2.0"  # Gate v2 + the five-line card (2026-10-03) — the 07 grammar constant: the S-rule
 #   wording, the plain-word lexicon, the budgets. Any change bumps
 #   and re-pins.
 #
@@ -89,6 +89,13 @@ S1-S11 and the gate checks G-1..G-7 are ruled design law.
 # ====================================================================
 # ==== (pseudo code APPROVED 2026-10-03, Sunny: "go" — real code
 #       follows) =====================================================
+# ==== SUPERSESSION NOTE 2026-10-03 (same day, the debug01 arc):
+# the block above is 07.1.0 HISTORY. GATE v2 replaced G-1..G-7:
+# the lexical whitelist is RETIRED, the template is FIVE lines
+# (One row is: leading), budgets retired, domain knowledge free,
+# estate facts must trace, model seat gpt-5.4. The contract's
+# "THE GATE v2" section and the design doc's Gate v2 ruling are
+# the law the code below implements. ============================
 
 import json
 import re
@@ -96,68 +103,24 @@ from pathlib import Path
 
 import technical_descriptions as td
 
-BASIS_VERSION = "07.1.0"
+BASIS_VERSION = "07.2.0"  # Gate v2 + the five-line card (2026-10-03)
 
 # The template labels (S7), in ruled order.
-TEMPLATE_LABELS = ["Who's in it:", "Each row shows:",
-                   "Time window:", "Excludes:"]
+TEMPLATE_LABELS = ["One row is:", "Who's in it:",
+                   "Each row shows:", "Time window:",
+                   "Excludes:"]
 
 BANNED_WORDS = {"join", "select", "query", "table", "temp",
                 "column", "procedure", "parameter"}
 
-RESTRICTION_STEMS = {"only", "exclude", "limited", "restricted"}
+RESTRICTION_WORDS = {"only", "limited", "restricted"}
 
-# Function words — structural English, never content claims.
-FUNCTION_WORDS = set("""
-a an the and or of for to in on at by with from as is are was
-were be been has have had it its it's this that these those each
-every all any no not when where who whose which while during
-either both than then there their they them he she s t who's
-what how if will can may must into onto over under after before
-between per also such same one two three
-excludes time specific type category
-""".split())
-# ('excludes'/'time': OUR OWN S7 template labels — structural,
-#  never content claims; the first live run's gate defect)
-
-# THE DESCRIBING VOCABULARY (S9 appendix, RATIFIED 2026-10-03 —
-# one enumerated ruling; never grows case-by-case again; the
-# NEVER list words are deliberately absent: separator delimiter
-# comma semicolon formatted / purpose words / superlative claims
-# / domain words — only the docket may supply those).
-PLAIN_LEXICON = set("""
-shows lists holds carries contains includes covers combines
-groups counts adds attaches brings draws keeps returns records
-marks labels names identifies appears belongs derives applies
-matches links ties pairs gathers collects summarizes totals
-measures tracks reflects represents describes indicates means
-refers relates remains stays spans ranges starts begins ends
-stops
-row record field value list set group count total amount period
-range window date time day month year start end beginning source
-category type kind status flag detail details summary item entry
-text name label identifier description information selection
-report dataset data result
-single multiple several separate combined related linked matching
-matched recorded available missing blank empty present absent
-active inactive current specific configurable optional defined
-stated listed shown included excluded grouped
-only limited restricted excluding
-within during across together otherwise alongside plus without
-whether
-marked lacking apply demographics context speaking entered about
-none begin
-""".split())
-# the stem pool — membership runs through the same prefix-
-# tolerant matcher the docket uses, so 'values'/'value',
-# 'attached'/'attaches', 'begins'/'begin' all meet
-PLAIN_STEMS = None  # built after _stem is defined (below)
-# (ruled 2026-10-03 with the S-set; grown same day at the first
-# live run: date/missing/identifier/begin/end/details — generic
-# business words only; domain claims like admission/discharge/
-# transfer stay BLOCKED, the gate's job. 'separator' is
-# deliberately ABSENT — the round-2 fabrication must always
-# fail here)
+# THE NEVER-LIST (Gate v2, V-2): format/purpose claim words — the
+# lie taxonomy. EXACT token match, grows only by Sunny's ruling.
+# The whitelist/lexicon of 07.1.0 is RETIRED (design doc, Gate v2).
+NEVER_LIST = {"separator", "delimiter", "comma", "semicolon",
+              "formatted", "supports", "enables", "helps",
+              "intended", "purpose"}
 
 _SIGHTINGS = []
 
@@ -174,141 +137,115 @@ def _tokens(text):
     return re.findall(r"[a-z]+", text.lower())
 
 
-def _stem(tok):
-    """Suffix-tolerant normal form (the probe's find: 'location'
-    must meet 'located', 'creation' meet 'created')."""
-    for suf in ("ation", "tion", "ing", "ion", "ed", "es", "s"):
-        if tok.endswith(suf) and len(tok) - len(suf) >= 4:
-            return tok[:-len(suf)]
-    return tok
-
-
-PLAIN_STEMS = PLAIN_LEXICON | {_stem(w) for w in PLAIN_LEXICON}
-
-
-def _in_pool(stem, pool):
-    """Prefix-tolerant membership (one matcher for docket,
-    lexicon and registry pools)."""
-    if stem in pool:
-        return True
-    return len(stem) >= 4 and any(
-        len(d) >= 4 and (d.startswith(stem) or stem.startswith(d))
-        for d in pool)
-
-
-def _sentences_of(text, grain):
-    if grain == "file":
-        parts = []
-        for line in text.splitlines():
-            line = line.strip()
-            for label in TEMPLATE_LABELS:
-                if line.startswith(label):
-                    line = line[len(label):].strip()
-            if line:
-                if label == "Excludes:":
-                    parts.extend(p.strip() for p in
-                                 line.split(";") if p.strip())
-                else:
-                    parts.extend(p.strip() for p in
-                                 re.split(r"[.!?]", line)
-                                 if p.strip())
-        return parts
-    return [p.strip() for p in re.split(r"[.!?]", text)
-            if p.strip()]
-
-
 def _docket_text(docket):
     return docket["text"] if isinstance(docket, dict) else docket
 
 
 def gate(audience_text, docket, grain, registry=None):
-    """G-1..G-7 (contract law): findings list; empty == pass.
-    No model anywhere in here."""
+    """GATE v2 (contract law, 2026-10-03): the estate boundary —
+    customer-specific facts must trace to the docket; general
+    domain knowledge is FREE. No whitelist, no word budgets. No
+    model anywhere in here."""
     findings = []
     dtext = _docket_text(docket)
-    dtokens = {_stem(t) for t in _tokens(dtext)}
-    rtokens = set()
-    for row in (registry or {}).get("names", []):
-        rtokens |= {_stem(t) for t in
-                    _tokens(str(row.get("blessed_name", "")))}
+    toks = _tokens(audience_text)
 
-    # G-1 lexical whitelist — fail NAMES the token
-    quoted = re.findall(r"'[^']*'", audience_text)
-    for q in quoted:
+    # V-1 grounded values: quoted literals and numbers
+    # a quoted VALUE is '-delimited with non-letter boundaries —
+    # apostrophes inside words (Who's, patient's) are not quotes
+    qpat = r"(?<![A-Za-z])'[^']*'(?![A-Za-z])"
+    for q in re.findall(qpat, audience_text):
         if q not in dtext:
-            findings.append(f"G-1: {q} has no stored basis")
-    for tok in _tokens(audience_text):
-        if tok in FUNCTION_WORDS:
-            continue
-        stem = _stem(tok)
-        if _in_pool(stem, PLAIN_STEMS) or _in_pool(stem, dtokens) \
-                or _in_pool(stem, rtokens):
-            continue
-        findings.append(f"G-1: '{tok}' has no stored basis")
+            findings.append(f"V-1: quoted {q} not in the docket")
+    unquoted = re.sub(qpat, " ", audience_text)
+    for n in set(re.findall(r"\b\d+\b", unquoted)):
+        if n not in dtext:
+            findings.append(f"V-1: number {n} has no stored "
+                            "basis")
+            _SIGHTINGS.append({"code": n,
+                               "context": audience_text[:120]})
 
-    # G-2 banned vocabulary
-    for tok in _tokens(audience_text):
-        if _stem(tok) in BANNED_WORDS or tok in BANNED_WORDS:
-            findings.append(f"G-2: banned word '{_stem(tok)}'")
+    # V-2 the never-list (exact tokens)
+    for t in set(toks):
+        if t in NEVER_LIST:
+            findings.append(f"V-2: never-list word '{t}'")
+
+    # V-3 register: SQL vocabulary and @tokens
+    for t in set(toks):
+        if t in BANNED_WORDS or (t.endswith("s")
+                                 and t[:-1] in BANNED_WORDS):
+            findings.append(f"V-3: SQL word "
+                            f"'{t[:-1] if t not in BANNED_WORDS else t}'")
     for m in re.findall(r"@\w+", audience_text):
-        findings.append(f"G-2: banned token '{m}'")
+        findings.append(f"V-3: banned token '{m}'")
 
-    # G-3 budgets
-    for s in _sentences_of(audience_text, grain):
-        n = len(s.split())
-        if n > 15:
-            findings.append(f"G-3: sentence exceeds 15 words "
-                            f"({n})")
-    if audience_text.count("(") > 1:
-        findings.append("G-3: more than one parenthetical")
-    if re.search(r"\([^)]*\(", audience_text):
-        findings.append("G-3: nested parenthetical")
-
-    # G-4 template (file grain)
+    # V-4 the five-line template (file grain)
+    lines = [ln.strip() for ln in audience_text.splitlines()
+             if ln.strip()]
     if grain == "file":
-        lines = [ln.strip() for ln in audience_text.splitlines()
-                 if ln.strip()]
-        shape_ok = (len(lines) == 4 and all(
-            ln.startswith(lab) for ln, lab in
-            zip(lines, TEMPLATE_LABELS)))
-        if not shape_ok:
-            findings.append("G-4: template shape — exactly the "
-                            "four labeled lines")
+        if len(lines) != 5 or not all(
+                ln.startswith(lab) for ln, lab in
+                zip(lines, TEMPLATE_LABELS)):
+            findings.append("V-4: template shape — exactly the "
+                            "five labeled lines")
 
-    # G-5 anchors: restriction speech needs membership rows
+        # V-5 the kinds backstop
+        for ln in lines:
+            if ln.startswith("Each row shows:"):
+                bare = re.sub(r"\([^)]*\)", "", ln)
+                items = re.split(r"[;,]| and ", bare)
+                if len(items) > 10:
+                    findings.append(
+                        "V-5: drop the field enumeration — the "
+                        "complete field list already lives in "
+                        "the technical appendix; name at most 5 "
+                        f"KINDS ({len(items)} items)")
+
+        # V-6 must-say (exactly three members)
+        if isinstance(docket, dict):
+            low = audience_text.lower()
+            if docket.get("gap") and not any(
+                    k in low for k in ("gap", "not described",
+                                       "not covered",
+                                       "built as a string",
+                                       "run time")):
+                findings.append("V-6: the gap must be said")
+            if docket.get("params") and "window" not in low:
+                findings.append("V-6: the window must be said")
+            if docket.get("population") and                     "excludes:" not in low:
+                findings.append("V-6: the Excludes line must "
+                                "exist")
+
+    # V-7 attachment anchor
     has_membership = ("Population:" in dtext
-                      or "Excludes" in dtext
                       or (": " in dtext and
                           "no membership conditions" not in dtext))
-    if any(_stem(t) in RESTRICTION_STEMS
-           for t in _tokens(audience_text)
-           if t not in FUNCTION_WORDS) and not has_membership:
-        findings.append("G-5: restriction speech without a "
+    if any(t in RESTRICTION_WORDS for t in toks)             and not has_membership:
+        findings.append("V-7: restriction speech without a "
                         "membership row to anchor it")
 
-    # G-6 must-say (file grain, exactly three members)
-    if grain == "file" and isinstance(docket, dict):
-        low = audience_text.lower()
-        if docket.get("gap") and not any(
-                k in low for k in ("gap", "not described",
-                                   "not covered",
-                                   "built as a string",
-                                   "run time")):
-            findings.append("G-6: the gap must be said")
-        if docket.get("params") and "window" not in low:
-            findings.append("G-6: the window must be said")
-        if docket.get("population") and \
-                "excludes:" not in low:
-            findings.append("G-6: the Excludes line must exist")
+    return list(dict.fromkeys(findings))
 
-    # G-7 unbound codes never surface (S10) — sighting recorded
-    unquoted = re.sub(r"'[^']*'", " ", audience_text)
-    for tok in re.findall(r"\b\d+\b", unquoted):
-        findings.append(f"G-7: raw code '{tok}' must not "
-                        "surface in business prose")
-        _SIGHTINGS.append({"code": tok,
-                           "context": audience_text[:120]})
-    return list(dict.fromkeys(findings))  # deduped, order kept
+
+def _table_descriptions(dir02):
+    t = td._read(Path(dir02) /
+                 "02_emr_data_dictionary_extraction_table.json")
+    return {r["table_name"].upper(): r.get("table_description")
+            for r in t if r.get("table_description")}
+
+
+def _source_lines(dir05, dir02, fname):
+    """The DOCKET AMENDMENT (2026-10-03, Sunny's find): the 02
+    table descriptions of every base table the file reads — the
+    dictionary's own words, for the proposer to translate from."""
+    descs = _table_descriptions(dir02)
+    tables = set()
+    for r in td._read(Path(dir05) / "05_resolves_edges.json"):
+        if r["to_kind"] == "table" \
+                and r["from_id"].split("::")[1] == fname:
+            tables.add(r["to_id"].upper())
+    return [f"Sources: {t} — {descs[t]}"
+            for t in sorted(tables) if t in descs]
 
 
 def docket_for_file(dir05, dir06, dir02, fname):
@@ -319,7 +256,8 @@ def docket_for_file(dir05, dir06, dir02, fname):
     scope_s = [r["sentence"] for r in rows
                if r["grain"] == "scope"
                and r["node_id"].split("::")[1] == fname]
-    text = "\n".join([file_s] + scope_s)
+    text = "\n".join([file_s] + scope_s
+                     + _source_lines(dir05, dir02, fname))
     return {"text": text,
             "gap": "in this gap" in file_s,
             "params": "Parameters shaping the population"
@@ -330,41 +268,45 @@ def docket_for_file(dir05, dir06, dir02, fname):
 # ---- the prompt constructor (deterministic; example-free by law)
 
 SYSTEM_PROMPT = (
- "You write business descriptions of report data for healthcare "
- "BI consumers. You receive a TECHNICAL description rendered "
- "mechanically from parsed SQL.\n"
- "TRUTH RULES (hard): claim only what the technical text states; "
- "never invent purposes, formats, separators, counts, or "
- "meanings; 'attaching'/'attachment rule' text ADDS information "
- "to rows and never restricts who is in the data; do not decode "
- "system default expressions — say 'a configurable window'; a "
- "bare code whose meaning the text does not state must never "
- "appear — say 'a specific recorded type'; translate technical "
- "phrasing into plain words and never copy uppercase tokens, "
- "abbreviations, or quoted literals verbatim.\n"
- "STYLE RULES (hard): one claim per sentence; sentences at most "
- "15 words; no nested parentheticals and at most one short "
- "parenthetical; no SQL vocabulary (join, select, query, table, "
- "temp, column, procedure, parameter); no tokens starting with "
- "@; no field inventories or abbreviations — name KINDS of "
- "information; plain present tense, active voice. Output only "
- "what the template asks — no preamble.")
+ "You are a senior healthcare BI analyst. You receive a machine-"
+ "generated technical description of a report's SQL logic. FIRST "
+ "understand what the logic actually does; THEN explain its "
+ "MEANING to business colleagues in your own words — complete, "
+ "natural sentences, never mirroring the technical phrasing.\n"
+ "USE YOUR DOMAIN KNOWLEDGE freely to explain what standard "
+ "healthcare/EMR concepts mean operationally. Decode provable "
+ "logic plainly: day-adding date arithmetic usually means an "
+ "inclusive end date; a filter accepting a special value or a "
+ "listed identifier is a multi-select choice (say what the "
+ "special value does); created/deleted rules against an as-of "
+ "date mean data as it stood on that date. Stay silent only "
+ "about genuinely opaque expressions.\n"
+ "THE ESTATE BOUNDARY (hard): every CUSTOMER-SPECIFIC fact — "
+ "names, codes, values, filters, formats in THIS data — must "
+ "come from the technical description; never guess those; never "
+ "invent formats or purposes.\n"
+ "REGISTER: no SQL vocabulary, no tokens starting with @, no "
+ "symbols like >= or &.")
 
 _GRAIN_INSTRUCTIONS = {
-    "file": ("Grain: a whole report dataset. Produce EXACTLY "
-             "these four labeled lines, nothing else:\n"
-             "Who's in it: <who the rows are about, one "
-             "sentence>\n"
-             "Each row shows: <the KINDS of information one row "
-             "carries, one sentence, no field names>\n"
-             "Time window: <the window, one short phrase>\n"
-             "Excludes: <each exclusion as a short plain-English "
-             "phrase, semicolon-separated>"),
+    "file": ("Grain: a whole report dataset. On the 'Each row "
+             "shows' line name AT MOST 5 KINDS of information "
+             "and no individual fields — the COMPLETE field "
+             "list is already published in this report's "
+             "technical appendix, so omit fields confidently.\n"
+             "Produce exactly these five labeled lines:\n"
+             "One row is: <what one row IS, in business "
+             "meaning>\n"
+             "Who's in it: <the population, plainly>\n"
+             "Each row shows: <at most 5 kinds>\n"
+             "Time window: <the window and as-of behavior, "
+             "decoded>\n"
+             "Excludes: <the exclusions, named>"),
     "scope": ("Grain: one selection inside the dataset build. "
-              "At most 3 sentences, each at most 15 words, "
-              "describing what this selection contains."),
-    "field": ("Grain: one delivered field. At most 2 sentences, "
-              "each at most 15 words."),
+              "At most 3 natural sentences describing what this "
+              "selection contains."),
+    "field": ("Grain: one delivered field. At most 2 natural "
+              "sentences for a business reader."),
 }
 
 
@@ -441,9 +383,15 @@ def build07(dir05, dir06, out07, dir02, no_llm=False,
         floor = next(r["sentence"] for r in six
                      if r["node_id"] == f"file::{f}")
         specs.append((f"file::{f}", "file", docket, floor))
+    src_by_file = {f: "\n".join(_source_lines(dir05, dir02, f))
+                   for f in files}
     for r in six:
         if r["grain"] == "scope":
-            specs.append((r["node_id"], "scope", r["sentence"],
+            fname = r["node_id"].split("::")[1]
+            docket = r["sentence"] + (
+                "\n" + src_by_file[fname]
+                if src_by_file.get(fname) else "")
+            specs.append((r["node_id"], "scope", docket,
                           r["sentence"]))
     for expr_id, scope_id, item in _field_nodes(dir05, dir02):
         if only_file and scope_id.split("::")[1] != only_file:
@@ -516,7 +464,7 @@ def build07(dir05, dir06, out07, dir02, no_llm=False,
 
 # ---- the paid proposer loop (build-time only; never in tests)
 
-_MODEL_NAME = "gpt-5-mini"
+_MODEL_NAME = "gpt-5.4"  # her ruling: the large seat
 REPAIR_BUDGET = 3
 CALL_TIMEOUT_S = 120  # harness law 2026-10-03: a wedged socket
 #                       can never hang the build

@@ -14475,3 +14475,16 @@ ZC_STATE	63	Yukon
 ZC_STATE	7	Connecticut
 ZC_STATE	8	Delaware
 ZC_STATE	9	District of Columbia
+ZC_EVENT_TYPE	1	Admission
+ZC_EVENT_TYPE	2	Discharge
+ZC_EVENT_TYPE	3	Transfer In
+ZC_EVENT_TYPE	4	Transfer Out
+ZC_EVENT_TYPE	5	Patient Update
+ZC_EVENT_TYPE	6	Census
+ZC_EVENT_TYPE	7	Hospital Outpatient
+ZC_EVENT_TYPE	8	Leave of Absence Out
+ZC_EVENT_TYPE	9	Leave of Absence Return
+ZC_EVENT_TYPE	10	Leave of Absence Census
+ZC_EVENT_SUBTYPE	1	Original
+ZC_EVENT_SUBTYPE	2	Canceled
+ZC_EVENT_SUBTYPE	3	Update

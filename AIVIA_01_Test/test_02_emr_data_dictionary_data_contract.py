@@ -42,9 +42,17 @@ def test_the_parse_door_opens():
     scriptdom_loader.ensure_scriptdom()
 
 
+
+def _corpus(name):
+    """Extension-tolerant corpus read (the 2026-10-03 .sql
+    rename; extraction entries keep extensionless names)."""
+    p = SQL_DIR / name
+    if not p.exists():
+        p = SQL_DIR / (name + ".sql")
+    return p.read_text(encoding="utf-8-sig")
+
 def test_one_real_subject_file_parses_clean():
-    sql = (SQL_DIR / "COOK_RPT_usp_SF_CensusDashboard").read_text(
-        encoding="utf-8-sig")
+    sql = _corpus("COOK_RPT_usp_SF_CensusDashboard")
     fragment, messages = scriptdom_loader.parse_tsql(sql)
     assert fragment is not None
     assert messages == []
@@ -165,7 +173,7 @@ def test_the_evidence_law_holds_everywhere(extraction):
     entries, _ = extraction
     checked = 0
     for entry in entries:
-        text = (SQL_DIR / entry["name"]).read_text(encoding="utf-8-sig")
+        text = _corpus(entry["name"])
         text = text.replace("\r\n", "\n").replace("\r", "\n")
         checked += _assert_evidence_against(entry, text, entry["name"])
         for node in _walk_nodes(entry):
@@ -1060,14 +1068,14 @@ def real_graph():
 def test_real_graph_structure_pins_the_corpus(real_graph):
     census = real_graph["census"]
     # Re-based 2026-10-02: the CR_STAT_EXECUTION supplemental entry.
-    assert census["tables"] == 39 and census["columns"] == 1621
-    assert census["joins_by_fk"] == 210      # the in-scope join rows
+    assert census["tables"] == 41 and census["columns"] == 1631
+    assert census["joins_by_fk"] == 216  # re-based 2026-10-03: ZC_EVENT scope      # the in-scope join rows
     assert census["joins_by_rule"] == 182    # DATETIME columns, L08
     # (+1 2026-10-02: EXEC_START_TIME's date_dimension rule edge)
     # shape 9 closes: ONE component with the rule edges built —
     # CR_STAT_EXECUTION joins the component through its rule edge
     assert len(census["components"]) == 1
-    assert len(census["components"][0]) == 39
+    assert len(census["components"][0]) == 41  # re-based 2026-10-03: the ZC tables join through the ADT fk edges
 
 
 def test_first_lock_round_rulings_are_mapped(extraction):
@@ -1091,3 +1099,28 @@ def test_first_lock_round_rulings_are_mapped(extraction):
     # The accepted remainder stays a counted remainder.
     rem_types = {i["type"] for e in entries for i in e["remainder"]}
     assert "SetTransactionIsolationLevelStatement" in rem_types
+
+
+def test_reuse_never_copies_a_null_embedding():
+    """2026-10-03 find: a prior row whose embedding is None must
+    NOT satisfy reuse — the economy law reuses vectors, not
+    holes."""
+    import json as _json
+
+    from build_dictionary_sheets import _embed_with_reuse
+    row = {"table_id": "T", "column_id": "C",
+           "column_name": "X", "column_name_embedding": None}
+    prior = [dict(row)]  # same ids, same text, None embedding
+    import os
+    import tempfile
+    with tempfile.TemporaryDirectory() as d:
+        p = os.path.join(d, "prev.json")
+        open(p, "w").write(_json.dumps(prior))
+        census = {"embeddings_new": 0, "embeddings_reused": 0}
+        _embed_with_reuse([row],
+                          [(row, "column_name_embedding", "X")],
+                          p, lambda texts: [[0.1] * 3072
+                                            for _ in texts],
+                          census)
+    assert census["embeddings_new"] == 1
+    assert row["column_name_embedding"] is not None

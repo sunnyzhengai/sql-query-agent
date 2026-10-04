@@ -545,6 +545,7 @@ def test_real_assets_smoke():
     assets = chat_bot.load_assets(DATA02, DATA03)
     census = assets["census"]
     # Re-based 2026-10-02: the CR_STAT_EXECUTION supplemental entry.
-    assert census["tables"] == 39 and census["columns"] == 1621
+    assert census["tables"] == 41 and census["columns"] == 1631
+    # re-based 2026-10-03: the ZC_EVENT_TYPE/SUBTYPE scope extension
     assert census["abstract_rows"] >= 1660
     assert census["lane2_ready"] is True

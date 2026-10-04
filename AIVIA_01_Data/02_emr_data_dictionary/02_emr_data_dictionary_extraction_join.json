@@ -31,7 +31,7 @@
     "may_be_stale_c": "2",
     "is_current_data_model_yn": "Y",
     "is_supplemental_yn": "N",
-    "destin_in_scope": false
+    "destin_in_scope": true
   },
   {
     "join_id": "C00000000000171560B21EAC0FFB60986:3",
@@ -48,7 +48,7 @@
     "may_be_stale_c": "2",
     "is_current_data_model_yn": "Y",
     "is_supplemental_yn": "N",
-    "destin_in_scope": false
+    "destin_in_scope": true
   },
   {
     "join_id": "C00000000000171560B21EAC0FFB60986:4",
@@ -405,7 +405,7 @@
     "may_be_stale_c": "2",
     "is_current_data_model_yn": "Y",
     "is_supplemental_yn": "N",
-    "destin_in_scope": false
+    "destin_in_scope": true
   },
   {
     "join_id": "C00000000000171560B21EAC0FFB60986:25",
@@ -422,7 +422,7 @@
     "may_be_stale_c": "2",
     "is_current_data_model_yn": "Y",
     "is_supplemental_yn": "N",
-    "destin_in_scope": false
+    "destin_in_scope": true
   },
   {
     "join_id": "C00000000000171560B21EAC0FFB60986:26",
@@ -4400,7 +4400,7 @@
     "may_be_stale_c": "2",
     "is_current_data_model_yn": "Y",
     "is_supplemental_yn": "N",
-    "destin_in_scope": false
+    "destin_in_scope": true
   },
   {
     "join_id": "C00000000000171560B21EAC0FFB60986:260",
@@ -85932,7 +85932,7 @@
     "may_be_stale_c": "3",
     "is_current_data_model_yn": "Y",
     "is_supplemental_yn": "N",
-    "destin_in_scope": false
+    "destin_in_scope": true
   },
   {
     "join_id": "C0000000001AC082DF9549832162D1B31:134",

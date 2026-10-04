@@ -38,3 +38,5 @@ C00000000000184090B21EAC0FFB60986	ZC_SEX	NULL	N
 C0000000000046B700B21EAC0FFB60986	ZC_SEX_ASGN_AT_BIRTH	NULL	N
 C000000000001979A0B21EAC0FFB60986	ZC_STATE	This table contains the categories for state/province.	N
 SUPP::CR_STAT_EXECUTION	CR_STAT_EXECUTION	SUPPLEMENTAL ENTRY (authored 2026-10-02, Sunny's ruling, option 1): Clarity report-execution log — reporting infrastructure that Epic's published data dictionary (CLARITY_TBL/CLARITY_COL) does not document; structure verifiable via INFORMATION_SCHEMA. Records each report run and its timing. In this estate it serves as the data-freshness (as-of) stamp for the census dashboards.	N
+C000000000004091C0B21EAC0FFB60986	ZC_EVENT_TYPE	NULL	N
+C000000000004090A0B21EAC0FFB60986	ZC_EVENT_SUBTYPE	NULL	N

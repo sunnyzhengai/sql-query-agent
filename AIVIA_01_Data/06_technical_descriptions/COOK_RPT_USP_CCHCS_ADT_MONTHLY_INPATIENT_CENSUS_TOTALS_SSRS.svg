@@ -19,9 +19,9 @@
 <text x="64" y="298" font-size="11">JOIN (LeftOuter):</text>
 <text x="64" y="313" font-size="11">  - dep.SERV_AREA_ID = sa.SERV_AREA_ID</text>
 <text x="64" y="328" font-size="11">WHERE:</text>
-<text x="64" y="343" font-size="11">  - adt.EVENT_TYPE_C = '6'</text>
-<text x="64" y="358" font-size="11">  - adt.EVENT_SUBTYPE_C &lt;&gt; '2'</text>
-<text x="64" y="373" font-size="11">  - adt.EVENT_SUBTYPE_C = '2'</text>
+<text x="64" y="343" font-size="11">  - adt.EVENT_TYPE_C = '6' = 'Census' (6)</text>
+<text x="64" y="358" font-size="11">  - adt.EVENT_SUBTYPE_C &lt;&gt; '2' = 'Canceled' (2)</text>
+<text x="64" y="373" font-size="11">  - adt.EVENT_SUBTYPE_C = '2' = 'Canceled' (2)</text>
 <text x="64" y="388" font-size="11">  - adt.DELETE_TIME &gt;= DATEADD(D, 1, @AsOfDate)</text>
 <text x="64" y="403" font-size="11">  - adt.EFFECTIVE_TIME &gt;= @StartDate</text>
 <text x="64" y="418" font-size="11">  - adt.EFFECTIVE_TIME &lt; DATEADD(D, 1, @EndDate)</text>

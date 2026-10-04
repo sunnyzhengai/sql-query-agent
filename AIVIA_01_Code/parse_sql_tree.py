@@ -1166,7 +1166,9 @@ def build_extraction(sql_dir, out_path, master_path=None):
     counts, examples = Counter(), {}
     for path in files:
         entry, fragment, text = map_tree(
-            path.name, path.read_text(encoding="utf-8-sig"))
+            path.stem,  # extensionless names (the
+            # 2026-10-03 .sql rename; the stored law)
+            path.read_text(encoding="utf-8-sig"))
         _raw_walk(fragment, text, counts, examples)
         entries.append(entry)
     entries.sort(key=lambda e: e["name"])

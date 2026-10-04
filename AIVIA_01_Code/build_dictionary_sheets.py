@@ -298,7 +298,10 @@ def _embed_with_reuse(rows, plans, out_path, embedder, census):
     for row, field, text in plans:
         rid = row.get("table_id"), row.get("column_id")
         prior = old.get((rid, field))
-        if prior is not None and prior[0] == _plan_text(row, field):
+        if prior is not None and prior[1] is not None \
+                and prior[0] == _plan_text(row, field):
+            # prior[1] check (2026-10-03): a stored None never
+            # satisfies reuse — vectors are reused, holes are not
             row[field] = prior[1]
             census["embeddings_reused"] += 1
         else:

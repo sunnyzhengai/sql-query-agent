@@ -15,12 +15,20 @@ What is the input of this data contract?
   known), the eleven 05 sheets (structural anchors: on_class,
   resolves, parameters), the 02 sheets (words, value meanings,
   table descriptions), the 05 kind library.
+  DOCKET AMENDMENT (2026-10-03, Sunny's find — "didn't we have
+  the description from the dictionary?"): file and scope dockets
+  CARRY the 02 table descriptions of every base table the node
+  reads ("Sources:" lines). The dictionary's own words are the
+  interpretation material the proposer translates from and the
+  whitelist grounds against — the gate blocks only words from
+  NOWHERE, never words the dictionary holds.
 - The importable 06 renderers (technical_descriptions.py) — the
   field grain's defining phrases (design ruling 4 / G2a); 06 is
   never reopened by this phase.
 - THE BLESSING REGISTRY (07_blessing_registry.json) — Sunny's
   hand only (schema below); machines read it, never write rows.
-- The LLM seat: local dev gpt-5-mini; production gpt-5.4-mini on
+- The LLM seat: gpt-5.4 (Sunny 2026-10-03: 'don't use mini, use
+  the large one'); the production seat re-decides at the move on
   the aivia Azure endpoint (parity law at the move). PAID CALLS
   ONLY at build/run time; Claude's test suite is DETERMINISTIC —
   recorded real outputs (the dry run's 14 calls, provenance in
@@ -37,7 +45,7 @@ What is the output of this data contract?
   - node_id (the Phase I node), grain: file | scope | field
     (term grain deferred to the glossary milestone).
   - audience_text: the business description (S1-S11 govern its
-    shape; file grain = the S7 four-line micro-template).
+    shape; file grain = the FIVE-line card, One row is: leading (2026-10-03)).
   - status: proposed | gate_passed | blessed | floor — the
     EFFECTIVE text ladder is blessed > gate_passed > floor; a
     floor row's audience_text IS the 06 sentence, verbatim.
@@ -83,28 +91,38 @@ wedged socket with zero CPU, nothing written, no progress):
   stand-in proposer — plumbing tests, never fake LLM output
   presented as speech; the paid path stays build-only.
 
-THE GATE (contract law, ruled; no model anywhere in it):
-  G-1 LEXICAL WHITELIST: every content token in audience_text
-      must trace to the docket (06 sentences + 05 rows + 02
-      words + blessed vocabulary) or the plain-word closed list
-      (function words); fail names the token.
-  G-2 BANNED VOCABULARY (S2): join, select, query, table, temp,
-      column, procedure, parameter, @tokens, raw codes.
-  G-3 BUDGETS (S8): sentence count and per-sentence word caps
-      by grain; one parenthetical max; no nesting.
-  G-4 TEMPLATE (S7): file grain = exactly the four labeled
-      lines.
-  G-5 MEMBERSHIP/ATTACHMENT ANCHORS (S4): restriction claims
-      anchor to Population/WHERE rows; attachment speech
-      anchors to on_class attachment rows; cross-speaking
-      fails.
-  G-6 MUST-SAY (exactly three): the gap sentence's business
-      echo for dynamic-SQL files; the window when parameters
-      shape the population; the Excludes line when exclusions
-      exist.
-  G-7 S10: no unbound code appears; the sighting is RECORDED.
-  A proposal passes only when every check passes. Repair budget
-  3; then the floor stands, findings kept.
+THE GATE v2 (contract law, REWRITTEN WHOLE 2026-10-03 per the
+debug01/debug02 rulings; no model anywhere in it; the lexical
+whitelist is RETIRED — see the design doc's Gate v2 section):
+  THE ESTATE BOUNDARY: customer-specific facts (names, codes,
+  values, filters, formats of this estate) must trace to the
+  docket; general domain knowledge is FREE — the gate polices
+  the truth boundary and the register, never interpretation.
+  V-1 GROUNDED VALUES: every quoted value and every number in
+      audience_text must appear in the docket; an ungrounded
+      number fails AND lands a code sighting (S10 narrowed:
+      grounded numbers may speak).
+  V-2 THE NEVER-LIST: format/purpose claim words (separator,
+      delimiter, comma, semicolon, formatted, supports,
+      enables, helps, intended, purpose) — the lie taxonomy;
+      grows only by Sunny's ruling.
+  V-3 REGISTER: no SQL vocabulary (join, select, query, table,
+      temp, column, procedure, parameter), no @tokens.
+  V-4 TEMPLATE: file grain = exactly the FIVE labeled lines
+      (One row is / Who's in it / Each row shows / Time window
+      / Excludes).
+  V-5 THE KINDS BACKSTOP: the Each-row-shows line over ~10
+      segments (parentheticals stripped) fails with the named
+      objection — the complete field list already lives in the
+      technical appendix.
+  V-6 MUST-SAY (exactly three): the gap echo (dynamic-SQL
+      files), the window (population-shaping parameters), the
+      Excludes line (existing exclusions).
+  V-7 ATTACHMENT ANCHOR: restriction speech requires a
+      membership row to anchor it.
+  No word budgets (retired). A proposal passes only when every
+  check passes. Repair budget 3; then the floor stands,
+  findings and last_proposal kept.
 
 What are the tests?
 - AIVIA_01_Test/test_07_business_descriptions_data_contract.py —

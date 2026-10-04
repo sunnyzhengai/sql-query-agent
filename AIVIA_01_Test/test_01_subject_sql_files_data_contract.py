@@ -43,8 +43,10 @@ EMBEDDING_LENGTH = 3072
 def sql_file_names(folder: Path) -> set:
     """The subject sql files: every visible file in the folder except the
     data sheet itself (the sheet lives alongside the files per the design doc)."""
+    # Sunny renamed the corpus files to .sql (2026-10-03); the
+    # sheet keys stay extensionless — compare by STEM.
     return {
-        p.name
+        p.stem
         for p in folder.iterdir()
         if p.is_file() and not p.name.startswith(".") and p.suffix != ".json"
     }

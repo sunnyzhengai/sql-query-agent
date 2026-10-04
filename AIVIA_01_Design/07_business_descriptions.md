@@ -30,9 +30,67 @@ Design description (draft):
 - Paid API calls only, per standing law. Dry-run cost evidence:
   convergence ≈ 3 rounds per grain at gpt-5-mini prices.
 
+THE GOOD DESCRIPTION — RULED 2026-10-03 (Sunny, the debug01
+sessions; supersedes where it conflicts with anything below):
+A good report description answers FIVE questions, in order, as
+five labeled lines:
+  One row is:      what one row IS, in business meaning
+  Who's in it:     the population — in and out, plainly
+  Each row shows:  AT MOST 5 KINDS of information, never fields
+  Time window:     the window + the as-of behavior, decoded
+  Excludes:        the exclusions, named
+Quality bars and their judges: TRUE (estate facts trace to
+stored rows — the machine gate); PLAIN (natural complete
+sentences, a human register — her eye); COMPLETE-FOR-PURPOSE
+(the five questions; omission only by rule — must-say);
+SCANNABLE (the template — the machine). The test of the whole:
+a business user decides "is this the report I need, can I trust
+this number" without opening the SQL.
+
+GATE v2 — RULED 2026-10-03 (the Echo-law generator verdict +
+the debug01/debug02 A/B evidence; Sunny: "narrow to fact-words"
+then, on the evidence, further):
+- THE WORD WHITELIST IS RETIRED (S9's appendix and its lexicon
+  are SUPERSEDED — kept in this doc as history). Four
+  recalibrations on one beat = wrong mechanism; the A/B run
+  showed it was the gate-ese generator and its one famous catch
+  (the semicolon) dies twice over without it.
+- THE ESTATE BOUNDARY replaces it: every CUSTOMER-SPECIFIC fact
+  (names, codes, values, filters, formats of THIS estate) must
+  trace to the docket; GENERAL DOMAIN KNOWLEDGE IS FREE — "this
+  is why we use LLM" (her ruling). Interpretation is the
+  model's job; the gate polices truth boundary and register,
+  never thinking.
+- THE SURVIVING CHECKS (all precise, zero calibration debt):
+  quoted values + numbers must appear in the docket (an
+  UNGROUNDED number fails AND lands a code sighting — S10
+  narrowed: grounded numbers may speak); the never-list
+  (format/purpose claim words — the lie taxonomy, ~15 words,
+  grows only by her ruling); SQL vocabulary + @tokens banned;
+  the five-line template; the kinds backstop (the Each-row-
+  shows line over ~10 segments fails with "the full field list
+  already lives in the technical appendix — name kinds");
+  must-say (gap / window / excludes); the attachment anchor.
+- WORD BUDGETS RETIRED (her "don't limit yet"); natural
+  sentences; the kinds backstop replaces counting.
+- S5 FLIPPED: provable logic IS decoded (inclusive date
+  arithmetic, special-value multi-select, as-of replay);
+  silence only for genuinely opaque expressions.
+- MODEL SEAT: gpt-5.4 (her "don't use mini, use the large one");
+  the production seat re-decides at the Fabric move under the
+  parity law.
+- THE PROMPT POSTURE (run-7 validated): understand first, then
+  explain in own words; never mirror the technical phrasing;
+  permission to omit (the appendix holds the complete detail).
+- Evidence trail: debug01.md runs 1-7 — ungated ~90% accurate
+  (the docket carries accuracy), run 7 PASS round 1 at gold
+  parity. Residual variance between runs is sampling; her
+  blessing picks.
+
 THE STYLE GRAMMAR (S-rules) — RULED IN THE DRY RUN, Sunny's go
-per round (2026-10-03); to be re-stamped as a set at the design
-session:
+per round (2026-10-03); S2/S4/S6/S7(as five lines)/S10(narrowed)
+/S11 stand; S1/S3 absorbed into the definition above; S5
+FLIPPED, S8 budgets and S9's lexicon RETIRED per Gate v2:
   S1  THE SHAPE (file grain): labeled parts, never prose walls.
   S2  BANNED VOCABULARY: no SQL words (join, select, query,
       table, temp, column, procedure, parameter), no @tokens,

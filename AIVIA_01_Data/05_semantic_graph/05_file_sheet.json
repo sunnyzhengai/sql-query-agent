@@ -2,97 +2,97 @@
   {
     "file_name": "COOK_RPT_USP_CCHCS_ADT_MONTHLY_INPATIENT_CENSUS_TOTALS_SSRS",
     "dialect": "tsql",
-    "parsed_at": "2026-10-03T02:46:14.397784+00:00",
+    "parsed_at": "2026-10-04T04:29:32.574584+00:00",
     "statement_total": 2,
     "statements_handled": 1,
     "statements_operational": 1,
     "statements_gap": 0,
     "remainder_total": 0,
     "parser_version": "ScriptDom 18.0.78.1 / TSql160Parser",
-    "kind_library_version": "b763a0edebd7"
+    "kind_library_version": "a7234faca2bb"
   },
   {
     "file_name": "COOK_RPT_usp_PTA_CensusDashboard_PBI",
     "dialect": "tsql",
-    "parsed_at": "2026-10-03T02:46:14.442242+00:00",
+    "parsed_at": "2026-10-04T04:29:32.617836+00:00",
     "statement_total": 3,
     "statements_handled": 1,
     "statements_operational": 2,
     "statements_gap": 0,
     "remainder_total": 0,
     "parser_version": "ScriptDom 18.0.78.1 / TSql160Parser",
-    "kind_library_version": "b763a0edebd7"
+    "kind_library_version": "a7234faca2bb"
   },
   {
     "file_name": "COOK_RPT_usp_SF_CensusDashboard",
     "dialect": "tsql",
-    "parsed_at": "2026-10-03T02:46:14.469701+00:00",
+    "parsed_at": "2026-10-04T04:29:32.645397+00:00",
     "statement_total": 3,
     "statements_handled": 1,
     "statements_operational": 2,
     "statements_gap": 0,
     "remainder_total": 0,
     "parser_version": "ScriptDom 18.0.78.1 / TSql160Parser",
-    "kind_library_version": "b763a0edebd7"
+    "kind_library_version": "a7234faca2bb"
   },
   {
     "file_name": "Reporting_USP_CCHCS_CC_ADT_Monthly_IP_Census_Days_SSRS",
     "dialect": "tsql",
-    "parsed_at": "2026-10-03T02:46:14.476513+00:00",
+    "parsed_at": "2026-10-04T04:29:32.652730+00:00",
     "statement_total": 6,
     "statements_handled": 4,
     "statements_operational": 1,
     "statements_gap": 1,
     "remainder_total": 0,
     "parser_version": "ScriptDom 18.0.78.1 / TSql160Parser",
-    "kind_library_version": "b763a0edebd7"
+    "kind_library_version": "a7234faca2bb"
   },
   {
     "file_name": "Reporting_USP_CCHCS_CC_ADT_Monthly_IP_Census_Totals_SSRS",
     "dialect": "tsql",
-    "parsed_at": "2026-10-03T02:46:14.479005+00:00",
+    "parsed_at": "2026-10-04T04:29:32.655576+00:00",
     "statement_total": 6,
     "statements_handled": 4,
     "statements_operational": 1,
     "statements_gap": 1,
     "remainder_total": 0,
     "parser_version": "ScriptDom 18.0.78.1 / TSql160Parser",
-    "kind_library_version": "b763a0edebd7"
+    "kind_library_version": "a7234faca2bb"
   },
   {
     "file_name": "Reporting_USP_CCMC_LOTE_Census_Interpreter_Services_Detail_PBI",
     "dialect": "tsql",
-    "parsed_at": "2026-10-03T02:46:14.627650+00:00",
+    "parsed_at": "2026-10-04T04:29:32.803224+00:00",
     "statement_total": 17,
     "statements_handled": 7,
     "statements_operational": 10,
     "statements_gap": 0,
     "remainder_total": 0,
     "parser_version": "ScriptDom 18.0.78.1 / TSql160Parser",
-    "kind_library_version": "b763a0edebd7"
+    "kind_library_version": "a7234faca2bb"
   },
   {
     "file_name": "Reporting_USP_CCMC_LOTE_Census_Interpreter_Services_Summary_PBI",
     "dialect": "tsql",
-    "parsed_at": "2026-10-03T02:46:14.690047+00:00",
+    "parsed_at": "2026-10-04T04:29:32.865938+00:00",
     "statement_total": 23,
     "statements_handled": 8,
     "statements_operational": 15,
     "statements_gap": 0,
     "remainder_total": 0,
     "parser_version": "ScriptDom 18.0.78.1 / TSql160Parser",
-    "kind_library_version": "b763a0edebd7"
+    "kind_library_version": "a7234faca2bb"
   },
   {
     "file_name": "Reporting_USP_Hospitalist_Daily_Census_Report_92a_PBI",
     "dialect": "tsql",
-    "parsed_at": "2026-10-03T02:46:14.696815+00:00",
+    "parsed_at": "2026-10-04T04:29:32.873910+00:00",
     "statement_total": 5,
     "statements_handled": 1,
     "statements_operational": 4,
     "statements_gap": 0,
     "remainder_total": 0,
     "parser_version": "ScriptDom 18.0.78.1 / TSql160Parser",
-    "kind_library_version": "b763a0edebd7"
+    "kind_library_version": "a7234faca2bb"
   }
 ]

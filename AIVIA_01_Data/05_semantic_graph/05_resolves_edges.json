@@ -385,6 +385,27 @@
     "match_basis": "exact"
   },
   {
+    "from_id": "file::COOK_RPT_USP_CCHCS_ADT_MONTHLY_INPATIENT_CENSUS_TOTALS_SSRS::scope/delivery::structure/WHERE/1::structure/AND/1::pred/1::expr/2",
+    "ref_text": "'6'",
+    "to_kind": "value",
+    "to_id": "ZC_EVENT_TYPE::6",
+    "match_basis": "exact"
+  },
+  {
+    "from_id": "file::COOK_RPT_USP_CCHCS_ADT_MONTHLY_INPATIENT_CENSUS_TOTALS_SSRS::scope/delivery::structure/WHERE/1::structure/AND/1::structure/OR/1::pred/1::expr/2",
+    "ref_text": "'2'",
+    "to_kind": "value",
+    "to_id": "ZC_EVENT_SUBTYPE::2",
+    "match_basis": "exact"
+  },
+  {
+    "from_id": "file::COOK_RPT_USP_CCHCS_ADT_MONTHLY_INPATIENT_CENSUS_TOTALS_SSRS::scope/delivery::structure/WHERE/1::structure/AND/1::structure/OR/1::structure/AND/1::pred/1::expr/2",
+    "ref_text": "'2'",
+    "to_kind": "value",
+    "to_id": "ZC_EVENT_SUBTYPE::2",
+    "match_basis": "exact"
+  },
+  {
     "from_id": "file::COOK_RPT_USP_CCHCS_ADT_MONTHLY_INPATIENT_CENSUS_TOTALS_SSRS::scope/delivery::structure/WHERE/1::structure/AND/1::pred/8::expr/2",
     "ref_text": "'100108022'",
     "to_kind": "value",
@@ -1000,10 +1021,38 @@
     "match_basis": "exact"
   },
   {
+    "from_id": "file::COOK_RPT_usp_PTA_CensusDashboard_PBI::scope/month_cte::structure/WHERE/1::structure/AND/1::pred/1::expr/2",
+    "ref_text": "6",
+    "to_kind": "value",
+    "to_id": "ZC_EVENT_TYPE::6",
+    "match_basis": "exact"
+  },
+  {
+    "from_id": "file::COOK_RPT_usp_PTA_CensusDashboard_PBI::scope/month_cte::structure/WHERE/1::structure/AND/1::pred/4::expr/2",
+    "ref_text": "2",
+    "to_kind": "value",
+    "to_id": "ZC_EVENT_SUBTYPE::2",
+    "match_basis": "exact"
+  },
+  {
     "from_id": "file::COOK_RPT_usp_PTA_CensusDashboard_PBI::scope/delivery::structure/PROJECTION/1::expr/19::pred/1::expr/2",
     "ref_text": "100200",
     "to_kind": "value",
     "to_id": "CLARITY_LOC::100200",
+    "match_basis": "exact"
+  },
+  {
+    "from_id": "file::COOK_RPT_usp_PTA_CensusDashboard_PBI::scope/delivery::structure/WHERE/1::structure/AND/1::pred/1::expr/2",
+    "ref_text": "6",
+    "to_kind": "value",
+    "to_id": "ZC_EVENT_TYPE::6",
+    "match_basis": "exact"
+  },
+  {
+    "from_id": "file::COOK_RPT_usp_PTA_CensusDashboard_PBI::scope/delivery::structure/WHERE/1::structure/AND/1::pred/4::expr/2",
+    "ref_text": "2",
+    "to_kind": "value",
+    "to_id": "ZC_EVENT_SUBTYPE::2",
     "match_basis": "exact"
   },
   {
@@ -1510,6 +1559,34 @@
     "ref_text": "adt.ROOM_ID",
     "to_kind": "column",
     "to_id": "CLARITY_ADT.ROOM_ID",
+    "match_basis": "exact"
+  },
+  {
+    "from_id": "file::COOK_RPT_usp_SF_CensusDashboard::scope/month_cte::structure/WHERE/1::structure/AND/1::pred/1::expr/2",
+    "ref_text": "6",
+    "to_kind": "value",
+    "to_id": "ZC_EVENT_TYPE::6",
+    "match_basis": "exact"
+  },
+  {
+    "from_id": "file::COOK_RPT_usp_SF_CensusDashboard::scope/month_cte::structure/WHERE/1::structure/AND/1::pred/4::expr/2",
+    "ref_text": "2",
+    "to_kind": "value",
+    "to_id": "ZC_EVENT_SUBTYPE::2",
+    "match_basis": "exact"
+  },
+  {
+    "from_id": "file::COOK_RPT_usp_SF_CensusDashboard::scope/delivery::structure/WHERE/1::structure/AND/1::pred/1::expr/2",
+    "ref_text": "6",
+    "to_kind": "value",
+    "to_id": "ZC_EVENT_TYPE::6",
+    "match_basis": "exact"
+  },
+  {
+    "from_id": "file::COOK_RPT_usp_SF_CensusDashboard::scope/delivery::structure/WHERE/1::structure/AND/1::pred/4::expr/2",
+    "ref_text": "2",
+    "to_kind": "value",
+    "to_id": "ZC_EVENT_SUBTYPE::2",
     "match_basis": "exact"
   },
   {

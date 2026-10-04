@@ -136,11 +136,11 @@ GOLDEN_COUNTS = {
     # entry, 05 gap-first gate): +1 table, +3 columns, no-match
     # 1 -> 0, +1 date_dimension rule edge (EXEC_START_TIME is a
     # date column), +4 abstracts.
-    "dict_tables": 39, "dict_columns": 1621, "dict_joins": 5262,
-    "dict_values": 14476, "dict_value_embeddings": 14476,
+    "dict_tables": 41, "dict_columns": 1631, "dict_joins": 5262,
+    "dict_values": 14489, "dict_value_embeddings": 14489,
     "dict_no_match": 0, "chat_abstract_names": 1660,
-    "chat_technical_terms": 9, "graph_join_edges": 392,
-    "graph_table_nodes": 39, "graph_column_nodes": 1621,
+    "chat_technical_terms": 9, "graph_join_edges": 398,
+    "graph_table_nodes": 41, "graph_column_nodes": 1631,
 }
 
 ABSTRACT_FIELDS = {"object_kind", "object_id", "object_name",
