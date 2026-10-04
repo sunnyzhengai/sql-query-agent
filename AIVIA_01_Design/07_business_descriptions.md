@@ -105,6 +105,14 @@ delegated to the model, her blessing the catch):
       provable semantics, one general sentence, every file.
   ONE-HOME-PER-FACT: each fact speaks once, on its ruled line
       (the as-of logic lives in Time window).
+  THE LINE-OWNERSHIP LAW (RULED 2026-10-04, her "reads weird"
+      find on Who's in it): Who's in it carries the POSITIVE
+      population only — who + the window reference + ONE
+      natural sentence for the run-time choices. EVERY negative
+      (exclusions, "other than", housekeeping) lives ONLY in
+      Excludes. Backed by a mechanical check: negative language
+      on the Who's-in-it line fails, named (a shape rule, no
+      content lists).
   THE TONE LAW (RULED 2026-10-04, superseding grammar
       micro-nudges — her words: "speak in a clinician's tone,
       instead of telling it about grammar"): cards and fact

@@ -189,6 +189,16 @@ def gate(audience_text, docket, grain, registry=None):
                             "paragraph — no markdown, no "
                             "labels, no line breaks")
     if grain == "file":
+        for ln in lines:
+            if ln.startswith("Who's in it:") and any(
+                    neg in ln.lower() for neg in
+                    ("other than", "excluded", "exclude",
+                     " not ", "except")):
+                findings.append(
+                    "V-4: line ownership — negatives (other "
+                    "than / excluded / not) live ONLY in "
+                    "Excludes; Who's in it is the positive "
+                    "population")
         if len(lines) != 5 or not all(
                 ln.startswith(lab) for ln, lab in
                 zip(lines, TEMPLATE_LABELS)):
@@ -319,7 +329,12 @@ _GRAIN_INSTRUCTIONS = {
              "Produce exactly these five labeled lines:\n"
              "One row is: <what one row IS, in business "
              "meaning>\n"
-             "Who's in it: <the population, plainly>\n"
+             "Who's in it: <the POSITIVE population only: who "
+             "+ the window reference + ONE natural sentence "
+             "for run-time choices (plurals natural; choosing "
+             "All includes all). NO negatives here — every "
+             "exclusion and housekeeping condition belongs on "
+             "the Excludes line>\n"
              "Each row shows: <at most 5 kinds>\n"
              "Time window: <the window and as-of behavior, "
              "decoded>\n"

@@ -542,3 +542,24 @@ def test_prompt_carries_the_clinician_tone():
     assert "clinician" in p
     assert "concrete verbs" not in p  # the grammar nudge retired
     assert "clinician" in bd._VOICE_PROMPT
+
+
+def test_line_ownership_negatives_live_in_excludes():
+    """Her 'reads weird' find: Who's in it is positive-only."""
+    docket = bd.docket_for_file(DIR05, DIR06, DIR02, TOTALS)
+    bad = ("One row is: a census event.\n"
+           "Who's in it: patients, other than those in CCMC "
+           "MAIN OR, not linked to a record.\n"
+           "Each row shows: event details.\n"
+           "Time window: a configurable window\n"
+           "Excludes: the listed departments")
+    f = bd.gate(bad, docket, "file")
+    assert any("Excludes" in x and "ownership" in x.lower()
+               for x in f)
+    good = bad.replace(
+        "Who's in it: patients, other than those in CCMC "
+        "MAIN OR, not linked to a record.",
+        "Who's in it: patients with a census event in the "
+        "chosen window.")
+    assert not any("ownership" in x.lower()
+                   for x in bd.gate(good, docket, "file"))
