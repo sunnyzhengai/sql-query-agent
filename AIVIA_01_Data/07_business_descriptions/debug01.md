@@ -149,3 +149,18 @@ VERDICT:
    deterministic check sees.
 4. Open dial for Sunny: the S8 budget may be ONE notch too
    tight (run 2's telegraphic Excludes).
+
+## THE CLOSING ENTRY — production Gate v2 (2026-10-04)
+
+The production rerun of the probe file under Gate v2 (gpt-5.4,
+the five-line card, the estate boundary, no whitelist):
+21 of 21 nodes GATE_PASSED, every one in ROUND 1. The card
+decodes '0 means all', explains the as-of snapshot, names all
+eight excluded departments, and leads with what one row IS.
+
+The arc, for the record: 9/21 (whitelist gate-ese) -> 15 -> 16
+-> rules re-founded on Sunny's first-principles challenges
+(the docket carries the dictionary's own words; domain knowledge
+is the LLM's job; the gate polices truth boundary and register,
+never thinking) -> 21/21 in one round. Every improvement came
+from her questions; every fix is a ruled law, not a patch.
