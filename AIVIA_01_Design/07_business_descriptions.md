@@ -139,6 +139,15 @@ poisoning find in debug02 and her how-to-leverage-LLM question):
   registry.
 - SLICE SCOPE (this implement): the file grain's docket moves
   to v2; scope/field dockets follow in a later slice.
+- THE FACTS SHAPE LAW (RULED 2026-10-04, her 13-vs-9 find):
+  WHO-IS-IN lists ONE line per TOP-LEVEL condition of the WHERE
+  — an OR-group composes on ONE line (R3's shape law at the
+  facts grain: splitting an OR silently makes it an AND); an
+  EXISTS condition INLINES its sub-selection's own condition on
+  its line ("a matching entry exists in <source> where ...") —
+  the L03 floor-form deferral closes; sub-selection leaves are
+  never listed as file filters (no double counting). The line
+  count equals the SQL's top-level clause count, by test.
 - RECORDEDNESS SPEAKS THE LADDER + LINKAGE (RULED 2026-10-04,
   her 'pat id' find): (a) the recordedness voice ("...is
   recorded") consults the name ladder like every other 07

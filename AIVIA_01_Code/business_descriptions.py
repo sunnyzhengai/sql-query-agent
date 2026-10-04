@@ -637,18 +637,21 @@ def render_facts(dir05, dir06, dir02, fname, dir03=None,
     pred_rows = {p["node_id"]: p for p in
                  td._read(dir05 / "05_predicate_sheet.json")}
 
-    filters, attachments = [], []
+    scopes_sheet = td._read(dir05 / "05_scope_sheet.json")
+    filters = _shape_filter_lines(ng, nvoice, nsql, scopes_sheet,
+                                  fname)
+    sub_paths = tuple(sc["node_id"] for sc in scopes_sheet
+                      if sc["scope_kind"] == "subquery")
+    attachments = []
     for r in sorted(preds, key=lambda x: x["node_id"]):
+        if r["node_id"].startswith(sub_paths):
+            continue
         meta = pred_rows.get(r["node_id"], {})
-        oc = meta.get("on_class")
-        where_rooted = "::structure/WHERE/" in r["node_id"] \
-            or "::structure/HAVING/" in r["node_id"]
-        sent = _named_fact(ng, nvoice, nsql, r["node_id"]) \
-            or r["sentence"]
-        if oc in ("join_pair", "lookup_shaping"):
+        if meta.get("on_class") in ("join_pair",
+                                    "lookup_shaping"):
+            sent = _named_fact(ng, nvoice, nsql, r["node_id"]) \
+                or r["sentence"]
             attachments.append((r["node_id"], sent))
-        elif where_rooted or oc == "population_filter":
-            filters.append((r["node_id"], sent))
 
     params_line = next((ln for ln in file_s.splitlines()
                         if ln.startswith("Parameters shaping")),
@@ -846,6 +849,86 @@ def _facts_renderer(dir05, dir02, names, dir01=None):
     voice = _NamedVoice(g, words, values)
     sql_lines = td._load_sql(Path(dir01 or DIR01_DEFAULT))
     return g, voice, sql_lines
+
+
+
+def _exists_inline(g, voice, sql_lines, pred_id, sub_scope):
+    """The shape law: an EXISTS condition inlines its
+    sub-selection's own condition (the L03 floor-form deferral
+    closes)."""
+    src = "another selection"
+    if sub_scope:
+        for fid in td._scope_structures(g, sub_scope, "FROM"):
+            for k in g["children"].get(fid, []):
+                e = g["exprs"].get(k, {})
+                if e.get("expression_kind") == "table_ref":
+                    src = e.get("raw_text") or src
+        for wid in td._scope_structures(g, sub_scope, "WHERE"):
+            leaves = []
+            phrase = td._compose(wid, g, voice, sql_lines,
+                                 leaves, True)
+            if phrase:
+                return (f"A matching entry exists in {src} "
+                        f"where {td._lower_first(phrase)}.")
+    return f"A matching entry exists in {src}."
+
+
+def _shape_filter_lines(g, voice, sql_lines, scopes, fname):
+    """ONE line per TOP-LEVEL condition (her 13-vs-9 ruling):
+    leaves speak; OR-groups compose on one line; EXISTS inlines;
+    sub-selection leaves never enter."""
+    subs = {}
+    for sc in scopes:
+        if sc["scope_kind"] == "subquery" \
+                and sc["node_id"].split("::")[1] == fname:
+            subs.setdefault(sc["owning_statement"],
+                            []).append(sc["node_id"])
+    for v in subs.values():
+        v.sort()
+    mains = [sc for sc in scopes
+             if sc["node_id"].split("::")[1] == fname
+             and sc["scope_kind"] != "subquery"]
+    lines = []
+
+    def emit(node_id, stmt_id):
+        kind = g["struct_kind"].get(node_id)
+        pred = g["pred_by_id"].get(node_id)
+        if pred is not None:
+            if pred["predicate_kind"] == "EXISTS_SELECTION":
+                q = subs.get(stmt_id, [])
+                sub = q.pop(0) if q else None
+                lines.append((node_id,
+                              _exists_inline(g, voice, sql_lines,
+                                             node_id, sub)))
+            else:
+                voice.refs = []
+                sent = td._leaf_sentence(pred, voice, g,
+                                         sql_lines)
+                if sent:
+                    lines.append((node_id, sent))
+            return
+        if kind == "AND":
+            for k in g["children"].get(node_id, []):
+                emit(k, stmt_id)
+            return
+        if kind in ("OR", "NOT"):
+            leaves = []
+            phrase = td._compose(node_id, g, voice, sql_lines,
+                                 leaves, True)
+            if phrase:
+                lines.append((node_id,
+                              phrase[0].upper() + phrase[1:]
+                              + "."))
+
+    for sc in mains:
+        stmt_id = sc.get("owning_statement")
+        for wid in [k for k in g["children"].get(sc["node_id"],
+                                                 [])
+                    if g["struct_kind"].get(k) in ("WHERE",
+                                                   "HAVING")]:
+            for k in g["children"].get(wid, []):
+                emit(k, stmt_id)
+    return lines
 
 
 def _named_fact(g, voice, sql_lines, node_id):

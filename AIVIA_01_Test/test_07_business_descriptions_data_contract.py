@@ -462,3 +462,35 @@ def test_recordedness_speaks_the_ladder():
 def test_voice_prompt_carries_the_linkage_law():
     p = bd._VOICE_PROMPT
     assert "linked" in p and "identifier" in p
+
+
+def _filter_lines(facts):
+    out, on = [], False
+    for ln in facts.splitlines():
+        if ln.startswith("WHO-IS-IN"):
+            on = True
+            continue
+        if ln.startswith("ATTACHMENTS"):
+            break
+        if on and ln.strip().startswith("- "):
+            out.append(ln.strip()[2:])
+    return out
+
+
+def test_facts_shape_matches_the_sql():
+    """Her 13-vs-9 find: one line per TOP-LEVEL clause — the OR
+    composes, EXISTS inlines, sub-scope leaves never double."""
+    facts, _ = bd.render_facts(DIR05, DIR06, DIR02, TOTALS)
+    lines = _filter_lines(facts)
+    assert len(lines) == 9, lines
+    # the cancel OR-group is ONE line, shape preserved
+    orl = [ln for ln in lines
+           if " or " in ln and "'Canceled' (2)" in ln]
+    assert len(orl) == 1
+    assert not any(ln.strip() == "The event subtype is 'Canceled' "
+                   "(2)." for ln in lines)
+    # EXISTS inlines its sub-selection detail
+    ex = [ln for ln in lines
+          if "STRING_SPLIT(@ServiceArea" in ln]
+    assert len(ex) == 1 and "'0'" in ex[0]
+    assert "separately defined selection" not in facts
