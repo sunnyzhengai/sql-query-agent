@@ -1,1 +1,14 @@
-[]
+[
+ {
+  "code": "6",
+  "context": "The selection contains event records with added bed, room, department, and service information.\nSelected records carry a"
+ },
+ {
+  "code": "0",
+  "context": "One selection contains a single entry from a comma-separated input of locations.  \nAn entry can equal the single charact"
+ },
+ {
+  "code": "1",
+  "context": "One selection contains a single entry from a comma-separated input of locations.  \nAn entry can equal the single charact"
+ }
+]

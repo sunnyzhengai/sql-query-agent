@@ -210,6 +210,86 @@ def test_call_timeout_is_law():
     assert bd.CALL_TIMEOUT_S == 120
 
 
+def test_template_label_words_never_fail_the_gate():
+    """The first live run's gate defect: proposals were failed
+    for using OUR OWN template labels ('excludes')."""
+    text = ("Who's in it: records from the recorded source.\n"
+            "Each row shows: recorded values.\n"
+            "Time window: a configurable date window\n"
+            "Excludes: none stated")
+    docket = {"text": "a recorded source with values and a date",
+              "gap": False, "params": False, "population": False}
+    assert bd.gate(text, docket, "file") == []
+
+
+def test_ruled_phrase_words_are_structural():
+    """The single-file probe's bug: 'specific' — S10's OWN
+    commanded phrase — was failing G-1. Ruled-phrase words can
+    never be content findings."""
+    findings = bd.gate("It holds a specific recorded type.",
+                       "nothing relevant here", "field")
+    assert not any("'specific'" in f or "'type'" in f
+                   for f in findings)
+
+
+def test_morphology_variants_match_the_docket():
+    """'location' must clear against a docket saying 'located';
+    'creation' against 'created' (the probe's stemming find)."""
+    docket = ("the service area in which this department is "
+              "located; the instant when the record was created")
+    findings = bd.gate(
+        "The location and creation are recorded.", docket,
+        "scope")
+    assert findings == []
+
+
+def test_probe_lexicon_growth_clears():
+    """Ruled growth 2026-10-03 (the single-file probe): ordinary
+    describing words; 'outside'/'external'/'failing' stay
+    blocked — the gate's catches."""
+    ok = bd.gate("Each field carries attached values configured "
+                 "within the named window.", "irrelevant",
+                 "scope")
+    assert not any(f.startswith("G-1") for f in ok)
+    blocked = bd.gate("It excludes events outside the external "
+                      "window.", "irrelevant", "scope")
+    assert any("'outside'" in f for f in blocked)
+    assert any("'external'" in f for f in blocked)
+
+
+def test_ratified_vocabulary_clears_and_never_list_dies():
+    """S9 appendix RATIFIED 2026-10-03: generic describing
+    English clears without docket basis; the never list stays
+    dead regardless of fluency."""
+    ok = bd.gate("Each record spans a period and reflects the "
+                 "linked source group totals.", "irrelevant",
+                 "scope")
+    assert not any(f.startswith("G-1") for f in ok)
+    dead = bd.gate("The values are formatted with a separator.",
+                   "irrelevant", "scope")
+    assert any("'formatted'" in f for f in dead)
+    assert any("'separator'" in f for f in dead)
+
+
+def test_gate_findings_are_deduped():
+    findings = bd.gate("The widget widget widget is here.",
+                       "nothing relevant", "scope")
+    named = [f for f in findings if "'widget'" in f]
+    assert len(named) == 1
+
+
+def test_single_file_build_scope(tmp_path):
+    out = tmp_path / "07"
+    out.mkdir()
+    rows = bd.build07(DIR05, DIR06, out, DIR02, no_llm=True,
+                      only_file=LOTE)
+    assert rows
+    assert all(r["node_id"].split("::")[1] == LOTE or
+               r["node_id"] == f"file::{LOTE}" for r in rows)
+    texts = [p.name for p in out.iterdir() if p.suffix == ".txt"]
+    assert texts == [f"{LOTE}.txt"]
+
+
 def test_no_llm_build_conserves_and_registry_stays_untouched(
         tmp_path):
     out = tmp_path / "07"

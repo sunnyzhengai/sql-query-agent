@@ -135,6 +135,77 @@ word — round 5's outputs are the accepted quality bar):
      field that already passed her eye. The report-layer
      cherry-pick stays Phase II-later (prior art R13 rider).
 
+S9 APPENDIX — THE DESCRIBING VOCABULARY (RATIFIED 2026-10-03,
+Sunny: "ratify the vocabulary" — ONE enumerated ruling replaces
+drip-growth; the list below IS the lexicon; it never grows
+case-by-case again. The words from the earlier dated growths
+carry forward with their standing rulings: marked lacking apply
+demographics context speaking entered about none begin):
+
+  The law of the split: this list holds only GENERIC DESCRIBING
+  ENGLISH — how any data is spoken about. CONTENT words (what
+  THIS data is) must always trace to the file's own stored rows.
+  A word's absence here is not a gap if the docket can supply it.
+
+  verbs of showing:   shows lists holds carries contains
+    includes covers combines groups counts adds attaches brings
+    draws keeps returns records marks labels names identifies
+    appears belongs derives applies matches links ties pairs
+    gathers collects summarizes totals measures tracks reflects
+    represents describes indicates means refers relates remains
+    stays spans ranges starts begins ends stops
+  nouns of shape:     row record field value list set group
+    count total amount period range window date time day month
+    year start end beginning source category type kind status
+    flag detail details summary item entry text name label
+    identifier description information selection report dataset
+    data result
+  qualifiers:         single multiple several separate combined
+    related linked matching matched recorded available missing
+    blank empty present absent active inactive current specific
+    configurable optional defined stated listed shown included
+    excluded grouped
+  restriction words (lexicon-legal, but G-5 STILL requires a
+    membership anchor): only limited restricted excluding
+  connectives:        within during across together otherwise
+    alongside plus without whether
+
+  THE NEVER LIST (deliberately absent; documented so their
+  absence is a ruling, not an oversight):
+  - format-claim words: separator delimiter comma semicolon
+    formatted (the round-2 fabrication class — only the docket
+    may supply them)
+  - purpose words: supports enables helps intended purpose
+    (purpose is not stored anywhere; saying it is invention)
+  - superlative/order claims: latest earliest first last primary
+    verified (true only when the docket says so — the docket
+    supplies them when true)
+  - domain words: admission discharge transfer diagnosis etc. —
+    all domain content comes from stored rows or blessed names,
+    never from the gate's own vocabulary.
+
+THE SINGLE-FILE PROBE (Sunny's call 2026-10-03: "take one medium
+sized sql file and run it end to end" — Totals_SSRS, 21 nodes,
+~17 min first pass, ~1 min/node, ≈2.4 calls/node):
+- Calibration trajectory 9 -> 15 -> 16 of 21 gate-passed across
+  three passes (probe fixes, then the ratified vocabulary);
+  checkpoint seeding made every pass's survivors free.
+- Fixes landed test-first en route: ruled-phrase words structural
+  ('specific' — the gate no longer rejects obedience to S10);
+  morphology-tolerant matching (location/located,
+  creation/created, values/value — ONE matcher for docket,
+  lexicon, registry); findings deduped; only_file scoping.
+- THE PRINCIPLED RESIDUE (5 floors, all correct): the file grain
+  wants admission/discharge/transfer — domain words no row
+  stores; the fix is HER flywheel (a blessed name / table
+  description for CLARITY_ADT), never the gate. The STRING_SPLIT
+  mechanics scopes say 'comma' (stored only as punctuation);
+  marginal targets, honest floors.
+- AUTONOMY RULING (hers, same day): no per-file curation ever —
+  class fixes + the one-time ratified vocabulary; a new SQL file
+  runs unattended, floors ship honestly, her hand only RAISES
+  quality (blessing, dictionary growth), never unblocks.
+
 TEST POSTURE (ruled with the set): Claude's suite is
 DETERMINISTIC — the gate, the docket builder, the prompt
 constructor, the sheet and texts are all testable without a

@@ -115,19 +115,49 @@ every all any no not when where who whose which while during
 either both than then there their they them he she s t who's
 what how if will can may must into onto over under after before
 between per also such same one two three
+excludes time specific type category
 """.split())
+# ('excludes'/'time': OUR OWN S7 template labels — structural,
+#  never content claims; the first live run's gate defect)
 
-# THE PLAIN-WORD LEXICON (S9/G-1) — the CLOSED business
-# vocabulary; growth is a ruled row here, dated, never silent.
+# THE DESCRIBING VOCABULARY (S9 appendix, RATIFIED 2026-10-03 —
+# one enumerated ruling; never grows case-by-case again; the
+# NEVER list words are deliberately absent: separator delimiter
+# comma semicolon formatted / purpose words / superlative claims
+# / domain words — only the docket may supply those).
 PLAIN_LEXICON = set("""
-shows lists includes include present marked lacking demographics
-context data dataset row rows information kind kinds value values
-apply applies multiple single text combined combine window report
-active entered speaking none stated about recorded
-configurable
+shows lists holds carries contains includes covers combines
+groups counts adds attaches brings draws keeps returns records
+marks labels names identifies appears belongs derives applies
+matches links ties pairs gathers collects summarizes totals
+measures tracks reflects represents describes indicates means
+refers relates remains stays spans ranges starts begins ends
+stops
+row record field value list set group count total amount period
+range window date time day month year start end beginning source
+category type kind status flag detail details summary item entry
+text name label identifier description information selection
+report dataset data result
+single multiple several separate combined related linked matching
+matched recorded available missing blank empty present absent
+active inactive current specific configurable optional defined
+stated listed shown included excluded grouped
+only limited restricted excluding
+within during across together otherwise alongside plus without
+whether
+marked lacking apply demographics context speaking entered about
+none begin
 """.split())
-# (ruled 2026-10-03 with the S-set; 'separator' is deliberately
-# ABSENT — the round-2 fabrication must always fail here)
+# the stem pool — membership runs through the same prefix-
+# tolerant matcher the docket uses, so 'values'/'value',
+# 'attached'/'attaches', 'begins'/'begin' all meet
+PLAIN_STEMS = None  # built after _stem is defined (below)
+# (ruled 2026-10-03 with the S-set; grown same day at the first
+# live run: date/missing/identifier/begin/end/details — generic
+# business words only; domain claims like admission/discharge/
+# transfer stay BLOCKED, the gate's job. 'separator' is
+# deliberately ABSENT — the round-2 fabrication must always
+# fail here)
 
 _SIGHTINGS = []
 
@@ -145,7 +175,25 @@ def _tokens(text):
 
 
 def _stem(tok):
-    return tok[:-1] if len(tok) > 3 and tok.endswith("s") else tok
+    """Suffix-tolerant normal form (the probe's find: 'location'
+    must meet 'located', 'creation' meet 'created')."""
+    for suf in ("ation", "tion", "ing", "ion", "ed", "es", "s"):
+        if tok.endswith(suf) and len(tok) - len(suf) >= 4:
+            return tok[:-len(suf)]
+    return tok
+
+
+PLAIN_STEMS = PLAIN_LEXICON | {_stem(w) for w in PLAIN_LEXICON}
+
+
+def _in_pool(stem, pool):
+    """Prefix-tolerant membership (one matcher for docket,
+    lexicon and registry pools)."""
+    if stem in pool:
+        return True
+    return len(stem) >= 4 and any(
+        len(d) >= 4 and (d.startswith(stem) or stem.startswith(d))
+        for d in pool)
 
 
 def _sentences_of(text, grain):
@@ -190,10 +238,11 @@ def gate(audience_text, docket, grain, registry=None):
         if q not in dtext:
             findings.append(f"G-1: {q} has no stored basis")
     for tok in _tokens(audience_text):
-        if tok in FUNCTION_WORDS or tok in PLAIN_LEXICON \
-                or _stem(tok) in PLAIN_LEXICON:
+        if tok in FUNCTION_WORDS:
             continue
-        if _stem(tok) in dtokens or _stem(tok) in rtokens:
+        stem = _stem(tok)
+        if _in_pool(stem, PLAIN_STEMS) or _in_pool(stem, dtokens) \
+                or _in_pool(stem, rtokens):
             continue
         findings.append(f"G-1: '{tok}' has no stored basis")
 
@@ -232,7 +281,8 @@ def gate(audience_text, docket, grain, registry=None):
                       or (": " in dtext and
                           "no membership conditions" not in dtext))
     if any(_stem(t) in RESTRICTION_STEMS
-           for t in _tokens(audience_text)) and not has_membership:
+           for t in _tokens(audience_text)
+           if t not in FUNCTION_WORDS) and not has_membership:
         findings.append("G-5: restriction speech without a "
                         "membership row to anchor it")
 
@@ -258,7 +308,7 @@ def gate(audience_text, docket, grain, registry=None):
                         "surface in business prose")
         _SIGHTINGS.append({"code": tok,
                            "context": audience_text[:120]})
-    return findings
+    return list(dict.fromkeys(findings))  # deduped, order kept
 
 
 def docket_for_file(dir05, dir06, dir02, fname):
@@ -363,7 +413,7 @@ def _field_nodes(dir05, dir02, dir01=None):
 
 
 def build07(dir05, dir06, out07, dir02, no_llm=False,
-            proposer=None):
+            proposer=None, only_file=None):
     """The build command's door. no_llm=True renders floor-only
     rows deterministically (the suite's path, zero cost). The
     live path (harness laws, amended 2026-10-03): explicit call
@@ -375,6 +425,10 @@ def build07(dir05, dir06, out07, dir02, no_llm=False,
                      .read_text())
     files = sorted({r["node_id"].split("::")[1] for r in six
                     if r["grain"] == "file"})
+    if only_file:
+        files = [f for f in files if f == only_file]
+        six = [r for r in six
+               if r["node_id"].split("::")[1] == only_file]
     reg_path = out07 / "07_blessing_registry.json"
     registry = (json.loads(reg_path.read_text())
                 if reg_path.exists()
@@ -392,6 +446,8 @@ def build07(dir05, dir06, out07, dir02, no_llm=False,
             specs.append((r["node_id"], "scope", r["sentence"],
                           r["sentence"]))
     for expr_id, scope_id, item in _field_nodes(dir05, dir02):
+        if only_file and scope_id.split("::")[1] != only_file:
+            continue
         owner = next((r["sentence"] for r in six
                       if r["node_id"] == scope_id), "")
         specs.append((expr_id, "field", owner + "\n" + item,
