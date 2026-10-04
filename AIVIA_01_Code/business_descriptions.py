@@ -525,6 +525,35 @@ def _propose_loop(grain, docket_text, docket, registry,
     return text, "floor", findings, REPAIR_BUDGET
 
 
+# ==== THE NAME LADDER — PSEUDO CODE (written BEFORE code this
+#      time; ruled 2026-10-04, the naming law in
+#      Design_Proprietary_Term_Assets.md) ===========================
+#
+# load_names(dir03, registry) -> {(kind, OBJECT_NAME): short}
+#   ONE source: 03_chat_abstract_names.json (the estate's naming
+#   asset; no 07 store exists, by ruling). Per row:
+#     sunny_synonyms[0] if present          (her hand)
+#     else a registry blessed_name for the object
+#     else synonyms[0]                      (the ruled short name)
+#   Keys: ('table', 'CLARITY_ADT') and
+#         ('column', 'CLARITY_ADT.EVENT_TYPE_C').
+#
+# render_facts gains the overlay:
+#   - FILTER/ATTACHMENT lines are RE-RENDERED through the
+#     importable 06 machinery (td._Voice + _voice_predicate)
+#     with words overridden by the ladder: subject words for
+#     (T,C) = names[('column', 'T.C')] when present, else the
+#     R5 description words. The 06 floor itself is untouched —
+#     the overlay exists only in 07's FACTS.
+#   - SOURCES lines read "short name (TABLE_NAME) — description".
+#   fact keys keep the node+hash law, so renamed facts
+#   re-propose their voices once and settle.
+#
+# the voice prompt is corrected the same slice: codes and VALUES
+#   stay exact; CONCEPTS may be renamed plainly (the earlier
+#   prompt made the voicer preserve awkward subject words as if
+#   they were names).
+# ====================================================================
 # ==== DOCKET v2 + THE FACT-VOICE LAYER — PSEUDO CODE ================
 # (RETROACTIVE, added 2026-10-04 at Sunny's catch — this slice
 # was built contract->red->code without the pseudo step; the
@@ -589,11 +618,16 @@ def _gate_reference(docket):
     return _docket_text(docket)
 
 
-def render_facts(dir05, dir06, dir02, fname):
+def render_facts(dir05, dir06, dir02, fname, dir03=None,
+                 registry=None):
     """The FACTS block — every line printed from a resolver-bound
-    row; assembly is never grep, never hand. -> (text, items)
-    where items = [(fact_key, machine_fact)] for voicing."""
+    row; assembly is never grep, never hand. Names ride the
+    ladder (the 03 asset; Design_Proprietary_Term_Assets.md).
+    -> (text, items) where items = [(fact_key, machine_fact)]."""
     dir05, dir06 = Path(dir05), Path(dir06)
+    names = load_names(dir03 or DIR03_DEFAULT,
+                       registry or {"names": []})
+    ng, nvoice, nsql = _facts_renderer(dir05, dir02, names)
     six = json.loads((dir06 / "06_description_sheet.json")
                      .read_text())
     file_s = next(r["sentence"] for r in six
@@ -609,10 +643,12 @@ def render_facts(dir05, dir06, dir02, fname):
         oc = meta.get("on_class")
         where_rooted = "::structure/WHERE/" in r["node_id"] \
             or "::structure/HAVING/" in r["node_id"]
+        sent = _named_fact(ng, nvoice, nsql, r["node_id"]) \
+            or r["sentence"]
         if oc in ("join_pair", "lookup_shaping"):
-            attachments.append((r["node_id"], r["sentence"]))
+            attachments.append((r["node_id"], sent))
         elif where_rooted or oc == "population_filter":
-            filters.append((r["node_id"], r["sentence"]))
+            filters.append((r["node_id"], sent))
 
     params_line = next((ln for ln in file_s.splitlines()
                         if ln.startswith("Parameters shaping")),
@@ -628,8 +664,14 @@ def render_facts(dir05, dir06, dir02, fname):
         items.append((key, fact))
 
     lines = [f"FACTS — {fname}", "", "SOURCES:"]
-    lines += ["  " + ln[len("Sources: "):] for ln in
-              _source_lines(dir05, dir02, fname)]
+    for ln in _source_lines(dir05, dir02, fname):
+        body = ln[len("Sources: "):]
+        tname = body.split(" — ")[0].strip()
+        short = names.get(("table", tname))
+        lines.append("  " + (f"{short} ({tname}) — "
+                             + body.split(" — ", 1)[1]
+                             if short and " — " in body
+                             else body))
     lines += ["", "WHO-IS-IN FILTERS (each line is one parsed, "
               "bound condition):"]
     lines += [f"  - {s}" for _, s in filters]
@@ -654,9 +696,9 @@ def _voice_gate(voice, fact):
 def _openai_voicer(fact):
     return _openai_caller(
         "Rewrite this one data condition in plain business "
-        "English — one short sentence, natural words, keep every "
-        "code, value and name EXACTLY as written, no SQL "
-        "vocabulary:\n" + fact)
+        "English — one short sentence, natural words; keep every "
+        "code and value EXACTLY as written; concepts may be "
+        "renamed plainly; no SQL vocabulary:\n" + fact)
 
 
 def voice_facts(items, store_path, registry, voicer=None):
@@ -727,3 +769,65 @@ def docket_v2_for_file(dir05, dir06, dir02, fname, voices=None,
             "grounds nothing):\n" + context,
             "gap": base["gap"], "params": base["params"],
             "population": base["population"]}, items
+
+
+# ==== THE NAME LADDER (code; pseudo above) ==========================
+
+DIR03_DEFAULT = str(Path(__file__).resolve().parents[1]
+                    / "AIVIA_01_Data" / "03_chat_bot")
+
+
+def load_names(dir03, registry):
+    """ONE naming asset (the 03 abstracts): sunny_synonyms[0] >
+    a registry blessed_name > synonyms[0]."""
+    rows = json.loads((Path(dir03) /
+                       "03_chat_abstract_names.json").read_text())
+    blessed = {str(n.get("object_name")): n.get("blessed_name")
+               for n in registry.get("names", [])
+               if n.get("blessed_name")}
+    names = {}
+    for r in rows:
+        kind, oname = r.get("object_kind"), r.get("object_name")
+        if kind not in ("table", "column") or not oname:
+            continue
+
+        def _lst(v):
+            if isinstance(v, list):
+                return v
+            try:
+                out = json.loads(str(v).replace("'", '"'))
+                return out if isinstance(out, list) else []
+            except Exception:  # noqa: BLE001 — a malformed row
+                return []      # never kills the ladder
+
+        sunny = _lst(r.get("sunny_synonyms"))
+        syns = _lst(r.get("synonyms"))
+        short = (sunny[0] if sunny
+                 else blessed.get(oname)
+                 or (syns[0] if syns else None))
+        if short:
+            names[(kind, oname)] = short
+    return names
+
+
+def _facts_renderer(dir05, dir02, names, dir01=None):
+    """A 07-side render seat: the 06 machinery with the name
+    overlay — the 06 floor itself stays untouched."""
+    dir05 = Path(dir05)
+    g = td._load_graph(dir05)
+    words, values = td._load_words(Path(dir02))
+    for (kind, oname), short in names.items():
+        if kind == "column" and "." in oname:
+            t, c = oname.split(".", 1)
+            words[(t.upper(), c.upper())] = (short, False)
+    voice = td._Voice(g, words, values)
+    sql_lines = td._load_sql(Path(dir01 or DIR01_DEFAULT))
+    return g, voice, sql_lines
+
+
+def _named_fact(g, voice, sql_lines, node_id):
+    pred = g["pred_by_id"].get(node_id)
+    if pred is None:
+        return None
+    voice.refs = []
+    return td._leaf_sentence(pred, voice, g, sql_lines)

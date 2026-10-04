@@ -139,6 +139,14 @@ poisoning find in debug02 and her how-to-leverage-LLM question):
   registry.
 - SLICE SCOPE (this implement): the file grain's docket moves
   to v2; scope/field dockets follow in a later slice.
+- THE NAME LADDER (RULED 2026-10-04; the law lives in
+  Design_Proprietary_Term_Assets.md — ONE naming asset, the 03
+  abstracts; a 07-local name store was REJECTED): FACTS, fact
+  voices and cards speak tables and columns through
+  sunny_*/blessed > the asset's FIRST synonym > the R5
+  description words. FACTS filter lines are RE-RENDERED through
+  the importable 06 machinery with the name overlay — the 06
+  floor itself stays dictionary-words, untouched.
 
 THE STYLE GRAMMAR (S-rules) — RULED IN THE DRY RUN, Sunny's go
 per round (2026-10-03); S2/S4/S6/S7(as five lines)/S10(narrowed)

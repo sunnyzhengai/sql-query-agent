@@ -415,3 +415,37 @@ def test_fact_voice_gate_rejects_foreign_values(tmp_path):
                        store, {"sentences": []}, voicer=liar)
     assert v["k1"] == "the category is 'Lucky' (7)"  # machine
     #                 fact stands when the voice fails its gate
+
+
+# ---------- the name ladder (ruled 2026-10-04; red first)
+
+DIR03 = REPO_ROOT / "AIVIA_01_Data" / "03_chat_bot"
+
+
+def test_name_ladder_source_and_order(tmp_path):
+    """ONE naming asset (03); ladder: sunny > blessed > first
+    synonym."""
+    names = bd.load_names(DIR03, {"names": []})
+    assert names[("column", "CLARITY_ADT.EVENT_TYPE_C")] \
+        == "event type"
+    assert names[("table", "CLARITY_ADT")] == "adt"
+    reg = {"names": [{"object_name": "CLARITY_ADT",
+                      "blessed_name": "ADT events",
+                      "ruling": "RULED"}]}
+    names2 = bd.load_names(DIR03, reg)
+    assert names2[("table", "CLARITY_ADT")] == "ADT events"
+
+
+def test_facts_speak_short_names():
+    """Her find: 'The event record category' must become 'The
+    event type' in FACTS — via the asset, with 06 untouched."""
+    facts, _ = bd.render_facts(DIR05, DIR06, DIR02, TOTALS)
+    assert "event type is 'Census' (6)" in facts
+    assert "event record category is 'Census' (6)" not in facts
+    assert "(CLARITY_ADT)" in facts  # sources: short (NAME) — desc
+    # and the 06 floor keeps its dictionary words
+    six = json.loads((DIR06 / "06_description_sheet.json")
+                     .read_text())
+    fl = next(r["sentence"] for r in six
+              if r["node_id"] == f"file::{TOTALS}")
+    assert "the event record category" in fl

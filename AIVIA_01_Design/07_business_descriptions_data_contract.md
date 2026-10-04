@@ -33,6 +33,11 @@ What is the input of this data contract?
   re-pays), blessable per fact in the registry. Voice ladder:
   blessed > gated proposed > the machine fact. --no-llm builds
   skip voicing and stay deterministic.
+- THE 03 NAMING ASSET (03_chat_abstract_names.json) — read
+  only; the name ladder's source (Design_Proprietary_Term_
+  Assets.md THE NAMING LAW, 2026-10-04): sunny_*/blessed >
+  first synonym > R5 words. FACTS/voices/cards consume it; no
+  07 naming store exists.
 - The importable 06 renderers (technical_descriptions.py) — the
   field grain's defining phrases (design ruling 4 / G2a); 06 is
   never reopened by this phase.

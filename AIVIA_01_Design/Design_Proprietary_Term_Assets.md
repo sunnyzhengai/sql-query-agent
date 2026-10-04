@@ -79,3 +79,35 @@ NEVER FOUNDATION, ALWAYS BENCHMARK, EVENTUALLY CUSTOMER.
 - M07 boundary: Fabric-ecosystem packaging decisions are made on
   marketplace grounds with ZERO architectural dependency on the
   Agent, either way.
+
+## THE NAMING LAW (RULED 2026-10-04, Sunny in chat — "this same
+## philosophy should apply to tables too... where should we
+## update this policy")
+
+ONE NAMING ASSET, MANY CONSUMERS. The estate's short names for
+tables and columns live in ONE home: the phase-03 abstract-names
+asset (03_chat_abstract_names.json — abstract + synonyms derived
+once from the long dictionary descriptions, sunny_* overrides
+preserved by the reuse law). No phase may mint a second naming
+store (the one-home law; a 07-local store was proposed and
+REJECTED on this ruling).
+
+THE NAME LADDER, wherever names are consumed:
+  1. sunny_* override / a blessed name (her hand)
+  2. the asset's FIRST synonym (the ruled short name)
+  3. the deterministic fallback of the consuming layer
+     (07: the R5 description words; 03: its own lanes)
+
+THE CONSUMPTION MAP:
+  02 dictionary — NEVER renamed (vendor truth verbatim).
+  05 graph — identifiers only; names do not apply.
+  06 technical floor — stays dictionary-words (the exact,
+     auditable register); consuming short names there is
+     possible deterministically but UNRULED — reopen only at
+     Sunny's word.
+  03 chat — consumes (already).
+  07 business layer — consumes via the ladder in FACTS, fact
+     voices, and cards (ruled 2026-10-04).
+
+Growth: new tables/columns get names when the 03 asset build
+runs (reuse law, new rows only); her sunny_* hand wins forever.
