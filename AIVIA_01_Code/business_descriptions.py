@@ -304,7 +304,10 @@ SYSTEM_PROMPT = (
  "value that makes a filter true for every row means \"All\" — "
  "say the choice, not the mechanism.\n"
  "ONE HOME PER FACT: each fact speaks once, on the line that "
- "owns it (as-of and date logic belong to Time window).")
+ "owns it (as-of and date logic belong to Time window).\n"
+ "HUMAN VERBS: prefer concrete verbs that say what the "
+ "subject is DOING over abstract status or classification "
+ "phrasings.")
 
 _GRAIN_INSTRUCTIONS = {
     "file": ("Grain: a whole report dataset. On the 'Each row "

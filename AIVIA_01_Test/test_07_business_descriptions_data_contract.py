@@ -532,3 +532,9 @@ def test_field_prompt_carries_one_home():
     p = bd.build_prompt("field", "DOCKET", [])
     assert "context" in p.lower()
     assert "card" in p.lower()
+
+
+def test_prompt_prefers_human_verbs():
+    """Her ruling 2026-10-04: more human phrasing by prompt law,
+    never by hand-curating the registry."""
+    assert "concrete verbs" in bd.build_prompt("file", "D", [])
