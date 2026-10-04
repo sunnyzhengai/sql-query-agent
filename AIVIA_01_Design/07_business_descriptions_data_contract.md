@@ -138,7 +138,8 @@ whitelist is RETIRED — see the design doc's Gate v2 section):
       temp, column, procedure, parameter), no @tokens.
   V-4 TEMPLATE: file grain = exactly the FIVE labeled lines
       (One row is / Who's in it / Each row shows / Time window
-      / Excludes).
+      / Excludes). FIELD arm (2026-10-04): one short plain
+      paragraph — no markdown, no labels, no line breaks.
   V-5 THE KINDS BACKSTOP: the Each-row-shows line over ~10
       segments (parentheticals stripped) fails with the named
       objection — the complete field list already lives in the

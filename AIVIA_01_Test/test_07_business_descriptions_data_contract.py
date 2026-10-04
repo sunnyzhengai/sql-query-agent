@@ -513,3 +513,22 @@ def test_field_docket_v2_named_and_inheriting(tmp_path):
     assert "FIELD:" in facts
     assert "The event type is 'Census' (6)." in facts  # inherited
     assert "event record category" not in facts  # named, not raw
+
+
+def test_field_shape_gate():
+    """The 17-tooltips find: fields are one plain paragraph —
+    no markdown mini-cards."""
+    docket = {"facts": "FIELD: the room name", "text": "x"}
+    bad = ("**Department**: the department.\n"
+           "**Time window**: includes events.")
+    f = bd.gate(bad, docket, "field")
+    assert any("plain paragraph" in x for x in f)
+    ok = bd.gate("Shows the room name for each census event.",
+                 docket, "field")
+    assert ok == []
+
+
+def test_field_prompt_carries_one_home():
+    p = bd.build_prompt("field", "DOCKET", [])
+    assert "context" in p.lower()
+    assert "card" in p.lower()

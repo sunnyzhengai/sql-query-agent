@@ -179,9 +179,15 @@ def gate(audience_text, docket, grain, registry=None):
     for m in re.findall(r"@\w+", audience_text):
         findings.append(f"V-3: banned token '{m}'")
 
-    # V-4 the five-line template (file grain)
+    # V-4 the five-line template (file grain) + the field arm
     lines = [ln.strip() for ln in audience_text.splitlines()
              if ln.strip()]
+    if grain == "field":
+        if len(lines) > 1 or "**" in audience_text \
+                or audience_text.strip().startswith("#"):
+            findings.append("V-4: a field is one short plain "
+                            "paragraph — no markdown, no "
+                            "labels, no line breaks")
     if grain == "file":
         if len(lines) != 5 or not all(
                 ln.startswith(lab) for ln, lab in
@@ -317,8 +323,15 @@ _GRAIN_INSTRUCTIONS = {
     "scope": ("Grain: one selection inside the dataset build. "
               "At most 3 natural sentences describing what this "
               "selection contains."),
-    "field": ("Grain: one delivered field. At most 2 natural "
-              "sentences for a business reader."),
+    "field": ("Grain: one delivered field. Describe THE FIELD "
+              "ONLY in one or two natural sentences — what it "
+              "holds and what it means for a business reader. "
+              "The filters shown below are CONTEXT so you "
+              "understand the data's scope — NEVER restate the "
+              "population, date window or as-of behavior; those "
+              "live once, on the report's card. One plain "
+              "paragraph: no markdown, no labels, no line "
+              "breaks."),
 }
 
 
