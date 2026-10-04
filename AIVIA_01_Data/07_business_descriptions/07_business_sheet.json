@@ -42,7 +42,7 @@
  {
   "node_id": "file::COOK_RPT_USP_CCHCS_ADT_MONTHLY_INPATIENT_CENSUS_TOTALS_SSRS::scope/delivery::structure/PROJECTION/1::expr/1",
   "grain": "field",
-  "audience_text": "Shows the event type for census events only, during the chosen effective-date period including the end date, and as the data stood on the As Of date including that date. It includes canceled census events only when they were still not deleted as of that date, lets the person running the report choose Service Area and Location with All available for each, and excludes records without a patient plus activity from these departments: CCMC EMERGENCY, CCMC IR IMAGING, CCMC CATH LAB, CCMC MAIN OR, CCMC SPA OR, CCMC PHP PSYCHIATRY, CCMC CARDIOVASCULAR OR, and DSC OR.",
+  "audience_text": "This field shows the type of event recorded for the row; in this report it will be the Census event type, which is the ADT-style census activity used to track a patient\u2019s inpatient or hospital census status.",
   "status": "gate_passed",
   "gate_findings": [],
   "rounds_used": 1,
@@ -52,7 +52,7 @@
  {
   "node_id": "file::COOK_RPT_USP_CCHCS_ADT_MONTHLY_INPATIENT_CENSUS_TOTALS_SSRS::scope/delivery::structure/PROJECTION/1::expr/2",
   "grain": "field",
-  "audience_text": "Shows the subtype of each Census event for patients who had an effective event during the chosen start and end dates, using the record as it stood on the chosen as-of date. The report includes only patients with a recorded patient identifier, respects the chosen Service Area and Location selections with All available for each, excludes the listed departments, and keeps canceled events only when they were still not deleted as of that as-of date.",
+  "audience_text": "This field shows the subtype recorded on the census event, which tells the business meaning of that census update, such as whether it reflects a cancellation or another kind of census activity. It is the event\u2019s more specific classification within the overall Census event category.",
   "status": "gate_passed",
   "gate_findings": [],
   "rounds_used": 1,
@@ -62,7 +62,7 @@
  {
   "node_id": "file::COOK_RPT_USP_CCHCS_ADT_MONTHLY_INPATIENT_CENSUS_TOTALS_SSRS::scope/delivery::structure/PROJECTION/1::expr/3",
   "grain": "field",
-  "audience_text": "The effective time is the date and time when the census event took effect for the patient. It only appears for census events with a recorded patient, in the chosen date range including the full end date, using the data as it stood at the end of the chosen as-of date; Service Area and Location can be chosen when running the report, with All including every value, and it excludes the listed departments plus canceled events unless they were still not deleted by the end of the as-of date.",
+  "audience_text": "This field shows the date and time when the census event took effect for the patient encounter. For business users, this is the operational timestamp to use when understanding when the patient\u2019s census status actually became active, which may differ from when the event was entered into the record.",
   "status": "gate_passed",
   "gate_findings": [],
   "rounds_used": 1,
@@ -72,7 +72,7 @@
  {
   "node_id": "file::COOK_RPT_USP_CCHCS_ADT_MONTHLY_INPATIENT_CENSUS_TOTALS_SSRS::scope/delivery::structure/PROJECTION/1::expr/4",
   "grain": "field",
-  "audience_text": "The patient ID is shown for patients who had a Census event in the reporting period, using events effective from the chosen start date through the chosen end date, including the full end date, and only counting events that existed as of the chosen as-of date. Canceled Census events are left out unless they were still not deleted by that as-of date, and the results are limited to the service areas and locations chosen when running the report, where choosing All includes every service area or location.\n\nThis excludes records without a patient ID and events from these departments: CCMC EMERGENCY, CCMC IR IMAGING, CCMC CATH LAB, CCMC MAIN OR, CCMC SPA OR, CCMC PHP PSYCHIATRY, CCMC CARDIOVASCULAR OR, and DSC OR.",
+  "audience_text": "This field contains the identifier for the patient tied to the census event, so each value points to the specific person the row is about. It is the patient\u2019s recorded ID from the medical record, used to distinguish one patient from another.",
   "status": "gate_passed",
   "gate_findings": [],
   "rounds_used": 1,
@@ -82,7 +82,7 @@
  {
   "node_id": "file::COOK_RPT_USP_CCHCS_ADT_MONTHLY_INPATIENT_CENSUS_TOTALS_SSRS::scope/delivery::structure/PROJECTION/1::expr/5",
   "grain": "field",
-  "audience_text": "The abbreviated patient class shown here comes from census events during the chosen date range, based on events effective from the start date through the end date inclusive, and it reflects the data as it stood at the as-of date. Service area and location are chosen when running the report, and choosing All includes every service area or location.\n\nExcluded are events from the listed departments CCMC EMERGENCY, CCMC IR IMAGING, CCMC CATH LAB, CCMC MAIN OR, CCMC SPA OR, CCMC PHP PSYCHIATRY, CCMC CARDIOVASCULAR OR, and DSC OR, along with records without a patient, and canceled events unless they were still not deleted as of the as-of date.",
+  "audience_text": "This field shows the abbreviated patient class recorded for the census event, such as the short form used in the medical record to indicate the patient\u2019s care setting or registration status. For business users, it is the compact category that tells you how the patient was classified at that point in care.",
   "status": "gate_passed",
   "gate_findings": [],
   "rounds_used": 1,
@@ -92,7 +92,7 @@
  {
   "node_id": "file::COOK_RPT_USP_CCHCS_ADT_MONTHLY_INPATIENT_CENSUS_TOTALS_SSRS::scope/delivery::structure/PROJECTION/1::expr/6",
   "grain": "field",
-  "audience_text": "**Department**: the department abbreviation for each qualifying census event.\n\n**Time window / Includes / Excludes**: includes census events with an effective time during the chosen start and end dates, treating the end date as inclusive, and shows the data as it stood at the chosen as-of date; canceled events are excluded unless they were still not deleted by the day after that as-of date. It only includes records with a patient ID, only for the service areas and locations chosen when running the report, where choosing **All** includes every service area or location, and it excludes these departments: CCMC EMERGENCY, CCMC IR IMAGING, CCMC CATH LAB, CCMC MAIN OR, CCMC SPA OR, CCMC PHP PSYCHIATRY, CCMC CARDIOVASCULAR OR, and DSC OR.",
+  "audience_text": "This field shows the abbreviated department name for the department tied to the census event, so business users can see the short department label rather than the full department name. It identifies the operational unit associated with that census record.",
   "status": "gate_passed",
   "gate_findings": [],
   "rounds_used": 1,
@@ -102,17 +102,17 @@
  {
   "node_id": "file::COOK_RPT_USP_CCHCS_ADT_MONTHLY_INPATIENT_CENSUS_TOTALS_SSRS::scope/delivery::structure/PROJECTION/1::expr/7",
   "grain": "field",
-  "audience_text": "The room field shows the room name from a patient census event for a patient with a recorded patient identifier. It only includes events in the chosen Start Date through End Date, using an inclusive End Date, as the data stood at the chosen As Of Date, and only in the service areas and locations chosen when running the report, where choosing All includes every service area or location.\n\nExcluded: canceled census events unless they were still present as of the As Of Date, records without a patient link, and events from these departments: CCMC EMERGENCY, CCMC IR IMAGING, CCMC CATH LAB, CCMC MAIN OR, CCMC SPA OR, CCMC PHP PSYCHIATRY, CCMC CARDIOVASCULAR OR, and DSC OR.",
+  "audience_text": "This field shows the name of the room tied to the census event for the patient encounter, in other words the specific room where the patient was assigned at that point in their stay. For business users, it is the room label used to identify the patient\u2019s physical placement within the unit or department.",
   "status": "gate_passed",
   "gate_findings": [],
-  "rounds_used": 1,
+  "rounds_used": 2,
   "model": "gpt-5.4",
   "basis_version": "07.2.0"
  },
  {
   "node_id": "file::COOK_RPT_USP_CCHCS_ADT_MONTHLY_INPATIENT_CENSUS_TOTALS_SSRS::scope/delivery::structure/PROJECTION/1::expr/8",
   "grain": "field",
-  "audience_text": "**The bed label**  \nShows the bed assigned on a qualifying census event for a patient stay. It is limited to patients with a recorded patient identifier, in the service areas and locations chosen when running the report, with **All** available for either choice, during the effective date range including both the start and end dates, as the data stood through the As Of date including that date; canceled census events are excluded unless they were still not deleted by the day after the As Of date, and several named procedural and emergency departments are excluded.",
+  "audience_text": "This field shows the label of the bed tied to the census event, which is the bed name or identifier a business user would recognize on a unit or rooming board. It tells you which specific bed the patient was assigned to for that event.",
   "status": "gate_passed",
   "gate_findings": [],
   "rounds_used": 1,
@@ -122,17 +122,17 @@
  {
   "node_id": "file::COOK_RPT_USP_CCHCS_ADT_MONTHLY_INPATIENT_CENSUS_TOTALS_SSRS::scope/delivery::structure/PROJECTION/1::expr/9",
   "grain": "field",
-  "audience_text": "Shows the patient\u2019s service from census events during the chosen effective-date range, as the data stood at the chosen as-of date; the end dates are inclusive, and canceled census events are included only if they were still not deleted by that as-of date. The report is limited to patients with an ID, to the service areas and locations chosen when running the report where choosing All includes every value, and it excludes these departments: CCMC EMERGENCY, CCMC IR IMAGING, CCMC CATH LAB, CCMC MAIN OR, CCMC SPA OR, CCMC PHP PSYCHIATRY, CCMC CARDIOVASCULAR OR, and DSC OR.",
+  "audience_text": "This field shows the patient\u2019s service for the census event, meaning the clinical or operational service the patient was assigned to at that point in care, such as the service line responsible for the patient\u2019s stay. For business users, it identifies which hospital service the patient belonged to for that event.",
   "status": "gate_passed",
   "gate_findings": [],
-  "rounds_used": 2,
+  "rounds_used": 1,
   "model": "gpt-5.4",
   "basis_version": "07.2.0"
  },
  {
   "node_id": "file::COOK_RPT_USP_CCHCS_ADT_MONTHLY_INPATIENT_CENSUS_TOTALS_SSRS::scope/delivery::structure/PROJECTION/1::expr/10",
   "grain": "field",
-  "audience_text": "Shows when the census event was deleted, for census activity during the chosen date range, using an inclusive end date, and only as it stood by the chosen as-of date. If a census event was canceled, it is included only when its deletion happened after the as-of date, so cancellations already deleted by that point are not shown.\n\nExcludes records without a patient, records outside the chosen service area or location unless All was chosen, and records from these departments: CCMC EMERGENCY, CCMC IR IMAGING, CCMC CATH LAB, CCMC MAIN OR, CCMC SPA OR, CCMC PHP PSYCHIATRY, CCMC CARDIOVASCULAR OR, and DSC OR.",
+  "audience_text": "This field shows when the census event was deleted from the record. For business users, it is the date and time the event was removed; if it is blank, the event had not been deleted.",
   "status": "gate_passed",
   "gate_findings": [],
   "rounds_used": 1,
@@ -142,7 +142,7 @@
  {
   "node_id": "file::COOK_RPT_USP_CCHCS_ADT_MONTHLY_INPATIENT_CENSUS_TOTALS_SSRS::scope/delivery::structure/PROJECTION/1::expr/11",
   "grain": "field",
-  "audience_text": "The event time is the date and time when the Census event was recorded for the patient. It is shown only for patients with an identified patient record, for events effective during the chosen date range using an inclusive end date, entered by the as-of date, limited to the chosen Service Area and Location or All, excluding the listed departments, and it reflects data as it stood on the as-of date, including canceled events only if they were still not deleted by then.",
+  "audience_text": "This field shows the date and time when the census event was recorded for the patient encounter. For business users, it is the timestamp of that census status event in the medical record.",
   "status": "gate_passed",
   "gate_findings": [],
   "rounds_used": 1,
@@ -152,7 +152,7 @@
  {
   "node_id": "file::COOK_RPT_USP_CCHCS_ADT_MONTHLY_INPATIENT_CENSUS_TOTALS_SSRS::scope/delivery::structure/PROJECTION/1::expr/12",
   "grain": "field",
-  "audience_text": "Service area is the name of the service area tied to each census event that is in scope. The report includes census activity with effective dates during the chosen start and end dates, uses the data as it stood at the as-of date, lets the person running the report choose one or more service areas and revenue locations or choose All, and excludes records without a patient and activity from these departments: CCMC EMERGENCY, CCMC IR IMAGING, CCMC CATH LAB, CCMC MAIN OR, CCMC SPA OR, CCMC PHP PSYCHIATRY, CCMC CARDIOVASCULAR OR, and DSC OR.",
+  "audience_text": "This field shows the name of the service area tied to the census event, such as the broader operational area or facility grouping the patient encounter belongs to. For business users, it identifies which service area each returned record is associated with so results can be grouped, filtered, or compared at that organizational level.",
   "status": "gate_passed",
   "gate_findings": [],
   "rounds_used": 1,
@@ -162,7 +162,7 @@
  {
   "node_id": "file::COOK_RPT_USP_CCHCS_ADT_MONTHLY_INPATIENT_CENSUS_TOTALS_SSRS::scope/delivery::structure/PROJECTION/1::expr/13",
   "grain": "field",
-  "audience_text": "Department ID for census events that were active in the reporting period from the chosen start date through the chosen end date, using data as it stood at the end of the chosen as-of date. The Service Area and Location choices are selected when running the report, and choosing All includes every service area or location.\n\nExcludes canceled census events unless they were still present as of the as-of date, records without a patient, and these departments: CCMC EMERGENCY, CCMC IR IMAGING, CCMC CATH LAB, CCMC MAIN OR, CCMC SPA OR, CCMC PHP PSYCHIATRY, CCMC CARDIOVASCULAR OR, and DSC OR.",
+  "audience_text": "This field contains the identifier of the department tied to the census event record. For business users, it is the department ID for the unit or clinical area associated with that event, excluding the specific departments named in the report rules.",
   "status": "gate_passed",
   "gate_findings": [],
   "rounds_used": 1,
@@ -172,7 +172,7 @@
  {
   "node_id": "file::COOK_RPT_USP_CCHCS_ADT_MONTHLY_INPATIENT_CENSUS_TOTALS_SSRS::scope/delivery::structure/PROJECTION/1::expr/14",
   "grain": "field",
-  "audience_text": "The room ID is the room tied to a patient census event during the chosen date range, based on events effective from the start date through the end date inclusive, and shown as the data stood on the as-of date. It is limited to records with a patient ID, in the service areas and locations chosen when running the report, where choosing All includes every service area or location.\n\nExcludes canceled census events unless they were still present as of the as-of date, and excludes the departments CCMC EMERGENCY, CCMC IR IMAGING, CCMC CATH LAB, CCMC MAIN OR, CCMC SPA OR, CCMC PHP PSYCHIATRY, CCMC CARDIOVASCULAR OR, and DSC OR.",
+  "audience_text": "This field shows the identifier of the room tied to the census event, meaning the room where the patient was assigned or located for that recorded census activity. For business users, it is the room ID value used by the system to distinguish one room from another.",
   "status": "gate_passed",
   "gate_findings": [],
   "rounds_used": 1,
@@ -182,7 +182,7 @@
  {
   "node_id": "file::COOK_RPT_USP_CCHCS_ADT_MONTHLY_INPATIENT_CENSUS_TOTALS_SSRS::scope/delivery::structure/PROJECTION/1::expr/15",
   "grain": "field",
-  "audience_text": "This is the identifier of the bed tied to a patient census event, so it shows which bed the patient was assigned to for that census record.\n\nTime window: it includes census activity with an effective date during the chosen start and end dates, treating the end date as inclusive, and it shows the data as it stood by the chosen as-of date; canceled census events are left out unless they were still not deleted by that as-of date. Excludes: records without a patient, records outside the chosen service area or location selections, and records from these departments: CCMC EMERGENCY, CCMC IR IMAGING, CCMC CATH LAB, CCMC MAIN OR, CCMC SPA OR, CCMC PHP PSYCHIATRY, CCMC CARDIOVASCULAR OR, and DSC OR; when running the report, choosing All for service area or location includes every value.",
+  "audience_text": "This field shows the identifier of the bed tied to the patient\u2019s census event, meaning the specific bed assignment associated with that stay activity. For business users, it is the bed ID for where the patient was assigned at that point in their encounter.",
   "status": "gate_passed",
   "gate_findings": [],
   "rounds_used": 1,
@@ -192,7 +192,7 @@
  {
   "node_id": "file::COOK_RPT_USP_CCHCS_ADT_MONTHLY_INPATIENT_CENSUS_TOTALS_SSRS::scope/delivery::structure/PROJECTION/1::expr/16",
   "grain": "field",
-  "audience_text": "The event id is the unique identifier for a census event that was in scope during the chosen effective date range, using an inclusive end date, and as the data stood on the As Of date. It only includes events tied to a patient, chosen when running the report for the selected service area and location, with All available for either choice, and it excludes the listed departments plus canceled events unless they were still present as of the As Of date.",
+  "audience_text": "This field holds the unique identifier for the census event record itself, so each value points to one specific census event in the source system. For a business reader, it is mainly a technical tracking number used to distinguish one event record from another and to link back to the exact event if needed.",
   "status": "gate_passed",
   "gate_findings": [],
   "rounds_used": 1,
@@ -202,7 +202,7 @@
  {
   "node_id": "file::COOK_RPT_USP_CCHCS_ADT_MONTHLY_INPATIENT_CENSUS_TOTALS_SSRS::scope/delivery::structure/PROJECTION/1::expr/17",
   "grain": "field",
-  "audience_text": "The field shows the calendar day of the census event\u2019s effective time. It includes census events effective during the chosen start and end dates, treats the end date as inclusive, reflects the data as it stood by the chosen as-of date, keeps canceled events only when they were still present as of that date, and is limited to patients with a recorded patient id in the chosen service areas and locations, where choosing All means every service area or location; it excludes the departments CCMC EMERGENCY, CCMC IR IMAGING, CCMC CATH LAB, CCMC MAIN OR, CCMC SPA OR, CCMC PHP PSYCHIATRY, CCMC CARDIOVASCULAR OR, and DSC OR.",
+  "audience_text": "This field gives the calendar day taken from the event\u2019s effective timestamp, so it shows which census day the event belongs to for reporting purposes. In business terms, it is the date you would use to place the census event on a daily census timeline.",
   "status": "gate_passed",
   "gate_findings": [],
   "rounds_used": 1,
