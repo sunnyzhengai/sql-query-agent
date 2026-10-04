@@ -106,6 +106,40 @@ delegated to the model, her blessing the catch):
   ONE-HOME-PER-FACT: each fact speaks once, on its ruled line
       (the as-of logic lives in Time window).
 
+DOCKET v2 + THE FACT-VOICE LAYER — RULED 2026-10-04 (Sunny:
+"fold it in... and let's implement"; born from the EMH OVERFLOW
+poisoning find in debug02 and her how-to-leverage-LLM question):
+- THE SPLIT: the docket has two parts. FACTS — assembled ONLY by
+  the 05 resolver (never grep, never hand): sources with
+  dictionary words, each population condition WITH its bound
+  meaning on its own line, attachments, parameters, outputs.
+  CONTEXT — the raw SQL + fuller dictionary prose, riding below
+  as interpretation fuel ONLY.
+- V-1 IS SCOPED TO FACTS: every value the card asserts must
+  appear in the FACTS block — presence in CONTEXT grounds
+  nothing. A value only enters FACTS through a parse-proven
+  binding, so a wrong-purpose value (the EMH class) cannot
+  enter, and a value lifted from the SQL without a binding
+  FAILS.
+- THE FACT-VOICE LAYER (her proposal, ruled): an LLM translates
+  each machine fact into plain English ONCE — small scoped
+  calls, each voice GATED (its values must be the fact's own;
+  never-list; no SQL words), STORED in 07_fact_voices.json
+  keyed by node + fact-text hash (delta-by-name: a changed fact
+  re-proposes; an unchanged fact never re-pays), and BLESSABLE
+  at the fact grain via the registry (blessed voice > gated
+  proposed voice > the machine fact). The card writer composes
+  from these vetted pieces — variance drops, her blessing gains
+  its finest lever.
+- HOMES AND LAWS: this layer is PHASE II territory — the 06
+  floor stays zero-LLM (the two-machines ruling untouched).
+  The per-file FACTS text (machine fact + voice side by side)
+  lands TRACKED as <file_name>.facts.txt. Machine writes
+  proposed voices only; blessing stays her hand in the
+  registry.
+- SLICE SCOPE (this implement): the file grain's docket moves
+  to v2; scope/field dockets follow in a later slice.
+
 THE STYLE GRAMMAR (S-rules) — RULED IN THE DRY RUN, Sunny's go
 per round (2026-10-03); S2/S4/S6/S7(as five lines)/S10(narrowed)
 /S11 stand; S1/S3 absorbed into the definition above; S5

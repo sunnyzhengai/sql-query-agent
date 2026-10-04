@@ -312,8 +312,11 @@ def test_single_file_build_scope(tmp_path):
     assert rows
     assert all(r["node_id"].split("::")[1] == LOTE or
                r["node_id"] == f"file::{LOTE}" for r in rows)
-    texts = [p.name for p in out.iterdir() if p.suffix == ".txt"]
+    texts = [p.name for p in out.iterdir()
+             if p.name.endswith(".txt")
+             and not p.name.endswith(".facts.txt")]
     assert texts == [f"{LOTE}.txt"]
+    assert (out / f"{LOTE}.facts.txt").exists()  # docket v2
 
 
 def test_no_llm_build_conserves_and_registry_stays_untouched(
@@ -331,8 +334,13 @@ def test_no_llm_build_conserves_and_registry_stays_untouched(
     assert {r["grain"] for r in rows} == {"file", "scope",
                                           "field"}
     assert reg.read_bytes() == before  # Sunny's hand only
-    texts = [p for p in out.iterdir() if p.suffix == ".txt"]
+    texts = [p for p in out.iterdir()
+             if p.name.endswith(".txt")
+             and not p.name.endswith(".facts.txt")]
     assert len(texts) == 8
+    facts = [p for p in out.iterdir()
+             if p.name.endswith(".facts.txt")]
+    assert len(facts) == 8  # docket v2's tracked FACTS
 
 
 def test_prompt_carries_s12_to_s14():
@@ -345,3 +353,65 @@ def test_prompt_carries_s12_to_s14():
     assert "means \"All\"" in p or "means 'All'" in p
     assert "plain connectors" in p.lower()
     assert "speaks once" in p.lower() or "one home" in p.lower()
+
+
+# ------------- DOCKET v2 + the fact-voice layer (red first)
+
+def test_facts_block_is_bound_truth_only():
+    """The EMH-class impossibility: FACTS carries the eight
+    bound department exclusions with meanings; code 0 appears
+    ONLY as the multi-select All value, never as a department."""
+    facts, items = bd.render_facts(DIR05, DIR06, DIR02, TOTALS)
+    assert "CCMC EMERGENCY" in facts and "DSC OR" in facts
+    assert "'Census' (6)" in facts or "Census" in facts
+    assert "EMH OVERFLOW" not in facts
+    assert items  # (fact_key, machine_fact) pairs for voicing
+
+
+def test_v1_is_scoped_to_facts_not_context():
+    docket = {"facts": "the category is 6 here",
+              "text": "the category is 6 here\nCONTEXT: 999"}
+    ok = bd.gate("The category 6 applies.", docket, "scope")
+    assert not any("number 6" in f for f in ok)
+    bad = bd.gate("The value 999 applies.", docket, "scope")
+    assert any("999" in f for f in bad)  # present only in CONTEXT
+
+
+def test_fact_voices_store_reuse_and_ladder(tmp_path):
+    """One scoped call per NEW fact; unchanged facts never
+    re-pay; blessed > proposed > machine."""
+    store = tmp_path / "07_fact_voices.json"
+    calls = []
+
+    def voicer(fact):
+        calls.append(fact)
+        return "plain words for " + fact
+
+    items = [("k1", "the category is 'Lucky' (7)"),
+             ("k2", "the date is recorded")]
+    v1 = bd.voice_facts(items, store, {"sentences": []},
+                        voicer=voicer)
+    assert len(calls) == 2 and v1["k1"].startswith("plain words")
+    calls.clear()
+    v2 = bd.voice_facts(items, store, {"sentences": []},
+                        voicer=voicer)
+    assert calls == []          # reuse: nothing re-paid
+    assert v2 == v1
+    registry = {"sentences": [{"fact_key": "k1",
+                               "blessed_text": "her words",
+                               "ruling": "RULED"}]}
+    v3 = bd.voice_facts(items, store, registry, voicer=voicer)
+    assert v3["k1"] == "her words"      # blessed wins
+
+
+def test_fact_voice_gate_rejects_foreign_values(tmp_path):
+    """A voice may only carry its own fact's values."""
+    store = tmp_path / "07_fact_voices.json"
+
+    def liar(fact):
+        return "the category is 'Lucky' (8)"  # 8 is not the fact
+
+    v = bd.voice_facts([("k1", "the category is 'Lucky' (7)")],
+                       store, {"sentences": []}, voicer=liar)
+    assert v["k1"] == "the category is 'Lucky' (7)"  # machine
+    #                 fact stands when the voice fails its gate

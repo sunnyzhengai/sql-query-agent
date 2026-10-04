@@ -147,7 +147,7 @@ def gate(audience_text, docket, grain, registry=None):
     domain knowledge is FREE. No whitelist, no word budgets. No
     model anywhere in here."""
     findings = []
-    dtext = _docket_text(docket)
+    dtext = _gate_reference(docket)
     toks = _tokens(audience_text)
 
     # V-1 grounded values: quoted literals and numbers
@@ -389,9 +389,21 @@ def build07(dir05, dir06, out07, dir02, no_llm=False,
                 else {"names": [], "sentences": []})
 
     # the ordered node specs: (node_id, grain, docket, floor)
+    # FILE grain rides DOCKET v2 (FACTS/CONTEXT + fact voices,
+    # ruled 2026-10-04); voices are skipped under no_llm.
     specs = []
     for f in files:
-        docket = docket_for_file(dir05, dir06, dir02, f)
+        if no_llm:
+            docket, _items = docket_v2_for_file(
+                dir05, dir06, dir02, f)
+        else:
+            _, items = render_facts(dir05, dir06, dir02, f)
+            voices = voice_facts(
+                items, out07 / "07_fact_voices.json", registry)
+            docket, _items = docket_v2_for_file(
+                dir05, dir06, dir02, f, voices=voices)
+        (out07 / f"{f}.facts.txt").write_text(
+            docket["facts"] + "\n")
         floor = next(r["sentence"] for r in six
                      if r["node_id"] == f"file::{f}")
         specs.append((f"file::{f}", "file", docket, floor))
@@ -511,3 +523,160 @@ def _propose_loop(grain, docket_text, docket, registry,
         if not findings:
             return text, "gate_passed", [], round_no
     return text, "floor", findings, REPAIR_BUDGET
+
+
+# ==== DOCKET v2 + THE FACT-VOICE LAYER (ruled 2026-10-04;
+#      contract: FACTS = the gate's only reference; CONTEXT
+#      grounds nothing; voices stored, gated, blessable) ============
+
+import hashlib  # noqa: E402
+
+DIR01_DEFAULT = str(Path(__file__).resolve().parents[1]
+                    / "AIVIA_01_Data" / "01_subject_sql_files")
+
+
+def _gate_reference(docket):
+    """V-1 scoped (2026-10-04): FACTS alone grounds values."""
+    if isinstance(docket, dict) and docket.get("facts"):
+        return docket["facts"]
+    return _docket_text(docket)
+
+
+def render_facts(dir05, dir06, dir02, fname):
+    """The FACTS block — every line printed from a resolver-bound
+    row; assembly is never grep, never hand. -> (text, items)
+    where items = [(fact_key, machine_fact)] for voicing."""
+    dir05, dir06 = Path(dir05), Path(dir06)
+    six = json.loads((dir06 / "06_description_sheet.json")
+                     .read_text())
+    file_s = next(r["sentence"] for r in six
+                  if r["node_id"] == f"file::{fname}")
+    preds = [r for r in six if r["grain"] == "predicate"
+             and r["node_id"].split("::")[1] == fname]
+    pred_rows = {p["node_id"]: p for p in
+                 td._read(dir05 / "05_predicate_sheet.json")}
+
+    filters, attachments = [], []
+    for r in sorted(preds, key=lambda x: x["node_id"]):
+        meta = pred_rows.get(r["node_id"], {})
+        oc = meta.get("on_class")
+        where_rooted = "::structure/WHERE/" in r["node_id"] \
+            or "::structure/HAVING/" in r["node_id"]
+        if oc in ("join_pair", "lookup_shaping"):
+            attachments.append((r["node_id"], r["sentence"]))
+        elif where_rooted or oc == "population_filter":
+            filters.append((r["node_id"], r["sentence"]))
+
+    params_line = next((ln for ln in file_s.splitlines()
+                        if ln.startswith("Parameters shaping")),
+                       "Parameters: none bound to filters")
+    presents = next((ln for ln in file_s.splitlines()
+                     if ln.startswith("Presents:")),
+                    "Presents: (none)")
+
+    items = []
+    for nid, fact in filters + attachments:
+        key = nid + ":" + hashlib.sha1(
+            fact.encode()).hexdigest()[:8]
+        items.append((key, fact))
+
+    lines = [f"FACTS — {fname}", "", "SOURCES:"]
+    lines += ["  " + ln[len("Sources: "):] for ln in
+              _source_lines(dir05, dir02, fname)]
+    lines += ["", "WHO-IS-IN FILTERS (each line is one parsed, "
+              "bound condition):"]
+    lines += [f"  - {s}" for _, s in filters]
+    lines += ["", "ATTACHMENTS (add information to rows; never "
+              "restrict membership):"]
+    lines += [f"  - {s}" for _, s in attachments]
+    lines += ["", params_line, "", presents]
+    return "\n".join(lines), items
+
+
+def _voice_gate(voice, fact):
+    """A voice may carry only its own fact's values; same
+    register laws as everything else."""
+    probe = {"facts": fact, "text": fact}
+    f = []
+    for x in gate(voice, probe, "scope"):
+        if x.startswith(("V-1", "V-2", "V-3")):
+            f.append(x)
+    return f
+
+
+def _openai_voicer(fact):
+    return _openai_caller(
+        "Rewrite this one data condition in plain business "
+        "English — one short sentence, natural words, keep every "
+        "code, value and name EXACTLY as written, no SQL "
+        "vocabulary:\n" + fact)
+
+
+def voice_facts(items, store_path, registry, voicer=None):
+    """One scoped call per NEW fact; stored; blessed > gated
+    proposed > the machine fact. Machine writes PROPOSED only."""
+    store_path = Path(store_path)
+    store = (json.loads(store_path.read_text())
+             if store_path.exists() else {})
+    blessed = {s.get("fact_key"): s.get("blessed_text")
+               for s in registry.get("sentences", [])
+               if s.get("fact_key") and s.get("blessed_text")}
+    voicer = voicer or _openai_voicer
+    out = {}
+    changed = False
+    for key, fact in items:
+        if key in blessed:
+            out[key] = blessed[key]
+            continue
+        if key not in store:
+            try:
+                voice = voicer(fact)
+            except Exception as exc:  # noqa: BLE001 — a failed
+                voice = None          # voice is a recorded miss,
+                findings = [f"call failed: {type(exc).__name__}"]
+            else:
+                findings = _voice_gate(voice, fact)
+            store[key] = {"machine_fact": fact,
+                          "voice": None if findings else voice,
+                          "status": ("failed" if findings
+                                     else "proposed"),
+                          "findings": findings,
+                          "model": _MODEL_NAME,
+                          "basis_version": BASIS_VERSION}
+            changed = True
+        entry = store[key]
+        out[key] = entry["voice"] or fact
+    if changed:
+        store_path.write_text(json.dumps(store, indent=1))
+    return out
+
+
+def docket_v2_for_file(dir05, dir06, dir02, fname, voices=None,
+                       dir01=None):
+    """FACTS (+voices beside their facts) and CONTEXT (raw SQL),
+    with the must-say flags. The gate reads FACTS alone."""
+    facts, items = render_facts(dir05, dir06, dir02, fname)
+    if voices:
+        lines = []
+        bykey = {k: v for k, v in voices.items()}
+        fact_to_voice = {f: bykey.get(k) for k, f in items}
+        for ln in facts.splitlines():
+            lines.append(ln)
+            v = fact_to_voice.get(ln.strip().lstrip("- ").strip())
+            core = ln.strip()[2:] if ln.strip().startswith("- ") \
+                else None
+            v = fact_to_voice.get(core)
+            if v and v != core:
+                lines.append(f"      plain: {v}")
+        facts = "\n".join(lines)
+    sql_path = Path(dir01 or DIR01_DEFAULT) / f"{fname}.sql"
+    if not sql_path.exists():
+        sql_path = Path(dir01 or DIR01_DEFAULT) / fname
+    context = (sql_path.read_text(encoding="utf-8-sig")
+               if sql_path.exists() else "")
+    base = docket_for_file(dir05, dir06, dir02, fname)
+    return {"facts": facts,
+            "text": facts + "\n\nCONTEXT (interpretation only — "
+            "grounds nothing):\n" + context,
+            "gap": base["gap"], "params": base["params"],
+            "population": base["population"]}, items

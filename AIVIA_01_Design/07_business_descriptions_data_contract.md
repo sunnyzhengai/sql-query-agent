@@ -15,13 +15,24 @@ What is the input of this data contract?
   known), the eleven 05 sheets (structural anchors: on_class,
   resolves, parameters), the 02 sheets (words, value meanings,
   table descriptions), the 05 kind library.
-  DOCKET AMENDMENT (2026-10-03, Sunny's find — "didn't we have
-  the description from the dictionary?"): file and scope dockets
-  CARRY the 02 table descriptions of every base table the node
-  reads ("Sources:" lines). The dictionary's own words are the
-  interpretation material the proposer translates from and the
-  whitelist grounds against — the gate blocks only words from
-  NOWHERE, never words the dictionary holds.
+  DOCKET v2 (REWRITTEN 2026-10-04, superseding the 10-03 docket
+  amendment; the EMH OVERFLOW find is the evidence): the FILE
+  grain's docket is TWO PARTS. FACTS — assembled only by the 05
+  resolver: sources + dictionary words, each population
+  condition with its bound meaning, attachments, parameters,
+  outputs; THE GATE'S V-1 REFERENCE IS FACTS ALONE. CONTEXT —
+  the raw SQL + dictionary prose, interpretation fuel only,
+  grounds nothing. Scope/field dockets keep the 10-03 shape
+  (their 06 sentence + Sources lines) until a later slice.
+  THE FACT-VOICE LAYER (ruled same day): each machine fact gains
+  a stored plain-English voice — one scoped LLM call per NEW
+  fact, gated (the voice's values must be the fact's own;
+  never-list; no SQL words; no @tokens), persisted in
+  07_fact_voices.json keyed by node_id + fact-text hash
+  (delta-by-name: changed fact re-proposes, unchanged never
+  re-pays), blessable per fact in the registry. Voice ladder:
+  blessed > gated proposed > the machine fact. --no-llm builds
+  skip voicing and stay deterministic.
 - The importable 06 renderers (technical_descriptions.py) — the
   field grain's defining phrases (design ruling 4 / G2a); 06 is
   never reopened by this phase.
@@ -73,6 +84,17 @@ What is the output of this data contract?
   dictionary-growth queue record: 07_code_sightings.json —
   table.column + code + the reading node; Sunny's 02 value
   growth consumes it.
+- 07_fact_voices.json (DOCKET v2, 2026-10-04) — machine-written
+  PROPOSED voices only: {fact_key (node_id + fact hash),
+  machine_fact, voice, status: proposed, model, basis_version}.
+  Blessing a voice is HER registry row (fact_key in sentences);
+  the build reads blessed first. Reuse law: unchanged fact_key
+  never re-proposes.
+- <file_name>.facts.txt — the TRACKED per-file FACTS artifact
+  (machine fact + effective voice side by side): the proposer's
+  grounding half, the gate's V-1 reference, and her audit
+  surface — three readers, one artifact, regenerated every
+  build.
 
 THE LIVE-RUN HARNESS LAWS (AMENDED 2026-10-03, the first-failure
 build per the Echo Law — the first live run hung 2h22m on a
@@ -98,10 +120,11 @@ whitelist is RETIRED — see the design doc's Gate v2 section):
   values, filters, formats of this estate) must trace to the
   docket; general domain knowledge is FREE — the gate polices
   the truth boundary and the register, never interpretation.
-  V-1 GROUNDED VALUES: every quoted value and every number in
-      audience_text must appear in the docket; an ungrounded
-      number fails AND lands a code sighting (S10 narrowed:
-      grounded numbers may speak).
+  V-1 GROUNDED VALUES (SCOPED 2026-10-04): every quoted value
+      and every number in audience_text must appear in the
+      docket's FACTS part — CONTEXT grounds nothing; an
+      ungrounded number fails AND lands a code sighting (S10
+      narrowed: grounded numbers may speak).
   V-2 THE NEVER-LIST: format/purpose claim words (separator,
       delimiter, comma, semicolon, formatted, supports,
       enables, helps, intended, purpose) — the lie taxonomy;
