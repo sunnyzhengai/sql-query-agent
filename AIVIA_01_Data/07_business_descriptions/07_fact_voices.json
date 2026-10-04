@@ -294,5 +294,43 @@
   "findings": [],
   "model": "gpt-5.4",
   "basis_version": "07.2.0"
+ },
+ "file::COOK_RPT_USP_CCHCS_ADT_MONTHLY_INPATIENT_CENSUS_TOTALS_SSRS::scope/delivery::structure/WHERE/1::structure/AND/1::structure/OR/1:4bd5de85": {
+  "machine_fact": "The event subtype is not 'Canceled' (2) or the event subtype is 'Canceled' (2) and the delete time is on or after DATEADD(D, 1, @AsOfDate).",
+  "voice": null,
+  "status": "failed",
+  "findings": [
+   "V-3: banned token '@AsOfDate'"
+  ],
+  "model": "gpt-5.4",
+  "basis_version": "07.2.0"
+ },
+ "file::COOK_RPT_USP_CCHCS_ADT_MONTHLY_INPATIENT_CENSUS_TOTALS_SSRS::scope/delivery::structure/WHERE/1::structure/AND/1::pred/5:f2f06483": {
+  "machine_fact": "The patient id is recorded.",
+  "voice": "The record is linked to a patient.",
+  "status": "proposed",
+  "findings": [],
+  "model": "gpt-5.4",
+  "basis_version": "07.2.0"
+ },
+ "file::COOK_RPT_USP_CCHCS_ADT_MONTHLY_INPATIENT_CENSUS_TOTALS_SSRS::scope/delivery::structure/WHERE/1::structure/AND/1::pred/6:ad4e8f6d": {
+  "machine_fact": "A matching entry exists in STRING_SPLIT(@ServiceArea, ',') where the value is one of the values '0', the service area id.",
+  "voice": null,
+  "status": "failed",
+  "findings": [
+   "V-3: banned token '@ServiceArea'"
+  ],
+  "model": "gpt-5.4",
+  "basis_version": "07.2.0"
+ },
+ "file::COOK_RPT_USP_CCHCS_ADT_MONTHLY_INPATIENT_CENSUS_TOTALS_SSRS::scope/delivery::structure/WHERE/1::structure/AND/1::pred/7:228ea6cc": {
+  "machine_fact": "A matching entry exists in STRING_SPLIT(@Location, ',') where the value is one of the values '0', the revenue location id.",
+  "voice": null,
+  "status": "failed",
+  "findings": [
+   "V-3: banned token '@Location'"
+  ],
+  "model": "gpt-5.4",
+  "basis_version": "07.2.0"
  }
 }

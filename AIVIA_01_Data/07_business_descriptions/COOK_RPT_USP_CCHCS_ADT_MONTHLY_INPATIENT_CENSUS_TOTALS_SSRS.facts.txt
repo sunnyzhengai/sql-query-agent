@@ -12,25 +12,16 @@ SOURCES:
 WHO-IS-IN FILTERS (each line is one parsed, bound condition):
   - The event type is 'Census' (6).
       plain: The event is a Census (6).
+  - The event subtype is not 'Canceled' (2) or the event subtype is 'Canceled' (2) and the delete time is on or after DATEADD(D, 1, @AsOfDate).
   - The effective time is on or after @StartDate.
   - The effective time is before DATEADD(D, 1, @EndDate).
   - The event time is before DATEADD(D, 1, @AsOfDate).
-  - The pat id is recorded.
-      plain: The pat id has been recorded.
-  - A matching record exists in a separately defined selection.
-      plain: There is a matching record in a separately defined selection.
-  - A matching record exists in a separately defined selection.
-      plain: There is a matching record in a separately defined selection.
+  - The patient id is recorded.
+      plain: The record is linked to a patient.
+  - A matching entry exists in STRING_SPLIT(@ServiceArea, ',') where the value is one of the values '0', the service area id.
+  - A matching entry exists in STRING_SPLIT(@Location, ',') where the value is one of the values '0', the revenue location id.
   - The department id is none of the values 'CCMC EMERGENCY' (100108022), 'CCMC IR IMAGING' (100108034), 'CCMC CATH LAB' (100108047), 'CCMC MAIN OR' (100108049), 'CCMC SPA OR' (100108068), 'CCMC PHP PSYCHIATRY' (100108112), 'CCMC CARDIOVASCULAR OR' (100108118), 'DSC OR' (100639001).
       plain: The department is not 'CCMC EMERGENCY' (100108022), 'CCMC IR IMAGING' (100108034), 'CCMC CATH LAB' (100108047), 'CCMC MAIN OR' (100108049), 'CCMC SPA OR' (100108068), 'CCMC PHP PSYCHIATRY' (100108112), 'CCMC CARDIOVASCULAR OR' (100108118), or 'DSC OR' (100639001).
-  - The event subtype is not 'Canceled' (2).
-      plain: Exclude records where the event subtype is 'Canceled' (2).
-  - The event subtype is 'Canceled' (2).
-  - The delete time is on or after DATEADD(D, 1, @AsOfDate).
-  - The value is one of the values '0', the service area id.
-      plain: The value is either '0' or the service area id.
-  - The value is one of the values '0', the revenue location id.
-      plain: The value is either '0' or the revenue location id.
 
 ATTACHMENTS (add information to rows; never restrict membership):
   - The bed contact serial is the bed contact serial number.
