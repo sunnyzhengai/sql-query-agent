@@ -494,3 +494,22 @@ def test_facts_shape_matches_the_sql():
           if "STRING_SPLIT(@ServiceArea" in ln]
     assert len(ex) == 1 and "'0'" in ex[0]
     assert "separately defined selection" not in facts
+
+
+def test_field_docket_v2_named_and_inheriting(tmp_path):
+    """Field docket v2 (2026-10-04): the named defining phrase +
+    the owning file's shaped filters."""
+    out = tmp_path / "07"
+    out.mkdir()
+    rows = bd.build07(DIR05, DIR06, out, DIR02, no_llm=True,
+                      only_file=TOTALS)
+    fields = [r for r in rows if r["grain"] == "field"]
+    assert len(fields) == 17
+    # the per-field facts are built and gate-scoped
+    facts = bd.render_field_facts(
+        DIR05, DIR06, DIR02, TOTALS,
+        fields[0]["node_id"],
+        f"file::{TOTALS}::scope/delivery")
+    assert "FIELD:" in facts
+    assert "The event type is 'Census' (6)." in facts  # inherited
+    assert "event record category" not in facts  # named, not raw

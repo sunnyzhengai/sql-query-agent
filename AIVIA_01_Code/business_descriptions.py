@@ -417,12 +417,18 @@ def build07(dir05, dir06, out07, dir02, no_llm=False,
                 if src_by_file.get(fname) else "")
             specs.append((r["node_id"], "scope", docket,
                           r["sentence"]))
+    field_shared = {}
     for expr_id, scope_id, item in _field_nodes(dir05, dir02):
-        if only_file and scope_id.split("::")[1] != only_file:
+        fname = scope_id.split("::")[1]
+        if only_file and fname != only_file:
             continue
-        owner = next((r["sentence"] for r in six
-                      if r["node_id"] == scope_id), "")
-        specs.append((expr_id, "field", owner + "\n" + item,
+        ffacts = render_field_facts(dir05, dir06, dir02, fname,
+                                    expr_id, scope_id,
+                                    shared=field_shared)
+        specs.append((expr_id, "field",
+                      {"facts": ffacts, "text": ffacts,
+                       "gap": False, "params": False,
+                       "population": False},
                       item))
 
     reset_sightings()
@@ -525,6 +531,24 @@ def _propose_loop(grain, docket_text, docket, registry,
     return text, "floor", findings, REPAIR_BUDGET
 
 
+# ==== FIELD DOCKET v2 — PSEUDO CODE (written before code;
+#      ruled 2026-10-04, the single-file deep track) ===============
+#
+# render_field_facts(dir05, dir06, dir02, fname, expr_id,
+#                    scope_id, shared) -> facts text
+#   FIELD line  : the output's NAMED defining phrase — the 06
+#                 payload item rendered through the name-overlay
+#                 voice (td._payload_item on a _NamedVoice), so
+#                 lineage (built in / read through / origins)
+#                 rides in, named.
+#   FILTER lines: the owning file's SHAPED nine (render_facts,
+#                 computed once per file and shared across its
+#                 fields) — a field sentence inherits the
+#                 population truth.
+#   V-1 is scoped to this facts text; no CONTEXT for fields
+#   (small dockets); must-say flags off (file-grain law only).
+#   The field FLOOR stays the plain 06 item verbatim.
+# ====================================================================
 # ==== THE NAME LADDER — PSEUDO CODE (written BEFORE code this
 #      time; ruled 2026-10-04, the naming law in
 #      Design_Proprietary_Term_Assets.md) ===========================
@@ -937,3 +961,39 @@ def _named_fact(g, voice, sql_lines, node_id):
         return None
     voice.refs = []
     return td._leaf_sentence(pred, voice, g, sql_lines)
+
+
+# ==== FIELD DOCKET v2 (code; pseudo above) ==========================
+
+_FIELD_SHARED = {}
+
+
+def render_field_facts(dir05, dir06, dir02, fname, expr_id,
+                       scope_id, shared=None):
+    """A field's FACTS: its named defining phrase + the owning
+    file's shaped filters (computed once per file)."""
+    key = (str(dir05), fname)
+    cache = shared if shared is not None else _FIELD_SHARED
+    if key not in cache:
+        facts_text, _ = render_facts(dir05, dir06, dir02, fname)
+        names = load_names(DIR03_DEFAULT, {"names": []})
+        g, voice, sql = _facts_renderer(dir05, dir02, names)
+        filt = []
+        on = False
+        for ln in facts_text.splitlines():
+            if ln.startswith("WHO-IS-IN"):
+                on = True
+                continue
+            if ln.startswith("ATTACHMENTS"):
+                break
+            if on and ln.strip().startswith("- "):
+                filt.append(ln.strip())
+        cache[key] = (g, voice, sql, filt)
+    g, voice, sql, filt = cache[key]
+    voice.refs = []
+    item = td._payload_item(voice, expr_id, scope_id)
+    lines = [f"FIELD: {item}", "",
+             "THE OWNING SELECTION'S FILTERS (every row of this "
+             "field already passed these):"]
+    lines += ["  " + ln for ln in filt]
+    return "\n".join(lines)

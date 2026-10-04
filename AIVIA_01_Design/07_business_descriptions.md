@@ -139,6 +139,14 @@ poisoning find in debug02 and her how-to-leverage-LLM question):
   registry.
 - SLICE SCOPE (this implement): the file grain's docket moves
   to v2; scope/field dockets follow in a later slice.
+- FIELD DOCKET v2 (RULED 2026-10-04, the single-file deep
+  track): a field's docket.facts = its NAMED defining phrase
+  (the 06 payload item rendered through the name overlay), its
+  lineage when read through selections, and its owning scope's
+  SHAPED filter lines — so a field sentence can say what the
+  field means AND inherit the population truth. V-1 scoped as
+  everywhere. The field FLOOR stays the 06 item verbatim
+  (deterministic, ladder-free). Scope grain follows last.
 - THE FACTS SHAPE LAW (RULED 2026-10-04, her 13-vs-9 find):
   WHO-IS-IN lists ONE line per TOP-LEVEL condition of the WHERE
   — an OR-group composes on ONE line (R3's shape law at the
