@@ -2,7 +2,7 @@
  {
   "node_id": "file::COOK_RPT_USP_CCHCS_ADT_MONTHLY_INPATIENT_CENSUS_TOTALS_SSRS",
   "grain": "file",
-  "audience_text": "One row is: one inpatient census event for a patient, representing that patient being counted in a bedded location on a particular census date.\n\nWho's in it: patients with a census event during the chosen reporting period, linked to a patient record, in the chosen service area or areas and chosen location or locations. Choosing All for service area includes every service area. Choosing All for location includes every location. The report is limited to departments other than CCMC EMERGENCY, CCMC IR IMAGING, CCMC CATH LAB, CCMC MAIN OR, CCMC SPA OR, CCMC PHP PSYCHIATRY, CCMC CARDIOVASCULAR OR, and DSC OR.\n\nEach row shows: the patient\u2019s census placement, the clinical setting involved, the patient\u2019s hospital class and service, the event timing, and identifying details for the related ADT and location records.\n\nTime window: it includes census events whose effective time falls from the chosen start date through the chosen end date, including the whole end date. It shows the data as it stood at the end of the chosen as-of date, so only events entered by then are included. Canceled census events are still shown if they were not deleted until after the as-of date, which means they still existed in the record at that point in time.\n\nExcludes: records not linked to a patient; the listed excluded departments; events outside the chosen date range; events entered after the as-of date; and census events that had already been canceled and deleted by the end of the as-of date.",
+  "audience_text": "One row is: one inpatient census event for one patient in one bed or room location, representing that patient being counted on a census day.\n\nWho's in it: Patients with census events whose effective time falls during the requested reporting period, using the patient\u2019s department, room, bed, patient class, patient service, and service area details linked to that event. When running the report, colleagues choose the service areas and locations to include; choosing All includes every service area or every location.\n\nEach row shows: the patient\u2019s census occurrence, where they were located, the clinical stay grouping, the organizational area, and identifying details for the event and location records.\n\nTime window: The report includes census events from the start date through the end date, with the end date counted inclusively. It shows the data as it stood at the as-of date: only events entered by the end of that day are included, and canceled census events are still included if they were not deleted until after that day.\n\nExcludes: Records not linked to a patient; departments CCMC EMERGENCY, CCMC IR IMAGING, CCMC CATH LAB, CCMC MAIN OR, CCMC SPA OR, CCMC PHP PSYCHIATRY, CCMC CARDIOVASCULAR OR, and DSC OR.",
   "status": "gate_passed",
   "gate_findings": [],
   "rounds_used": 1,
@@ -12,7 +12,7 @@
  {
   "node_id": "file::COOK_RPT_USP_CCHCS_ADT_MONTHLY_INPATIENT_CENSUS_TOTALS_SSRS::scope/delivery",
   "grain": "scope",
-  "audience_text": "This selection contains census ADT events for patients whose event time falls during the chosen date range, using the event date up to and including the end date, and showing the data as it existed on the chosen As Of date. It includes events that were still active then, and also events later marked canceled if they were not deleted until after that As Of date, so the report reflects what staff would have seen at that point in time.\n\nFor each included event, it shows the patient, census day, patient class, patient service, department, room, bed, service area, and the event\u2019s create and delete timestamps, along with the event\u2019s identifiers. Excludes records without a patient, records that do not match the separately defined required linked selections, and events in these departments: CCMC EMERGENCY, CCMC IR IMAGING, CCMC CATH LAB, CCMC MAIN OR, CCMC SPA OR, CCMC PHP PSYCHIATRY, CCMC CARDIOVASCULAR OR, and DSC OR.",
+  "audience_text": "This selection contains inpatient census ADT events for patients during the chosen date range, using the event date up to and including the end date, and showing the event as it existed as of the chosen as-of date. It includes the patient, patient class, service, unit, room, bed, service area, event day, and the event\u2019s create and delete timestamps, while keeping canceled events only if they were still present as of that as-of date.\n\nIt excludes events from these departments: CCMC EMERGENCY, CCMC IR IMAGING, CCMC CATH LAB, CCMC MAIN OR, CCMC SPA OR, CCMC PHP PSYCHIATRY, CCMC CARDIOVASCULAR OR, and DSC OR. It also excludes records without a patient and any records that do not link to the required related selections.",
   "status": "gate_passed",
   "gate_findings": [],
   "rounds_used": 1,
@@ -22,7 +22,7 @@
  {
   "node_id": "file::COOK_RPT_USP_CCHCS_ADT_MONTHLY_INPATIENT_CENSUS_TOTALS_SSRS::stmt/2::scope/sub1",
   "grain": "scope",
-  "audience_text": "This selection is the list of service areas chosen when running the report. It includes either the specific service area where a department sits, or the choice All, which brings in every service area.\n\nIt is built from hospital location setup and bed and room setup, with ADT history and patient class information available to support how those departments and locations are used in the inpatient setting. Each selected service area is carried forward once as a reporting choice for the rest of the dataset.",
+  "audience_text": "This selection is the list of service areas chosen when running the report, based on the service area attached to each department. Choosing **All** means every service area is included; otherwise it includes only the specifically chosen service areas.\n\nIt is built from ADT event history and the department, room, bed, service area, and patient class reference records, so in practice it is identifying which service areas are represented by the hospital location tied to the ADT data. Each selected service area is carried forward as a simple included choice for the rest of the dataset build.",
   "status": "gate_passed",
   "gate_findings": [],
   "rounds_used": 1,
@@ -32,7 +32,7 @@
  {
   "node_id": "file::COOK_RPT_USP_CCHCS_ADT_MONTHLY_INPATIENT_CENSUS_TOTALS_SSRS::stmt/2::scope/sub2",
   "grain": "scope",
-  "audience_text": "This selection is one chosen location value when running the report: either **All** or one specific **revenue location linked to the department**. It is used to keep ADT bed history aligned to the hospital location structure, so activity can be limited to the chosen revenue location or include every location when **All** is chosen.\n\nIn practical terms, it ties bed, room, department, service area, and patient class information to each ADT event for a hospital encounter. It also carries a simple marker showing the chosen location entry is active in this dataset build.",
+  "audience_text": "This selection is the set of locations chosen when running the report: either **All** by choosing **0**, or the specific **revenue location linked to a department**. It is built from ADT history and the linked bed, room, department, service area, patient class, and patient service reference records so the report can limit results to the relevant hospital location choices.",
   "status": "gate_passed",
   "gate_findings": [],
   "rounds_used": 1,
@@ -42,7 +42,7 @@
  {
   "node_id": "file::COOK_RPT_USP_CCHCS_ADT_MONTHLY_INPATIENT_CENSUS_TOTALS_SSRS::scope/delivery::structure/PROJECTION/1::expr/1",
   "grain": "field",
-  "audience_text": "This field shows the type of patient movement event recorded for the row; in this data it will read Census, meaning a census-related bed or patient location event rather than another kind of ADT activity. For business users, that tells you the row is about inpatient census tracking.",
+  "audience_text": "This field shows the type of event recorded for the row; in this report it will be the Census event type, meaning the bed census movement or status event that counts the patient in the inpatient census.",
   "status": "gate_passed",
   "gate_findings": [],
   "rounds_used": 1,
@@ -52,17 +52,17 @@
  {
   "node_id": "file::COOK_RPT_USP_CCHCS_ADT_MONTHLY_INPATIENT_CENSUS_TOTALS_SSRS::scope/delivery::structure/PROJECTION/1::expr/2",
   "grain": "field",
-  "audience_text": "This field tells you the subtype recorded for the census event, which is the specific kind of census movement or status change for that patient event. In business terms, it is the label that further describes what kind of census event happened, beyond simply knowing it was a census event.",
+  "audience_text": "This field shows the subtype recorded on the census event, so it tells you what kind of census movement or status change the event represents within the broader census event category. In practice, this is the business-facing label that distinguishes one kind of census event from another, such as separating routine activity from a cancellation when that cancellation is still considered part of the reported history.",
   "status": "gate_passed",
   "gate_findings": [],
-  "rounds_used": 1,
+  "rounds_used": 2,
   "model": "gpt-5.4",
   "basis_version": "07.2.0"
  },
  {
   "node_id": "file::COOK_RPT_USP_CCHCS_ADT_MONTHLY_INPATIENT_CENSUS_TOTALS_SSRS::scope/delivery::structure/PROJECTION/1::expr/3",
   "grain": "field",
-  "audience_text": "This field is the date and time when the census event actually took effect for the patient, such as when a bed status or location change became active in the hospital census. For business users, this is the operational timestamp to use when you want to know when that census status truly started, which can differ from when someone entered the event into the record.",
+  "audience_text": "This field shows the date and time when the census event took effect for the patient, meaning the moment the bed status or patient placement change became active in operational terms. For business users, this is the clinically meaningful timestamp to use when you want to know when the patient\u2019s census status actually changed, rather than when someone entered the event.",
   "status": "gate_passed",
   "gate_findings": [],
   "rounds_used": 1,
@@ -72,7 +72,7 @@
  {
   "node_id": "file::COOK_RPT_USP_CCHCS_ADT_MONTHLY_INPATIENT_CENSUS_TOTALS_SSRS::scope/delivery::structure/PROJECTION/1::expr/4",
   "grain": "field",
-  "audience_text": "This field is the patient\u2019s identifier from the medical record, so it tells you which patient each census event belongs to. In business terms, it is the value you would use to distinguish one patient from another and to link this row to that patient\u2019s other activity in the record.",
+  "audience_text": "This is the unique identifier for the patient linked to that census event, so it tells you which patient the bed or census record belongs to. It is the patient\u2019s system ID rather than a display name, and it is used to reliably tie this row to the same patient across the record.",
   "status": "gate_passed",
   "gate_findings": [],
   "rounds_used": 1,
@@ -82,17 +82,17 @@
  {
   "node_id": "file::COOK_RPT_USP_CCHCS_ADT_MONTHLY_INPATIENT_CENSUS_TOTALS_SSRS::scope/delivery::structure/PROJECTION/1::expr/5",
   "grain": "field",
-  "audience_text": "This field shows the abbreviated patient class for the encounter tied to the census event, such as the short label used in the record for whether the patient is inpatient, outpatient, observation, or another class. For business readers, it is the concise category that tells you what kind of hospital stay or visit this bed or census event belongs to.",
+  "audience_text": "This field shows the abbreviated patient class for the census event, meaning the short label for the patient\u2019s level or setting of care at that point in time, such as whether the patient was inpatient, observation, or in another standard class used by the hospital. It is the concise class code clinicians and operations staff use to quickly understand how the patient was being categorized for bed management, throughput, and reporting.",
   "status": "gate_passed",
   "gate_findings": [],
-  "rounds_used": 2,
+  "rounds_used": 1,
   "model": "gpt-5.4",
   "basis_version": "07.2.0"
  },
  {
   "node_id": "file::COOK_RPT_USP_CCHCS_ADT_MONTHLY_INPATIENT_CENSUS_TOTALS_SSRS::scope/delivery::structure/PROJECTION/1::expr/6",
   "grain": "field",
-  "audience_text": "This field shows the abbreviated name of the department tied to the patient\u2019s census event, so it tells you which clinical department or unit the patient was assigned to in shorthand form. In practice, this is the short department label staff would recognize for where the patient was placed, rather than the full department name.",
+  "audience_text": "This field shows the abbreviated name of the department tied to the census event, so it tells you the clinical unit or area recorded for that bed status movement in a short department label rather than the full department name. For business users, this is the shorthand department identifier you would group or filter on when looking at where census activity occurred.",
   "status": "gate_passed",
   "gate_findings": [],
   "rounds_used": 1,
@@ -102,7 +102,7 @@
  {
   "node_id": "file::COOK_RPT_USP_CCHCS_ADT_MONTHLY_INPATIENT_CENSUS_TOTALS_SSRS::scope/delivery::structure/PROJECTION/1::expr/7",
   "grain": "field",
-  "audience_text": "This field shows the name of the room tied to the patient\u2019s census bed event, so it is the room staff would recognize on the unit where the patient was placed or assigned at that point in care.",
+  "audience_text": "This field shows the name of the room tied to the patient\u2019s census bed movement, so it tells you the room the patient was assigned to at that point in their stay. For a business reader, this is the room label staff would recognize on the unit, used to identify where the patient was physically located.",
   "status": "gate_passed",
   "gate_findings": [],
   "rounds_used": 1,
@@ -112,7 +112,7 @@
  {
   "node_id": "file::COOK_RPT_USP_CCHCS_ADT_MONTHLY_INPATIENT_CENSUS_TOTALS_SSRS::scope/delivery::structure/PROJECTION/1::expr/8",
   "grain": "field",
-  "audience_text": "This field shows the label of the bed tied to the patient\u2019s census event, in other words the bed name staff would recognize on the unit. It tells the business reader which specific bed the patient was assigned to at that point in their stay.",
+  "audience_text": "This field shows the label of the bed tied to the census event for that patient encounter, in other words the bed name staff would recognize on the unit. It tells business users which specific bed the patient was assigned to at that point in the stay.",
   "status": "gate_passed",
   "gate_findings": [],
   "rounds_used": 1,
@@ -122,7 +122,7 @@
  {
   "node_id": "file::COOK_RPT_USP_CCHCS_ADT_MONTHLY_INPATIENT_CENSUS_TOTALS_SSRS::scope/delivery::structure/PROJECTION/1::expr/9",
   "grain": "field",
-  "audience_text": "This field shows the patient service name for the census event, meaning the clinical service the patient was assigned to at that point in their stay, such as the team or specialty responsible for their inpatient care. For business readers, it tells you which service line was managing the patient when that census snapshot was recorded.",
+  "audience_text": "This field shows the patient service name for the census event, meaning the clinical service or care team the patient was assigned under at that point in their stay, such as the service responsible for the patient\u2019s inpatient care. It is the service label business users would recognize when looking at who clinically \u201cowned\u201d the patient during that census moment.",
   "status": "gate_passed",
   "gate_findings": [],
   "rounds_used": 1,
@@ -132,7 +132,7 @@
  {
   "node_id": "file::COOK_RPT_USP_CCHCS_ADT_MONTHLY_INPATIENT_CENSUS_TOTALS_SSRS::scope/delivery::structure/PROJECTION/1::expr/10",
   "grain": "field",
-  "audience_text": "This field shows the date and time when that census event record was deleted from the system. In practice, it lets you see whether an event was later removed after it had been entered, which is useful when reviewing changes or understanding why an event no longer counts as an active census entry.",
+  "audience_text": "This field shows when that census event was deleted from the record. For business users, it tells you whether the event was later removed and, if so, the exact date and time that happened.",
   "status": "gate_passed",
   "gate_findings": [],
   "rounds_used": 1,
@@ -142,7 +142,7 @@
  {
   "node_id": "file::COOK_RPT_USP_CCHCS_ADT_MONTHLY_INPATIENT_CENSUS_TOTALS_SSRS::scope/delivery::structure/PROJECTION/1::expr/11",
   "grain": "field",
-  "audience_text": "This is the date and time when the census event was entered in the record. For business use, it tells you when that bed or patient movement update was documented, which can be different from when the event actually took effect.",
+  "audience_text": "This is the timestamp when the census event was entered in the record. For business use, it tells you when that bed status or patient movement update was recorded, which may be different from when the change actually took effect.",
   "status": "gate_passed",
   "gate_findings": [],
   "rounds_used": 1,
@@ -152,7 +152,7 @@
  {
   "node_id": "file::COOK_RPT_USP_CCHCS_ADT_MONTHLY_INPATIENT_CENSUS_TOTALS_SSRS::scope/delivery::structure/PROJECTION/1::expr/12",
   "grain": "field",
-  "audience_text": "This field shows the name of the service area attached to the event, so it tells you which service line or operational area the patient activity belongs to in the organization. For business users, it is the plain-language service area name rather than the internal identifier.",
+  "audience_text": "This field shows the name of the service area tied to the census event, so it tells you which larger operational area of the organization the patient\u2019s bed status belonged to, such as the broad service area that sits above the specific hospital location or department.",
   "status": "gate_passed",
   "gate_findings": [],
   "rounds_used": 1,
@@ -162,17 +162,17 @@
  {
   "node_id": "file::COOK_RPT_USP_CCHCS_ADT_MONTHLY_INPATIENT_CENSUS_TOTALS_SSRS::scope/delivery::structure/PROJECTION/1::expr/13",
   "grain": "field",
-  "audience_text": "This field is the identifier of the department tied to the census event, so it tells you which clinical department or unit the patient\u2019s bed status was recorded under. In practice, this is the department value used to place the patient in the right care area for reporting, excluding the specific procedural and emergency departments that are intentionally left out of this dataset.",
+  "audience_text": "This field gives the identifier of the department tied to the census event, so it tells you which department the patient was assigned to for that bed status record. In business terms, it is the department\u2019s stored ID value, used to group or match activity by department rather than showing the department name.",
   "status": "gate_passed",
   "gate_findings": [],
-  "rounds_used": 2,
+  "rounds_used": 1,
   "model": "gpt-5.4",
   "basis_version": "07.2.0"
  },
  {
   "node_id": "file::COOK_RPT_USP_CCHCS_ADT_MONTHLY_INPATIENT_CENSUS_TOTALS_SSRS::scope/delivery::structure/PROJECTION/1::expr/14",
   "grain": "field",
-  "audience_text": "This field is the identifier of the room tied to the patient\u2019s census bed placement event, so it tells you which room the patient was assigned to at that point in their stay. In business terms, it is the room-level location value used to place the patient within the hospital.",
+  "audience_text": "This field is the identifier for the room tied to the patient\u2019s census bed stay event, so it tells you which room the patient was assigned to at that point in their stay. For business use, read it as the room reference from the bed management record rather than a narrative room name or description.",
   "status": "gate_passed",
   "gate_findings": [],
   "rounds_used": 1,
@@ -182,7 +182,7 @@
  {
   "node_id": "file::COOK_RPT_USP_CCHCS_ADT_MONTHLY_INPATIENT_CENSUS_TOTALS_SSRS::scope/delivery::structure/PROJECTION/1::expr/15",
   "grain": "field",
-  "audience_text": "This field shows the identifier of the bed tied to that census event, meaning the specific bed the patient was occupying for that recorded inpatient bed-status moment. For business users, it is the bed-level value used to place the patient in an exact bed rather than just a room, unit, or department.",
+  "audience_text": "This field shows the identifier of the bed tied to that census event, in other words the specific bed the patient was assigned to at that point in their stay. For business users, it is the bed-level value you would use to tell exactly which bed the patient occupied, rather than just the room, unit, or department.",
   "status": "gate_passed",
   "gate_findings": [],
   "rounds_used": 1,
@@ -192,7 +192,7 @@
  {
   "node_id": "file::COOK_RPT_USP_CCHCS_ADT_MONTHLY_INPATIENT_CENSUS_TOTALS_SSRS::scope/delivery::structure/PROJECTION/1::expr/16",
   "grain": "field",
-  "audience_text": "This is the unique identifier for the individual census event record, so it distinguishes one bed or unit census event from another in the data. For business users, it is mainly a technical tracking number you can use to tie this row back to the exact underlying event if you need to validate or investigate it.",
+  "audience_text": "This is the unique identifier for the census event itself, so it distinguishes one bed status or patient movement event from another in the source record set. It is mainly useful as a reference key when you need to trace a specific census event back to the underlying event record.",
   "status": "gate_passed",
   "gate_findings": [],
   "rounds_used": 1,
@@ -202,7 +202,7 @@
  {
   "node_id": "file::COOK_RPT_USP_CCHCS_ADT_MONTHLY_INPATIENT_CENSUS_TOTALS_SSRS::scope/delivery::structure/PROJECTION/1::expr/17",
   "grain": "field",
-  "audience_text": "This field gives the calendar day taken from the event\u2019s effective time, so it tells you which census date the bed or patient status belongs to. In practice, it is the day the census event counts on for reporting, not the exact timestamp.",
+  "audience_text": "This field gives the calendar day for the census event\u2019s effective time, so it shows which census day that event belongs to in business terms. Use it as the day-level date for counting or grouping census activity, rather than the exact timestamp when the event took effect.",
   "status": "gate_passed",
   "gate_findings": [],
   "rounds_used": 1,
