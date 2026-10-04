@@ -449,3 +449,16 @@ def test_facts_speak_short_names():
     fl = next(r["sentence"] for r in six
               if r["node_id"] == f"file::{TOTALS}")
     assert "the event record category" in fl
+
+
+def test_recordedness_speaks_the_ladder():
+    """Her 'pat id' find (2026-10-04): the recordedness voice
+    consults the name ladder — facts say 'patient id'."""
+    facts, _ = bd.render_facts(DIR05, DIR06, DIR02, TOTALS)
+    assert "The patient id is recorded." in facts
+    assert "pat id is recorded" not in facts
+
+
+def test_voice_prompt_carries_the_linkage_law():
+    p = bd._VOICE_PROMPT
+    assert "linked" in p and "identifier" in p

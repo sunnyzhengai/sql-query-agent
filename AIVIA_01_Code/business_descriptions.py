@@ -693,12 +693,19 @@ def _voice_gate(voice, fact):
     return f
 
 
+_VOICE_PROMPT = (
+    "Rewrite this one data condition in plain business English "
+    "— one short sentence, natural words; keep every code and "
+    "value EXACTLY as written; concepts may be renamed plainly; "
+    "no SQL vocabulary. A condition that an identifier is "
+    "recorded means the record is LINKED to that entity — say "
+    "the linkage (the record is linked to a patient), not the "
+    "field mechanics; recordedness of an ordinary data column "
+    "stays 'has a recorded <x>'.\n")
+
+
 def _openai_voicer(fact):
-    return _openai_caller(
-        "Rewrite this one data condition in plain business "
-        "English — one short sentence, natural words; keep every "
-        "code and value EXACTLY as written; concepts may be "
-        "renamed plainly; no SQL vocabulary:\n" + fact)
+    return _openai_caller(_VOICE_PROMPT + fact)
 
 
 def voice_facts(items, store_path, registry, voicer=None):
@@ -810,6 +817,22 @@ def load_names(dir03, registry):
     return names
 
 
+class _NamedVoice(td._Voice):
+    """The 07 voice seat (ruled 2026-10-04, her 'pat id' find):
+    recordedness name-words consult the name ladder first; the
+    06 floor keeps its own R5.c law untouched."""
+
+    def name_words(self, expr_id):
+        self.refs.append(expr_id)
+        for r in self.g["resolves"].get(expr_id, []):
+            if r["to_kind"] == "column":
+                tu, cu = r["to_id"].split(".", 1)
+                hit = self.words.get((tu.upper(), cu.upper()))
+                if hit:
+                    return hit[0]
+        return super().name_words(expr_id)
+
+
 def _facts_renderer(dir05, dir02, names, dir01=None):
     """A 07-side render seat: the 06 machinery with the name
     overlay — the 06 floor itself stays untouched."""
@@ -820,7 +843,7 @@ def _facts_renderer(dir05, dir02, names, dir01=None):
         if kind == "column" and "." in oname:
             t, c = oname.split(".", 1)
             words[(t.upper(), c.upper())] = (short, False)
-    voice = td._Voice(g, words, values)
+    voice = _NamedVoice(g, words, values)
     sql_lines = td._load_sql(Path(dir01 or DIR01_DEFAULT))
     return g, voice, sql_lines
 

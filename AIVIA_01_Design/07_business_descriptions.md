@@ -139,6 +139,15 @@ poisoning find in debug02 and her how-to-leverage-LLM question):
   registry.
 - SLICE SCOPE (this implement): the file grain's docket moves
   to v2; scope/field dockets follow in a later slice.
+- RECORDEDNESS SPEAKS THE LADDER + LINKAGE (RULED 2026-10-04,
+  her 'pat id' find): (a) the recordedness voice ("...is
+  recorded") consults the name ladder like every other 07
+  surface — "The patient id is recorded", never "pat id"; a
+  07-side voice seat, the 06 floor's own R5.c law untouched.
+  (b) VOICE LAW, prompt-only: recordedness of an IDENTIFIER
+  means LINKAGE — "The event is linked to a patient." (her
+  wording); recordedness of a data column stays "has a recorded
+  <x>". The voicer judges which; her blessing catches.
 - THE NAME LADDER (RULED 2026-10-04; the law lives in
   Design_Proprietary_Term_Assets.md — ONE naming asset, the 03
   abstracts; a 07-local name store was REJECTED): FACTS, fact
