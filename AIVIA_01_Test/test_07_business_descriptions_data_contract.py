@@ -235,11 +235,14 @@ RUN7_FILE_CLEAN = (
 TOTALS = "COOK_RPT_USP_CCHCS_ADT_MONTHLY_INPATIENT_CENSUS_TOTALS_SSRS"
 
 
-def test_gate_v2_passes_the_recorded_run7_card():
-    """The RECORDED run-7 card (gpt-5.4, 2026-10-03) is the
-    quality bar: it must pass Gate v2 untouched."""
+def test_gate_v2_and_the_run7_card_history():
+    """The RECORDED run-7 card was the 10-03 quality bar; the
+    10-04 LINE-OWNERSHIP LAW deliberately supersedes it — the
+    old card now fails EXACTLY that one named check ("a unit
+    other than ..." in Who's in it) and nothing else."""
     docket = bd.docket_for_file(DIR05, DIR06, DIR02, TOTALS)
-    assert bd.gate(RUN7_FILE_CLEAN, docket, "file") == []
+    f = bd.gate(RUN7_FILE_CLEAN, docket, "file")
+    assert len(f) == 1 and "ownership" in f[0]
 
 
 def test_gate_v2_template_and_register():
