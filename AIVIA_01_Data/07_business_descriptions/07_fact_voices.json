@@ -1,0 +1,162 @@
+{
+ "file::COOK_RPT_USP_CCHCS_ADT_MONTHLY_INPATIENT_CENSUS_TOTALS_SSRS::scope/delivery::structure/WHERE/1::structure/AND/1::pred/1:9a291d89": {
+  "machine_fact": "The event record category is 'Census' (6).",
+  "voice": "The event record category is Census (6).",
+  "status": "proposed",
+  "findings": [],
+  "model": "gpt-5.4",
+  "basis_version": "07.2.0"
+ },
+ "file::COOK_RPT_USP_CCHCS_ADT_MONTHLY_INPATIENT_CENSUS_TOTALS_SSRS::scope/delivery::structure/WHERE/1::structure/AND/1::pred/2:5a2042e0": {
+  "machine_fact": "The instant when the event was supposed to have happened is on or after @StartDate.",
+  "voice": null,
+  "status": "failed",
+  "findings": [
+   "V-3: banned token '@StartDate'"
+  ],
+  "model": "gpt-5.4",
+  "basis_version": "07.2.0"
+ },
+ "file::COOK_RPT_USP_CCHCS_ADT_MONTHLY_INPATIENT_CENSUS_TOTALS_SSRS::scope/delivery::structure/WHERE/1::structure/AND/1::pred/3:75fafbe1": {
+  "machine_fact": "The instant when the event was supposed to have happened is before DATEADD(D, 1, @EndDate).",
+  "voice": null,
+  "status": "failed",
+  "findings": [
+   "V-3: banned token '@EndDate'"
+  ],
+  "model": "gpt-5.4",
+  "basis_version": "07.2.0"
+ },
+ "file::COOK_RPT_USP_CCHCS_ADT_MONTHLY_INPATIENT_CENSUS_TOTALS_SSRS::scope/delivery::structure/WHERE/1::structure/AND/1::pred/4:79858479": {
+  "machine_fact": "The instant when the event record was actually created is before DATEADD(D, 1, @AsOfDate).",
+  "voice": null,
+  "status": "failed",
+  "findings": [
+   "V-3: banned token '@AsOfDate'"
+  ],
+  "model": "gpt-5.4",
+  "basis_version": "07.2.0"
+ },
+ "file::COOK_RPT_USP_CCHCS_ADT_MONTHLY_INPATIENT_CENSUS_TOTALS_SSRS::scope/delivery::structure/WHERE/1::structure/AND/1::pred/5:8a6082a8": {
+  "machine_fact": "The pat id is recorded.",
+  "voice": "The pat id has been recorded.",
+  "status": "proposed",
+  "findings": [],
+  "model": "gpt-5.4",
+  "basis_version": "07.2.0"
+ },
+ "file::COOK_RPT_USP_CCHCS_ADT_MONTHLY_INPATIENT_CENSUS_TOTALS_SSRS::scope/delivery::structure/WHERE/1::structure/AND/1::pred/6:72dad653": {
+  "machine_fact": "A matching record exists in a separately defined selection.",
+  "voice": "There is a matching record in a separately defined selection.",
+  "status": "proposed",
+  "findings": [],
+  "model": "gpt-5.4",
+  "basis_version": "07.2.0"
+ },
+ "file::COOK_RPT_USP_CCHCS_ADT_MONTHLY_INPATIENT_CENSUS_TOTALS_SSRS::scope/delivery::structure/WHERE/1::structure/AND/1::pred/7:72dad653": {
+  "machine_fact": "A matching record exists in a separately defined selection.",
+  "voice": "There is a matching record in a separately defined selection.",
+  "status": "proposed",
+  "findings": [],
+  "model": "gpt-5.4",
+  "basis_version": "07.2.0"
+ },
+ "file::COOK_RPT_USP_CCHCS_ADT_MONTHLY_INPATIENT_CENSUS_TOTALS_SSRS::scope/delivery::structure/WHERE/1::structure/AND/1::pred/8:af6beda4": {
+  "machine_fact": "The unit of the event record at the effective time ID is none of the values 'CCMC EMERGENCY' (100108022), 'CCMC IR IMAGING' (100108034), 'CCMC CATH LAB' (100108047), 'CCMC MAIN OR' (100108049), 'CCMC SPA OR' (100108068), 'CCMC PHP PSYCHIATRY' (100108112), 'CCMC CARDIOVASCULAR OR' (100108118), 'DSC OR' (100639001).",
+  "voice": "At the effective time ID, the event record unit is not 'CCMC EMERGENCY' (100108022), 'CCMC IR IMAGING' (100108034), 'CCMC CATH LAB' (100108047), 'CCMC MAIN OR' (100108049), 'CCMC SPA OR' (100108068), 'CCMC PHP PSYCHIATRY' (100108112), 'CCMC CARDIOVASCULAR OR' (100108118), or 'DSC OR' (100639001).",
+  "status": "proposed",
+  "findings": [],
+  "model": "gpt-5.4",
+  "basis_version": "07.2.0"
+ },
+ "file::COOK_RPT_USP_CCHCS_ADT_MONTHLY_INPATIENT_CENSUS_TOTALS_SSRS::scope/delivery::structure/WHERE/1::structure/AND/1::structure/OR/1::pred/1:42f1792a": {
+  "machine_fact": "The category value indicating whether the event record has been changed or deleted is not 'Canceled' (2).",
+  "voice": "The category value showing whether the event record was changed or deleted is not 'Canceled' (2).",
+  "status": "proposed",
+  "findings": [],
+  "model": "gpt-5.4",
+  "basis_version": "07.2.0"
+ },
+ "file::COOK_RPT_USP_CCHCS_ADT_MONTHLY_INPATIENT_CENSUS_TOTALS_SSRS::scope/delivery::structure/WHERE/1::structure/AND/1::structure/OR/1::structure/AND/1::pred/1:2784a2be": {
+  "machine_fact": "The category value indicating whether the event record has been changed or deleted is 'Canceled' (2).",
+  "voice": "The event record status category shows it has been changed or deleted: 'Canceled' (2).",
+  "status": "proposed",
+  "findings": [],
+  "model": "gpt-5.4",
+  "basis_version": "07.2.0"
+ },
+ "file::COOK_RPT_USP_CCHCS_ADT_MONTHLY_INPATIENT_CENSUS_TOTALS_SSRS::scope/delivery::structure/WHERE/1::structure/AND/1::structure/OR/1::structure/AND/1::pred/2:0bb147fb": {
+  "machine_fact": "The instant when the event record was actually deleted is on or after DATEADD(D, 1, @AsOfDate).",
+  "voice": null,
+  "status": "failed",
+  "findings": [
+   "V-3: banned token '@AsOfDate'"
+  ],
+  "model": "gpt-5.4",
+  "basis_version": "07.2.0"
+ },
+ "file::COOK_RPT_USP_CCHCS_ADT_MONTHLY_INPATIENT_CENSUS_TOTALS_SSRS::stmt/2::scope/sub1::structure/WHERE/1::pred/1:0c8c93a9": {
+  "machine_fact": "The value is one of the values '0', the service area in which this department is located unique.",
+  "voice": "The value is '0' in the unique service area where this department is located.",
+  "status": "proposed",
+  "findings": [],
+  "model": "gpt-5.4",
+  "basis_version": "07.2.0"
+ },
+ "file::COOK_RPT_USP_CCHCS_ADT_MONTHLY_INPATIENT_CENSUS_TOTALS_SSRS::stmt/2::scope/sub2::structure/WHERE/1::pred/1:2b5934f8": {
+  "machine_fact": "The value is one of the values '0', the revenue location to which the department is linked unique.",
+  "voice": "The value is '0' and the unique revenue location linked to the department.",
+  "status": "proposed",
+  "findings": [],
+  "model": "gpt-5.4",
+  "basis_version": "07.2.0"
+ },
+ "file::COOK_RPT_USP_CCHCS_ADT_MONTHLY_INPATIENT_CENSUS_TOTALS_SSRS::scope/delivery::structure/JOIN/1::pred/1:6c01af7e": {
+  "machine_fact": "The bed contact of the event record serial is the bed contact of the bed record serial.",
+  "voice": "The event record serial uses the same bed contact as the bed record serial.",
+  "status": "proposed",
+  "findings": [],
+  "model": "gpt-5.4",
+  "basis_version": "07.2.0"
+ },
+ "file::COOK_RPT_USP_CCHCS_ADT_MONTHLY_INPATIENT_CENSUS_TOTALS_SSRS::scope/delivery::structure/JOIN/2::pred/1:88d6666d": {
+  "machine_fact": "The room contact of the event record serial is the room contact of the room record serial.",
+  "voice": "The event record serial uses the same room contact as the room record serial.",
+  "status": "proposed",
+  "findings": [],
+  "model": "gpt-5.4",
+  "basis_version": "07.2.0"
+ },
+ "file::COOK_RPT_USP_CCHCS_ADT_MONTHLY_INPATIENT_CENSUS_TOTALS_SSRS::scope/delivery::structure/JOIN/3::pred/1:4006e7d9": {
+  "machine_fact": "The unit of the event record at the effective time ID is the unique ID number assigned to the department record.",
+  "voice": "At the effective time ID, the event record\u2019s unit is the department record\u2019s unique ID number.",
+  "status": "proposed",
+  "findings": [],
+  "model": "gpt-5.4",
+  "basis_version": "07.2.0"
+ },
+ "file::COOK_RPT_USP_CCHCS_ADT_MONTHLY_INPATIENT_CENSUS_TOTALS_SSRS::scope/delivery::structure/JOIN/4::pred/1:df533d17": {
+  "machine_fact": "The patient of the event record at the effective time category is the patient class for the hospital encounter category.",
+  "voice": "The patient on the event record at the effective time category is in the patient class for the hospital encounter category.",
+  "status": "proposed",
+  "findings": [],
+  "model": "gpt-5.4",
+  "basis_version": "07.2.0"
+ },
+ "file::COOK_RPT_USP_CCHCS_ADT_MONTHLY_INPATIENT_CENSUS_TOTALS_SSRS::scope/delivery::structure/JOIN/5::pred/1:4f1aa001": {
+  "machine_fact": "The patient of the event record at the effective time category is the hosp serv c.",
+  "voice": "At the effective time category, the patient on the event record is hosp serv c.",
+  "status": "proposed",
+  "findings": [],
+  "model": "gpt-5.4",
+  "basis_version": "07.2.0"
+ },
+ "file::COOK_RPT_USP_CCHCS_ADT_MONTHLY_INPATIENT_CENSUS_TOTALS_SSRS::scope/delivery::structure/JOIN/6::pred/1:ba6ca7b3": {
+  "machine_fact": "The service area in which this department is located unique is the unique ID number assigned to the service area record.",
+  "voice": "This department is in the service area whose unique ID number is the one assigned to the service area record.",
+  "status": "proposed",
+  "findings": [],
+  "model": "gpt-5.4",
+  "basis_version": "07.2.0"
+ }
+}

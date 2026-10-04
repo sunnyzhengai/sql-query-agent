@@ -525,9 +525,56 @@ def _propose_loop(grain, docket_text, docket, registry,
     return text, "floor", findings, REPAIR_BUDGET
 
 
-# ==== DOCKET v2 + THE FACT-VOICE LAYER (ruled 2026-10-04;
-#      contract: FACTS = the gate's only reference; CONTEXT
-#      grounds nothing; voices stored, gated, blessable) ============
+# ==== DOCKET v2 + THE FACT-VOICE LAYER — PSEUDO CODE ================
+# (RETROACTIVE, added 2026-10-04 at Sunny's catch — this slice
+# was built contract->red->code without the pseudo step; the
+# process law stands, the miss is recorded, the design is
+# documented here as the law requires.)
+#
+# render_facts(dir05, dir06, dir02, fname) -> (text, items)
+#   Assembly ONLY from resolver-bound rows (the EMH law):
+#   SOURCES   = the 02 table descriptions of tables the file's
+#               resolves edges actually bind (never grep).
+#   FILTERS   = the 06 predicate sentences whose node sits under
+#               a WHERE/HAVING structure or carries on_class
+#               population_filter — each line already carries its
+#               bound meaning ('Census' (6), the department
+#               names) because 06 rendered it from binds.
+#   ATTACHMENTS = join_pair + lookup_shaping predicate sentences
+#               (speak as additions, never membership).
+#   PARAMETERS / OUTPUTS = the file floor's own lines (verbatim).
+#   items     = [(fact_key, machine_fact)] for the voice layer;
+#               fact_key = node_id + sha1(fact)[:8] so a CHANGED
+#               fact re-proposes and an unchanged one never does
+#               (delta-by-name).
+#
+# voice_facts(items, store_path, registry, voicer) -> {key: text}
+#   ladder per fact: BLESSED (registry row w/ fact_key)
+#     > stored gated PROPOSED voice
+#     > the machine fact itself (when no voice or the voice
+#       failed its gate).
+#   a NEW fact -> one scoped call ("rewrite this one condition
+#   plainly; keep every code/value/name EXACTLY") -> the voice
+#   gate (V-1/V-2/V-3 against THE FACT ALONE: a voice may carry
+#   only its own fact's values — the lying-voicer test) ->
+#   stored as status proposed|failed with findings. Machine
+#   writes PROPOSED only; blessing stays her hand.
+#   A failed call = a recorded miss, never a dead build.
+#
+# docket_v2_for_file(...) -> (docket, items)
+#   docket.facts   = the FACTS text, each voiced fact showing
+#                    "      plain: <voice>" under its machine
+#                    line (values stay visible for V-1).
+#   docket.text    = facts + "CONTEXT (grounds nothing)" + the
+#                    raw SQL (interpretation fuel only).
+#   gate reference = _gate_reference() -> docket.facts ALONE.
+#   must-say flags ride from the file floor as before.
+#
+# build07 wiring: FILE grain only this slice; <file>.facts.txt
+#   lands tracked (proposer grounding + gate reference + her
+#   audit, one artifact); no_llm skips voicing, stays
+#   deterministic.
+# ====================================================================
 
 import hashlib  # noqa: E402
 

@@ -1,0 +1,52 @@
+FACTS — COOK_RPT_USP_CCHCS_ADT_MONTHLY_INPATIENT_CENSUS_TOTALS_SSRS
+
+SOURCES:
+  CLARITY_ADT — The CLARITY_ADT table is the master table for ADT event history information. This table contains several foreign keys for other ADT tables.
+  CLARITY_BED — This table reflects the data in the Hospital Beds (BED) master file.
+  CLARITY_DEP — The CLARITY_DEP table contains high-level information about departments.
+  CLARITY_ROM — This table reflects the information in the Hospital Rooms (ROM) master file.
+  CLARITY_SA — The CLARITY_SA table contains information about your service areas. The records included in this table are facility profile records that are designated as facility, service area or payor business segment. That is, Type of Location, has a value of 1, 4 or 11.
+  ZC_PAT_CLASS — This table contains the category information for the patient classes for the hospital encounter.
+  ZC_PAT_SERVICE — NULL
+
+WHO-IS-IN FILTERS (each line is one parsed, bound condition):
+  - The event record category is 'Census' (6).
+      plain: The event record category is Census (6).
+  - The instant when the event was supposed to have happened is on or after @StartDate.
+  - The instant when the event was supposed to have happened is before DATEADD(D, 1, @EndDate).
+  - The instant when the event record was actually created is before DATEADD(D, 1, @AsOfDate).
+  - The pat id is recorded.
+      plain: The pat id has been recorded.
+  - A matching record exists in a separately defined selection.
+      plain: There is a matching record in a separately defined selection.
+  - A matching record exists in a separately defined selection.
+      plain: There is a matching record in a separately defined selection.
+  - The unit of the event record at the effective time ID is none of the values 'CCMC EMERGENCY' (100108022), 'CCMC IR IMAGING' (100108034), 'CCMC CATH LAB' (100108047), 'CCMC MAIN OR' (100108049), 'CCMC SPA OR' (100108068), 'CCMC PHP PSYCHIATRY' (100108112), 'CCMC CARDIOVASCULAR OR' (100108118), 'DSC OR' (100639001).
+      plain: At the effective time ID, the event record unit is not 'CCMC EMERGENCY' (100108022), 'CCMC IR IMAGING' (100108034), 'CCMC CATH LAB' (100108047), 'CCMC MAIN OR' (100108049), 'CCMC SPA OR' (100108068), 'CCMC PHP PSYCHIATRY' (100108112), 'CCMC CARDIOVASCULAR OR' (100108118), or 'DSC OR' (100639001).
+  - The category value indicating whether the event record has been changed or deleted is not 'Canceled' (2).
+      plain: The category value showing whether the event record was changed or deleted is not 'Canceled' (2).
+  - The category value indicating whether the event record has been changed or deleted is 'Canceled' (2).
+      plain: The event record status category shows it has been changed or deleted: 'Canceled' (2).
+  - The instant when the event record was actually deleted is on or after DATEADD(D, 1, @AsOfDate).
+  - The value is one of the values '0', the service area in which this department is located unique.
+      plain: The value is '0' in the unique service area where this department is located.
+  - The value is one of the values '0', the revenue location to which the department is linked unique.
+      plain: The value is '0' and the unique revenue location linked to the department.
+
+ATTACHMENTS (add information to rows; never restrict membership):
+  - The bed contact of the event record serial is the bed contact of the bed record serial.
+      plain: The event record serial uses the same bed contact as the bed record serial.
+  - The room contact of the event record serial is the room contact of the room record serial.
+      plain: The event record serial uses the same room contact as the room record serial.
+  - The unit of the event record at the effective time ID is the unique ID number assigned to the department record.
+      plain: At the effective time ID, the event record’s unit is the department record’s unique ID number.
+  - The patient of the event record at the effective time category is the patient class for the hospital encounter category.
+      plain: The patient on the event record at the effective time category is in the patient class for the hospital encounter category.
+  - The patient of the event record at the effective time category is the hosp serv c.
+      plain: At the effective time category, the patient on the event record is hosp serv c.
+  - The service area in which this department is located unique is the unique ID number assigned to the service area record.
+      plain: This department is in the service area whose unique ID number is the one assigned to the service area record.
+
+Parameters shaping the population: @AsOfDate (no default); @EndDate (no default); @StartDate (no default).
+
+Presents: event type (the event record category); event subtype (the category value indicating whether the event record has been changed or deleted); the instant when the event was supposed to have happened; patient id (the patient of the event record at the effective time ID); patient class (the category value abbreviation); department (the department name abbreviation); room (the room name); the bed name; patient servce (the name); the instant when the event record was actually deleted; the instant when the event record was actually created; service area (the service area name); the unique ID number assigned to the department record; the room record ID; the bed record ID; the ADT event record unique; census day (the day of the instant when the event was supposed to have happened).
