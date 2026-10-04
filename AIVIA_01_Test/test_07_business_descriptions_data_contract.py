@@ -333,3 +333,15 @@ def test_no_llm_build_conserves_and_registry_stays_untouched(
     assert reg.read_bytes() == before  # Sunny's hand only
     texts = [p for p in out.iterdir() if p.suffix == ".txt"]
     assert len(texts) == 8
+
+
+def test_prompt_carries_s12_to_s14():
+    """RULED 2026-10-04 (her six verbiage findings): relevance
+    ranking, plain diction, prompts-as-choices, one home per
+    fact — prompt law, zero lists."""
+    p = bd.build_prompt("file", "DOCKET", [])
+    assert "housekeeping" in p.lower() or "data-quality" in p.lower()
+    assert "chosen when running the report" in p
+    assert "means \"All\"" in p or "means 'All'" in p
+    assert "plain connectors" in p.lower()
+    assert "speaks once" in p.lower() or "one home" in p.lower()

@@ -87,6 +87,25 @@ then, on the evidence, further):
   parity. Residual variance between runs is sampling; her
   blessing picks.
 
+S12-S14 + ONE-HOME — RULED 2026-10-04 (Sunny's six verbiage
+findings on the 21/21 card; her case-by-case test applied: ZERO
+new lists, zero gate growth — all four are PROMPT LAW, judgment
+delegated to the model, her blessing the catch):
+  S12 RELEVANCE RANKING: data-quality housekeeping (unlinked or
+      incomplete records, record-entry timing) is summarized
+      plainly in Excludes; business logic gets the prose. No
+      column list — the model judges, she blesses.
+  S13 PLAIN DICTION: plain connectors (in, with, during); never
+      legal-ese (provided, passed, accepted, subject to).
+      Prompt-only — NO word list, NO gate check; a list may be
+      ruled later only on evidence of drift.
+  S14 PROMPTS SPEAK AS CHOICES: multi-select parameters are
+      "chosen when running the report"; a special value that
+      makes the condition true for every row means "All" —
+      provable semantics, one general sentence, every file.
+  ONE-HOME-PER-FACT: each fact speaks once, on its ruled line
+      (the as-of logic lives in Time window).
+
 THE STYLE GRAMMAR (S-rules) — RULED IN THE DRY RUN, Sunny's go
 per round (2026-10-03); S2/S4/S6/S7(as five lines)/S10(narrowed)
 /S11 stand; S1/S3 absorbed into the definition above; S5

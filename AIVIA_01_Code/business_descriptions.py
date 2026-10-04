@@ -286,7 +286,19 @@ SYSTEM_PROMPT = (
  "come from the technical description; never guess those; never "
  "invent formats or purposes.\n"
  "REGISTER: no SQL vocabulary, no tokens starting with @, no "
- "symbols like >= or &.")
+ "symbols like >= or &.\n"
+ "RELEVANCE (S12): data-quality housekeeping conditions — "
+ "unlinked or incomplete records, record-entry timing checks — "
+ "are summarized plainly in Excludes (e.g. records not linked "
+ "to a patient); business logic gets the prose.\n"
+ "PLAIN DICTION (S13): plain connectors — in, with, during; "
+ "never legal-ese like provided, passed, accepted, subject to.\n"
+ "PROMPTS AS CHOICES (S14): multi-select filters driven by "
+ "report inputs are 'chosen when running the report'; a special "
+ "value that makes a filter true for every row means \"All\" — "
+ "say the choice, not the mechanism.\n"
+ "ONE HOME PER FACT: each fact speaks once, on the line that "
+ "owns it (as-of and date logic belong to Time window).")
 
 _GRAIN_INSTRUCTIONS = {
     "file": ("Grain: a whole report dataset. On the 'Each row "
