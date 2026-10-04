@@ -481,6 +481,9 @@ def build07(dir05, dir06, out07, dir02, no_llm=False,
                    "status": status, "gate_findings": findings,
                    "rounds_used": used, "model": _MODEL_NAME,
                    "basis_version": BASIS_VERSION}
+            if status == "floor" and text:
+                row["last_proposal"] = text  # her eye: what
+                #                      wanted saying, and why not
             rows.append(row)
             done[node_id] = row
             ck_path.write_text(json.dumps(done, indent=1))

@@ -206,6 +206,24 @@ def test_live_harness_checkpoints_resumes_and_reports(tmp_path,
     assert "[5/151]" in capsys.readouterr().out  # progress lines
 
 
+def test_floor_rows_keep_the_rejected_card(tmp_path):
+    """Her ruling 2026-10-03: a floor row carries the last
+    REJECTED proposal so she can see what wanted saying."""
+    out = tmp_path / "07"
+    out.mkdir()
+
+    def failing_proposer(grain, docket_text, docket, registry):
+        return ("the rejected words", "floor",
+                ["G-1: 'rejected' has no stored basis"], 3)
+
+    rows = bd.build07(DIR05, DIR06, out, DIR02, no_llm=False,
+                      proposer=failing_proposer, only_file=LOTE)
+    r = rows[0]
+    assert r["status"] == "floor"
+    assert r["last_proposal"] == "the rejected words"
+    assert r["audience_text"] != "the rejected words"  # floor ships
+
+
 def test_call_timeout_is_law():
     assert bd.CALL_TIMEOUT_S == 120
 

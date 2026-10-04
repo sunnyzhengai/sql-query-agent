@@ -44,6 +44,9 @@ What is the output of this data contract?
   - gate_findings: the named objections (empty when clean);
     after the repair budget (3 rounds) the LAST findings stay
     on the row for Sunny's eye.
+  - last_proposal (AMENDED 2026-10-03, Sunny's word): on floor
+    rows, the final REJECTED card text — so she can see what
+    the model wanted to say and spot which words to bless.
   - rounds_used, model, proposed_at: the call provenance.
   - basis_version: the 07 grammar constant; docket_refs: the
     Phase I rows the docket carried.
