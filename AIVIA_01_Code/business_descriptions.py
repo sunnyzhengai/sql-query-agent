@@ -305,9 +305,10 @@ SYSTEM_PROMPT = (
  "say the choice, not the mechanism.\n"
  "ONE HOME PER FACT: each fact speaks once, on the line that "
  "owns it (as-of and date logic belong to Time window).\n"
- "HUMAN VERBS: prefer concrete verbs that say what the "
- "subject is DOING over abstract status or classification "
- "phrasings.")
+ "TONE: write in the voice of an experienced clinician "
+ "explaining this data to colleagues — the plain, concrete way "
+ "clinical staff talk about patients, beds and events; never "
+ "the abstract voice of a systems document.")
 
 _GRAIN_INSTRUCTIONS = {
     "file": ("Grain: a whole report dataset. On the 'Each row "
@@ -740,7 +741,9 @@ _VOICE_PROMPT = (
     "Rewrite this one data condition in plain business English "
     "— one short sentence, natural words; keep every code and "
     "value EXACTLY as written; concepts may be renamed plainly; "
-    "no SQL vocabulary. A condition that an identifier is "
+    "no SQL vocabulary; the plain, concrete voice of an "
+    "experienced clinician, never a systems document. A "
+    "condition that an identifier is "
     "recorded means the record is LINKED to that entity — say "
     "the linkage (the record is linked to a patient), not the "
     "field mechanics; recordedness of an ordinary data column "

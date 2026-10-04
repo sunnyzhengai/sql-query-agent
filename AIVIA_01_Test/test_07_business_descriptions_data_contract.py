@@ -534,7 +534,11 @@ def test_field_prompt_carries_one_home():
     assert "card" in p.lower()
 
 
-def test_prompt_prefers_human_verbs():
-    """Her ruling 2026-10-04: more human phrasing by prompt law,
-    never by hand-curating the registry."""
-    assert "concrete verbs" in bd.build_prompt("file", "D", [])
+def test_prompt_carries_the_clinician_tone():
+    """Her ruling 2026-10-04: a VOICE, not grammar rules — 'speak
+    in a clinician's tone, instead of telling it about
+    grammar'."""
+    p = bd.build_prompt("file", "D", [])
+    assert "clinician" in p
+    assert "concrete verbs" not in p  # the grammar nudge retired
+    assert "clinician" in bd._VOICE_PROMPT

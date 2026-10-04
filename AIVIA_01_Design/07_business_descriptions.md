@@ -105,6 +105,14 @@ delegated to the model, her blessing the catch):
       provable semantics, one general sentence, every file.
   ONE-HOME-PER-FACT: each fact speaks once, on its ruled line
       (the as-of logic lives in Time window).
+  THE TONE LAW (RULED 2026-10-04, superseding grammar
+      micro-nudges — her words: "speak in a clinician's tone,
+      instead of telling it about grammar"): cards and fact
+      voices write in the voice of an experienced clinician
+      explaining data to colleagues — plain, concrete, never
+      the abstract voice of a systems document. A persona
+      subsumes a pile of grammar rules; grammar nudges are not
+      added to the prompt from here on.
 
 DOCKET v2 + THE FACT-VOICE LAYER — RULED 2026-10-04 (Sunny:
 "fold it in... and let's implement"; born from the EMH OVERFLOW
