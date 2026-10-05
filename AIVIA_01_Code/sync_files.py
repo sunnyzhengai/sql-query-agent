@@ -62,7 +62,9 @@
 #
 # CLAUDE'S TESTS (sync section of test_04, red first; live upload is
 # Sunny's hand, not pytest-able):
-#   - SYNC_FILES: the constant lists exactly the eight contract files
+#   - SYNC_FILES: the constant lists exactly the contract files
+#     (eight 02/03; +24 at the 2026-10-04 manifest extension,
+#     census scope)
 #     with their local dirs and Files destinations.
 #   - every listed local file exists on this machine (the truth is
 #     present before anyone ships it).
@@ -107,6 +109,57 @@ SYNC_FILES = [
     ("02_emr_data_dictionary", "02_no_dictionary_match.json"),
     ("03_chat_bot", "03_chat_technical_terms.md"),
     ("03_chat_bot", "03_chat_abstract_names.json"),
+    # THE SYNC MANIFEST EXTENSION (2026-10-04, her "go, build
+    # step 0" — 04 contract amended first, lock red second,
+    # this constant third): the 05/06/07 estate, census scope.
+    ("05_semantic_graph",
+     "05_contains_edges.json"),
+    ("05_semantic_graph",
+     "05_discovered_joins.json"),
+    ("05_semantic_graph",
+     "05_exclusion_ledger.json"),
+    ("05_semantic_graph",
+     "05_expression_sheet.json"),
+    ("05_semantic_graph",
+     "05_file_sheet.json"),
+    ("05_semantic_graph",
+     "05_kind_library.json"),
+    ("05_semantic_graph",
+     "05_parameter_sheet.json"),
+    ("05_semantic_graph",
+     "05_predicate_sheet.json"),
+    ("05_semantic_graph",
+     "05_resolves_edges.json"),
+    ("05_semantic_graph",
+     "05_scope_sheet.json"),
+    ("05_semantic_graph",
+     "05_statement_sheet.json"),
+    ("05_semantic_graph",
+     "05_structure_sheet.json"),
+    ("06_technical_descriptions",
+     "06_description_sheet.json"),
+    ("06_technical_descriptions",
+     "06_voicing_ledger.json"),
+    ("06_technical_descriptions",
+     "COOK_RPT_USP_CCHCS_ADT_MONTHLY_INPATIENT_CENSUS_TOTALS_SSRS.txt"),
+    ("06_technical_descriptions",
+     "COOK_RPT_USP_CCHCS_ADT_MONTHLY_INPATIENT_CENSUS_TOTALS_SSRS.svg"),
+    ("07_business_descriptions",
+     "07_business_sheet.json"),
+    ("07_business_descriptions",
+     "07_blessing_registry.json"),
+    ("07_business_descriptions",
+     "07_fact_voices.json"),
+    ("07_business_descriptions",
+     "07_code_sightings.json"),
+    ("07_business_descriptions",
+     "07_walk_trace.json"),
+    ("07_business_descriptions",
+     "07_naming_gaps.json"),
+    ("07_business_descriptions",
+     "COOK_RPT_USP_CCHCS_ADT_MONTHLY_INPATIENT_CENSUS_TOTALS_SSRS.txt"),
+    ("07_business_descriptions",
+     "COOK_RPT_USP_CCHCS_ADT_MONTHLY_INPATIENT_CENSUS_TOTALS_SSRS.facts.txt"),
 ]
 
 

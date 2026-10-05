@@ -129,6 +129,22 @@ Who can edit these tables?
   — the local sheets are the truth; a lakehouse-only change is drift
   and the next load erases it.
 
+THE SYNC MANIFEST EXTENSION (AMENDED 2026-10-04, Sunny's "go,
+build step 0" — the 07 runbook's named build item): the files
+transport ships, beyond the eight 02/03 files, the 05/06/07
+estate AT CENSUS SCOPE (the corpus stays paused by her word):
+- 05_semantic_graph/: all twelve 05 sheets
+- 06_technical_descriptions/: the description sheet, the voicing
+  ledger, the census .txt and .svg
+- 07_business_descriptions/: the business sheet, the blessing
+  registry, fact voices, code sightings, walk trace, naming
+  gaps, the census .txt and .facts.txt
+Destination Files/Data/<subdir>/<name>, unchanged mechanics
+(skip-if-unchanged, --force, chunked). The lock
+(test_sync_file_list_matches_the_contract) pins the full list;
+future scope growth (the corpus, 08 outputs) re-amends here
+first, red test second, constant third — the standing order.
+
 How to test?
 /opt/homebrew/bin/python3.11 -m pytest AIVIA_01_Test/ -v
 

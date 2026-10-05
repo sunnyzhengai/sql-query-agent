@@ -5,9 +5,11 @@ personal Fabric and running the D8 end-to-end proof (the wheel,
 her reports, the descriptions file). Every file name and command
 exact. Written by Claude 2026-10-04; grows as steps land.
 
-> **Status:** DRAFT — no step has run yet. Step 0 is a BUILD ITEM
-> (needs her go before any shipping). Golden counts land after
-> each step's first clean run, same as the 04 runbook.
+> **Status:** Step 0 BUILT 2026-10-04 (her "go, build step 0":
+> 04 contract amended -> lock red -> SYNC_FILES +24, census
+> scope -> 26/26 green). Steps A-E not yet run; golden counts
+> land after each step's first clean run, same as the 04
+> runbook.
 
 ---
 
@@ -50,14 +52,11 @@ exact. Written by Claude 2026-10-04; grows as steps land.
 
 ---
 
-## Step 0 — BUILD ITEM (her go required; red test first)
+## Step 0 — BUILT 2026-10-04 (the standing order held)
 
-`sync_files.py`'s SYNC_FILES constant lists exactly the eight
-02/03 contract files. Shipping the 05/06/07 artifacts needs that
-constant extended per the 07 contract's production home
-(`Files/Data/07_business_descriptions/` etc.). Per the process:
-her go -> the contract's file list amended -> red test -> code.
-The files to add (census scope — the corpus is paused by her
+04 contract amended first, the list lock red second, the
+constant third; 26/26 green. SYNC_FILES now ships 32 files.
+The files added (census scope — the corpus stays paused by her
 word):
 
 - 05_semantic_graph/: the twelve 05 sheets (kind library included)
