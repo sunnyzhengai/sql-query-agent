@@ -71,15 +71,20 @@ def _stage_empty_dict(tmp):
     return d
 
 
-def describe(sql_dir, out_dir):
-    """Folder of .sql in -> per-file technical .txt out."""
+def describe(sql_dir, out_dir, dict_dir=None):
+    """Folder of .sql in -> per-file technical .txt out.
+    dict_dir (RULED 2026-10-04, her post-D8 ask): a RUNTIME-
+    OFFERED 02 dictionary folder — value meanings and column
+    words speak; None = the empty-dictionary work mode (the
+    wheel itself still ships NO dictionary, ever)."""
     _point_at_packaged_dll()
     import semantic_graph
     import technical_descriptions as td
     out = Path(out_dir)
     out.mkdir(parents=True, exist_ok=True)
     with tempfile.TemporaryDirectory() as tmp:
-        d02 = _stage_empty_dict(tmp)
+        d02 = Path(dict_dir) if dict_dir else \
+            _stage_empty_dict(tmp)
         d05 = Path(tmp) / "05"
         d05.mkdir()
         _stage_kind_library(d05)
@@ -88,12 +93,13 @@ def describe(sql_dir, out_dir):
     return out
 
 
-def report_descriptions(tmdl_dir, sql_dir, out_dir):
+def report_descriptions(tmdl_dir, sql_dir, out_dir,
+                        dict_dir=None):
     """The D8 chain: reports -> linked sql -> descriptions."""
     import pbi_lineage as pl
     out = Path(out_dir)
     reports = pl.build08(tmdl_dir, sql_dir, out)
-    describe(sql_dir, out)
+    describe(sql_dir, out, dict_dir=dict_dir)
     sheet = json.loads(
         (out / "06_description_sheet.json").read_text())
     file_sentence = {r["node_id"].split("::")[1]: r["sentence"]
@@ -117,17 +123,24 @@ def report_descriptions(tmdl_dir, sql_dir, out_dir):
 
 def main(argv=None):
     argv = list(sys.argv[1:] if argv is None else argv)
+    dict_dir = None
+    if "--dict" in argv:
+        i = argv.index("--dict")
+        dict_dir = argv[i + 1]
+        argv = argv[:i] + argv[i + 2:]
     if argv and argv[0] == "--reports":
         if len(argv) != 4:
             print("usage: aivia-describe --reports <tmdl_dir> "
-                  "<sql_dir> <out_dir>")
+                  "<sql_dir> <out_dir> [--dict <dir02>]")
             return 2
-        report_descriptions(argv[1], argv[2], argv[3])
+        report_descriptions(argv[1], argv[2], argv[3],
+                            dict_dir=dict_dir)
         return 0
     if len(argv) != 2:
-        print("usage: aivia-describe <sql_dir> <out_dir>")
+        print("usage: aivia-describe <sql_dir> <out_dir> "
+              "[--dict <dir02>]")
         return 2
-    describe(argv[0], argv[1])
+    describe(argv[0], argv[1], dict_dir=dict_dir)
     return 0
 
 

@@ -39,10 +39,15 @@ were drafted in but the chain never imports them — dropped; the
   (aivia_sqldesc_assets) — the CLI sets SCRIPTDOM_DLL to the
   packaged path before the loader imports; no loader fork (its
   two-route law stands: env var first)
-- sqldesc_cli.py (the thin CLI, build item): `aivia-describe
-  <sql_dir> <out_dir>` — folder of .sql in, per-file
-  technical-description .txt out; runs with an EMPTY staged
-  dictionary (no 02 at work — degraded words, honest, counted)
+- sqldesc_cli.py (the thin CLI): `aivia-describe <sql_dir>
+  <out_dir> [--dict <dir02>]` — folder of .sql in, per-file
+  technical-description .txt out. Default: EMPTY staged
+  dictionary (no 02 at work — degraded words, honest, counted).
+  --dict (ADDED 0.2.0, RULED 2026-10-04 after her D8
+  acceptance): a RUNTIME-OFFERED dictionary folder makes value
+  meanings and column words speak; the wheel itself still
+  ships no dictionary, ever — offering one is the runner's
+  act, on her tenant hers, at a customer theirs
 - pbi_lineage.py (ADDED 2026-10-04 at the 08 D8 ruling) + the
   end-to-end command: folder of *.SemanticModel + folder of
   .sql in -> 08_report_descriptions.json out (report name +

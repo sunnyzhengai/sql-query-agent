@@ -1,7 +1,12 @@
 08_pbi_lineage.md
 
-Status: DRAFT for Sunny's ruling pass — scribed by Claude
-2026-10-04 at her "follow our process" word. Prior art: the old
+Status: D1-D8 STAMPED 2026-10-04; BUILT same day (7 locks red
+then green); D8 END-TO-END ACCEPTED 2026-10-04 (Sunny's "a
+passes" on the Fabric run: 1 report, 1 binding resolved, parse
+matched local to the digit, the deterministic card read true —
+the work wheel's honest product). Open rider: the dict_dir
+option (her same-day ask) — the CLI reads a runtime-offered
+dictionary; nothing new travels in the wheel. Prior art: the old
 estate's devtools/pbi_extract.py (M7, "approved" 2026-09-17) and
 the DevOps-lineage fact (TMDL = deterministic column-level
 truth). Nothing builds until she stamps the decisions below.

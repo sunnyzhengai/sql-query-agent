@@ -7,9 +7,36 @@ exact. Written by Claude 2026-10-04; grows as steps land.
 
 > **Status:** Step 0 BUILT 2026-10-04 (her "go, build step 0":
 > 04 contract amended -> lock red -> SYNC_FILES +24, census
-> scope -> 26/26 green). Steps A-E not yet run; golden counts
-> land after each step's first clean run, same as the 04
-> runbook.
+> scope -> 26/26 green). Step A RAN CLEAN 2026-10-04 (Sunny),
+> golden verbatim: `sync census: 31 uploaded (1,473,548,271
+> bytes), 1 skipped — 32 files total` (a rerun's expectation:
+> 0 uploaded, 32 skipped). Step B GREEN 2026-10-04 (her portal
+> eye): both wheels Success in AIVIA_01_ENV custom libraries —
+> aivia01_sqldesc-0.1.0 beside aivia01-0.3.0 (DIFFERENT
+> packages, disjoint module names; the one-wheel law governs
+> versions of the SAME package). Shipped via the sync_wheel
+> machinery, scratchpad runner. Step C GREEN 2026-10-04
+> (scratchpad runner, her two sign-ins), golden verbatim:
+> `step C done: 5 tmdl files + 1 sql ->
+> Files/Data/08_pbi_lineage/` — the demo model's TMDL round-
+> tripped via getDefinition into tmdl/Census_Totals_Demo_FAKE
+> .SemanticModel/, the census .sql into sql/. Step D GREEN
+> 2026-10-04 (her notebook run; one pool fix on the way — the
+> env's SAVED executor count was 2 from a bigger pool, dynamic
+> allocation off + instances 1 = 16/112 exactly, published).
+> Golden verbatim: `08 lineage: 1 report(s); conservation 1
+> bindings == 1 resolved + 0 unresolved` · parse matched local
+> to the digit (2 statements, 3 scopes, 19 predicates, 83
+> expressions) — ScriptDom ran IN FABRIC from the wheel's DLL ·
+> the 7 clarity tables landed in the UNKNOWN-TABLES human
+> queue (the empty-dictionary degraded mode, as designed) ·
+> `1 reports described`. Step E PASSED 2026-10-04 (Sunny: "a
+> passes" — the deterministic card read true against the SQL;
+> PHASE 08 ACCEPTED, D8c). Rider built same day at her word:
+> wheel 0.2.0 adds dict_dir (a runtime-offered dictionary
+> speaks names); rerun of step D with the dict cell is
+> OPTIONAL — the named-voice variant, after 0.2.0 replaces
+> 0.1.0 in the environment.
 
 ---
 
@@ -118,9 +145,17 @@ import sqldesc_cli
 rows = sqldesc_cli.report_descriptions(
     "/lakehouse/default/Files/Data/08_pbi_lineage/tmdl",
     "/lakehouse/default/Files/Data/08_pbi_lineage/sql",
-    "/lakehouse/default/Files/Data/08_pbi_lineage/out")
+    "/lakehouse/default/Files/Data/08_pbi_lineage/out",
+    dict_dir="/lakehouse/default/Files/Data/"
+             "02_emr_data_dictionary")
 print(len(rows), "reports described")
 ```
+
+(dict_dir — wheel 0.2.0: her own dictionary speaks on her
+tenant: 'Census' (6), 'Canceled' (2), the departments by name.
+Omit it for the pure work-mode voice; needs aivia01-sqldesc
+0.2.0 published in the environment, replacing 0.1.0 — one
+version of the same package at a time, the one-wheel law.)
 
 - The loader finds the DLL inside the wheel (SCRIPTDOM_DLL is
   set by the CLI from the packaged assets); Fabric's dotnet
