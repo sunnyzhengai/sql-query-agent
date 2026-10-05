@@ -26,15 +26,32 @@ checked mechanically at build, refused loud on any drift.
 
 ## THE ALLOWLIST (the work wheel's exact contents)
 
-TRAVELS — engine code only:
+TRAVELS — engine code only (CORRECTED 2026-10-04 at the build,
+import-graph verified: parse_sql_tree and derive_tables_columns
+were drafted in but the chain never imports them — dropped; the
+05 builder is semantic_graph):
 - scriptdom_loader.py        (the one parse door, ADR 0001)
-- parse_sql_tree.py          (the walker to the 05 sheets)
-- derive_tables_columns.py   (structural derivation)
-- technical_descriptions.py  (the deterministic 06 renderer)
-- the ScriptDom DLL, wheel-internal (the loader's four-route
-  law already knows this route; the old estate shipped it)
-- a NEW thin CLI wrapper (build item): one command, folder of
-  .sql in, one technical-description .txt per file out
+- semantic_graph.py          (the 05 sheet builder; imports the
+                              loader only)
+- technical_descriptions.py  (the deterministic 06 renderer;
+                              stdlib only)
+- the ScriptDom DLL inside a tiny assets package
+  (aivia_sqldesc_assets) — the CLI sets SCRIPTDOM_DLL to the
+  packaged path before the loader imports; no loader fork (its
+  two-route law stands: env var first)
+- sqldesc_cli.py (the thin CLI, build item): `aivia-describe
+  <sql_dir> <out_dir>` — folder of .sql in, per-file
+  technical-description .txt out; runs with an EMPTY staged
+  dictionary (no 02 at work — degraded words, honest, counted)
+- pbi_lineage.py (ADDED 2026-10-04 at the 08 D8 ruling) + the
+  end-to-end command: folder of *.SemanticModel + folder of
+  .sql in -> 08_report_descriptions.json out (report name +
+  the descriptions of what feeds it) — stdlib-only, same zero
+  keys / zero network law
+- 05_kind_library.json (ADDED 2026-10-04 at the smoke: the
+  engine refuses to run without the ratified closed vocabulary;
+  it is AIVIA's ruled asset per the portability split — travels;
+  the canary lock verifies it carries no customer rows)
 - this manifest itself, as data — the wheel can state its law
 
 NEVER TRAVELS (refused at build, test-locked):

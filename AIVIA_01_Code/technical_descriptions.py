@@ -51,8 +51,11 @@ _voice_predicate/_voice_negated (the ruled negation closed set).
 # 3a — VALUE WORDS (THE WORDING RULING, flagged for Sunny):
 #   a comparand literal whose resolves row binds to_kind=value
 #   voices MEANING-FIRST AND QUOTED: "'Lucky' (7)" (quoted form
-#   RULED 2026-10-03; was bare in 06.1.0) — per the ruled 3a example
-#   "department is CCMC EMERGENCY (100108022)". This SUPERSEDES the
+#   RULED 2026-10-03; was bare in 06.1.0) — per the ruled 3a
+#   department example (the REAL ruled text lives in the 06 design
+#   doc; an INVENTED stand-in here — "department is 'North Annex'
+#   (900000001)" — because code TRAVELS and customer values never
+#   do; the wheel canary enforces, 2026-10-04). This SUPERSEDES the
 #   prior estate's code-first "7 ('Lucky')" format, uniformly (EQ,
 #   IN_LIST members, everywhere). Unbound literals stay bare, as
 #   written in the SQL. [Sunny confirms or flips at this approval.]
