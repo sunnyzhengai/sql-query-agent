@@ -134,6 +134,26 @@ def report_descriptions(tmdl_dir, sql_dir, out_dir,
                     "(no business card offered for this file)")
                 for f in r["executes"]}
         rows.append(row)
+
+    # THE OFFICIAL READ FILE (RULED 2026-10-04, her work-
+    # transition ask): report, sql file, the description — the
+    # VOICE labeled: business when a 07 sheet offered the card,
+    # technical otherwise; never a silent downgrade.
+    blocks = []
+    for row in rows:
+        for f in row["executes"]:
+            card = (row.get("business") or {}).get(f)
+            if card and not card.startswith("(no business"):
+                voice = "business"
+            else:
+                voice = "technical"
+                card = row["descriptions"].get(
+                    f, "(no description rendered)")
+            blocks.append(f"==== REPORT: {row['report']} ====\n"
+                          f"feeds from: {f}\n"
+                          f"voice: {voice}\n\n{card}\n")
+    (out / "08_report_descriptions.txt").write_text(
+        "\n".join(blocks))
     (out / "08_report_descriptions.json").write_text(
         json.dumps(rows, indent=1))
     print(f"08 report descriptions: {len(rows)} report(s)")

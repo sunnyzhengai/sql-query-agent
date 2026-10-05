@@ -169,7 +169,11 @@ one version of the same package at a time, the one-wheel law.)
   serves the runtime (the old estate's proven route).
 - Output: `Files/Data/08_pbi_lineage/out/`:
   `08_pbi_reports.json`, `08_lineage_ledger.json`,
-  `08_report_descriptions.json` + the per-file 06 texts.
+  `08_report_descriptions.json` + the per-file 06 texts +
+  **`08_report_descriptions.txt` — THE OFFICIAL READ FILE**
+  (0.4.0): report, sql file, description, `voice:` labeled
+  business|technical (never a silent downgrade) — the one
+  file she collects at work.
 - The printed conservation equation (bindings == resolved +
   unresolved) is the step's green.
 

@@ -53,7 +53,11 @@ were drafted in but the chain never imports them — dropped; the
   clinician card for its linked files, blessed lines riding
   (the stored sheet carries them). Same law: the wheel ships
   no 07 content, ever; the card exists only where a tenant's
-  own 07 build put it
+  own 07 build put it.
+  THE OFFICIAL TXT (ADDED 0.4.0, same day): every reports run
+  writes 08_report_descriptions.txt — report, sql file,
+  description, the voice labeled business|technical; her
+  work-transition collectable
 - pbi_lineage.py (ADDED 2026-10-04 at the 08 D8 ruling) + the
   end-to-end command: folder of *.SemanticModel + folder of
   .sql in -> 08_report_descriptions.json out (report name +

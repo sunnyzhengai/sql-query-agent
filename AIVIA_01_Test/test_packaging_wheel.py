@@ -135,3 +135,48 @@ def test_cli_business_dir_serves_the_07_card(tmp_path):
     assert r["business"]["USP_FIX_BIZ.sql"].startswith(
         "One row is: a fixture row.")
     assert "HER BLESSED SENTENCE" in str(r["business"])
+
+
+def _official_fixture(tmp_path):
+    tmdl = tmp_path / "tmdl"
+    tdir = tmdl / "Fix.SemanticModel" / "definition" / "tables"
+    tdir.mkdir(parents=True)
+    (tdir / "T.tmdl").write_text(
+        "table T\n\tcolumn A\n\t\tsourceColumn: A\n"
+        "\tpartition p = m\n\t\tmode: import\n\t\tsource =\n"
+        '\t\t\tValue.NativeQuery(db,"EXEC dbo.USP_FIX_OFF")\n')
+    sql = tmp_path / "sql"
+    sql.mkdir()
+    (sql / "USP_FIX_OFF.sql").write_text("SELECT 1 AS A\n")
+    return tmdl, sql
+
+
+def test_cli_official_txt_speaks_its_voice(tmp_path):
+    """RULED 2026-10-04 (her official-output ask): every run
+    writes 08_report_descriptions.txt — report, sql file, and
+    the description, with the VOICE labeled: business when a
+    07 sheet is offered, technical otherwise — never a silent
+    downgrade (the work-transition law)."""
+    import sqldesc_cli
+    tmdl, sql = _official_fixture(tmp_path)
+
+    out1 = tmp_path / "out1"
+    sqldesc_cli.report_descriptions(tmdl, sql, out1)
+    t1 = (out1 / "08_report_descriptions.txt").read_text()
+    assert "REPORT: Fix" in t1
+    assert "feeds from: USP_FIX_OFF.sql" in t1
+    assert "voice: technical" in t1
+
+    biz = tmp_path / "07"
+    biz.mkdir()
+    (biz / "07_business_sheet.json").write_text(json.dumps([
+        {"node_id": "file::USP_FIX_OFF", "grain": "file",
+         "audience_text": "One row is: an official fixture "
+                          "row. Time window: HER SENTENCE.",
+         "status": "blessed"}]))
+    out2 = tmp_path / "out2"
+    sqldesc_cli.report_descriptions(tmdl, sql, out2,
+                                    business_dir=biz)
+    t2 = (out2 / "08_report_descriptions.txt").read_text()
+    assert "voice: business" in t2
+    assert "HER SENTENCE" in t2

@@ -52,6 +52,14 @@ Definitions:
     report executes several files, one description per file,
     keyed
   Her gap-check of THIS file is the phase acceptance (D8c).
+- AIVIA_01_Data/08_pbi_lineage/08_report_descriptions.txt —
+  THE OFFICIAL READ FILE (AMENDED 2026-10-04, her work-
+  transition ask, wheel 0.4.0): one block per report x linked
+  file — report name, sql file, the description — with the
+  VOICE labeled: `voice: business` when a runtime-offered 07
+  sheet carries the card, `voice: technical` otherwise; never
+  a silent downgrade. The json stays the machine artifact;
+  the txt is the read surface she collects at work.
 
 Who writes what (authorship)?
 - Both outputs: machine-written by the build, whole-file,
