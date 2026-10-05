@@ -47,7 +47,13 @@ were drafted in but the chain never imports them — dropped; the
   acceptance): a RUNTIME-OFFERED dictionary folder makes value
   meanings and column words speak; the wheel itself still
   ships no dictionary, ever — offering one is the runner's
-  act, on her tenant hers, at a customer theirs
+  act, on her tenant hers, at a customer theirs.
+  --business (ADDED 0.3.0, RULED same day, her "build it"): a
+  RUNTIME-OFFERED 07 folder — each report row gains the
+  clinician card for its linked files, blessed lines riding
+  (the stored sheet carries them). Same law: the wheel ships
+  no 07 content, ever; the card exists only where a tenant's
+  own 07 build put it
 - pbi_lineage.py (ADDED 2026-10-04 at the 08 D8 ruling) + the
   end-to-end command: folder of *.SemanticModel + folder of
   .sql in -> 08_report_descriptions.json out (report name +

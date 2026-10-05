@@ -147,15 +147,22 @@ rows = sqldesc_cli.report_descriptions(
     "/lakehouse/default/Files/Data/08_pbi_lineage/sql",
     "/lakehouse/default/Files/Data/08_pbi_lineage/out",
     dict_dir="/lakehouse/default/Files/Data/"
-             "02_emr_data_dictionary")
-print(len(rows), "reports described")
+             "02_emr_data_dictionary",
+    business_dir="/lakehouse/default/Files/Data/"
+                 "07_business_descriptions")
+for r in rows:
+    print("REPORT:", r["report"])
+    for f, card in r.get("business", {}).items():
+        print("  feeds from:", f)
+        print(" ", card)
 ```
 
-(dict_dir — wheel 0.2.0: her own dictionary speaks on her
-tenant: 'Census' (6), 'Canceled' (2), the departments by name.
-Omit it for the pure work-mode voice; needs aivia01-sqldesc
-0.2.0 published in the environment, replacing 0.1.0 — one
-version of the same package at a time, the one-wheel law.)
+(dict_dir — 0.2.0: her dictionary speaks — 'Census' (6), the
+departments by name. business_dir — 0.3.0: the report row
+carries the CLINICIAN CARD from her shipped 07 sheet, blessed
+lines riding. Omit both for the pure work-mode voice. Needs
+aivia01-sqldesc 0.3.0 published, replacing the prior version —
+one version of the same package at a time, the one-wheel law.)
 
 - The loader finds the DLL inside the wheel (SCRIPTDOM_DLL is
   set by the CLI from the packaged assets); Fabric's dotnet

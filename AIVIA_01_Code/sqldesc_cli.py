@@ -94,8 +94,12 @@ def describe(sql_dir, out_dir, dict_dir=None):
 
 
 def report_descriptions(tmdl_dir, sql_dir, out_dir,
-                        dict_dir=None):
-    """The D8 chain: reports -> linked sql -> descriptions."""
+                        dict_dir=None, business_dir=None):
+    """The D8 chain: reports -> linked sql -> descriptions.
+    business_dir (RULED 2026-10-04, her 'build it'): a RUNTIME-
+    OFFERED 07 folder — each report row gains the clinician
+    card for its linked files (blessed lines ride, the stored
+    sheet carries them). The wheel ships no 07 content, ever."""
     import pbi_lineage as pl
     out = Path(out_dir)
     reports = pl.build08(tmdl_dir, sql_dir, out)
@@ -104,9 +108,17 @@ def report_descriptions(tmdl_dir, sql_dir, out_dir,
         (out / "06_description_sheet.json").read_text())
     file_sentence = {r["node_id"].split("::")[1]: r["sentence"]
                      for r in sheet if r["grain"] == "file"}
+    business_card = {}
+    if business_dir:
+        biz = json.loads(
+            (Path(business_dir) / "07_business_sheet.json")
+            .read_text())
+        business_card = {
+            r["node_id"].split("::")[1]: r["audience_text"]
+            for r in biz if r["grain"] == "file"}
     rows = []
     for r in reports:
-        rows.append({
+        row = {
             "report": r["name"],
             "executes": r["executes"],
             "descriptions": {
@@ -114,7 +126,14 @@ def report_descriptions(tmdl_dir, sql_dir, out_dir,
                     f.removesuffix(".sql"),
                     "(no description rendered)")
                 for f in r["executes"]},
-        })
+        }
+        if business_dir:
+            row["business"] = {
+                f: business_card.get(
+                    f.removesuffix(".sql"),
+                    "(no business card offered for this file)")
+                for f in r["executes"]}
+        rows.append(row)
     (out / "08_report_descriptions.json").write_text(
         json.dumps(rows, indent=1))
     print(f"08 report descriptions: {len(rows)} report(s)")
@@ -123,18 +142,24 @@ def report_descriptions(tmdl_dir, sql_dir, out_dir,
 
 def main(argv=None):
     argv = list(sys.argv[1:] if argv is None else argv)
-    dict_dir = None
+    dict_dir = business_dir = None
     if "--dict" in argv:
         i = argv.index("--dict")
         dict_dir = argv[i + 1]
         argv = argv[:i] + argv[i + 2:]
+    if "--business" in argv:
+        i = argv.index("--business")
+        business_dir = argv[i + 1]
+        argv = argv[:i] + argv[i + 2:]
     if argv and argv[0] == "--reports":
         if len(argv) != 4:
             print("usage: aivia-describe --reports <tmdl_dir> "
-                  "<sql_dir> <out_dir> [--dict <dir02>]")
+                  "<sql_dir> <out_dir> [--dict <dir02>] "
+                  "[--business <dir07>]")
             return 2
         report_descriptions(argv[1], argv[2], argv[3],
-                            dict_dir=dict_dir)
+                            dict_dir=dict_dir,
+                            business_dir=business_dir)
         return 0
     if len(argv) != 2:
         print("usage: aivia-describe <sql_dir> <out_dir> "

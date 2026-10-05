@@ -20,7 +20,7 @@ from pathlib import Path
 CODE = Path(__file__).resolve().parent
 REPO = CODE.parent
 DLL = "Microsoft.SqlServer.TransactSql.ScriptDom.dll"
-VERSION = "0.2.0"
+VERSION = "0.3.0"
 
 MODULES = ("scriptdom_loader.py", "semantic_graph.py",
            "technical_descriptions.py", "pbi_lineage.py",

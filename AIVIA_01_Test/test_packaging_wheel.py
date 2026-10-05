@@ -102,3 +102,36 @@ def test_cli_dict_dir_speaks_meanings(tmp_path):
     sqldesc_cli.describe(sql, out, dict_dir=d02)
     text = (out / "USP_FIX_DESCRIBE.txt").read_text()
     assert "'Lucky' (7)" in text or "Lucky" in text
+
+
+def test_cli_business_dir_serves_the_07_card(tmp_path):
+    """RULED 2026-10-04 (her 'build it' on the 07-card rider):
+    report_descriptions accepts a RUNTIME-OFFERED 07 folder —
+    each report row gains the business card for its linked
+    files (blessed lines ride, since the stored sheet carries
+    them). The wheel ships no 07 content, ever."""
+    import sqldesc_cli
+    tmdl = tmp_path / "tmdl"
+    tdir = tmdl / "Fix.SemanticModel" / "definition" / "tables"
+    tdir.mkdir(parents=True)
+    (tdir / "T.tmdl").write_text(
+        "table T\n\tcolumn A\n\t\tsourceColumn: A\n"
+        "\tpartition p = m\n\t\tmode: import\n\t\tsource =\n"
+        '\t\t\tValue.NativeQuery(db,"EXEC dbo.USP_FIX_BIZ")\n')
+    sql = tmp_path / "sql"
+    sql.mkdir()
+    (sql / "USP_FIX_BIZ.sql").write_text("SELECT 1 AS A\n")
+    biz = tmp_path / "07"
+    biz.mkdir()
+    (biz / "07_business_sheet.json").write_text(json.dumps([
+        {"node_id": "file::USP_FIX_BIZ", "grain": "file",
+         "audience_text": "One row is: a fixture row. "
+                          "Time window: HER BLESSED SENTENCE.",
+         "status": "blessed"}]))
+    out = tmp_path / "out"
+    rows = sqldesc_cli.report_descriptions(
+        tmdl, sql, out, business_dir=biz)
+    r = rows[0]
+    assert r["business"]["USP_FIX_BIZ.sql"].startswith(
+        "One row is: a fixture row.")
+    assert "HER BLESSED SENTENCE" in str(r["business"])
