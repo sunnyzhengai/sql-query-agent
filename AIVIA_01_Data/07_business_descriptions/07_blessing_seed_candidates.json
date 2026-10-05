@@ -2,6 +2,12 @@
  "_status": "STAGED 2026-10-03 (ladder L02) from 03's sunny_* fields \u2014 candidates ONLY; nothing is blessed until Sunny's dated ruling moves a row into 07_blessing_registry.json",
  "candidates": [
   {
+   "staged": "2026-10-04, Claude at Sunny's chat ruling (option 2: pin the Time window card line after the inverted cancel clause roll). TO LAND IT: copy this object (without this 'staged' note) into 07_blessing_registry.json sentences[].",
+   "node_id": "file::COOK_RPT_USP_CCHCS_ADT_MONTHLY_INPATIENT_CENSUS_TOTALS_SSRS::card/time_window",
+   "blessed_text": "The report includes census events from the chosen start date through the chosen end date, with the end date counted in full. It shows the data as it stood at the end of the chosen as-of date: only events entered by then are included, and a canceled census event is still included if it was not deleted until after that day.",
+   "ruling": "RULED 2026-10-04 (Sunny, in chat)"
+  },
+  {
    "sunny_synonyms": [
     "inpatient admission",
     "inpatient admission data"

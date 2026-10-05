@@ -9,9 +9,11 @@ head-to-head against our own chat. Local stays the build-and-truth
 environment (the standing principle: design, plan and develop
 locally, then move code and data to Fabric).
 - ALL DECISIONS RATIFIED by Sunny 2026-09-30. Table names confirmed;
-decision 1's archive question RULED: Delta only. Open TBDs remain
-only where named: the Key Vault secret names (decision 5, by M05)
-and stage B's host (decision 7, by M07).
+decision 1's archive question RULED: Delta only. Both named TBDs
+have since closed: the Key Vault secret names (RULED at M05 DONE,
+2026-10-01: aivia01-kv / aivia01-azure-openai-key) and stage B's
+host (RULED 2026-10-01: B1 in-phase as M09, B2 deferred). The one
+open TBD: the SaaS offer's timing (decision 7 rider).
 
 The decisions:
 
@@ -54,8 +56,9 @@ The decisions:
    pinned in the 04 contract.
 5. KEYS AND IDENTITY (proposed) — Entra ID sign-in (the phase 01
   browser sign-in precedent); keys in Azure Key Vault.
-  - TBD (Sunny): the secret names (closes the standing TBD in the 02
-  and 03 contracts).
+  - RULED at M05 DONE (2026-10-01): vault aivia01-kv, secret
+  aivia01-azure-openai-key (closes the standing TBD in the 02 and
+  03 contracts).
 6. THE REFRESH STORY (proposed) — local stays the truth: parses,
   dictionary builds, abstract generation, gap-checks and paid-call
    gates all run on Sunny's machine; the Fabric load is a SYNC step
@@ -67,10 +70,15 @@ The decisions:
    surface. The asset source becomes a parameter (local dir OR
    lakehouse), never a fork.
   - Stage B: the hosted production surface.
-  TBD (Sunny, the big product ruling): Azure-hosted web app
-  reading the lakehouse, or a Fabric-native workload (the deeper
-  marketplace story, the heavier lift). Stage B may be ruled into
-  this phase or split into its own.
+  RULED 2026-10-01 (Sunny, in chat; the full costing in
+  briefs/Brief_M07_Stage_B_Host.md): stage B splits — B1 (the
+  Azure-hosted, Entra-fronted engine) builds in THIS phase as
+  M09; B2 (the Fabric workload wrapper) is deferred to its own
+  phase, keyed to the marketplace push; the pure frontend-only
+  toolkit port is REJECTED (one-engine law). SaaS-offer timing
+  still open. (This passage said TBD until 2026-10-04 — the
+  ruling had landed only in the M07/M09 milestone lines below;
+  aligned in the briefs sweep.)
 8. THE FABRIC DATA AGENT COMPARISON — RULED 2026-09-30 (Sunny's ask).
   Stand up the Fabric Data Agent over the same lakehouse tables and
    run the twelve shapes (plus the live session questions) against

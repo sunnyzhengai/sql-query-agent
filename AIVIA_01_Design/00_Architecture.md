@@ -61,6 +61,12 @@ node, made by two different machines, serving two purposes:
   description into plain English that preserves the
   population-shaping facts (filters, exclusions, transformations);
   never a general blurb, because the exact pseudo code is its input.
+  "Preserves" FORMALIZED 2026-10-04 (THE MUST-SURVIVE LAW, ruled in
+  briefs/Brief_07_Graph_Grounded_Proposer.md Q3): three mechanical
+  fact classes — population-shaping survives every composition rung
+  with values intact; housekeeping survives as one plain clause;
+  plumbing dies at its rung — enforced by a both-directions value
+  conservation check at the card.
   This is Phase II's output, composed upward: node, then block, then
   file. Sunny's gap-check is the acceptance.
 - The pair is the audit chain: a wrong business description is
@@ -111,6 +117,12 @@ Phase I graph.
 - Needs only Phase I's completed graph to work; Phase II's
   descriptions make path answers readable. Ordered after Phase II by
   value and risk, not by dependency.
+- RULED 2026-10-04 (brief Q9): Phase III writes its OWN pathfinder —
+  it does not reuse Phase II's description walk (bottom-up whole-tree
+  vs question-driven path search: different machines, same graph).
+  The shared piece is the graph READ layer only, one small read
+  surface (the read_api precedent). No shared walking framework is
+  built ahead of this phase's own design.
 - BOUNDARY (named at birth, per the standing law): traversal answers
   with paths and explanations, never with new SQL. A join-path
   answer is not an invitation to generate a query.

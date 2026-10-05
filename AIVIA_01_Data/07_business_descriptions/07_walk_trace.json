@@ -1,0 +1,145 @@
+{
+ "COOK_RPT_USP_CCHCS_ADT_MONTHLY_INPATIENT_CENSUS_TOTALS_SSRS": {
+  "file::COOK_RPT_USP_CCHCS_ADT_MONTHLY_INPATIENT_CENSUS_TOTALS_SSRS::scope/delivery::structure/WHERE/1::structure/AND/1::pred/1": {
+   "text": "Count event records where the event type is Census.",
+   "status": "gate_passed"
+  },
+  "file::COOK_RPT_USP_CCHCS_ADT_MONTHLY_INPATIENT_CENSUS_TOTALS_SSRS::scope/delivery::structure/WHERE/1::structure/AND/1::structure/OR/1": {
+   "text": "Count events with event subtype Canceled and a delete time on or after the day after the chosen as of date.",
+   "status": "gate_passed"
+  },
+  "file::COOK_RPT_USP_CCHCS_ADT_MONTHLY_INPATIENT_CENSUS_TOTALS_SSRS::scope/delivery::structure/WHERE/1::structure/AND/1::pred/2": {
+   "text": "Count events whose effective time is on or after the chosen start date.",
+   "status": "gate_passed"
+  },
+  "file::COOK_RPT_USP_CCHCS_ADT_MONTHLY_INPATIENT_CENSUS_TOTALS_SSRS::scope/delivery::structure/WHERE/1::structure/AND/1::pred/3": {
+   "text": "Count events whose effective time is before one day after the chosen end date.",
+   "status": "gate_passed"
+  },
+  "file::COOK_RPT_USP_CCHCS_ADT_MONTHLY_INPATIENT_CENSUS_TOTALS_SSRS::scope/delivery::structure/WHERE/1::structure/AND/1::pred/4": {
+   "text": "Count events whose event time is before one day after the chosen as of date.",
+   "status": "gate_passed"
+  },
+  "file::COOK_RPT_USP_CCHCS_ADT_MONTHLY_INPATIENT_CENSUS_TOTALS_SSRS::scope/delivery::structure/WHERE/1::structure/AND/1::pred/5": {
+   "text": "Count records where the patient id is recorded.",
+   "status": "gate_passed"
+  },
+  "file::COOK_RPT_USP_CCHCS_ADT_MONTHLY_INPATIENT_CENSUS_TOTALS_SSRS::scope/delivery::structure/WHERE/1::structure/AND/1::pred/6": {
+   "text": "Count records in the chosen service area that are also in the separately defined selection.",
+   "status": "gate_passed"
+  },
+  "file::COOK_RPT_USP_CCHCS_ADT_MONTHLY_INPATIENT_CENSUS_TOTALS_SSRS::scope/delivery::structure/WHERE/1::structure/AND/1::pred/7": {
+   "text": "Count only records at the chosen location that are also included in the separately defined selection.",
+   "status": "gate_passed"
+  },
+  "file::COOK_RPT_USP_CCHCS_ADT_MONTHLY_INPATIENT_CENSUS_TOTALS_SSRS::scope/delivery::structure/WHERE/1::structure/AND/1::pred/8": {
+   "text": "Count records whose department id is not CCMC EMERGENCY, CCMC IR IMAGING, CCMC CATH LAB, CCMC MAIN OR, CCMC SPA OR, CCMC PHP PSYCHIATRY, CCMC CARDIOVASCULAR OR, or DSC OR.",
+   "status": "gate_passed"
+  },
+  "card/one_row_is": {
+   "text": "An ADT event record with its effective time, patient, patient class, department, room, bed, patient servce, service area, and related record IDs.",
+   "status": "gate_passed",
+   "findings": []
+  },
+  "card/whos_in_it": {
+   "text": "Patients with Census event records during the reporting period, within the separately defined selection, for the chosen service area and the chosen location. Choosing All for the chosen service area or the chosen location includes all.",
+   "status": "gate_passed",
+   "findings": []
+  },
+  "card/each_row_shows": {
+   "text": "event details, when it took effect, patient identifiers and class, location, and service information",
+   "status": "gate_passed",
+   "findings": []
+  },
+  "card/time_window": {
+   "text": "The report includes census events from the chosen start date through the chosen end date, with the end date counted in full. It shows the data as it stood at the end of the chosen as-of date: only events entered by then are included, and a canceled census event is still included if it was not deleted until after that day.",
+   "status": "blessed",
+   "findings": []
+  },
+  "card/excludes": {
+   "text": "Exclude records not linked to a patient, and records from CCMC EMERGENCY, CCMC IR IMAGING, CCMC CATH LAB, CCMC MAIN OR, CCMC SPA OR, CCMC PHP PSYCHIATRY, CCMC CARDIOVASCULAR OR, and DSC OR.",
+   "status": "gate_passed",
+   "findings": []
+  },
+  "file::COOK_RPT_USP_CCHCS_ADT_MONTHLY_INPATIENT_CENSUS_TOTALS_SSRS::scope/delivery": {
+   "text": "One row is one row of adt.\n\nKeeps Census event records, with Canceled event subtype and a delete time on or after the day after the chosen as of date, an effective time on or after the chosen start date and before one day after the chosen end date, and an event time before one day after the chosen as of date. It also keeps records with a recorded patient id, in the chosen service area and at the chosen location, within the separately defined selection, and with department id not CCMC EMERGENCY, CCMC IR IMAGING, CCMC CATH LAB, CCMC MAIN OR, CCMC SPA OR, CCMC PHP PSYCHIATRY, CCMC CARDIOVASCULAR OR, or DSC OR.",
+   "status": "gate_passed"
+  },
+  "file::COOK_RPT_USP_CCHCS_ADT_MONTHLY_INPATIENT_CENSUS_TOTALS_SSRS::stmt/2::scope/sub1": {
+   "text": "One row is one chosen service area.",
+   "status": "gate_passed"
+  },
+  "file::COOK_RPT_USP_CCHCS_ADT_MONTHLY_INPATIENT_CENSUS_TOTALS_SSRS::stmt/2::scope/sub2": {
+   "text": "One row is one chosen location.",
+   "status": "gate_passed"
+  },
+  "file::COOK_RPT_USP_CCHCS_ADT_MONTHLY_INPATIENT_CENSUS_TOTALS_SSRS::scope/delivery::structure/PROJECTION/1::expr/1": {
+   "text": "Event type is the category for the event record. It tells you what kind of event it is.",
+   "status": "gate_passed"
+  },
+  "file::COOK_RPT_USP_CCHCS_ADT_MONTHLY_INPATIENT_CENSUS_TOTALS_SSRS::scope/delivery::structure/PROJECTION/1::expr/2": {
+   "text": "Event subtype holds the category that shows whether the event record was changed or deleted. It tells you what kind of update happened to that event record.",
+   "status": "gate_passed"
+  },
+  "file::COOK_RPT_USP_CCHCS_ADT_MONTHLY_INPATIENT_CENSUS_TOTALS_SSRS::scope/delivery::structure/PROJECTION/1::expr/3": {
+   "text": "Effective time is the time the event took effect. It holds when the event happened.",
+   "status": "gate_passed"
+  },
+  "file::COOK_RPT_USP_CCHCS_ADT_MONTHLY_INPATIENT_CENSUS_TOTALS_SSRS::scope/delivery::structure/PROJECTION/1::expr/4": {
+   "text": "Patient id is the identifier for the patient on the event record. It tells you which patient the record belongs to.",
+   "status": "gate_passed"
+  },
+  "file::COOK_RPT_USP_CCHCS_ADT_MONTHLY_INPATIENT_CENSUS_TOTALS_SSRS::scope/delivery::structure/PROJECTION/1::expr/5": {
+   "text": "This field holds the abbreviation for the patient class. It tells you the category value in abbreviated form.",
+   "status": "gate_passed"
+  },
+  "file::COOK_RPT_USP_CCHCS_ADT_MONTHLY_INPATIENT_CENSUS_TOTALS_SSRS::scope/delivery::structure/PROJECTION/1::expr/6": {
+   "text": "Dept abbreviation holds the department\u2019s short name. It tells you which department is being referenced in abbreviated form.",
+   "status": "gate_passed"
+  },
+  "file::COOK_RPT_USP_CCHCS_ADT_MONTHLY_INPATIENT_CENSUS_TOTALS_SSRS::scope/delivery::structure/PROJECTION/1::expr/7": {
+   "text": "This field holds the room name. It tells you which room is being referred to.",
+   "status": "gate_passed"
+  },
+  "file::COOK_RPT_USP_CCHCS_ADT_MONTHLY_INPATIENT_CENSUS_TOTALS_SSRS::scope/delivery::structure/PROJECTION/1::expr/8": {
+   "text": "Bed label holds the name of the bed. It tells you which bed is assigned or referenced.",
+   "status": "gate_passed"
+  },
+  "file::COOK_RPT_USP_CCHCS_ADT_MONTHLY_INPATIENT_CENSUS_TOTALS_SSRS::scope/delivery::structure/PROJECTION/1::expr/9": {
+   "text": "Patient service holds the patient service value. If it is blank, no patient service is recorded.",
+   "status": "gate_passed"
+  },
+  "file::COOK_RPT_USP_CCHCS_ADT_MONTHLY_INPATIENT_CENSUS_TOTALS_SSRS::scope/delivery::structure/PROJECTION/1::expr/10": {
+   "text": "Delete time is the time the event record was deleted. It tells you when that record was removed.",
+   "status": "gate_passed"
+  },
+  "file::COOK_RPT_USP_CCHCS_ADT_MONTHLY_INPATIENT_CENSUS_TOTALS_SSRS::scope/delivery::structure/PROJECTION/1::expr/11": {
+   "text": "Event time is when the event record was actually created. It tells you the exact moment that event was entered.",
+   "status": "gate_passed"
+  },
+  "file::COOK_RPT_USP_CCHCS_ADT_MONTHLY_INPATIENT_CENSUS_TOTALS_SSRS::scope/delivery::structure/PROJECTION/1::expr/12": {
+   "text": "Service area name holds the name of the service area. It tells you which service area the record belongs to.",
+   "status": "gate_passed"
+  },
+  "file::COOK_RPT_USP_CCHCS_ADT_MONTHLY_INPATIENT_CENSUS_TOTALS_SSRS::scope/delivery::structure/PROJECTION/1::expr/13": {
+   "text": "Department id is the department id. It is the unique number used to identify the department record.",
+   "status": "gate_passed"
+  },
+  "file::COOK_RPT_USP_CCHCS_ADT_MONTHLY_INPATIENT_CENSUS_TOTALS_SSRS::scope/delivery::structure/PROJECTION/1::expr/14": {
+   "text": "Room id is the identifying number for the room record. It tells you which room record this is.",
+   "status": "gate_passed"
+  },
+  "file::COOK_RPT_USP_CCHCS_ADT_MONTHLY_INPATIENT_CENSUS_TOTALS_SSRS::scope/delivery::structure/PROJECTION/1::expr/15": {
+   "text": "Bed id holds the identifier for the bed record. It is the value used to tell one bed record from another.",
+   "status": "gate_passed"
+  },
+  "file::COOK_RPT_USP_CCHCS_ADT_MONTHLY_INPATIENT_CENSUS_TOTALS_SSRS::scope/delivery::structure/PROJECTION/1::expr/16": {
+   "text": "Event id is the unique identifier for the event record. It holds the number that distinguishes that event from every other event record.",
+   "status": "gate_passed"
+  },
+  "file::COOK_RPT_USP_CCHCS_ADT_MONTHLY_INPATIENT_CENSUS_TOTALS_SSRS::scope/delivery::structure/PROJECTION/1::expr/17": {
+   "text": "Census Day is the calendar day used for the census. It names the specific day the census applies to.",
+   "status": "gate_passed"
+  }
+ }
+}

@@ -1,5 +1,27 @@
 {
- "_law": "SUNNY'S HAND ONLY (07 contract, APPROVED 2026-10-03): machines read, never write; one dated ruling per row; delta-by-name.",
- "names": [],
- "sentences": []
+ "_law": "SUNNY'S RULING ONLY (THE RATIFY CLAUSE, amended 2026-10-04): the decision is hers alone; the write is machine-executed via business_walk.bless() at her explicit ruling, recorded verbatim per row; an unruled write is a contract violation; delta-by-name.",
+ "names": [
+  {
+   "node_id": "ZC_PAT_SERVICE.NAME",
+   "blessed_name": "patient service",
+   "ruling": "RULED 2026-10-04 (Sunny, in chat): bless \"patient servce\" as \"patient service\" \u2014 the SQL alias typo never speaks; landed via the ratify door."
+  }
+ ],
+ "sentences": [
+  {
+   "node_id": "file::COOK_RPT_USP_CCHCS_ADT_MONTHLY_INPATIENT_CENSUS_TOTALS_SSRS::card/time_window",
+   "blessed_text": "The report includes census events from the chosen start date through the chosen end date, with the end date counted in full. It shows the data as it stood at the end of the chosen as-of date: only events entered by then are included, and a canceled census event is still included if it was not deleted until after that day.",
+   "ruling": "RULED 2026-10-04 (Sunny, in chat): \"use option 2, bless the time window line\" \u2014 the corrected cancel clause pinned; landed via the ratify door (law amended same day at her word)."
+  },
+  {
+   "node_id": "file::COOK_RPT_USP_CCHCS_ADT_MONTHLY_INPATIENT_CENSUS_TOTALS_SSRS::card/one_row_is",
+   "blessed_text": "An ADT event record with its effective time, patient, patient class, department, room, bed, patient service, service area, and related record IDs.",
+   "ruling": "RULED 2026-10-04 (Sunny, in chat): \"bless 1 and 2, drop the separately defined selection phrase\" \u2014 landed via the ratify door."
+  },
+  {
+   "node_id": "file::COOK_RPT_USP_CCHCS_ADT_MONTHLY_INPATIENT_CENSUS_TOTALS_SSRS::card/whos_in_it",
+   "blessed_text": "Patients with Census event records during the reporting period, for the chosen service area and the chosen location. Choosing All for the chosen service area or the chosen location includes all.",
+   "ruling": "RULED 2026-10-04 (Sunny, in chat): \"bless 1 and 2, drop the separately defined selection phrase\" \u2014 landed via the ratify door."
+  }
+ ]
 }

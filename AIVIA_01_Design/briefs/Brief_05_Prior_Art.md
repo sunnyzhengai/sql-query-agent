@@ -1,7 +1,12 @@
 # Brief_05_Prior_Art — what the previous estate already solved for the semantics layer
 
 Status: REFERENCE (survey run 2026-10-01 at Sunny's direction, before
-designing phase 05). Source: the live `aisql` package in this repo.
+designing phase 05).
+Audited 2026-10-04 (the briefs sweep): every cited path verified
+present (aisql/, AIVIA_Design/, AIVIA_Product/estates/sepsis/,
+tests/aisql); the one "done" claim (scriptdom_loader ported)
+verified true; phases 05-07 have since been built consuming this
+survey — the read-first list is now historical, not a to-do. Source: the live `aisql` package in this repo.
 Context: there were TWO prior estates. Era 1 (`src/parser/`,
 `src/tree/`) was deleted 2026-09-19 (commit 91b198a, 831 files) and
 survives only in git history. Era 2 = the `aisql/` package — it is

@@ -4,6 +4,10 @@ Status: RULED (Sunny, 2026-10-01, in chat): B1 builds in this phase
 (04); B2 deferred to its own later phase; Shape 2 rejected
 (one-engine law). SaaS-offer timing: still open.
 Drafted: Claude, overnight 2026-10-01.
+Audited 2026-10-04 (the briefs sweep): rulings match the estate;
+the stale "TBD" at 04 decision 7 and the stale header TBD line
+(secret names + stage B host) were found in 04_fabric_move.md and
+aligned same day. SaaS timing verified still unruled.
 The question: where does the production chat surface live? (04 design
 decision 7, stage B.)
 

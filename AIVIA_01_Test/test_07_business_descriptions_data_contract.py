@@ -358,6 +358,28 @@ def test_prompt_carries_s12_to_s14():
     assert "speaks once" in p.lower() or "one home" in p.lower()
 
 
+# RETIRED test_prompt_carries_s15_and_linkage_diction — 2026-10-04 at
+# section-H acceptance (contract G): the S15 prompt lock moved to the
+# checker (test_walk_g1/g3/g5 make the class mechanical); the prompt
+# text keeps the law.
+
+
+def test_whos_in_it_window_reference_never_asof():
+    """RULED 2026-10-04 (her read of the regenerated census
+    card): on Who's in it, the window reference names the
+    reporting period ONLY — as-of behavior has one home, the
+    Time window line."""
+    p = bd.build_prompt("file", "DOCKET", [])
+    assert "name the reporting period only" in p.lower()
+    assert "as-of behavior never appears" in p.lower()
+
+
+# RETIRED test_prompt_carries_s16_to_s18_and_selection_diction —
+# 2026-10-04 at section-H acceptance (contract G): the S16-S18 prompt
+# locks moved to the checker (test_walk_g1/g7 + the walk tone law);
+# the prompt text keeps the laws.
+
+
 # ------------- DOCKET v2 + the fact-voice layer (red first)
 
 def test_facts_block_is_bound_truth_only():
@@ -499,23 +521,10 @@ def test_facts_shape_matches_the_sql():
     assert "separately defined selection" not in facts
 
 
-def test_field_docket_v2_named_and_inheriting(tmp_path):
-    """Field docket v2 (2026-10-04): the named defining phrase +
-    the owning file's shaped filters."""
-    out = tmp_path / "07"
-    out.mkdir()
-    rows = bd.build07(DIR05, DIR06, out, DIR02, no_llm=True,
-                      only_file=TOTALS)
-    fields = [r for r in rows if r["grain"] == "field"]
-    assert len(fields) == 17
-    # the per-field facts are built and gate-scoped
-    facts = bd.render_field_facts(
-        DIR05, DIR06, DIR02, TOTALS,
-        fields[0]["node_id"],
-        f"file::{TOTALS}::scope/delivery")
-    assert "FIELD:" in facts
-    assert "The event type is 'Census' (6)." in facts  # inherited
-    assert "event record category" not in facts  # named, not raw
+# RETIRED test_field_docket_v2_named_and_inheriting — 2026-10-04 at
+# section-H acceptance (contract G): Law A's inheriting field docket
+# superseded by the room law (brief Q6); fields fly blind, lock
+# replaced by test_walk_g6_population_fact_on_a_field_fails.
 
 
 def test_field_shape_gate():
@@ -566,3 +575,313 @@ def test_line_ownership_negatives_live_in_excludes():
         "chosen window.")
     assert not any("ownership" in x.lower()
                    for x in bd.gate(good, docket, "file"))
+
+
+# ====================================================================
+# THE WALK REOPEN TEST PLAN (documented 2026-10-04, the day all nine
+# brief questions were ruled — Brief_07_Graph_Grounded_Proposer.md;
+# contract: THE WALK CONTRACT section G, stamped same day).
+#
+# These are DOCUMENTED INTENT, not yet code: per the standing law
+# the executable tests land RED, verbatim pytest output shown,
+# IMMEDIATELY AFTER Sunny approves the pseudo code and BEFORE the
+# first line of real walk code. Each lock below seeds a defect and
+# must FAIL until the walk build makes it pass.
+#
+#   G.1 seeded memory-invention — a sentence carrying a value absent
+#       from its room ("admission, discharge, transfer" on the
+#       subtype field) -> the checker fails it, named finding.
+#   G.2 seeded omission — 7 of the census file's 8 excluded
+#       departments on the Excludes line -> class-1 value
+#       conservation fails, both-directions.
+#   G.3 paraphrased name — a column spoken outside its ladder name
+#       ("the effective moment" for event effective time) -> name
+#       violation.
+#   G.4 filler KEEPS — a keeps-sentence on a condition-less scope
+#       (the location split) -> scope shape fails (honest silence).
+#   G.5 foreign condition — the date window spoken in the
+#       service-area scope's text -> ownership fails.
+#   G.6 population fact in a field room's output — any excluded
+#       department named on a field sentence -> room violation.
+#   G.7 plumbing climb — a class-3 value (the marker 1, STRING_SPLIT,
+#       the All-code 0 as mechanism) on the card -> class-3 fails.
+#
+# RETIREMENTS — EXECUTED 2026-10-04 at Sunny's section-H
+# acceptance ("accepted, run the cutover"): the inheriting
+# field-docket lock and the S15/S16-S18 prompt locks are
+# tombstoned below; their classes live on as walk G-locks.
+# ====================================================================
+
+
+# ------------------- THE WALK G-LOCKS (landed RED 2026-10-04 at
+# pseudo approval; green only when business_walk.py's code lands
+# under its approved comments. Room shape pinned per THE WALK
+# CONTRACT A/E: speakable = the four match lists; context never
+# grounds; must_say = the rung's obligations. check(text, room,
+# grain) -> list of named finding strings, same as the gate.)
+
+CENSUS = "COOK_RPT_USP_CCHCS_ADT_MONTHLY_INPATIENT_CENSUS_TOTALS_SSRS"
+DIR03 = REPO_ROOT / "AIVIA_01_Data" / "03_chat_bot"
+
+EIGHT_DEPTS = ["CCMC EMERGENCY", "CCMC IR IMAGING", "CCMC CATH LAB",
+               "CCMC MAIN OR", "CCMC SPA OR", "CCMC PHP PSYCHIATRY",
+               "CCMC CARDIOVASCULAR OR", "DSC OR"]
+
+
+def _room(short=(), values=(), params=(), blessed=(), ctx="",
+          must=()):
+    return {"speakable": {"short_names": list(short),
+                          "value_names": list(values),
+                          "param_names": list(params),
+                          "blessed_names": list(blessed)},
+            "context": {"dictionary": ctx},
+            "must_say": list(must)}
+
+
+def test_walk_g1_memory_invention_fails_the_room():
+    """G.1: a value from the model's MEMORY, absent from the room
+    ('admission, discharge, transfer' on the subtype field)."""
+    import business_walk as bw
+    room = _room(short=["event subtype"], values=["Canceled"],
+                 ctx="The subtype of the event record.",
+                 must=["event subtype"])
+    out = ("This field shows the event subtype, such as whether "
+           "it reflects an admission, discharge, or transfer.")
+    f = bw.check(out, room, "field")
+    assert f and any("room" in x.lower() for x in f)
+    assert any("admission" in x.lower() for x in f)
+
+
+def test_walk_g2_omission_breaks_conservation():
+    """G.2: 7 of 8 departments on the Excludes line — smooth text,
+    missing value; the must-say direction catches it."""
+    import business_walk as bw
+    room = _room(values=EIGHT_DEPTS, must=list(EIGHT_DEPTS))
+    out = ("Excludes: census events from " +
+           ", ".join(EIGHT_DEPTS[:6]) + ", and " + EIGHT_DEPTS[6]
+           + ".")  # DSC OR silently dropped
+    f = bw.check(out, room, "card_line")
+    assert f and any("conservation" in x.lower() for x in f)
+    assert any("DSC OR" in x for x in f)
+
+
+def test_walk_g3_paraphrased_name_is_a_name_violation():
+    """G.3: the column spoken outside its ladder name."""
+    import business_walk as bw
+    room = _room(short=["event effective time"],
+                 ctx="The instant when the event was supposed to "
+                     "have happened.",
+                 must=["event effective time"])
+    out = ("This is the effective moment for the patient's "
+           "census status.")
+    f = bw.check(out, room, "field")
+    assert f and any("event effective time" in x for x in f)
+
+
+def test_walk_g4_filler_keeps_fails_scope_shape():
+    """G.4: a keeps-sentence on a condition-less scope (the
+    location split owns no membership conditions)."""
+    import business_walk as bw
+    room = _room(short=["revenue location"],
+                 params=["the person running the report"],
+                 must=["one row is"])  # no owned conditions
+    out = ("One row here is one revenue location chosen when "
+           "running the report. It keeps the locations picked "
+           "when running the report.")
+    f = bw.check(out, room, "scope")
+    assert f and any("keep" in x.lower() for x in f)
+
+
+def test_walk_g5_foreign_condition_fails_the_room():
+    """G.5: the date window spoken inside the service-area
+    scope — a fact no element of this room can ground."""
+    import business_walk as bw
+    room = _room(short=["service area"],
+                 params=["the chosen service areas"],
+                 must=["one row is"])
+    out = ("One row here is one chosen service area, for events "
+           "from the chosen start date through the chosen end "
+           "date.")
+    f = bw.check(out, room, "scope")
+    assert f and any("room" in x.lower() for x in f)
+    assert any("start date" in x.lower() for x in f)
+
+
+def test_walk_g6_population_fact_on_a_field_fails():
+    """G.6: a department name on a field sentence — the field
+    room is blind to population (Q6), so it cannot resolve."""
+    import business_walk as bw
+    room = _room(short=["department"],
+                 ctx="The abbreviated name of the department.",
+                 must=["department"])
+    out = ("This field shows the department, excluding CCMC "
+           "EMERGENCY and DSC OR.")
+    f = bw.check(out, room, "field")
+    assert f and any("room" in x.lower() for x in f)
+    assert any("CCMC EMERGENCY" in x for x in f)
+
+
+def test_walk_g7_plumbing_on_the_card_fails():
+    """G.7: class-3 values climbing to the card — the All-code 0
+    and the marker 1 are in NO card room (the choice survives,
+    its mechanism dies)."""
+    import business_walk as bw
+    room = _room(params=["the chosen service areas",
+                         "the chosen locations"],
+                 must=["the chosen service areas"])
+    out = ("Who's in it: patients in the chosen service areas; "
+           "choosing the value 0 includes every one, marked "
+           "with a constant 1.")
+    f = bw.check(out, room, "card_line")
+    assert f and any("room" in x.lower() for x in f)
+    assert any("0" in x or "1" in x for x in f)
+
+
+def test_walk_selectors_are_disjoint_on_the_proving_file():
+    """P4's disjointness law: the same predicate never lands in
+    two card lines — one home per fact, mechanical at the card.
+    Runs on the REAL census subgraph through the one read door."""
+    import business_walk as bw
+    store = bw.WalkStore(DIR05, DIR02, DIR03)
+    sels = [bw.sel_whos_in_it, bw.sel_time_window,
+            bw.sel_excludes]
+    sets = [set(s(store, CENSUS)) for s in sels]
+    for i in range(len(sets)):
+        for j in range(i + 1, len(sets)):
+            assert not (sets[i] & sets[j])
+    assert any(sets)  # the census file is not conditionless
+
+
+def test_walk_build_conserves_the_21_rows(tmp_path):
+    """The 2026-10-04 live find: the first walk build landed 4
+    rows where 21 were owed (fields zipped against a 06 grain
+    that does not exist). Locked: the proving file's floor build
+    lands 1 file + 3 scope + 17 field rows, no-llm, zero cost."""
+    import business_walk as bw
+    out = tmp_path / "07"
+    out.mkdir()
+    rows = bw.build07_walk(DIR05, DIR06, out, DIR02, DIR03,
+                           no_llm=True, only_file=CENSUS)
+    grains = {}
+    for r in rows:
+        grains[r["grain"]] = grains.get(r["grain"], 0) + 1
+    assert grains == {"file": 1, "scope": 3, "field": 17}
+
+
+def test_walk_blessed_card_line_wins(tmp_path):
+    """RULED 2026-10-04 (Sunny, option 2 on the inverted cancel
+    clause): a blessed card line outranks every roll — blessed >
+    gate_passed > floor, now at card-line grain. The walk build
+    must consult the registry and never re-roll a blessed line."""
+    import business_walk as bw
+    out = tmp_path / "07"
+    out.mkdir()
+    blessed = "HER EXACT TIME WINDOW SENTENCE"
+    (out / "07_blessing_registry.json").write_text(json.dumps(
+        {"names": [], "sentences": [
+            {"node_id": f"file::{CENSUS}::card/time_window",
+             "blessed_text": blessed,
+             "ruling": "RULED 2026-10-04"}]}))
+    rows = bw.build07_walk(DIR05, DIR06, out, DIR02, DIR03,
+                           no_llm=True, only_file=CENSUS)
+    card = next(r for r in rows if r["grain"] == "file")
+    assert blessed in card["audience_text"]
+
+
+def test_walk_bless_door_requires_her_ruling(tmp_path):
+    """THE RATIFY CLAUSE (2026-10-04): the write is machine-
+    executed ONLY at Sunny's explicit ruling — an unruled write
+    refuses; a ruled write lands her ruling verbatim; a newer
+    dated ruling on the same node supersedes (delta-by-name)."""
+    import business_walk as bw
+    out = tmp_path / "07"
+    out.mkdir()
+    nid = f"file::{CENSUS}::card/time_window"
+    try:
+        bw.bless(out, nid, "some text", ruling="")
+        raise AssertionError("unruled write must refuse")
+    except ValueError as e:
+        assert "ruling" in str(e).lower()
+    bw.bless(out, nid, "her sentence",
+             ruling="RULED 2026-10-04 (Sunny, in chat)")
+    reg = json.loads((out / "07_blessing_registry.json")
+                     .read_text())
+    row = next(r for r in reg["sentences"]
+               if r["node_id"] == nid)
+    assert row["blessed_text"] == "her sentence"
+    assert row["ruling"] == "RULED 2026-10-04 (Sunny, in chat)"
+    bw.bless(out, nid, "her newer sentence",
+             ruling="RULED 2026-10-05 (Sunny, in chat)")
+    reg = json.loads((out / "07_blessing_registry.json")
+                     .read_text())
+    rows = [r for r in reg["sentences"] if r["node_id"] == nid]
+    assert len(rows) == 1
+    assert rows[0]["blessed_text"] == "her newer sentence"
+
+
+def test_walk_choosing_all_is_licensed_with_choices():
+    """The 2026-10-04 false positive: 'Choosing All' flagged as
+    an unresolved claim. 'All' is S14's own ruled vocabulary —
+    licensed whenever the room carries run-time choices."""
+    import business_walk as bw
+    room = _room(params=["the chosen service area",
+                         "the chosen location"],
+                 must=[])
+    out = ("Census records in the chosen service area and the "
+           "chosen location. Choosing All includes all.")
+    assert bw.check(out, room, "card_line") == []
+
+
+def test_walk_bless_name_door(tmp_path):
+    """RULED 2026-10-04 (Sunny: bless 'patient servce' as
+    'patient service'): the ratify door writes NAME rows too —
+    same refusal law, and the ladder serves the blessed name
+    first."""
+    import business_walk as bw
+    out = tmp_path / "07"
+    out.mkdir()
+    bw.bless(out, "ZC_PAT_SERVICE.NAME", "patient service",
+             ruling="RULED 2026-10-04 (Sunny, in chat)",
+             kind="name")
+    store = bw.WalkStore(DIR05, DIR02, DIR03, out)
+    assert store.ladder_name("ZC_PAT_SERVICE.NAME") == \
+        "patient service"
+
+
+def test_walk_class2_units_carry_no_string_must_say():
+    """Q3 as ruled: class-2 survives as ONE plain clause, values
+    NOT carried — so a class-2 room has no string must-say (the
+    2026-10-04 doubled-Excludes root: must-say 'patient id'
+    forced a second utterance beside 'not linked to a patient')."""
+    import business_walk as bw
+    store = bw.WalkStore(DIR05, DIR02, DIR03)
+    for u in bw._top_units(store, CENSUS):
+        room, ucls = bw._unit_room(store, u)
+        if ucls == 2:
+            assert room["must_say"] == []
+
+
+def test_walk_rerender_applies_registry_without_calls(tmp_path):
+    """RULED 2026-10-04 (Sunny's bless-1-and-2): landing a
+    blessing must not reroll the unpinned lines — rerender mode
+    rebuilds the card from the registry + the stored trace with
+    ZERO calls, keeping every other row byte-identical."""
+    import shutil
+
+    import business_walk as bw
+    src = Path("AIVIA_01_Data/07_business_descriptions")
+    out = tmp_path / "07"
+    out.mkdir()
+    for f in ("07_business_sheet.json", "07_walk_trace.json",
+              "07_blessing_registry.json"):
+        shutil.copy(src / f, out / f)
+    def no_caller(prompt):
+        raise AssertionError("rerender must make zero calls")
+    rows = bw.build07_walk(DIR05, DIR06, out, DIR02, DIR03,
+                           only_file=CENSUS, rerender=True,
+                           caller=no_caller)
+    card = next(r for r in rows if r["grain"] == "file")
+    assert "patient service" in card["audience_text"]
+    assert "separately defined selection" not in \
+        card["audience_text"]
+    assert len(rows) == 21

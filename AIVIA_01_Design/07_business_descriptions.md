@@ -61,7 +61,17 @@ then, on the evidence, further):
   is why we use LLM" (her ruling). Interpretation is the
   model's job; the gate polices truth boundary and register,
   never thinking.
-- THE SURVIVING CHECKS (all precise, zero calibration debt):
+- THE SURVIVING CHECKS (all precise, zero calibration debt)
+  (2026-10-04, later same day — brief Q7/Q8: at the graph-walk
+  reopen's build the RESOLVE-BACK CHECKER joins this gate as
+  new named findings — room violation, conservation break,
+  name violation — same objection-and-repair loop, budget 3;
+  matching normalized-deterministic against short names,
+  value-node names, parameter plain names, blessed names; an
+  LLM linker EXCLUDED by ruling; the quoted-values check
+  below is superseded there — grown to both directions; the
+  pinned regressions stay forever; this passage stands as
+  written until that build):
   quoted values + numbers must appear in the docket (an
   UNGROUNDED number fails AND lands a code sighting — S10
   narrowed: grounded numbers may speak); the never-list
@@ -121,10 +131,31 @@ delegated to the model, her blessing the catch):
       the abstract voice of a systems document. A persona
       subsumes a pile of grammar rules; grammar nudges are not
       added to the prompt from here on.
+  THE MUST-SURVIVE LAW (RULED 2026-10-04, demonstrated on the
+      census SQL's nine WHERE conditions; full text in
+      briefs/Brief_07_Graph_Grounded_Proposer.md Q3; binds the
+      graph-walk reopen, test-locked at its build): as
+      sentences compose upward, three MECHANICAL fact classes
+      — assigned from where the predicate lives in the tree,
+      never by judgment. (1) population-shaping: values intact
+      every rung, landing on the owning card line (the
+      line-ownership law is its landing map); (2) housekeeping:
+      one plain clause, values not carried (S12 restated as a
+      survival class); (3) plumbing (ON clauses, markers,
+      split functions, special values as mechanisms): dies at
+      its rung — the choice survives, its 0 dies. Enforced by
+      VALUE CONSERVATION at the card, both directions (the
+      voicing-ledger precedent). Branch scope: the population
+      path only; fields never carry class-1 facts.
 
 DOCKET v2 + THE FACT-VOICE LAYER — RULED 2026-10-04 (Sunny:
 "fold it in... and let's implement"; born from the EMH OVERFLOW
 poisoning find in debug02 and her how-to-leverage-LLM question):
+(2026-10-04, later same day: THE ROOM LAW — brief Q5 —
+supersedes the flat FACTS+CONTEXT docket AT THE GRAPH-WALK
+REOPEN'S BUILD: one call per graph node, each rung's room
+closed per the pinned table; docket v2 stands as written until
+that build.)
 - THE SPLIT: the docket has two parts. FACTS — assembled ONLY by
   the 05 resolver (never grep, never hand): sources with
   dictionary words, each population condition WITH its bound
@@ -151,18 +182,63 @@ poisoning find in debug02 and her how-to-leverage-LLM question):
   floor stays zero-LLM (the two-machines ruling untouched).
   The per-file FACTS text (machine fact + voice side by side)
   lands TRACKED as <file_name>.facts.txt. Machine writes
-  proposed voices only; blessing stays her hand in the
-  registry.
+  proposed voices only; blessing stays her RULING in the
+  registry (THE RATIFY CLAUSE, 2026-10-04: the decision hers
+  alone, the write machine-executed at her explicit ruling via
+  the bless() door — full text in the 07 contract; amended for
+  corpus scale, her words: hundreds of report files).
 - SLICE SCOPE (this implement): the file grain's docket moves
   to v2; scope/field dockets follow in a later slice.
 - FIELD DOCKET v2 (RULED 2026-10-04, the single-file deep
-  track): a field's docket.facts = its NAMED defining phrase
+  track) — SUPERSEDED later the same day by THE ROOM LAW
+  (brief Q5/Q6, Sunny's confirm after the conflicting-laws
+  demonstration): at the graph-walk reopen's build, fields fly
+  BLIND to population — the owning scope's filter lines leave
+  the field's room entirely (the don't-restate instruction was
+  advisory and line 27 was its bill: held for 16 fields, broke
+  on the 17th); the dictionary description stays as
+  context-only. The clause below stands as written ONLY until
+  that build; its CI lock
+  (test_field_docket_v2_named_and_inheriting) retires with it.
+  Original clause: a field's docket.facts = its NAMED defining phrase
   (the 06 payload item rendered through the name overlay), its
   lineage when read through selections, and its owning scope's
   SHAPED filter lines — so a field sentence can say what the
   field means AND inherit the population truth. V-1 scoped as
   everywhere. The field FLOOR stays the 06 item verbatim
   (deterministic, ladder-free). Scope grain follows last.
+- THE SCOPE MUST-SAYS (RULED 2026-10-04, brief Q4 — closes the
+  "scope grain follows last" deferral above; binds the
+  graph-walk reopen, test-locked at its build): a scope
+  sentence owes (1) ONE ROW IS — always (the selection's
+  grain); (2) KEEPS — only when the scope OWNS membership
+  conditions in its own WHERE, voiced under the must-survive
+  classes; honest silence when it owns none (R7 precedent) —
+  a parameter-split selection is fully described by its grain
+  sentence alone. Ownership boundary: a scope speaks only its
+  own WHERE (EXISTS sub-conditions voice inline at the parent
+  per THE FACTS SHAPE LAW, no double counting). Per-scope
+  value conservation. FEEDS (the consumed side restating who
+  uses it) REJECTED by one-home-per-fact — the consuming
+  sentence owns the relationship; the chat serves "why does
+  this exist" from the graph edge at read time.
+- THE ROOM LAW + THE LINE SELECTORS (RULED 2026-10-04, brief
+  Q5, full table there; bind the graph-walk reopen, built at
+  its build): code walks the 05 graph bottom-up, ONE call per
+  node, each rung's room closed — predicate (its columns'
+  short names + bound values; dictionary words context-only),
+  structure (child sentences only), scope (own structures +
+  grain + payload), file card (scope sentences routed per
+  selector), field (column + expression only; population
+  facts NOT in the room). The LLM never walks; a fact outside
+  the room cannot be spoken. The five card lines stay as the
+  reader format — the graph decides CONTENT, the card decides
+  PRESENTATION — each line a NAMED SELECTOR over the file
+  subgraph (One row is <- delivery grain; Who's in it <-
+  class-1 positives + choices; Each row shows <- payload
+  kinds; Time window <- class-1 temporal; Excludes <- class-1
+  negatives + class-2). Generation LINE BY LINE, five calls,
+  per-line conservation and repair; code assembles the card.
 - THE FACTS SHAPE LAW (RULED 2026-10-04, her 13-vs-9 find):
   WHO-IS-IN lists ONE line per TOP-LEVEL condition of the WHERE
   — an OR-group composes on ONE line (R3's shape law at the
