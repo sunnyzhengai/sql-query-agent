@@ -15,7 +15,7 @@ blessed-only (no unblessed name reaches Collibra).
 
 ## Prereqs (pack before the first session — checklist Step 2)
 
-- [ ] `ai01_sqldesc-0.5.5-py3-none-any.whl` (or newer; the
+- [ ] `ai01_sqldesc-0.5.6-py3-none-any.whl` (or newer; the
       version ladder law — never two versions installed)
 - [ ] The three dictionary files ONLY:
       `02_emr_data_dictionary_extraction_column.json`,
