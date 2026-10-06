@@ -46,6 +46,7 @@ REQUIRED = (
     "README_prereqs.md",
     "work_wheel_runbook.md",
     "tenant_intake.md",
+    "collibra_publish_notebook.md",
     "dictionary_extraction/dict_extract_table.sql",
     "dictionary_extraction/dict_extract_column.sql",
     "dictionary_extraction/dict_extract_join.sql",
@@ -86,6 +87,19 @@ def test_intake_sheet_carries_every_field():
     text = (DELIVERY / "tenant_intake.md").read_text()
     for field in INTAKE_FIELDS:
         assert field in text, field
+
+
+def test_publish_template_carries_the_laws():
+    text = (DELIVERY / "collibra_publish_notebook.md").read_text()
+    assert "DRY_RUN  = True" in text          # dry-first
+    assert "SANDBOX  = True" in text          # sandbox-first
+    assert 'bt_name_status") == "blessed"' in text  # blessed-only
+    assert "nameMatchMode" in text            # by-name, idempotent
+    assert "census" in text                   # the counted census
+    for cfg in ("BT_DOMAIN_ID", "BT_TYPE_ID", "DESC_ATTR_ID",
+                "TECHDEF_ATTR_ID", "REPORT_TYPE_ID",
+                "SANDBOX_DOMAIN", "TOKEN_SECRET"):
+        assert cfg in text, cfg               # intake-fed CONFIG
 
 
 def test_delivery_folder_is_clean():

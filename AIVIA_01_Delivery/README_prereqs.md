@@ -6,6 +6,11 @@ description engine on a customer's Microsoft Fabric tenant
 or copied in at pack time; nothing a customer makes ever
 lands back in it.
 
+READ IN THIS ORDER: this README (what to gather) ->
+`tenant_intake.md` (fill every blank) -> `work_wheel_runbook.md`
+(the step-by-step an admin follows) -> after the engine runs,
+`collibra_publish_notebook.md` (the publish cells).
+
 ## What's in the bucket
 
 | item | what it is |
@@ -13,6 +18,7 @@ lands back in it.
 | `work_wheel_runbook.md` | the step-by-step deployment runbook |
 | `tenant_intake.md` | THE INTAKE SHEET — every value to gather, fillable; a blank = not ready to deploy |
 | `dictionary_extraction/` | 4 shape-matched Clarity dictionary queries + the ZC value generator — run unscoped at the tenant |
+| `collibra_publish_notebook.md` | the publish notebook template — paste the cells, fill CONFIG from the intake sheet |
 | `tools/csv_to_json.py` | the zero-logic converter (copied in at pack time from the engine codebase) |
 | `wheel/ai01_sqldesc-<newest>.whl` | the engine (copied in at pack time) |
 
