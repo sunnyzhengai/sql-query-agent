@@ -121,9 +121,12 @@ L09: The graph metadata map (ruled 2026-09-29). Every field of every
              deprecated_yn, column_ini, column_item, name and
              description embeddings. 1,618 today.
              Columns are nodes BY RULING even though no phase 02 edge
-             terminates at them: phase 03's edges (business term ->
+             terminates at them: phase 03's edges (vocabulary term ->
              column, joins_observed, lineage) do, and the graph keeps
-             one shape across phases.
+             one shape across phases. (Reworded 2026-10-05 per the
+             vocabulary keyword law, Design_Proprietary_Term_Assets:
+             "business term" is reserved for the phase 09 governance
+             object; these chat edges carry healthcare vocabulary.)
     iniitm (ruled): line 1 only becomes the column_ini/column_item
              properties. Columns with more lines (38 today, the
              date+time item pairs and multi-source derived columns) are

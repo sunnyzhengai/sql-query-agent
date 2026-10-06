@@ -20,39 +20,54 @@ from pathlib import Path
 CODE = Path(__file__).resolve().parent
 REPO = CODE.parent
 DLL = "Microsoft.SqlServer.TransactSql.ScriptDom.dll"
-VERSION = "0.4.0"
+VERSION = "0.5.0"
 
+# 0.5.0 (RULED 2026-10-05, "approve the wheel change" — the
+# Brief_Packaging amendment): the LLM phases join the wheel;
+# the KEY never rides — offered at runtime (env/Key Vault).
 MODULES = ("scriptdom_loader.py", "semantic_graph.py",
            "technical_descriptions.py", "pbi_lineage.py",
-           "sqldesc_cli.py")
+           "business_descriptions.py", "business_terms.py",
+           "ai_delivery.py", "sqldesc_cli.py")
 
-# the stamped manifest: the wheel's exact payload
+# the stamped manifest: the wheel's exact payload (assets
+# package renamed ai_sqldesc_assets 2026-10-05, her ruling)
 ALLOWLIST = tuple(sorted(
-    MODULES + ("aivia_sqldesc_assets/__init__.py",
-               f"aivia_sqldesc_assets/{DLL}",
-               "aivia_sqldesc_assets/05_kind_library.json",
-               "aivia_sqldesc_assets/MANIFEST.txt")))
+    MODULES + ("ai_sqldesc_assets/__init__.py",
+               f"ai_sqldesc_assets/{DLL}",
+               "ai_sqldesc_assets/05_kind_library.json",
+               "ai_sqldesc_assets/MANIFEST.txt")))
+
+
+def _scrub(text):
+    """THE BRAND SCRUB (RULED 2026-10-05, her word: 'replace
+    aivia with ai everywhere in the wheel'): staged COPIES are
+    cleaned, case-preserving; repo sources keep citing the real
+    AIVIA_01 folder names. The no-aivia packaging lock enforces
+    the result on every member."""
+    return (text.replace("AIVIA", "AI").replace("Aivia", "Ai")
+                .replace("aivia", "ai"))
 
 _PYPROJECT = f'''[build-system]
 requires = ["setuptools", "wheel"]
 build-backend = "setuptools.build_meta"
 
 [project]
-name = "aivia01-sqldesc"
+name = "ai01-sqldesc"
 version = "{VERSION}"
-description = "AIVIA deterministic SQL description engine. No keys, no network."
+description = "Deterministic SQL description engine with a runtime-offered LLM seat. The key never rides."
 requires-python = ">=3.11"
-dependencies = ["pythonnet>=3.0.1"]
+dependencies = ["pythonnet>=3.0.1", "openai>=3"]
 
 [project.scripts]
-aivia-describe = "sqldesc_cli:main"
+ai-describe = "sqldesc_cli:main"
 
 [tool.setuptools]
 py-modules = {list(m.removesuffix(".py") for m in MODULES)}
-packages = ["aivia_sqldesc_assets"]
+packages = ["ai_sqldesc_assets"]
 
 [tool.setuptools.package-data]
-aivia_sqldesc_assets = ["*.dll", "*.json", "MANIFEST.txt"]
+ai_sqldesc_assets = ["*.dll", "*.json", "MANIFEST.txt"]
 '''
 
 
@@ -64,29 +79,34 @@ def build(out_dir=None):
         stage = Path(tmp) / "stage"
         stage.mkdir()
         for m in MODULES:
-            shutil.copy(CODE / m, stage / m)
-        assets = stage / "aivia_sqldesc_assets"
+            (stage / m).write_text(
+                _scrub((CODE / m).read_text()))
+        assets = stage / "ai_sqldesc_assets"
         assets.mkdir()
         (assets / "__init__.py").write_text(
             '"""The work wheel\'s assets: the ScriptDom DLL and '
             'its own manifest (Brief_Packaging)."""\n')
         shutil.copy(REPO / "libs" / DLL, assets / DLL)
         # the ratified closed vocabulary TRAVELS (the
-        # portability split: AIVIA's rulings, no customer rows;
-        # the canary lock verifies)
-        shutil.copy(REPO / "AIVIA_01_Data" / "05_semantic_graph"
-                    / "05_kind_library.json",
-                    assets / "05_kind_library.json")
+        # portability split: our rulings, no customer rows;
+        # the canary lock verifies); provenance line scrubbed
+        # in the staged copy only
+        (assets / "05_kind_library.json").write_text(
+            _scrub((REPO / "AIVIA_01_Data" / "05_semantic_graph"
+                    / "05_kind_library.json").read_text()))
+        # renamed ai01-sqldesc 2026-10-05 (her ask: no "aivia"
+        # in the wheel file name — the work-transition artifact)
         (assets / "MANIFEST.txt").write_text(
-            "aivia01-sqldesc " + VERSION + " — the allowlist "
-            "(Brief_Packaging, stamped 2026-10-04):\n" +
+            "ai01-sqldesc " + VERSION + " — the allowlist "
+            "(Brief_Packaging, stamped 2026-10-04; LLM phases "
+            "joined 2026-10-05, key never rides):\n" +
             "\n".join(ALLOWLIST) + "\n")
         (stage / "pyproject.toml").write_text(_PYPROJECT)
         subprocess.run(
             [sys.executable, "-m", "pip", "wheel", "--no-deps",
              "--no-build-isolation", "-w", str(out), str(stage)],
             check=True, capture_output=True)
-    whl = sorted(out.glob(f"aivia01_sqldesc-{VERSION}-*.whl"))[-1]
+    whl = sorted(out.glob(f"ai01_sqldesc-{VERSION}-*.whl"))[-1]
     print(f"built {whl}")
     return str(whl)
 

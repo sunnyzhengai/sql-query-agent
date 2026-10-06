@@ -18,7 +18,9 @@ checked mechanically at build, refused loud on any drift.
 1. `aivia01` — the FABRIC wheel (exists, 0.3.0): the full
    AIVIA_01 modules for Sunny's own tenant. Not in this brief's
    scope beyond the naming split.
-2. `aivia01-sqldesc` — the WORK wheel (new): the deterministic
+2. `ai01-sqldesc` (RENAMED 2026-10-05, her ask: no "aivia" in
+   the wheel file name — the work-transition artifact; was
+   aivia01-sqldesc 0.1.0-0.5.0) — the WORK wheel: the deterministic
    description engine only. Parse T-SQL, build the structural
    sheets, render the 06 technical descriptions. ZERO API keys,
    ZERO LLM calls, zero AIVIA prompts — the 07 business layer
@@ -36,10 +38,15 @@ were drafted in but the chain never imports them — dropped; the
 - technical_descriptions.py  (the deterministic 06 renderer;
                               stdlib only)
 - the ScriptDom DLL inside a tiny assets package
-  (aivia_sqldesc_assets) — the CLI sets SCRIPTDOM_DLL to the
-  packaged path before the loader imports; no loader fork (its
-  two-route law stands: env var first)
-- sqldesc_cli.py (the thin CLI): `aivia-describe <sql_dir>
+  (ai_sqldesc_assets — renamed with THE BRAND SCRUB, ruled
+  2026-10-05: "replace aivia with ai everywhere in the wheel";
+  staged COPIES of every module are scrubbed case-preserving,
+  repo sources keep the real AIVIA_01 citations; a packaging
+  lock asserts no member carries the string) — the CLI sets
+  SCRIPTDOM_DLL to the packaged path before the loader
+  imports; no loader fork (its two-route law stands: env var
+  first)
+- sqldesc_cli.py (the thin CLI): `ai-describe <sql_dir>
   <out_dir> [--dict <dir02>]` — folder of .sql in, per-file
   technical-description .txt out. Default: EMPTY staged
   dictionary (no 02 at work — degraded words, honest, counted).
@@ -69,9 +76,28 @@ were drafted in but the chain never imports them — dropped; the
   the canary lock verifies it carries no customer rows)
 - this manifest itself, as data — the wheel can state its law
 
+THE LLM PHASES JOIN THE WHEEL (RULED 2026-10-05, Sunny:
+"approve the wheel change" — the Collibra road's G-1; this
+OVERTURNS the never-travels row below for the two named
+files):
+- business_descriptions.py (the 07 engine: gate v2, the
+  prompts, build07) and business_terms.py (the 09 engine:
+  terms, the one-gate card, the export) move to TRAVELS at
+  wheel 0.5.0.
+- THE KEY LAW amends "zero network" to: network ONLY to the
+  tenant's own LLM endpoint; the key NEVER rides in the wheel
+  — read at runtime from the tenant's Key Vault (hers:
+  aivia01-kv; at work: theirs), the runtime-offered precedent
+  (--dict / --business) applied to the seat.
+- The import closure (what the two files pull in, incl. the
+  key-read door) is verified at the 0.5.0 build, the
+  import-graph precedent above; business_walk.py stays OUT
+  unless that verification names it.
+
 NEVER TRAVELS (refused at build, test-locked):
-- business_descriptions.py, business_walk.py (prompt laws, the
-  walk, the checker — AIVIA's 07 IP)
+- business_walk.py (the walk, the checker — AIVIA's 07 IP;
+  business_descriptions.py REMOVED from this row by the
+  2026-10-05 ruling above)
 - chat_bot.py, local_chat.py, azure_models.py, fabric_assets.py
   and every loader/notebook module (keys, endpoints, tenant)
 - AIVIA_01_Data/** in any form — dictionaries, graphs, sheets,
@@ -95,7 +121,7 @@ NEVER TRAVELS (refused at build, test-locked):
 
 ## Prereqs at work (the turn-key checklist, 5-rule gate)
 
-- Python 3.11+ and `pip install aivia01_sqldesc-<v>.whl`
+- Python 3.11+ and `pip install ai01_sqldesc-<v>.whl`
 - .NET 8 runtime present (the loader asserts DOTNET_ROOT only
   if its folder exists; macOS/Windows both known routes)
 - No network, no keys, no config — a folder of .sql files is
@@ -104,8 +130,8 @@ NEVER TRAVELS (refused at build, test-locked):
 ## For Sunny's stamp
 
 [x] Scope: deterministic-only (RULED 2026-10-04, in chat)
-[ ] The wheel name: aivia01-sqldesc (or her name)
-[ ] The CLI shape: `aivia-describe <folder>` one-command form
+[x] The wheel name: ai01-sqldesc (her rename, 2026-10-05)
+[x] The CLI shape: `ai-describe` (renamed with the wheel, 2026-10-05)
 [ ] DLL wheel-internal (vs carried alongside)
 [ ] The allowlist above, line by line
 

@@ -208,8 +208,13 @@ that build.)
   everywhere. The field FLOOR stays the 06 item verbatim
   (deterministic, ladder-free). Scope grain follows last.
 - THE SCOPE MUST-SAYS (RULED 2026-10-04, brief Q4 — closes the
-  "scope grain follows last" deferral above; binds the
-  graph-walk reopen, test-locked at its build): a scope
+  "scope grain follows last" deferral above; LANDING
+  RE-POINTED 2026-10-05, the GOALS session: binds build phase
+  09 (D3, the Business Term card — labeled lines Definition /
+  One row is / Keeps / Excludes), test-locked at ITS build,
+  not the graph-walk's; ONE-GATE RULING same day: the check
+  lives inside gate v2's V-4 — 09 calls THE one gate, ships
+  none of its own): a scope
   sentence owes (1) ONE ROW IS — always (the selection's
   grain); (2) KEEPS — only when the scope OWNS membership
   conditions in its own WHERE, voiced under the must-survive

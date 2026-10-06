@@ -42,6 +42,15 @@ Definitions:
   >=1 binding row or is counted in a named skip class; the
   equation is a test, as always.
 
+- RETIRED INTO ai_delivery.json (the consolidation ruling,
+  2026-10-05, recorded in the 09 contract): the json below is
+  superseded — the 08 step now writes reports[].report +
+  .files (and reportless_files[]) in AIVIA_01_Data/
+  ai_delivery.json; the OFFICIAL TXT below STAYS as the human
+  read view, regenerated from ai_delivery.json (her ruling:
+  "keep the per-files"). 08_pbi_reports.json and the ledger
+  stay as the store. Historical shape, until the delivery
+  build lands:
 - AIVIA_01_Data/08_pbi_lineage/08_report_descriptions.json —
   the D8 end-to-end artifact (built on her personal Fabric by
   the wheel; the acceptance surface): one row per PBI report:

@@ -9,9 +9,31 @@ grow with every customer engagement, and that growth compounds into
 AIVIA's healthcare-industry moat. Customer-specific names, counts and
 data NEVER travel.
 
+THE VOCABULARY KEYWORD LAW (RULED 2026-10-05, Sunny in chat —
+the GOALS session):
+- HEALTHCARE VOCABULARY is the broad asset: every healthcare
+  word/meaning we encounter, tracked as we go. Three sources,
+  each named on its rows: vendor dictionaries (the EMR's),
+  org SQL (the customer's), external files (the industry's).
+  The prior build's glossary machinery (abbreviation
+  dictionary + acronym ledger + blessed scopes of validity)
+  is this asset's keeping mechanism.
+- BUSINESS TERM is a RESERVED KEYWORD, data-governance
+  defined: the specific meaning of a finite data set,
+  represented and defined in a SQL logic block — specific to
+  one healthcare org's reality, never a vocabulary word. It
+  originates two ways: a user defines it manually, or it is
+  extracted automatically from SQL (build phase 09) — the
+  auto-extracted name follows a naming convention and the
+  user blesses it before it is published. Business Terms are
+  customer-local by the portability test below; only the
+  vocabulary they use travels.
+
 THE ASSETS (today)
-1. The business terms list (the prior build's meaning ladder): business
-   vocabulary bound to technical objects.
+1. The healthcare vocabulary (the prior build's meaning
+   ladder; renamed from "business terms list" by the keyword
+   law above): healthcare vocabulary bound to technical
+   objects.
 2. The technical terms list (AIVIA_01_Data/03_chat_bot/
    03_chat_technical_terms.md): the dictionary graph's own vocabulary —
    node kinds, edge kinds, operations, their synonyms. The file is its

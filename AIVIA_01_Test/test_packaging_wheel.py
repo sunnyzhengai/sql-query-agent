@@ -19,6 +19,13 @@ CANARY = ("CCMC EMERGENCY", "CCMC IR IMAGING", "CCMC CATH LAB",
 SECRET_SHAPES = ("OPENAI", "AZURE_OPENAI", "api_key",
                  "import openai", "import requests",
                  "import httpx")
+# THE LLM SEAT EXEMPTION (RULED 2026-10-05, Brief_Packaging
+# amendment — "approve the wheel change"): the two LLM phases
+# may import the openai client; the CLI may read the key's
+# PRESENCE (env name only, for the honest degrade). The KEY
+# still never rides (the literal-key lock covers every member).
+LLM_MODULES = ("business_descriptions.py", "business_terms.py",
+               "sqldesc_cli.py")
 
 
 def _wheel(tmp_path):
@@ -34,19 +41,51 @@ def test_wheel_manifest_equality(tmp_path):
     names = set(zipfile.ZipFile(whl).namelist())
     payload = {n for n in names if ".dist-info/" not in n}
     assert payload == set(bw.ALLOWLIST)
+    for m in ("business_descriptions.py", "business_terms.py",
+              "ai_delivery.py"):
+        assert m in payload, m   # the 0.5.0 ruling, test-locked
 
 
 def test_wheel_carries_no_secret_shapes(tmp_path):
-    """Lock 2: no key-shaped strings, no network clients, in any
-    packaged python module."""
+    """Lock 2 (amended 2026-10-05): outside the exempt LLM
+    modules, no key-shaped strings and no network clients; in
+    EVERY member, no literal key (sk-...)."""
+    import re
     whl = _wheel(tmp_path)
     z = zipfile.ZipFile(whl)
     for n in z.namelist():
-        if not n.endswith(".py"):
+        blob = z.read(n)
+        assert not re.search(rb"sk-[A-Za-z0-9_-]{16,}", blob), n
+        if not n.endswith(".py") or n in LLM_MODULES:
             continue
-        text = z.read(n).decode("utf-8", errors="replace")
+        text = blob.decode("utf-8", errors="replace")
         for shape in SECRET_SHAPES:
             assert shape not in text, (n, shape)
+
+
+def test_wheel_contains_no_aivia_string(tmp_path):
+    """RULED 2026-10-05 (her word: 'replace aivia with ai
+    everywhere in the wheel'): no member of the artifact —
+    code, assets, metadata — carries the brand string, any
+    case. The work-transition tripwire law."""
+    whl = _wheel(tmp_path)
+    assert "aivia" not in whl.name.lower()
+    z = zipfile.ZipFile(whl)
+    for n in z.namelist():
+        assert "aivia" not in n.lower(), n
+        assert b"aivia" not in z.read(n).lower(), n
+
+
+def test_wheel_is_0_5_0_with_the_llm_seat_dependency(tmp_path):
+    """The 0.5.0 ruling: version bumped, openai a declared
+    dependency (installed by the environment, key at runtime)."""
+    whl = _wheel(tmp_path)
+    assert "ai01_sqldesc-0.5.0-" in whl.name  # renamed, her ask
+    z = zipfile.ZipFile(whl)
+    meta = next(n for n in z.namelist()
+                if n.endswith("METADATA"))
+    text = z.read(meta).decode()
+    assert "Requires-Dist: openai" in text
 
 
 def test_wheel_carries_no_estate_data(tmp_path):
@@ -180,3 +219,23 @@ def test_cli_official_txt_speaks_its_voice(tmp_path):
     t2 = (out2 / "08_report_descriptions.txt").read_text()
     assert "voice: business" in t2
     assert "HER SENTENCE" in t2
+
+
+def test_cli_deliver_no_key_degrades_honestly(tmp_path,
+                                              monkeypatch):
+    """The 0.5.0 --deliver chain without a key: technical voice
+    only, no terms proposed, ai_delivery.json + the official txt
+    still land — an honest degrade, never a crash, never a
+    silent business claim."""
+    import sqldesc_cli
+    monkeypatch.delenv("OPENAI_API_KEY", raising=False)
+    tmdl, sql = _official_fixture(tmp_path)
+    out = tmp_path / "out"
+    delivery = sqldesc_cli.deliver(tmdl, sql, out)
+    assert (out / "ai_delivery.json").exists()
+    rep = next(e for e in delivery["reports"]
+               if e["report"] == "Fix")
+    assert rep["description"]["voice"] == "technical"
+    assert rep.get("terms", []) == []      # no key, no proposals
+    txt = (out / "08_report_descriptions.txt").read_text()
+    assert "voice: technical" in txt

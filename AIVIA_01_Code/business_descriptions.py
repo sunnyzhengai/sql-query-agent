@@ -110,6 +110,17 @@ TEMPLATE_LABELS = ["One row is:", "Who's in it:",
                    "Each row shows:", "Time window:",
                    "Excludes:"]
 
+# The Business Term card labels (THE ONE-GATE RULING,
+# 2026-10-05): phase 09's card rides THIS gate as grain
+# "term_card" — one gate, one law, two consumers. The 07 chat
+# sheet's free-form "scope" grain stands unchanged (its
+# adoption or retirement is Sunny's open ruling).
+TERM_CARD_LABELS = ["Definition:", "One row is:", "Keeps:",
+                    "Excludes:"]
+# the line-ownership markers (shared by the file arm below)
+NEGATIVE_MARKERS = ("other than", "excluded", "exclude",
+                    " not ", "except")
+
 BANNED_WORDS = {"join", "select", "query", "table", "temp",
                 "column", "procedure", "parameter"}
 
@@ -188,6 +199,22 @@ def gate(audience_text, docket, grain, registry=None):
             findings.append("V-4: a field is one short plain "
                             "paragraph — no markdown, no "
                             "labels, no line breaks")
+    if grain == "term_card":
+        # the TERM-CARD arm (THE ONE-GATE RULING, 2026-10-05):
+        # exactly the four labels, negatives only on Excludes
+        if len(lines) != len(TERM_CARD_LABELS) or not all(
+                ln.startswith(lab) for ln, lab in
+                zip(lines, TERM_CARD_LABELS)):
+            findings.append("V-4: the term card is exactly the "
+                            "four labeled lines — Definition / "
+                            "One row is / Keeps / Excludes, in "
+                            "order")
+        for ln in lines:
+            if not ln.startswith("Excludes:") and any(
+                    neg in ln.lower() for neg in NEGATIVE_MARKERS):
+                findings.append("V-4: line ownership — negative "
+                                "language lives ONLY on Excludes; "
+                                "found on: " + ln.split(":")[0])
     if grain == "file":
         for ln in lines:
             if ln.startswith("Who's in it:") and any(
@@ -554,10 +581,26 @@ CALL_TIMEOUT_S = 120  # harness law 2026-10-03: a wedged socket
 #                       can never hang the build
 
 
+def _load_key():
+    """The seat's key, runtime-offered (the 0.5.0 wheel law —
+    the key never rides in the wheel): repo mode reads .env via
+    build_abstract_names; wheel mode reads the environment (the
+    notebook sets it from a secret)."""
+    try:
+        from build_abstract_names import load_openai_key
+        return load_openai_key()
+    except ModuleNotFoundError:
+        import os
+        key = os.environ.get("OPENAI_API_KEY")
+        if not key:
+            raise RuntimeError(
+                "no OPENAI_API_KEY offered at runtime")
+        return key
+
+
 def _openai_caller(prompt):
-    from build_abstract_names import load_openai_key
     from openai import OpenAI
-    client = OpenAI(api_key=load_openai_key(),
+    client = OpenAI(api_key=_load_key(),
                     timeout=CALL_TIMEOUT_S, max_retries=2)
     r = client.chat.completions.create(
         model=_MODEL_NAME,

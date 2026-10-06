@@ -5,6 +5,27 @@ chat, scribed verbatim-in-substance by Claude at her direction.
 This document is the standing map of where AIVIA is going; it is
 updated as rulings land. Sunny owns it.
 
+GOALS (spoken 2026-10-05, Sunny, in chat; scribed by Claude at
+her direction)
+
+1. Report descriptions for Collibra. From a data governance
+   perspective: parse the organization's SQL files and translate
+   them into business descriptions that populate Collibra's
+   Power BI report description section — so the whole
+   organization's users can read and understand what a report
+   includes and excludes, and decide whether it is the right
+   report they are looking for. This automates the process so no
+   one has to ask a BI developer to read the SQL and translate
+   it.
+
+2. Business Terms proposed automatically. By the same token,
+   propose Business Terms from the parsed SQL. Sunny's
+   definition: all scopes should be Business Terms. Each
+   Business Term carries: a name, a business description, a
+   technical definition, and the PBI report it ties to. The
+   output is a data file with these fields; Sunny then runs a
+   notebook script that calls Collibra APIs to update.
+
 THE FOUR PRODUCT PHASES
 
 Naming ruled 2026-10-01 (Sunny, in chat): product phases carry Roman
@@ -101,6 +122,19 @@ descriptions.
 - This phase also allows us to bulk-generate descriptions and sync
   up with Collibra (by populating report descriptions or creating
   new business terms through API or extracts).
+
+RULED 2026-10-05 (Sunny, in chat — the GOALS session): the
+Business Term unit is the SCOPE — one term per (scope, report)
+this phase, dedup later. A scope is a business concept by a
+mechanical rule (reads at least one dictionary table; parameter-
+only scopes are plumbing). Each term carries a name (LLM
+proposes, Sunny blesses, blessed-only export), a business
+description (the scope card: Definition / One row is / Keeps /
+Excludes — the SCOPE MUST-SAYS landing), and a technical
+definition (deterministic, no LLM: Population / Exclusions /
+Parameters, one bullet per clause, dictionary business voice —
+no SQL, no table names, no codes). Build phase 09 owns this;
+design + contract: 09_business_terms.md and its data contract.
 
 Phase III — Traverse: lineage, impact, and path answers over the
 Phase I graph.

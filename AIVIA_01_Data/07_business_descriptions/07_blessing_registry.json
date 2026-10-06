@@ -23,5 +23,13 @@
    "blessed_text": "Patients with Census event records during the reporting period, for the chosen service area and the chosen location. Choosing All for the chosen service area or the chosen location includes all.",
    "ruling": "RULED 2026-10-04 (Sunny, in chat): \"bless 1 and 2, drop the separately defined selection phrase\" \u2014 landed via the ratify door."
   }
+ ],
+ "terms": [
+  {
+   "node_id": "file::COOK_RPT_USP_CCHCS_ADT_MONTHLY_INPATIENT_CENSUS_TOTALS_SSRS::scope/delivery",
+   "report": "COOK_RPT_USP_CCHCS_ADT_MONTHLY_INPATIENT_CENSUS_TOTALS_SSRS",
+   "bt_name": "Census ADT events in included inpatient units as of a chosen date",
+   "ruling": "RULED 2026-10-05 (Sunny, in chat): files approved for steps 0.3 0.4"
+  }
  ]
 }

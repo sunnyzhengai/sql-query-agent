@@ -78,6 +78,13 @@ Where do these data files live?
 
 What is the output of this data contract?
 
+- THE DELIVERY KEY (the consolidation ruling, 2026-10-05,
+  recorded in the 09 contract): the file-grain card ALSO
+  lands in AIVIA_01_Data/ai_delivery.json at reports[]
+  .description — {text, voice: business|technical, status} —
+  the 07 step owns that one key, never a silent downgrade
+  (the voice label law). The sheet below stays the store;
+  the per-file txts stay (her ruling: "keep the per-files").
 - 07_business_sheet.json — one row per described node:
   - node_id (the Phase I node), grain: file | scope | field
     (term grain deferred to the glossary milestone).
@@ -175,11 +182,21 @@ whitelist is RETIRED — see the design doc's Gate v2 section):
       carries no negative language ("other than", "excluded",
       "not ...") — negatives live only in Excludes.
       SCOPE arm (RULED 2026-10-04, THE SCOPE MUST-SAYS, brief
-      Q4; the check lands at the graph-walk reopen's build —
-      the current free-form scope grain stands until then):
-      ONE ROW IS always; KEEPS only where the scope owns
+      Q4; LANDING RE-POINTED 2026-10-05, the GOALS session —
+      the check lands at build phase 09 (D3, the Business Term
+      card), not the graph-walk build; ONE-GATE RULING same
+      day: the arm is BUILT INTO THIS gate's V-4 — phase 09
+      calls gate() and ships no gate of its own; V-1/V-2/V-3/
+      V-7 apply to the scope card as to every grain; the
+      current free-form scope grain stands until the 09
+      build): the shape is
+      LABELED LINES — Definition (one glossary sentence) / One
+      row is / Keeps / Excludes — carrying the must-says: ONE
+      ROW IS always; KEEPS only where the scope owns
       membership conditions, honest silence otherwise; a scope
-      speaks only its own WHERE; per-scope value conservation.
+      speaks only its own WHERE; negatives live only in
+      Excludes (the line-ownership law, extended); per-scope
+      value conservation.
       CARD arm (RULED 2026-10-04, THE ROOM LAW + LINE
       SELECTORS, brief Q5; lands at the walk build — the
       one-call card stands until then): the five lines keep

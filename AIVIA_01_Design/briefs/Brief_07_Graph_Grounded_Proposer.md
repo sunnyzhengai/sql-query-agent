@@ -382,7 +382,10 @@ Q3 — the must-survive law (sweep run + AMENDED same day,
    Brief_05_Prior_Art item 8, aisql/lenses/decisions.py).
 
 Q4 — the scope must-says (sweep run + AMENDED same day,
-2026-10-04):
+2026-10-04; LANDING RE-POINTED 2026-10-05: the must-says build
+moved from the walk build to build phase 09 — D3, the Business
+Term card, 09_business_terms.md — where the scope card gains
+its labeled shape: Definition / One row is / Keeps / Excludes):
 1. 07_business_descriptions.md: THE SCOPE MUST-SAYS block
    ADDED, closing the standing "scope grain follows last"
    deferral in the DOCKET v2 section. THE FACTS SHAPE LAW
