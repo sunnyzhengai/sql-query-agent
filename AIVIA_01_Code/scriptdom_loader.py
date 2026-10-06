@@ -154,12 +154,18 @@ def _probe_coreclr():
 
 
 def _find_dll():
-    for candidate in _DLL_CANDIDATES:
+    # AMENDED 2026-10-06 (rehearsal find #5, the frozen
+    # candidates): the env var is read AT CALL TIME, every
+    # call — a pointer staged after import must be seen (the
+    # preflight imports engines before staging the DLL).
+    candidates = (os.environ.get("SCRIPTDOM_DLL", ""),
+                  ) + _DLL_CANDIDATES
+    for candidate in candidates:
         if candidate and Path(candidate).exists():
             return candidate
     raise ScriptDomUnavailable(
         f"ScriptDom DLL not found (looked in: "
-        f"{[c for c in _DLL_CANDIDATES if c]}). {REMEDIATION}")
+        f"{[c for c in candidates if c]}). {REMEDIATION}")
 
 
 def ensure_scriptdom():

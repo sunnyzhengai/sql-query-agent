@@ -182,6 +182,10 @@ def preflight(tmdl_dir, sql_dir, out_dir, dict_dir=None):
         checks.append((ok, f"{what}" + ("" if ok else
                                         f" -> FIX: {fix}")))
 
+    # 0. the DLL pointer stages BEFORE any engine import
+    # (rehearsal find #5: imports first froze an empty pointer)
+    _point_at_packaged_dll()
+
     # 1. the engine modules (the dueling-wheels trap)
     for m in ("semantic_graph", "technical_descriptions",
               "pbi_lineage", "business_descriptions",

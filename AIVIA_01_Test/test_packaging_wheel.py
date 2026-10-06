@@ -257,6 +257,18 @@ def test_names_asset_absence_is_honest_and_offerable(tmp_path,
     assert bd._dir01(tmp_path / "y") == tmp_path / "y"
 
 
+def test_dll_env_var_honored_after_import(tmp_path, monkeypatch):
+    """The frozen-candidates find (2026-10-06, rehearsal find
+    #5): the loader froze SCRIPTDOM_DLL at import time, so a
+    pointer staged after any engine import was invisible. The
+    law: the env var is read AT CALL TIME, every call."""
+    import scriptdom_loader as sl
+    ghost = tmp_path / "Ghost.dll"
+    ghost.write_bytes(b"not a real dll - path check only")
+    monkeypatch.setenv("SCRIPTDOM_DLL", str(ghost))
+    assert sl._find_dll() == str(ghost)  # set AFTER import, seen
+
+
 def test_dead_dll_pointer_is_cleared_never_trusted(monkeypatch):
     """The vanishing-DLL find (2026-10-06): an env pointer at a
     path that no longer exists must be CLEARED, not trusted —
