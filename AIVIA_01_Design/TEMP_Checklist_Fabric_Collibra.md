@@ -38,7 +38,16 @@ Check boxes off in order; delete the file when Step 5 closes.
 
 - [ ] 1.1 Run the sync (existing manifest): 05 + 06 + 07 estate, the SQL files,
       the 02 dictionary, the blessing registry.
-- [ ] 1.2 Upload wheel 0.5.0 to the Fabric environment.
+- [ ] 1.2 Upload the wheel to the Fabric environment — 0.5.1
+      (the env-first key fix, built at the rehearsal).
+      THE ONE-WHEEL LAW (learned here 2026-10-05): exactly ONE
+      sqldesc wheel in the environment, ever — two versions
+      under different package names silently fight over the
+      same module files and the loser's modules vanish with no
+      install error. Delete old sqldesc wheels before Publish;
+      the aivia01 chat wheel may stay (no shared modules).
+      After Publish: STOP the session — only a fresh session
+      sees the new environment.
 - [ ] 1.3 Notebook: read the key from `aivia01-kv / aivia01-azure-openai-key`
       (or the OpenAI key), run: parse -> 06 -> 07 cards -> 09 terms ->
       `ai_delivery.json`.

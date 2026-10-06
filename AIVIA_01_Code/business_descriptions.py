@@ -582,20 +582,21 @@ CALL_TIMEOUT_S = 120  # harness law 2026-10-03: a wedged socket
 
 
 def _load_key():
-    """The seat's key, runtime-offered (the 0.5.0 wheel law —
-    the key never rides in the wheel): repo mode reads .env via
-    build_abstract_names; wheel mode reads the environment (the
-    notebook sets it from a secret)."""
+    """The seat's key, runtime-offered (the 0.5.1 law: the
+    ENVIRONMENT WINS FIRST — a notebook that set the secret is
+    the offer; only then the repo's .env reader. Fixed
+    2026-10-05 at the Fabric rehearsal: the 0.3.0 chat wheel
+    also ships build_abstract_names, so the import path is not
+    wheel-safe — ImportError caught too)."""
+    import os
+    key = os.environ.get("OPENAI_API_KEY")
+    if key:
+        return key
     try:
         from build_abstract_names import load_openai_key
         return load_openai_key()
-    except ModuleNotFoundError:
-        import os
-        key = os.environ.get("OPENAI_API_KEY")
-        if not key:
-            raise RuntimeError(
-                "no OPENAI_API_KEY offered at runtime")
-        return key
+    except ImportError:
+        raise RuntimeError("no OPENAI_API_KEY offered at runtime")
 
 
 def _openai_caller(prompt):

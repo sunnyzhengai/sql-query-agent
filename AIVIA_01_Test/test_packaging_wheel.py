@@ -76,11 +76,13 @@ def test_wheel_contains_no_aivia_string(tmp_path):
         assert b"aivia" not in z.read(n).lower(), n
 
 
-def test_wheel_is_0_5_0_with_the_llm_seat_dependency(tmp_path):
-    """The 0.5.0 ruling: version bumped, openai a declared
-    dependency (installed by the environment, key at runtime)."""
+def test_wheel_version_and_llm_seat_dependency(tmp_path):
+    """The 0.5.x ruling: openai a declared dependency (installed
+    by the environment, key at runtime); the name pins to the
+    builder's VERSION so a changed artifact always bumps."""
+    import build_sqldesc_wheel as bw
     whl = _wheel(tmp_path)
-    assert "ai01_sqldesc-0.5.0-" in whl.name  # renamed, her ask
+    assert f"ai01_sqldesc-{bw.VERSION}-" in whl.name
     z = zipfile.ZipFile(whl)
     meta = next(n for n in z.namelist()
                 if n.endswith("METADATA"))
