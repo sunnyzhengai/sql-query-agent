@@ -43,11 +43,14 @@ What is the output of this data contract?
 - THE PREFLIGHT's outputs (D8): the printed BOARD (one line
   per check, PASS/FAIL with the fix named), the returned
   failure list (empty == go), the CLI exit code (0 pass /
-  1 fail). The closed check set: engine modules import · DLL
-  reachable (either ruled route) · httpx + openai import ·
-  key offered (presence only, never printed) · >=1 *.sql ·
-  >=1 *.SemanticModel · the three dictionary files ·
-  out dir writable.
+  1 fail). The closed check set (amended 2026-10-06, the
+  rehearsal): the DLL pointer stages FIRST (before any engine
+  import — find #5) · engine modules import · DLL reachable
+  (either ruled route) · openai imports AND the client
+  CONSTRUCTS with a dummy key (zero network; never guess
+  transport names — the httpx2 find) · key offered (presence
+  only, never printed) · >=1 *.sql · >=1 *.SemanticModel ·
+  the three dictionary files · out dir writable.
 
 Definitions:
 - THE REFUSAL (D8): deliver() runs the preflight first; any

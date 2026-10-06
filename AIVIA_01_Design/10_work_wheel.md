@@ -63,6 +63,14 @@ D6. RUNTIME-OFFERED EVERYTHING (2026-10-04/05/06, the
     blessed-only names), never fatal. The repo-relative
     default class is CLOSED (the parents[1] sweep,
     2026-10-05).
+    THE OFFER-READ LAWS (rehearsal finds #4/#5, 2026-10-06):
+    an offer is read AT CALL TIME, never frozen at import —
+    the loader re-reads SCRIPTDOM_DLL on every lookup (find
+    #5: a module-level constant froze an empty pointer the
+    moment anything imported the engine). A pointer at a path
+    that no longer exists is CLEARED, never trusted (find #4:
+    as_file() can hand out a self-deleting temp copy); the
+    packaged DLL is staged to a STABLE dir by our own hand.
 
 D7. THE CLI SURFACE: ai-describe <sql> <out> [--dict] ·
     --reports <tmdl> <sql> <out> [--dict] [--business] ·
@@ -78,6 +86,16 @@ D8. THE PREFLIGHT + THE REFUSAL (2026-10-06, her ask after
     No paid call ever fires into a broken environment —
     mechanically enforced. The check set is closed; a new
     trip-wire earns a row + its lock, dated.
+    AMENDMENTS same day, from the rehearsal:
+    - THE SEAT CHECK CONSTRUCTS (the httpx2 find): never
+      guess transport library names — import openai and
+      construct the client with a dummy key (zero network);
+      a missing dependency fails with its REAL message.
+      (openai 3.x moved from httpx to httpx2; the check that
+      hardcoded "httpx" failed a healthy environment.)
+    - ORDER (find #5): the preflight stages the DLL pointer
+      BEFORE any engine import — checks must never poison
+      the state they check.
 
 D9. THE ONE-WHEEL LAW (2026-10-05, learned at the rehearsal):
     exactly ONE sqldesc wheel in a Fabric environment, ever —
@@ -89,6 +107,9 @@ D9. THE ONE-WHEEL LAW (2026-10-05, learned at the rehearsal):
 D10. THE VERSION LADDER: any byte change to the artifact
     bumps the version — 0.5.0 LLM phases, 0.5.1 env-first
     key, 0.5.2 names offer, 0.5.3 corpus offer, 0.5.4
-    preflight, 0.5.5 the refusal. The packaging lock pins the
-    name to the builder's VERSION so a changed artifact can
-    never ship under an old number.
+    preflight, 0.5.5 the refusal, 0.5.6 the construct check
+    (httpx2), 0.5.7 stable DLL staging + dead pointers
+    cleared, 0.5.8 call-time env reads + preflight stages
+    before imports. The packaging lock pins the name to the
+    builder's VERSION so a changed artifact can never ship
+    under an old number.
