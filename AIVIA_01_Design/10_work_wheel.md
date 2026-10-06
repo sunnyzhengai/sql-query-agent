@@ -46,6 +46,11 @@ D4. THE KEY LAW (2026-10-05, amended at the rehearsal): the
     workspace secret), the repo's .env reader second. Missing
     key = the ruled HONEST DEGRADE: technical voice, no terms,
     said out loud — never a crash, never a silent downgrade.
+    THE SEAT SPEAKS UNCOMPRESSED (find #6, 2026-10-06): the
+    client requests Accept-Encoding identity — Fabric cluster
+    images carry stale decompressors that die on compressed
+    responses (the TypeError that floored 151 nodes); skipping
+    the decoder entirely works on ANY cluster, work's included.
 
 D5. THE BRAND SCRUB (2026-10-05, "replace aivia with ai
     everywhere in the wheel"): staged COPIES are scrubbed
@@ -110,6 +115,7 @@ D10. THE VERSION LADDER: any byte change to the artifact
     preflight, 0.5.5 the refusal, 0.5.6 the construct check
     (httpx2), 0.5.7 stable DLL staging + dead pointers
     cleared, 0.5.8 call-time env reads + preflight stages
-    before imports. The packaging lock pins the name to the
+    before imports, 0.5.9 the seat speaks uncompressed
+    (find #6). The packaging lock pins the name to the
     builder's VERSION so a changed artifact can never ship
     under an old number.
