@@ -1,4 +1,4 @@
-# 10_work_wheel_production_steps — the WORK Fabric runbook
+# work_wheel_runbook — deploying the engine on a customer Fabric tenant
 
 Status: FINAL 2026-10-06 — the rehearsal CLOSED same day (Step 1
 of the TEMP checklist, blessed: 1 on Fabric); every cell below
@@ -15,19 +15,27 @@ blessed-only (no unblessed name reaches Collibra).
 
 ## Prereqs (pack before the first session — checklist Step 2)
 
-- [ ] the NEWEST `ai01_sqldesc-*.whl` from AIVIA_01_Code/dist/ (the
+- [ ] the NEWEST `ai01_sqldesc-*.whl` from wheel/ in this folder (the
       version ladder law — never two versions installed)
-- [ ] The FOUR dictionary extraction SQLs (not the home data
-      files! the full-dictionary ruling, 2026-10-06): carry the
-      02 extraction queries, run them UNSCOPED at work against
-      their Clarity dictionary tables (metadata — inside the
-      approval), export as the four json files: column, value,
-      table, join. Raw extraction = no embeddings = naturally
-      slim; full Clarity lands in the low hundreds of MB.
-      NEVER: the home data files (estate-scoped + embedding
-      bloat), the 1.2 GB embeddings file.
-- [ ] Her OpenAI key, entered as a workspace/notebook SECRET —
-      never pasted into a committed cell
+- [ ] The dictionary (the full-dictionary ruling, 2026-10-06):
+      run the four SHAPE-MATCHED queries in
+      dictionary_extraction/ against the tenant's Clarity
+      dictionary tables (metadata only), unscoped:
+      1. dict_extract_table.sql   -> dict_extract_table.csv
+      2. dict_extract_column.sql  -> dict_extract_column.csv
+         (primary keys + ini/item already folded in)
+      3. dict_extract_join.sql    -> dict_extract_join.csv
+      4. dict_extract_value.sql   -> dict_extract_value.csv,
+         then APPEND the result of the query ASSEMBLED by
+         dict_extract_value_generator.sql (the ZC universe —
+         eyeball the generated SQL before running it)
+      Then: `python tools/csv_to_json.py <csv_dir> <json_dir>`
+      (zero logic — the SQL already speaks the engine's shape)
+      and upload the four json files. Raw extraction carries
+      no embeddings — full Clarity lands in the low hundreds
+      of MB, fine for Fabric Files.
+- [ ] The runner's LLM API key, entered as a workspace/notebook
+      SECRET — never pasted into a committed cell
 - [ ] The DevOps path of the `*.SemanticModel` folders (TMDL)
 - [ ] Which SQL files go in (and that their names end `.sql` —
       the rehearsal's bare-name lesson: portal uploads can
@@ -82,7 +90,7 @@ names asset is absent (no 03 folder at work) — that is the
 ruled honest fallback, not a failure; the blessing registry
 starts empty — blessings are made here and STAY here.
 
-Cell 3 — THE RUN (her hand; quiet minutes = paid calls
+Cell 3 — THE RUN (the runner's hand; quiet minutes = paid calls
 working; deliver re-runs the preflight itself and refuses on
 any failure except a missing key):
 
@@ -97,17 +105,17 @@ Cell 4 — the eye:
     print(open("/lakehouse/default/Files/out/"
                "08_report_descriptions.txt").read()[:4000])
 
-## Step D — gap-check and bless (her hand)
+## Step D — gap-check and bless (the data owner's hand)
 
 1. Read the official txt; check cards + technical definitions
-   against the SQL she knows.
+   against the SQL the reviewer knows.
 2. Bless the keeper names:
 
     import business_terms as bt
     bt.bless("/lakehouse/default/Files/out",
              "/lakehouse/default/Files/out/07",
              "<node_id>", "<report name>",
-             "RULED <date> (Sunny): <her words>")
+             "RULED <date> (<the blesser>): <the ruling>")
 
 3. The artifact for Collibra: `Files/out/ai_delivery.json` —
    her publish notebook reads it, filters blessed itself,

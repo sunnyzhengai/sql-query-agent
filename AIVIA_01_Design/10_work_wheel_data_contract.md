@@ -63,6 +63,20 @@ What is the output of this data contract?
   only, never printed) · >=1 *.sql · >=1 *.SemanticModel ·
   the three dictionary files · out dir writable.
 
+- THE DELIVERY BUCKET (ruled 2026-10-06, her ask: one
+  catch-all for everything a new customer needs):
+  AIVIA_01_Delivery/ — README_prereqs.md ·
+  work_wheel_runbook.md (generalized; moved from the
+  production folder) · dictionary_extraction/ (4 shape-matched
+  UNSCOPED queries + the ZC value generator; SELECT aliases
+  ARE the engine's json keys — test-locked) · tools/
+  csv_to_json.py (zero-logic converter; SOURCE in
+  AIVIA_01_Code, packed copy byte-identical — test-locked) ·
+  wheel/ (exactly ONE wheel, packed). The bucket obeys the
+  wheel's hygiene laws (no brand string, no census canary, no
+  keys — test-locked, test_10_delivery_folder.py) and the
+  wall: one direction, nothing customer-made returns.
+
 Definitions:
 - THE REFUSAL (D8): deliver() runs the preflight first; any
   failure except the missing key raises with the full board —
