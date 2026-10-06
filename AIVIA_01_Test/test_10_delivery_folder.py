@@ -23,9 +23,29 @@ CANARY = ("CCMC EMERGENCY", "CCMC IR IMAGING", "CCMC CATH LAB",
           "CCMC MAIN OR", "CCMC SPA OR", "CCMC PHP PSYCHIATRY",
           "CCMC CARDIOVASCULAR OR", "DSC OR")
 
+# the intake sheet's field labels — every value a deployment
+# needs, whoever owns it; dropping one from the sheet is a
+# refused build (her ruling 2026-10-06: "so we don't miss any
+# item, whether it's customer's responsibility or not")
+INTAKE_FIELDS = (
+    "workspace id", "lakehouse id", "environment item name",
+    "provider + model", "key stored as",
+    "WRITTEN approval for metadata-only",
+    "SQL input folder", "TMDL source",
+    "Clarity database name", "who blesses term names",
+    "instance base URL", "service account / API token",
+    "Business Term DOMAIN id", "Business Term ASSET TYPE id",
+    "description ATTRIBUTE TYPE id",
+    "technical-definition ATTRIBUTE TYPE id",
+    "Power BI report ASSET TYPE id", "SANDBOX/test domain id",
+    "RELATION TYPE id", "capacity/run approval",
+    "the wall acknowledged", "sandbox-first acknowledged",
+)
+
 REQUIRED = (
     "README_prereqs.md",
     "work_wheel_runbook.md",
+    "tenant_intake.md",
     "dictionary_extraction/dict_extract_table.sql",
     "dictionary_extraction/dict_extract_column.sql",
     "dictionary_extraction/dict_extract_join.sql",
@@ -60,6 +80,12 @@ SHAPES = {
 def test_delivery_folder_structure():
     for rel in REQUIRED:
         assert (DELIVERY / rel).exists(), rel
+
+
+def test_intake_sheet_carries_every_field():
+    text = (DELIVERY / "tenant_intake.md").read_text()
+    for field in INTAKE_FIELDS:
+        assert field in text, field
 
 
 def test_delivery_folder_is_clean():

@@ -11,6 +11,7 @@ lands back in it.
 | item | what it is |
 |---|---|
 | `work_wheel_runbook.md` | the step-by-step deployment runbook |
+| `tenant_intake.md` | THE INTAKE SHEET — every value to gather, fillable; a blank = not ready to deploy |
 | `dictionary_extraction/` | 4 shape-matched Clarity dictionary queries + the ZC value generator — run unscoped at the tenant |
 | `tools/csv_to_json.py` | the zero-logic converter (copied in at pack time from the engine codebase) |
 | `wheel/ai01_sqldesc-<newest>.whl` | the engine (copied in at pack time) |
@@ -25,6 +26,10 @@ the hygiene lock sweeps this folder for brand strings, estate
 values, and keys.)
 
 ## Prereqs at the tenant (collect BEFORE the first session)
+
+FILL `tenant_intake.md` AS YOU GO — it is the one sheet of
+every id, path, secret name, and sign-off; the checklist below
+is the summary, the sheet is the record.
 
 - [ ] A Fabric workspace with: a lakehouse, an Environment
       item, notebook rights

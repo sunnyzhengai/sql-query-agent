@@ -158,7 +158,9 @@ every publish).
       file, `02_sql_extraction.json`.
 - [ ] 2.3 ACTION: her OpenAI key ready to enter as a notebook/
       workspace secret at work. NEVER pasted in a committed cell.
-- [ ] 2.4 ARTIFACT: the Collibra id list written down — BT domain
+- [ ] 2.4 ARTIFACT: the Collibra ids FILLED INTO
+      AIVIA_01_Delivery/tenant_intake.md section 4 (the intake
+      sheet is the one record; test-locked field list) — BT domain
       id · BT asset type id · description attribute id ·
       technical-definition attribute id (may need creating) ·
       PBI report asset type id · service-account token.
