@@ -20,7 +20,7 @@ from pathlib import Path
 CODE = Path(__file__).resolve().parent
 REPO = CODE.parent
 DLL = "Microsoft.SqlServer.TransactSql.ScriptDom.dll"
-VERSION = "0.5.6"  # the rehearsal-night ladder: 0.5.1 env-first
+VERSION = "0.5.7"  # the rehearsal-night ladder: 0.5.1 env-first
 # key, 0.5.2 names-asset offer, 0.5.3 corpus offer (AI_SQL_DIR)
 # — the parents[1] sweep says that was the last repo-relative
 # default (2026-10-05)

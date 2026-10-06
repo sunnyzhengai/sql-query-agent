@@ -6,6 +6,7 @@ data; the locks read the built artifact's own bytes.
 """
 
 import json
+import os
 import sys
 import zipfile
 from pathlib import Path
@@ -254,6 +255,18 @@ def test_names_asset_absence_is_honest_and_offerable(tmp_path,
     monkeypatch.setenv("AI_SQL_DIR", str(offered))
     assert str(bd._dir01()) == str(offered)
     assert bd._dir01(tmp_path / "y") == tmp_path / "y"
+
+
+def test_dead_dll_pointer_is_cleared_never_trusted(monkeypatch):
+    """The vanishing-DLL find (2026-10-06): an env pointer at a
+    path that no longer exists must be CLEARED, not trusted —
+    the loader then takes a live route instead of dying on a
+    ghost."""
+    import sqldesc_cli
+    monkeypatch.setenv("SCRIPTDOM_DLL", "/nonexistent/ghost.dll")
+    sqldesc_cli._point_at_packaged_dll()
+    assert os.environ.get("SCRIPTDOM_DLL") != \
+        "/nonexistent/ghost.dll"
 
 
 def test_cli_preflight_names_every_missing_prereq(tmp_path,

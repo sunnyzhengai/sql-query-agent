@@ -31,15 +31,25 @@ _EMPTY_02 = ("02_emr_data_dictionary_extraction_column.json",
 
 
 def _point_at_packaged_dll():
-    if os.environ.get("SCRIPTDOM_DLL"):
-        return
+    """AMENDED 2026-10-06 (the vanishing-DLL find at the
+    rehearsal): as_file() can hand out a TEMP copy that dies
+    with its context — the env var then points at nothing.
+    Now: revalidate an existing pointer (a dead path is
+    cleared, never trusted), and stage the packaged bytes to a
+    STABLE dir ourselves."""
+    dll_name = "Microsoft.SqlServer.TransactSql.ScriptDom.dll"
+    current = os.environ.get("SCRIPTDOM_DLL")
+    if current:
+        if Path(current).exists():
+            return
+        del os.environ["SCRIPTDOM_DLL"]  # dead pointer: clear
     try:
         from importlib.resources import files
-        dll = files("ai_sqldesc_assets") / \
-            "Microsoft.SqlServer.TransactSql.ScriptDom.dll"
-        with __import__("importlib.resources", fromlist=["as_file"]
-                        ).as_file(dll) as p:
-            os.environ["SCRIPTDOM_DLL"] = str(p)
+        data = (files("ai_sqldesc_assets") / dll_name).read_bytes()
+        stable = Path(tempfile.mkdtemp(prefix="sqldesc_dll_"))
+        target = stable / dll_name
+        target.write_bytes(data)
+        os.environ["SCRIPTDOM_DLL"] = str(target)
     except (ModuleNotFoundError, FileNotFoundError):
         pass  # repo run: the loader's libs/ route stands
 
