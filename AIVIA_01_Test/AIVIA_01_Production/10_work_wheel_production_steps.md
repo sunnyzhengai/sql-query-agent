@@ -1,8 +1,8 @@
 # 10_work_wheel_production_steps — the WORK Fabric runbook
 
-Status: DRAFT 2026-10-06, written from the personal-Fabric
-rehearsal (Step 1 of the TEMP checklist); FINALIZED when the
-rehearsal closes. The permanent home for the work-side
+Status: FINAL 2026-10-06 — the rehearsal CLOSED same day (Step 1
+of the TEMP checklist, blessed: 1 on Fabric); every cell below
+is rehearsal-proven. The permanent home for the work-side
 instructions — the TEMP checklist points here and dies at the
 end of the road; this doc stays.
 

@@ -141,11 +141,11 @@ every publish).
       token (pat-id-recorded landed in Exclusions); OR groups
       voice as ONE bullet via their 06 condition sentence
       (the canceled-logic flattening).
-- [ ] 1.5 One blessing on Fabric.
-      ACTION: bless one term from the notebook (bt.bless with the
-      ai_out paths).
-      ARTIFACTS: the term's row flips blessed in the Fabric
-      ai_delivery.json · the registry on Fabric gains the entry.
+- [x] 1.5 DONE 2026-10-06: one term blessed on Fabric by her
+      hand; ai_delivery.json counts.09 shows blessed: 1; the
+      Fabric registry carries the ruling.
+      STEP 1 CLOSED — build, gate, repair, deliver, bless, all
+      proven away from the laptop, on the work-bag wheel.
 
 ## STEP 2 — Pack the work bag (before the first work session)
 
