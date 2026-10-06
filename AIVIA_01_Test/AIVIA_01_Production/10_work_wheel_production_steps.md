@@ -106,6 +106,16 @@ Cell 4 — the eye:
    her publish notebook reads it, filters blessed itself,
    maps names to Collibra ids at push time.
 
+## If a run is canceled or the seat was broken mid-run
+
+build07 checkpoints per node (07_live_checkpoint.json in
+<out>/07/). A canceled or broken run leaves its failed nodes
+checkpointed as floors, and a later resume SKIPS them (rehearsal
+find #7: eight file cards stayed floored after the seat was
+fixed). After fixing any seat problem: delete
+<out>/07/07_live_checkpoint.json if present, keep the blessing
+registry, and re-run the chain clean in the SAME session.
+
 ## What never happens here
 
 No work file, output, or blessing comes back to the repo (the

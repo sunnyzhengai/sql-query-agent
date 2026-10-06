@@ -130,10 +130,17 @@ every publish).
       print(open("/lakehouse/default/Files/Data/ai_out/"
                  "08_report_descriptions.txt").read()[:4000])
       ```
-- [ ] 1.4 Her eye on Fabric.
-      ACTION: read the official txt + ai_delivery.json in the
-      Files pane; check: reports tied (not all reportless), cards
-      in clinician voice, term names worth blessing.
+- [x] 1.4 DONE 2026-10-06 ("it worked"): the census report entry
+      reads voice: business with the five-line card; terms named
+      and gate_passed; 1 report tied, 7 reportless (correct).
+      The road there = rehearsal finds #1-#7, each now a law +
+      lock (see 10_work_wheel.md D4/D6/D8/D9 + the runbook).
+      OPEN items for the amendments docket (found by her eye,
+      2026-10-06): the " not "-on-Keeps gate strictness ruling;
+      the D4 split follows the voiced sentence, not the NOT
+      token (pat-id-recorded landed in Exclusions); OR groups
+      voice as ONE bullet via their 06 condition sentence
+      (the canceled-logic flattening).
 - [ ] 1.5 One blessing on Fabric.
       ACTION: bless one term from the notebook (bt.bless with the
       ai_out paths).
