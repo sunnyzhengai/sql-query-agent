@@ -17,9 +17,15 @@ blessed-only (no unblessed name reaches Collibra).
 
 - [ ] the NEWEST `ai01_sqldesc-*.whl` from AIVIA_01_Code/dist/ (the
       version ladder law — never two versions installed)
-- [ ] The three dictionary files ONLY:
-      `02_emr_data_dictionary_extraction_column.json`,
-      `..._extraction_value.json`, `..._extraction_table.json`
+- [ ] The FOUR dictionary extraction SQLs (not the home data
+      files! the full-dictionary ruling, 2026-10-06): carry the
+      02 extraction queries, run them UNSCOPED at work against
+      their Clarity dictionary tables (metadata — inside the
+      approval), export as the four json files: column, value,
+      table, join. Raw extraction = no embeddings = naturally
+      slim; full Clarity lands in the low hundreds of MB.
+      NEVER: the home data files (estate-scoped + embedding
+      bloat), the 1.2 GB embeddings file.
 - [ ] Her OpenAI key, entered as a workspace/notebook SECRET —
       never pasted into a committed cell
 - [ ] The DevOps path of the `*.SemanticModel` folders (TMDL)
@@ -43,7 +49,8 @@ blessed-only (no unblessed name reaches Collibra).
 ## Step B — the lakehouse folders (once)
 
     Files/01_sql_input/      <- the work SQL files (*.sql)
-    Files/02_dictionary/     <- the three extraction files
+    Files/02_dictionary/     <- the FOUR extraction files
+                                (column, value, table, join)
     Files/tmdl/              <- the *.SemanticModel folders
     Files/out/               <- the run writes here
 

@@ -16,7 +16,18 @@ What is the input of this data contract?
 - The run (any tenant) — ALL RUNTIME-OFFERED (D6):
   - a folder of *.sql files (names MUST end .sql)
   - a folder of *.SemanticModel folders (TMDL)
-  - --dict: the three 02 extraction files (column/value/table)
+  - --dict: the 02 extraction files — FOUR, corrected
+    2026-10-06 at the bag design (the engine reads column +
+    value + table + join; join drives the value-meaning
+    bridge). THE FULL-DICTIONARY RULING (her ask, same day):
+    at work the dictionary is the FULL Clarity extraction,
+    unscoped — run the 02 extraction SQL against their
+    dictionary tables, raw output only. SLIM BY BIRTH: raw
+    extraction carries NO embeddings (embeddings are the 02
+    build's chat-side addition and never travel to the wheel);
+    full-Clarity slim JSON is low hundreds of MB — fine for
+    Fabric Files; slow load = declared debt, parquet later if
+    it bites. Per-corpus scoping is RETIRED for work.
   - the names asset beside the dictionary (03_chat_bot/) —
     optional; absence honest
   - OPENAI_API_KEY in the environment — optional; absence =
