@@ -254,7 +254,8 @@ def _propose(proposer, node_id, docket):
             prop = proposer({"node_id": node_id, "docket": docket,
                              "findings": list(findings)})
         except Exception as exc:  # noqa: BLE001
-            findings = [f"call failed: {type(exc).__name__}"]
+            findings = [f"call failed: {type(exc).__name__}: "
+                        f"{str(exc)[:200]}"]
             continue
         findings = bd.gate(prop["business_description"], docket,
                            "term_card")

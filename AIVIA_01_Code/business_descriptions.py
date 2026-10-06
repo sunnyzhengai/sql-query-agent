@@ -621,7 +621,8 @@ def _propose_loop(grain, docket_text, docket, registry,
         except Exception as exc:  # noqa: BLE001 — ANY call
             # failure is a failed round, never a dead build
             # (the 2026-10-03 APITimeoutError crash find)
-            findings = [f"call failed: {type(exc).__name__}"]
+            findings = [f"call failed: {type(exc).__name__}: "
+                        f"{str(exc)[:200]}"]
             continue
         findings = gate(text, docket, grain, registry)
         if not findings:
@@ -867,7 +868,8 @@ def voice_facts(items, store_path, registry, voicer=None):
                 voice = voicer(fact)
             except Exception as exc:  # noqa: BLE001 — a failed
                 voice = None          # voice is a recorded miss,
-                findings = [f"call failed: {type(exc).__name__}"]
+                findings = [f"call failed: {type(exc).__name__}: "
+                        f"{str(exc)[:200]}"]
             else:
                 findings = _voice_gate(voice, fact)
             store[key] = {"machine_fact": fact,

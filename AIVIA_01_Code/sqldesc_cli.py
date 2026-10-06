@@ -160,6 +160,98 @@ def report_descriptions(tmdl_dir, sql_dir, out_dir,
     return rows
 
 
+def preflight(tmdl_dir, sql_dir, out_dir, dict_dir=None):
+    """THE PREFLIGHT (her ask, 2026-10-06, after the rehearsal's
+    httpx find): check EVERY prereq before any paid call —
+    report-all, each failure names its fix, zero network, zero
+    cost. Returns the failure list (empty == go); prints the
+    full board either way."""
+    checks = []  # (ok, line)
+
+    def _check(ok, what, fix):
+        checks.append((ok, f"{what}" + ("" if ok else
+                                        f" -> FIX: {fix}")))
+
+    # 1. the engine modules (the dueling-wheels trap)
+    for m in ("semantic_graph", "technical_descriptions",
+              "pbi_lineage", "business_descriptions",
+              "business_terms", "ai_delivery"):
+        try:
+            __import__(m)
+            _check(True, f"module {m}", "")
+        except Exception as exc:  # noqa: BLE001
+            _check(False, f"module {m}: {type(exc).__name__}",
+                   "one sqldesc wheel only; publish; FRESH session")
+    # 2. the parser door (the loader's two-route law: env var
+    # from the packaged assets, or the repo's libs/ fallback)
+    _point_at_packaged_dll()
+    repo_dll = (Path(__file__).resolve().parents[1] / "libs" /
+                "Microsoft.SqlServer.TransactSql.ScriptDom.dll")
+    _check(bool(os.environ.get("SCRIPTDOM_DLL"))
+           or repo_dll.exists(),
+           "ScriptDom DLL reachable",
+           "the wheel's assets package should set SCRIPTDOM_DLL")
+    # 3. the seat's dependencies (the httpx find)
+    for m in ("httpx", "openai"):
+        try:
+            __import__(m)
+            _check(True, f"seat dependency {m}", "")
+        except Exception as exc:  # noqa: BLE001
+            _check(False, f"seat dependency {m}: "
+                   f"{type(exc).__name__}",
+                   "add openai (pinned) as a PUBLIC library in "
+                   "the environment so its tree resolves; publish")
+    # 4. the key (presence only — never printed)
+    _check(bool(os.environ.get("OPENAI_API_KEY")),
+           "OPENAI_API_KEY offered",
+           "set it from the vault secret BEFORE the run, else "
+           "honest degrade: technical voice, no terms")
+    # 5. the folders
+    sql_dir, tmdl_dir = Path(sql_dir), Path(tmdl_dir)
+    n_sql = len(list(sql_dir.glob("*.sql"))) \
+        if sql_dir.exists() else 0
+    _check(n_sql > 0, f"sql input: {n_sql} *.sql file(s)",
+           "upload .sql files WITH the extension (bare names "
+           "are invisible to the sweep)")
+    n_mod = len(list(tmdl_dir.glob("*.SemanticModel"))) \
+        if tmdl_dir.exists() else 0
+    _check(n_mod > 0,
+           f"tmdl: {n_mod} *.SemanticModel folder(s)",
+           "point at the folder CONTAINING the .SemanticModel "
+           "folders (else every term lands report-less)")
+    if dict_dir:
+        d02 = Path(dict_dir)
+        missing = [f for f in
+                   ("02_emr_data_dictionary_extraction_column"
+                    ".json",
+                    "02_emr_data_dictionary_extraction_value"
+                    ".json",
+                    "02_emr_data_dictionary_extraction_table"
+                    ".json")
+                   if not (d02 / f).exists()]
+        _check(not missing,
+               "dictionary: the three files present" if not
+               missing else f"dictionary missing: {missing}",
+               "upload the three extraction files (words speak)")
+    try:
+        out = Path(out_dir)
+        out.mkdir(parents=True, exist_ok=True)
+        probe = out / ".preflight_probe"
+        probe.write_text("ok")
+        probe.unlink()
+        _check(True, "out dir writable", "")
+    except Exception as exc:  # noqa: BLE001
+        _check(False, f"out dir: {type(exc).__name__}",
+               "check the lakehouse path/permissions")
+
+    for ok, line in checks:
+        print(("PASS  " if ok else "FAIL  ") + line)
+    failures = [line for ok, line in checks if not ok]
+    print(f"preflight: {len(checks) - len(failures)} pass / "
+          f"{len(failures)} fail")
+    return failures
+
+
 def deliver(tmdl_dir, sql_dir, out_dir, dict_dir=None):
     """THE 0.5.0 COLLIBRA CHAIN (ruled 2026-10-05, G-1 + G-2):
     08 links -> 05 graph -> 06 technical -> 07 cards -> 09 terms
@@ -238,6 +330,13 @@ def main(argv=None):
         i = argv.index("--business")
         business_dir = argv[i + 1]
         argv = argv[:i] + argv[i + 2:]
+    if argv and argv[0] == "--preflight":
+        if len(argv) != 4:
+            print("usage: ai-describe --preflight <tmdl_dir> "
+                  "<sql_dir> <out_dir> [--dict <dir02>]")
+            return 2
+        return 1 if preflight(argv[1], argv[2], argv[3],
+                              dict_dir=dict_dir) else 0
     if argv and argv[0] == "--deliver":
         if len(argv) != 4:
             print("usage: ai-describe --deliver <tmdl_dir> "

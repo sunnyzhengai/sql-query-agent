@@ -256,6 +256,39 @@ def test_names_asset_absence_is_honest_and_offerable(tmp_path,
     assert bd._dir01(tmp_path / "y") == tmp_path / "y"
 
 
+def test_cli_preflight_names_every_missing_prereq(tmp_path,
+                                                  monkeypatch):
+    """Her ask at the rehearsal (2026-10-06, after the httpx
+    find): one check for ALL prereqs before any paid call.
+    Report-all (never stop at the first), each failure NAMES
+    its fix; zero network, zero cost."""
+    import sqldesc_cli
+    monkeypatch.delenv("OPENAI_API_KEY", raising=False)
+    bad_sql = tmp_path / "sql"
+    bad_sql.mkdir()
+    (bad_sql / "BARE_NAME_NO_EXT").write_text("SELECT 1")
+    empty_tmdl = tmp_path / "tmdl"
+    empty_tmdl.mkdir()
+    fails = sqldesc_cli.preflight(
+        empty_tmdl, bad_sql, tmp_path / "out")
+    text = " | ".join(fails)
+    assert any("OPENAI_API_KEY" in f for f in fails)
+    assert "*.sql" in text          # the bare-name trap, named
+    assert "SemanticModel" in text  # the empty-tmdl trap, named
+    # the good world: everything present -> only the key fails
+    (bad_sql / "GOOD.sql").write_text("SELECT 1")
+    model = empty_tmdl / "Fix.SemanticModel" / "definition"
+    model.mkdir(parents=True)
+    fails2 = sqldesc_cli.preflight(
+        empty_tmdl, bad_sql, tmp_path / "out")
+    assert all("OPENAI_API_KEY" in f or "degrade" in f
+               for f in fails2)
+    monkeypatch.setenv("OPENAI_API_KEY", "sk-fake-for-preflight")
+    fails3 = sqldesc_cli.preflight(
+        empty_tmdl, bad_sql, tmp_path / "out")
+    assert fails3 == []
+
+
 def test_cli_deliver_no_key_degrades_honestly(tmp_path,
                                               monkeypatch):
     """The 0.5.0 --deliver chain without a key: technical voice

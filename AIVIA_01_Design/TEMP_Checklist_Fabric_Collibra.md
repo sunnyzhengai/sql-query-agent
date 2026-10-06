@@ -58,12 +58,12 @@ every publish).
       deleted (0.4.0 + 0.5.0), 0.5.1 uploaded, published.
       ARTIFACT: AIVIA_01_ENV Custom libraries = ai01_sqldesc-0.5.1
       + aivia01-0.3.0 (chat, stays), publish Success.
-- [ ] 1.3 The notebook run.
-      DONE: key half — vault secret `aivia01-kv/aivia01-openai-key`
-      created; Cell 1 printed `key loaded: True` (2026-10-05).
-      ACTION remaining: STOP the session, start fresh (old
-      sessions never see a new publish), then the cells below,
-      in order, her hand.
+- [x] 1.3 DONE 2026-10-06 ("it worked! ai_delivery.json is there") —
+      on wheel 0.5.3, after the rehearsal-night ladder: 0.5.1
+      env-first key, 0.5.2 names offer, 0.5.3 corpus offer; the
+      repo-relative class closed by the parents[1] sweep.
+      ARTIFACTS: Files/Data/ai_out/ai_delivery.json + the official
+      txt, built on Fabric by her hand. Cells kept below for reruns.
       ARTIFACTS: `Files/Data/ai_out/ai_delivery.json` ·
       `Files/Data/ai_out/08_report_descriptions.txt` · the run's
       printed summary line ("ai_delivery.json: N report(s)...").
