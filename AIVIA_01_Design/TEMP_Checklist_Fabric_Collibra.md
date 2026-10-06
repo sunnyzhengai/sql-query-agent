@@ -71,7 +71,7 @@ every publish).
       THE CELLS (notebook 07_description, environment
       AIVIA_01_ENV, lakehouse AIVIA_01_LH attached as default):
 
-      Cell 0 — THE PREFLIGHT (0.5.4, her ask after the httpx
+      Cell 0 — THE PREFLIGHT (0.5.5, her ask after the httpx
       find): every prereq checked before any paid call; run
       AFTER Cell 1 sets the key, or expect the one key FAIL.
       Must end `... / 0 fail`:
@@ -142,7 +142,8 @@ every publish).
 
 ## STEP 2 — Pack the work bag (before the first work session)
 
-- [ ] 2.1 ARTIFACT in the bag: `ai01_sqldesc-0.5.1-py3-none-any.whl`
+- [ ] 2.1 ARTIFACT in the bag: `ai01_sqldesc-0.5.5-py3-none-any.whl`
+      (0.5.5 = preflight + THE REFUSAL; deliver() self-checks at work too)
       (DLL rides inside).
 - [ ] 2.2 ARTIFACTS in the bag: the 3 dictionary files
       (`...extraction_column.json`, `...extraction_value.json`,

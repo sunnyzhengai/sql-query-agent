@@ -1,3 +1,9 @@
+# Brief_Packaging — SUPERSEDED 2026-10-06
+
+**The standing law moved to `10_work_wheel.md` + `10_work_wheel_data_contract.md`** (her consolidation ruling: one integrated design doc, decisions never scattered across briefs). This brief stays as the historical record of the 2026-10-04/05 rulings; new amendments land in the 10 pair ONLY.
+
+---
+
 # Brief_Packaging — the allowlist manifest and the deterministic work wheel
 
 Status: DRAFT for Sunny's stamp — scope RULED 2026-10-04 (Sunny,

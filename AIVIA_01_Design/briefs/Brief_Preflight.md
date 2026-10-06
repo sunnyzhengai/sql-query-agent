@@ -1,3 +1,9 @@
+# Brief_Preflight — SUPERSEDED 2026-10-06 (same day as birth)
+
+**The standing law moved to `10_work_wheel.md` D8 + the 10 contract** (her consolidation ruling). Historical record below; new amendments land in the 10 pair ONLY.
+
+---
+
 # Brief_Preflight — the wheel's run-time prereq check
 
 Status: RETROACTIVE PAPERWORK, her ruling 2026-10-06 ("i
