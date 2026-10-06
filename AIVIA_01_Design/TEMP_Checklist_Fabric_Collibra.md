@@ -71,10 +71,18 @@ every publish).
       THE CELLS (notebook 07_description, environment
       AIVIA_01_ENV, lakehouse AIVIA_01_LH attached as default):
 
-      Cell 0 — prove the wheel (must print `wheel ready`):
+      Cell 0 — THE PREFLIGHT (0.5.4, her ask after the httpx
+      find): every prereq checked before any paid call; run
+      AFTER Cell 1 sets the key, or expect the one key FAIL.
+      Must end `... / 0 fail`:
       ```python
-      import sqldesc_cli, ai_delivery, business_terms
-      print("wheel ready")
+      import sqldesc_cli
+      sqldesc_cli.preflight(
+          "/lakehouse/default/Files/Data/08_pbi_lineage/tmdl",
+          "/lakehouse/default/Files/Data/01_subject_sql_files",
+          "/lakehouse/default/Files/Data/ai_out",
+          dict_dir="/lakehouse/default/Files/Data/"
+                   "02_emr_data_dictionary")
       ```
 
       Cell 1 — the key (must print `key loaded: True`):

@@ -289,6 +289,26 @@ def test_cli_preflight_names_every_missing_prereq(tmp_path,
     assert fails3 == []
 
 
+def test_deliver_refuses_on_preflight_failure(tmp_path,
+                                              monkeypatch):
+    """THE REFUSAL (Brief_Preflight, ruled 2026-10-06): deliver
+    runs the preflight first and refuses to start on any
+    failure except the missing key — no paid call ever fires
+    into a broken environment, mechanically."""
+    import sqldesc_cli
+    monkeypatch.delenv("OPENAI_API_KEY", raising=False)
+    empty_sql = tmp_path / "sql"
+    empty_sql.mkdir()                       # zero *.sql: a FAIL
+    tmdl = tmp_path / "tmdl"
+    (tmdl / "Fix.SemanticModel").mkdir(parents=True)
+    try:
+        sqldesc_cli.deliver(tmdl, empty_sql, tmp_path / "out")
+        raise AssertionError("deliver must refuse on preflight "
+                             "failures")
+    except ValueError as e:
+        assert "*.sql" in str(e)            # the board rides out
+
+
 def test_cli_deliver_no_key_degrades_honestly(tmp_path,
                                               monkeypatch):
     """The 0.5.0 --deliver chain without a key: technical voice

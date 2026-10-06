@@ -75,6 +75,13 @@ were drafted in but the chain never imports them — dropped; the
   it is AIVIA's ruled asset per the portability split — travels;
   the canary lock verifies it carries no customer rows)
 - this manifest itself, as data — the wheel can state its law
+- THE PREFLIGHT (ADDED 0.5.4, 2026-10-06, her ask after the
+  httpx find; contract + laws in Brief_Preflight.md): the
+  wheel's shipped run-time self-check — `--preflight` names
+  every missing prereq before any paid call; deliver() refuses
+  on failures (missing key excepted: the honest degrade).
+  Pytest suites still never travel — the preflight checks the
+  ENVIRONMENT; the suites prove the code at home.
 
 THE LLM PHASES JOIN THE WHEEL (RULED 2026-10-05, Sunny:
 "approve the wheel change" — the Collibra road's G-1; this

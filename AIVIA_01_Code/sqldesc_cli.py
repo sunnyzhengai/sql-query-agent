@@ -258,7 +258,16 @@ def deliver(tmdl_dir, sql_dir, out_dir, dict_dir=None):
     -> ai_delivery.json + the official txt. The LLM seat is
     RUNTIME-OFFERED: OPENAI_API_KEY in the environment (the
     notebook sets it from a secret). No key -> HONEST DEGRADE:
-    technical voice, no terms proposed, said out loud."""
+    technical voice, no terms proposed, said out loud.
+    THE REFUSAL (Brief_Preflight, 2026-10-06): the preflight
+    runs FIRST; any failure except the missing key refuses the
+    run — no paid call into a broken environment, ever."""
+    blocking = [f for f in preflight(tmdl_dir, sql_dir, out_dir,
+                                     dict_dir=dict_dir)
+                if "OPENAI_API_KEY" not in f]
+    if blocking:
+        raise ValueError("preflight refused the run:\n  "
+                         + "\n  ".join(blocking))
     _point_at_packaged_dll()
     import ai_delivery
     import pbi_lineage as pl
