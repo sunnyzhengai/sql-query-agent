@@ -223,6 +223,31 @@ def test_cli_official_txt_speaks_its_voice(tmp_path):
     assert "HER SENTENCE" in t2
 
 
+def test_names_asset_absence_is_honest_and_offerable(tmp_path,
+                                                     monkeypatch):
+    """The Fabric rehearsal crash (2026-10-05): the 03 naming
+    asset's repo-relative default dies inside a wheel. The name
+    ladder's own law: the asset is ONE RUNG, never a requirement
+    — absence returns blessed-names-only, no raise; and the
+    runner may OFFER the real location via AI_NAMES_DIR (the
+    runtime-offered precedent)."""
+    import json as _json
+
+    import business_descriptions as bd
+    empty = tmp_path / "nowhere"
+    names = bd.load_names(empty, {"names": []})
+    assert names == {}                   # absent -> honest empty
+    offered = tmp_path / "03"
+    offered.mkdir()
+    (offered / "03_chat_abstract_names.json").write_text(
+        _json.dumps([{"object_kind": "table",
+                      "object_name": "FIX_TBL",
+                      "synonyms": ["fix things"]}]))
+    monkeypatch.setenv("AI_NAMES_DIR", str(offered))
+    assert str(bd._dir03()) == str(offered)   # the offer wins
+    assert bd._dir03(tmp_path / "x") == tmp_path / "x"
+
+
 def test_cli_deliver_no_key_degrades_honestly(tmp_path,
                                               monkeypatch):
     """The 0.5.0 --deliver chain without a key: technical voice

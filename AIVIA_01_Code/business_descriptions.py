@@ -747,7 +747,7 @@ def render_facts(dir05, dir06, dir02, fname, dir03=None,
     ladder (the 03 asset; Design_Proprietary_Term_Assets.md).
     -> (text, items) where items = [(fact_key, machine_fact)]."""
     dir05, dir06 = Path(dir05), Path(dir06)
-    names = load_names(dir03 or DIR03_DEFAULT,
+    names = load_names(_dir03(dir03),
                        registry or {"names": []})
     ng, nvoice, nsql = _facts_renderer(dir05, dir02, names)
     six = json.loads((dir06 / "06_description_sheet.json")
@@ -911,11 +911,29 @@ DIR03_DEFAULT = str(Path(__file__).resolve().parents[1]
                     / "AIVIA_01_Data" / "03_chat_bot")
 
 
+def _dir03(offered=None):
+    """The naming asset's home: an explicit offer first, then
+    the AI_NAMES_DIR environment offer (the runtime-offered
+    precedent — the wheel ships no asset, the runner points at
+    one), then the repo default. Added 2026-10-05 at the Fabric
+    rehearsal crash."""
+    import os
+    return offered or os.environ.get("AI_NAMES_DIR") \
+        or DIR03_DEFAULT
+
+
 def load_names(dir03, registry):
     """ONE naming asset (the 03 abstracts): sunny_synonyms[0] >
-    a registry blessed_name > synonyms[0]."""
-    rows = json.loads((Path(dir03) /
-                       "03_chat_abstract_names.json").read_text())
+    a registry blessed_name > synonyms[0]. ABSENCE IS HONEST
+    (2026-10-05): the asset is one rung of the name ladder,
+    never a requirement — no file means blessed-names-only and
+    the deterministic fallback words stand."""
+    try:
+        rows = json.loads((Path(dir03) /
+                           "03_chat_abstract_names.json")
+                          .read_text())
+    except FileNotFoundError:
+        rows = []
     blessed = {str(n.get("object_name")): n.get("blessed_name")
                for n in registry.get("names", [])
                if n.get("blessed_name")}
@@ -1076,7 +1094,7 @@ def render_field_facts(dir05, dir06, dir02, fname, expr_id,
     cache = shared if shared is not None else _FIELD_SHARED
     if key not in cache:
         facts_text, _ = render_facts(dir05, dir06, dir02, fname)
-        names = load_names(DIR03_DEFAULT, {"names": []})
+        names = load_names(_dir03(), {"names": []})
         g, voice, sql = _facts_renderer(dir05, dir02, names)
         filt = []
         on = False

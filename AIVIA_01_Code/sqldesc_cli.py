@@ -180,6 +180,14 @@ def deliver(tmdl_dir, sql_dir, out_dir, dict_dir=None):
     with tempfile.TemporaryDirectory() as tmp:
         d02 = Path(dict_dir) if dict_dir else \
             _stage_empty_dict(tmp)
+        # the naming asset, runtime-offered (2026-10-05): when a
+        # dictionary is offered and a 03_chat_bot folder sits
+        # beside it, its names speak; absent = honest fallback
+        d03 = Path(dict_dir).parent / "03_chat_bot" \
+            if dict_dir else None
+        if d03 and d03.exists() \
+                and not os.environ.get("AI_NAMES_DIR"):
+            os.environ["AI_NAMES_DIR"] = str(d03)
         _stage_kind_library(d05)
         semantic_graph.build(sql_dir, d05, d02)
         td.build06(d05, d06, d02, sql_dir)

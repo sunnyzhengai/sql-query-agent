@@ -1,107 +1,188 @@
 # TEMP — The Fabric + Collibra Road, Step by Step
 
 **Status:** TEMP working file (Sunny's ask, 2026-10-05).
-Check boxes off in order; delete the file when Step 5 closes.
+Every box names its ARTIFACT (the thing that must exist) or its
+ACTION (what was done when nothing is produced). Check boxes in
+order; delete the file when Step 5 closes.
 
-**Decided already (2026-10-05, all ruled, no open questions):**
-- Wheel 0.5.0 adds the LLM phases (07 cards + 09 terms); key never inside the wheel.
-- One delivery file: `ai_delivery.json` — each step updates its part.
-- Work LLM seat: her personal OpenAI key, work-approved, **metadata only**.
-- 02 dictionary goes to work: exactly three files.
-- Collibra path: five checks at work, then sandbox, then batch.
+**THE IDS:** `AIVIA_01_Test/AIVIA_01_Production/
+07_fabric_move_production_steps.md` — workspace / environment /
+lakehouse id table + the ready-filled sync command.
 
-**The laws that ride along every step:**
-- Metadata boundary: the LLM sees only text from SQL files + dictionaries — never query results.
-- The wall: work SQL and work outputs never come back to this repo.
-- Capacity law: Fabric runs happen by her hand, one at a time.
-- Blessed-only: no term name reaches Collibra before she blesses it.
+**Decided already (2026-10-05, all ruled):** wheel carries the LLM
+phases, key never rides · one delivery file `ai_delivery.json` ·
+work seat = her OpenAI key, metadata only · 02 upload = 3 files ·
+Collibra = five checks, sandbox first.
+
+**The laws riding every step:** metadata boundary (LLM sees SQL
+text + dictionaries, never query results) · the wall (work data
+never comes home) · capacity law (her hand per run) · blessed-only
+(no unblessed name reaches Collibra) · THE ONE-WHEEL LAW (one
+sqldesc wheel in the environment, ever; stop the session after
+every publish).
 
 ---
 
-## STEP 0 — Build at home (Claude builds, Sunny validates)
+## STEP 0 — Build at home — CLOSED 2026-10-05
 
-- [x] 0.1 DONE 2026-10-05: the delivery writer (`ai_delivery.py`) — 15 locks
-      red then green; local `AIVIA_01_Data/ai_delivery.json` built (census
-      terms replayed, zero new paid calls); the three retired 09 files deleted.
-- [x] 0.2 DONE 2026-10-05: wheel 0.5.0 built (`AIVIA_01_Code/dist/
-      ai01_sqldesc-0.5.0-py3-none-any.whl`) — LLM modules in, openai a
-      declared dependency, key read from `OPENAI_API_KEY` at run time, new
-      CLI: `ai-describe --deliver <tmdl> <sql> <out> [--dict <d02>]`
-      (no key = honest degrade: technical voice, no terms); 23 packaging +
-      09 locks green.
-- [x] 0.3 DONE 2026-10-05 (her word: "files approved for steps 0.3 0.4").
-- [x] 0.4 DONE 2026-10-05: the census term blessed, her ruling recorded
-      verbatim in the 07 registry; ai_delivery.json shows blessed: 1.
-      STEP 0 CLOSED. (Wheel renamed ai01-sqldesc same day, her ask.)
+- [x] 0.1 The delivery writer.
+      ARTIFACTS: `AIVIA_01_Code/ai_delivery.py` · local
+      `AIVIA_01_Data/ai_delivery.json` (census terms, blessed: 1) ·
+      15 locks green in `test_09_business_terms_data_contract.py`.
+- [x] 0.2 The work wheel with the LLM seat.
+      ARTIFACT: `AIVIA_01_Code/dist/ai01_sqldesc-0.5.1-py3-none-any.whl`
+      (0.5.1 = env-first key fix; 0.5.0 superseded same day) ·
+      9 packaging locks green · CLI `ai-describe --deliver`.
+- [x] 0.3 Her eye on the census card + technical definition.
+      ACTION: approved 2026-10-05 ("files approved for steps 0.3 0.4").
+- [x] 0.4 The first blessing.
+      ARTIFACTS: `terms` entry in `07_blessing_registry.json`
+      (ruling verbatim) · `ai_delivery.json` counts.09 blessed: 1.
+      Commits: 86dc10e + 6fa7f27 on dev.
 
-## STEP 1 — Rehearsal on HER personal Fabric (proves the whole chain)
+## STEP 1 — Rehearsal on HER personal Fabric
 
-- [ ] 1.1 Run the sync (existing manifest): 05 + 06 + 07 estate, the SQL files,
-      the 02 dictionary, the blessing registry.
-- [ ] 1.2 Upload the wheel to the Fabric environment — 0.5.1
-      (the env-first key fix, built at the rehearsal).
-      THE ONE-WHEEL LAW (learned here 2026-10-05): exactly ONE
-      sqldesc wheel in the environment, ever — two versions
-      under different package names silently fight over the
-      same module files and the loser's modules vanish with no
-      install error. Delete old sqldesc wheels before Publish;
-      the aivia01 chat wheel may stay (no shared modules).
-      After Publish: STOP the session — only a fresh session
-      sees the new environment.
-- [ ] 1.3 Notebook: read the key from `aivia01-kv / aivia01-azure-openai-key`
-      (or the OpenAI key), run: parse -> 06 -> 07 cards -> 09 terms ->
-      `ai_delivery.json`.
-- [ ] 1.4 Eyeball `ai_delivery.json` + the official txt on Fabric.
-- [ ] 1.5 Bless on Fabric (proves blessing works away from the laptop).
-      Mind the >1 hour token-cache limit on long runs.
+- [x] 1.1 DONE 2026-10-05. ARTIFACT: the sync census —
+      "1 uploaded (2,475 bytes), 31 skipped — 32 files total";
+      the one upload was 07_blessing_registry.json (the census
+      blessing riding up), everything else byte-identical.
+      [x] side-check: the 8 sql files present in
+          Files/Data/01_subject_sql_files (manual upload 9/27;
+          not in the manifest, the sync never touches them).
+      [x] the extension catch (2026-10-05): the 9/27 uploads WERE
+          bare (no .sql) — she re-uploaded the 8 with .sql and
+          removed the bare ones. LESSON for Step 4 at work: after
+          any portal upload of sql files, verify the full name
+          ends `.sql` — the run sweeps `*.sql` only.
+- [x] 1.2 DONE 2026-10-05 ("wheel synched"): old sqldesc wheels
+      deleted (0.4.0 + 0.5.0), 0.5.1 uploaded, published.
+      ARTIFACT: AIVIA_01_ENV Custom libraries = ai01_sqldesc-0.5.1
+      + aivia01-0.3.0 (chat, stays), publish Success.
+- [ ] 1.3 The notebook run.
+      DONE: key half — vault secret `aivia01-kv/aivia01-openai-key`
+      created; Cell 1 printed `key loaded: True` (2026-10-05).
+      ACTION remaining: STOP the session, start fresh (old
+      sessions never see a new publish), then the cells below,
+      in order, her hand.
+      ARTIFACTS: `Files/Data/ai_out/ai_delivery.json` ·
+      `Files/Data/ai_out/08_report_descriptions.txt` · the run's
+      printed summary line ("ai_delivery.json: N report(s)...").
 
-## STEP 2 — Pack the work bag (collect BEFORE the first work session)
+      THE CELLS (notebook 07_description, environment
+      AIVIA_01_ENV, lakehouse AIVIA_01_LH attached as default):
 
-- [ ] 2.1 The wheel file: `ai01_sqldesc-0.5.0-py3-none-any.whl`
-      (the ScriptDom DLL rides inside it — nothing separate to carry).
-- [ ] 2.2 The three dictionary files:
-      `02_emr_data_dictionary_extraction_column.json`,
-      `..._extraction_value.json`, `..._extraction_table.json`.
-      **Never**: the 1.2 GB embeddings file, or `02_sql_extraction.json`.
-- [ ] 2.3 Her OpenAI key — goes in as a workspace secret / notebook secret,
-      **never pasted into a committed notebook cell**.
-- [ ] 2.4 The Collibra id list (ask the Collibra admin, or look up as admin):
-      BT domain id · BT asset type id · description attribute id ·
-      technical-definition attribute id (confirm one exists — may need creating) ·
-      PBI report asset type id · a service account / API token.
-- [ ] 2.5 Locations at work: the DevOps folder of `*.SemanticModel` (TMDL),
-      and which SQL files go in the input folder.
+      Cell 0 — prove the wheel (must print `wheel ready`):
+      ```python
+      import sqldesc_cli, ai_delivery, business_terms
+      print("wheel ready")
+      ```
 
-## STEP 3 — First work session: the three connectivity tests (10 minutes)
+      Cell 1 — the key (must print `key loaded: True`):
+      ```python
+      import os
+      key = notebookutils.credentials.getSecret(
+          "https://aivia01-kv.vault.azure.net/",
+          "aivia01-openai-key")
+      os.environ["OPENAI_API_KEY"] = key
+      print("key loaded:", bool(key))   # never print the key
+      ```
 
-- [ ] 3.1 From a work Fabric notebook: one tiny call to `api.openai.com`
-      with her key — does it answer?
-- [ ] 3.2 One authentication ping to the Collibra API — reachable?
-- [ ] 3.3 Open the TMDL checkout — are the `*.SemanticModel` folders there?
-      (Any "no" = an IT conversation before anything else is built.)
+      Cell 2 — carry the blessing registry into the run:
+      ```python
+      import shutil, os
+      os.makedirs("/lakehouse/default/Files/Data/ai_out/07",
+                  exist_ok=True)
+      shutil.copy(
+          "/lakehouse/default/Files/Data/07_business_descriptions/"
+          "07_blessing_registry.json",
+          "/lakehouse/default/Files/Data/ai_out/07/"
+          "07_blessing_registry.json")
+      ```
+
+      Cell 3 — THE RUN (several quiet minutes is normal; fill
+      the real tmdl folder path — the one the phase 08 run used):
+      ```python
+      import sqldesc_cli
+      sqldesc_cli.deliver(
+          "/lakehouse/default/Files/<tmdl folder>",
+          "/lakehouse/default/Files/Data/01_subject_sql_files",
+          "/lakehouse/default/Files/Data/ai_out",
+          dict_dir="/lakehouse/default/Files/Data/"
+                   "02_emr_data_dictionary")
+      ```
+
+      Cell 4 — the first eye (feeds 1.4):
+      ```python
+      print(open("/lakehouse/default/Files/Data/ai_out/"
+                 "08_report_descriptions.txt").read()[:4000])
+      ```
+- [ ] 1.4 Her eye on Fabric.
+      ACTION: read the official txt + ai_delivery.json in the
+      Files pane; check: reports tied (not all reportless), cards
+      in clinician voice, term names worth blessing.
+- [ ] 1.5 One blessing on Fabric.
+      ACTION: bless one term from the notebook (bt.bless with the
+      ai_out paths).
+      ARTIFACTS: the term's row flips blessed in the Fabric
+      ai_delivery.json · the registry on Fabric gains the entry.
+
+## STEP 2 — Pack the work bag (before the first work session)
+
+- [ ] 2.1 ARTIFACT in the bag: `ai01_sqldesc-0.5.1-py3-none-any.whl`
+      (DLL rides inside).
+- [ ] 2.2 ARTIFACTS in the bag: the 3 dictionary files
+      (`...extraction_column.json`, `...extraction_value.json`,
+      `...extraction_table.json`). NEVER: the 1.2 GB embeddings
+      file, `02_sql_extraction.json`.
+- [ ] 2.3 ACTION: her OpenAI key ready to enter as a notebook/
+      workspace secret at work. NEVER pasted in a committed cell.
+- [ ] 2.4 ARTIFACT: the Collibra id list written down — BT domain
+      id · BT asset type id · description attribute id ·
+      technical-definition attribute id (may need creating) ·
+      PBI report asset type id · service-account token.
+- [ ] 2.5 ARTIFACT: the two work paths written down — the DevOps
+      TMDL folder · the SQL input folder.
+
+## STEP 3 — First work session: three connectivity tests (10 min)
+
+- [ ] 3.1 ACTION: one tiny call to api.openai.com from a work
+      Fabric notebook. ARTIFACT: a model's one-line answer.
+- [ ] 3.2 ACTION: one auth ping to the Collibra API.
+      ARTIFACT: an HTTP 200 printed.
+- [ ] 3.3 ACTION: open the TMDL checkout.
+      ARTIFACT: `*.SemanticModel` folders listed by eye.
+      (Any failure = IT conversation before anything else.)
 
 ## STEP 4 — Work sync and run
 
-- [ ] 4.1 Create the lakehouse folders: `Files/01_sql_input/`,
-      `Files/02_dictionary/`, `Files/out/`.
-- [ ] 4.2 Upload: the three dictionary files; the work SQL files into
-      `01_sql_input/`; install the wheel in the environment.
-- [ ] 4.3 Run the chain on ALL files in `01_sql_input/`:
-      parse -> 06 -> 07 cards -> 09 terms -> `ai_delivery.json`
-      (+ the official txt). Parse failures are counted rows, never silent.
-- [ ] 4.4 Read the official txt; gap-check cards and technical definitions.
-- [ ] 4.5 Bless the term names (nothing unblessed goes further).
+- [ ] 4.1 ACTION: create `Files/01_sql_input/`, `Files/02_dictionary/`,
+      `Files/out/` in the work lakehouse.
+- [ ] 4.2 ACTION: upload the 3 dictionary files + the work SQL
+      files; install the wheel in the work environment (the
+      one-wheel law; stop session after publish).
+- [ ] 4.3 ACTION: run `ai-describe --deliver` over ALL files in
+      `01_sql_input/` — her hand.
+      ARTIFACTS: `Files/out/ai_delivery.json` ·
+      `Files/out/08_report_descriptions.txt` · parse failures as
+      counted rows in the output, never silent.
+- [ ] 4.4 ACTION: gap-check the official txt (cards + technical
+      definitions) with her eye.
+- [ ] 4.5 ACTION: bless the keeper names.
+      ARTIFACT: blessed rows in the work ai_delivery.json +
+      the work-side registry.
 
 ## STEP 5 — Collibra publish (her notebook, outside this repo)
 
-- [ ] 5.1 Spot-check 3 report names: our report names vs the Collibra
-      PBI assets — match character for character? (Mismatch = add a
-      name-mapping step to the notebook.)
-- [ ] 5.2 SANDBOX: push ONE report description + ONE Business Term into a
-      test domain. Look at the rendering — do the line breaks between the
-      labeled lines survive? (If flattened: switch to `<br>` / rich text.)
-- [ ] 5.3 The notebook law: create-or-update **by name** — re-runs update,
-      never duplicate; reads `ai_delivery.json`; filters blessed itself.
-- [ ] 5.4 The batch. Print the counted result: reports updated, terms
-      created, terms updated, failures.
-- [ ] 5.5 Her eye on 3 published pages in Collibra. Done — delete this file.
+- [ ] 5.1 ACTION: spot-check 3 report names vs Collibra PBI assets,
+      character for character. ARTIFACT: the 3 matches noted (or
+      the mapping rule the notebook needs).
+- [ ] 5.2 SANDBOX. ACTION: push ONE report description + ONE term
+      to a test domain. ARTIFACT: the rendered Collibra page, line
+      breaks intact (else switch to <br>/rich text).
+- [ ] 5.3 ACTION: the notebook written — create-or-update BY NAME,
+      re-runnable, reads ai_delivery.json, filters blessed itself.
+      ARTIFACT: the notebook in her work workspace.
+- [ ] 5.4 THE BATCH. ARTIFACT: the counted result printed —
+      reports updated / terms created / terms updated / failures.
+- [ ] 5.5 ACTION: her eye on 3 published Collibra pages.
+      Then DELETE THIS FILE — the road is walked.
