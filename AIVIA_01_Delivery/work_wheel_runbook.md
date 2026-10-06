@@ -41,6 +41,23 @@ blessed-only (no unblessed name reaches Collibra).
       the rehearsal's bare-name lesson: portal uploads can
       drop extensions; the run sweeps `*.sql` only)
 
+## Step 0 — create the Fabric items (once; skip any that exist)
+
+DO NOT mirror any other tenant's folder estate — the engine
+needs ONLY the Step B folders below. Record every name/id you
+create in `tenant_intake.md` section 1.
+
+1. Fabric portal -> your workspace -> **+ New item** ->
+   **Lakehouse** -> name it (your convention) -> Create.
+2. **+ New item** -> **Environment** -> name it -> Create.
+3. **+ New item** -> **Notebook** -> name it; in the notebook
+   toolbar set **Environment** to the one you created, and in
+   the Explorer pane **Add data items -> your lakehouse** (it
+   becomes `/lakehouse/default/...` in the cells).
+4. The workspace/lakehouse ids live in the browser URL when
+   the lakehouse is open: `.../groups/<workspace-id>/
+   lakehouses/<lakehouse-id>` — copy both into the intake.
+
 ## Step A — the environment (once)
 
 1. Work Fabric portal -> the workspace -> New/open the
