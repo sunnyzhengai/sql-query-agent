@@ -191,16 +191,29 @@ def preflight(tmdl_dir, sql_dir, out_dir, dict_dir=None):
            or repo_dll.exists(),
            "ScriptDom DLL reachable",
            "the wheel's assets package should set SCRIPTDOM_DLL")
-    # 3. the seat's dependencies (the httpx find)
-    for m in ("httpx", "openai"):
+    # 3. the seat (amended 2026-10-06, the httpx2 find: never
+    # guess transport names — import openai and CONSTRUCT the
+    # client with a dummy key; zero network, and any missing
+    # dependency fails here with its real message)
+    try:
+        import openai as _oa
+        _check(True, f"seat library openai {_oa.__version__}",
+               "")
         try:
-            __import__(m)
-            _check(True, f"seat dependency {m}", "")
+            from openai import OpenAI
+            OpenAI(api_key="preflight-construct-probe")
+            _check(True, "seat client constructs", "")
         except Exception as exc:  # noqa: BLE001
-            _check(False, f"seat dependency {m}: "
-                   f"{type(exc).__name__}",
-                   "add openai (pinned) as a PUBLIC library in "
-                   "the environment so its tree resolves; publish")
+            _check(False, "seat client: "
+                   f"{type(exc).__name__}: {str(exc)[:120]}",
+                   "the openai install is incomplete — add "
+                   "openai (pinned) as a PUBLIC/YML library; "
+                   "publish; FRESH session")
+    except Exception as exc:  # noqa: BLE001
+        _check(False, f"seat library openai: "
+               f"{type(exc).__name__}",
+               "add openai (pinned) as a PUBLIC library in the "
+               "environment; publish; FRESH session")
     # 4. the key (presence only — never printed)
     _check(bool(os.environ.get("OPENAI_API_KEY")),
            "OPENAI_API_KEY offered",
