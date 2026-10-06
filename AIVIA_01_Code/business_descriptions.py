@@ -601,8 +601,15 @@ def _load_key():
 
 def _openai_caller(prompt):
     from openai import OpenAI
+    # Accept-Encoding identity (rehearsal find #6, 2026-10-06):
+    # Fabric cluster images carry a stale brotli whose process()
+    # rejects httpx2's new kwarg — every compressed response
+    # died in the decoder (TypeError). Uncompressed responses
+    # skip the decoder entirely; works on any cluster.
     client = OpenAI(api_key=_load_key(),
-                    timeout=CALL_TIMEOUT_S, max_retries=2)
+                    timeout=CALL_TIMEOUT_S, max_retries=2,
+                    default_headers={
+                        "Accept-Encoding": "identity"})
     r = client.chat.completions.create(
         model=_MODEL_NAME,
         messages=[{"role": "user", "content": prompt}])
