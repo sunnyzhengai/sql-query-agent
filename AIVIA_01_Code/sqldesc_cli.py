@@ -188,6 +188,9 @@ def deliver(tmdl_dir, sql_dir, out_dir, dict_dir=None):
         if d03 and d03.exists() \
                 and not os.environ.get("AI_NAMES_DIR"):
             os.environ["AI_NAMES_DIR"] = str(d03)
+        # the corpus home, same law (the second rehearsal
+        # crash): the runner knows its sql folder — offer it
+        os.environ.setdefault("AI_SQL_DIR", str(Path(sql_dir)))
         _stage_kind_library(d05)
         semantic_graph.build(sql_dir, d05, d02)
         td.build06(d05, d06, d02, sql_dir)

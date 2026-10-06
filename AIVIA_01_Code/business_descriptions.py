@@ -733,6 +733,17 @@ DIR01_DEFAULT = str(Path(__file__).resolve().parents[1]
                     / "AIVIA_01_Data" / "01_subject_sql_files")
 
 
+def _dir01(offered=None):
+    """The corpus home: explicit offer > AI_SQL_DIR environment
+    offer (deliver sets it — the runner always knows its sql
+    folder) > the repo default. The rehearsal's second
+    repo-relative crash, fixed 2026-10-05; sweep says this was
+    the last one."""
+    import os
+    return offered or os.environ.get("AI_SQL_DIR") \
+        or DIR01_DEFAULT
+
+
 def _gate_reference(docket):
     """V-1 scoped (2026-10-04): FACTS alone grounds values."""
     if isinstance(docket, dict) and docket.get("facts"):
@@ -892,9 +903,9 @@ def docket_v2_for_file(dir05, dir06, dir02, fname, voices=None,
             if v and v != core:
                 lines.append(f"      plain: {v}")
         facts = "\n".join(lines)
-    sql_path = Path(dir01 or DIR01_DEFAULT) / f"{fname}.sql"
+    sql_path = Path(_dir01(dir01)) / f"{fname}.sql"
     if not sql_path.exists():
-        sql_path = Path(dir01 or DIR01_DEFAULT) / fname
+        sql_path = Path(_dir01(dir01)) / fname
     context = (sql_path.read_text(encoding="utf-8-sig")
                if sql_path.exists() else "")
     base = docket_for_file(dir05, dir06, dir02, fname)
@@ -989,7 +1000,7 @@ def _facts_renderer(dir05, dir02, names, dir01=None):
             t, c = oname.split(".", 1)
             words[(t.upper(), c.upper())] = (short, False)
     voice = _NamedVoice(g, words, values)
-    sql_lines = td._load_sql(Path(dir01 or DIR01_DEFAULT))
+    sql_lines = td._load_sql(Path(_dir01(dir01)))
     return g, voice, sql_lines
 
 

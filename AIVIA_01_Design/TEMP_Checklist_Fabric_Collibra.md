@@ -99,17 +99,23 @@ every publish).
           "07_blessing_registry.json")
       ```
 
-      Cell 3 — THE RUN (several quiet minutes is normal; fill
-      the real tmdl folder path — the one the phase 08 run used):
+      Cell 3 — THE RUN (several quiet minutes is normal; the
+      tmdl path found 2026-10-05: the phase 08 demo model
+      Census_Totals_Demo_FAKE.SemanticModel lives at
+      Files/Data/08_pbi_lineage/tmdl — expect "1 report(s)"):
       ```python
       import sqldesc_cli
       sqldesc_cli.deliver(
-          "/lakehouse/default/Files/<tmdl folder>",
+          "/lakehouse/default/Files/Data/08_pbi_lineage/tmdl",
           "/lakehouse/default/Files/Data/01_subject_sql_files",
           "/lakehouse/default/Files/Data/ai_out",
           dict_dir="/lakehouse/default/Files/Data/"
                    "02_emr_data_dictionary")
       ```
+      NOTE for 1.5: the home blessing was keyed to the FILE name
+      (report-less at home); on Fabric the census term sits
+      under the report Census_Totals_Demo_FAKE — different key,
+      no auto-restore. Blessing it fresh there IS step 1.5.
 
       Cell 4 — the first eye (feeds 1.4):
       ```python

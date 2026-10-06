@@ -246,6 +246,14 @@ def test_names_asset_absence_is_honest_and_offerable(tmp_path,
     monkeypatch.setenv("AI_NAMES_DIR", str(offered))
     assert str(bd._dir03()) == str(offered)   # the offer wins
     assert bd._dir03(tmp_path / "x") == tmp_path / "x"
+    # the corpus home rides the same law (the second rehearsal
+    # crash, same night): AI_SQL_DIR offers it at runtime —
+    # the repo-relative default was the LAST of the four
+    # parents[1] paths (sweep 2026-10-05; loader + kind library
+    # already packaged-first)
+    monkeypatch.setenv("AI_SQL_DIR", str(offered))
+    assert str(bd._dir01()) == str(offered)
+    assert bd._dir01(tmp_path / "y") == tmp_path / "y"
 
 
 def test_cli_deliver_no_key_degrades_honestly(tmp_path,
