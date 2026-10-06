@@ -142,7 +142,7 @@ every publish).
 
 ## STEP 2 — Pack the work bag (before the first work session)
 
-- [ ] 2.1 ARTIFACT in the bag: `ai01_sqldesc-0.5.6-py3-none-any.whl`
+- [ ] 2.1 ARTIFACT in the bag: the NEWEST `ai01_sqldesc-*.whl` in AIVIA_01_Code/dist/ (the version ladder; 0.5.7+ as of 10-06)
       (0.5.6 = preflight constructs the seat client — the httpx2 find; THE REFUSAL rides)
       (DLL rides inside).
 - [ ] 2.2 ARTIFACTS in the bag: the 3 dictionary files
