@@ -170,6 +170,11 @@ every publish).
 
 ## STEP 4 — Work sync and run
 
+THE WORK RUNBOOK (permanent home; this checklist dies, it stays):
+`AIVIA_01_Test/AIVIA_01_Production/10_work_wheel_production_steps.md`
+— drafted 2026-10-06 from the rehearsal; finalize when Step 1 closes.
+The boxes below are the summary; the runbook is the instruction.
+
 - [ ] 4.1 ACTION: create `Files/01_sql_input/`, `Files/02_dictionary/`,
       `Files/out/` in the work lakehouse.
 - [ ] 4.2 ACTION: upload the 3 dictionary files + the work SQL
