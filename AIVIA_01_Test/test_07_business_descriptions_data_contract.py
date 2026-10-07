@@ -885,3 +885,59 @@ def test_walk_rerender_applies_registry_without_calls(tmp_path):
     assert "separately defined selection" not in \
         card["audience_text"]
     assert len(rows) == 21
+
+
+# --------------------------------------- incremental delivery (D12)
+# 10_work_wheel.md D12, ruled 2026-10-07: described = DONE. RED until
+# build07 takes skip_files (a set of file stems): a skipped file's
+# rows are CARRIED from the prior 07_business_sheet.json in out07 —
+# the seat is never asked about them; only unskipped files propose.
+
+def test_07_skip_files_carries_prior_rows_no_calls(tmp_path):
+    out = tmp_path / "07"
+    out.mkdir()
+    bd.build07(DIR05, DIR06, out, DIR02, no_llm=True)  # the prior run
+    prior = {r["node_id"]: r for r in json.loads(
+        (out / "07_business_sheet.json").read_text())}
+    stems = {n.split("::")[1] for n in prior}
+    skip = stems - {LOTE}
+
+    calls = []
+
+    def spy(grain, docket_text, docket, registry):
+        calls.append(grain)
+        return ("x", "floor", [], 1)
+
+    rows = bd.build07(DIR05, DIR06, out, DIR02, no_llm=False,
+                      proposer=spy, skip_files=skip)
+    # only LOTE's nodes reached the seat
+    lote_nodes = [n for n in prior if n.split("::")[1] == LOTE]
+    assert len(calls) == len(lote_nodes)
+    # the skipped files' rows survive VERBATIM in the new sheet
+    for r in rows:
+        if r["node_id"].split("::")[1] != LOTE:
+            assert r == prior[r["node_id"]], r["node_id"]
+
+
+def test_07_skip_files_without_prior_sheet_refuses(tmp_path):
+    """Skipping needs something to carry — no prior sheet in out07 is
+    an honest refusal, never a silent hole."""
+    out = tmp_path / "07"
+    out.mkdir()
+    import pytest
+    with pytest.raises(ValueError, match="prior"):
+        bd.build07(DIR05, DIR06, out, DIR02, no_llm=True,
+                   skip_files={LOTE})
+
+
+def test_07_defer_files_dropped_without_carry_or_refusal(tmp_path):
+    """D12 batch door: a DEFERRED file (new, beyond max_new) is not
+    in this run at all — no rows, no carry, no refusal; a later run
+    takes it."""
+    out = tmp_path / "07"
+    out.mkdir()
+    rows = bd.build07(DIR05, DIR06, out, DIR02, no_llm=True,
+                      defer_files={LOTE})
+    stems = {r["node_id"].split("::")[1] for r in rows}
+    assert LOTE not in stems
+    assert stems  # the others built

@@ -116,6 +116,64 @@ D10. THE VERSION LADDER: any byte change to the artifact
     (httpx2), 0.5.7 stable DLL staging + dead pointers
     cleared, 0.5.8 call-time env reads + preflight stages
     before imports, 0.5.9 the seat speaks uncompressed
-    (find #6). The packaging lock pins the name to the
-    builder's VERSION so a changed artifact can never ship
-    under an old number.
+    (find #6), 0.6.0 the work scale-up (D11 path 2 + D12 +
+    D13 in one ladder step, 2026-10-07). The packaging lock
+    pins the name to the builder's VERSION so a changed
+    artifact can never ship under an old number.
+
+D11. MULTI-WORKSPACE TMDL (ruled 2026-10-07, her work
+    scale-up — "path 1 today, path 2 on the docket";
+    PATH 2 BUILT same day, wheel 0.6.0):
+    - Files/tmdl/ may hold one SUBFOLDER PER SOURCE WORKSPACE;
+      read_models walks recursively and model identity = the
+      path relative to tmdl/ ("WS One/Fix Twin") — top-level
+      models keep bare names, so the flat layout stays legal
+      and unchanged. Same-named models in two workspaces
+      coexist; the qualified name rides through 08/09/
+      blessings whole.
+    - The preflight REFUSES on bare-name collision (names the
+      twins and their folders) and its tmdl count walks
+      recursively — the eyeball is retired.
+      Locks: test_08 l8+l9, test_10_incremental_delivery
+      collision test.
+
+D13. THE VIEW CLASS (ruled 2026-10-07, her work scale-up —
+    "we need to add views, there are hundreds"; BUILT same
+    day, wheel 0.6.0 — locks: test_05 view class x3): the
+    three view wrappers
+    (CreateViewStatement / CreateOrAlterViewStatement /
+    AlterViewStatement) unwrap to their single SelectStatement
+    the way the proc trio unwraps to its StatementList — the
+    SELECT then maps scopes/structures/predicates unchanged;
+    file identity stays the filename. Declared-column-list
+    headers (CREATE VIEW v (a,b) AS) are OUT of this slice —
+    the SELECT's own names speak; flagged for a follow-up
+    ruling only if a work view renames via the header.
+
+D12. INCREMENTAL DELIVERY (ruled 2026-10-07; BUILT same day,
+    wheel 0.6.0): described = DONE. deliver() keeps a
+    content-hash ledger (10_corpus_ledger.json in <out>); a
+    file whose hash is unchanged is never re-sent to the seat
+    — its 07 card text and 09 terms are reused from the prior
+    sheets (07: skip_files carries prior rows VERBATIM behind
+    a refusal when the prior sheet can't supply them; 09: the
+    L13 files_in_run carry, no refusal — a described file may
+    honestly hold zero terms); new TMDL tying a NEW report to
+    an unchanged file re-ties the existing text for free.
+    Changed hash or `force=True` = full re-describe. THE
+    BATCH DOOR (her 3.2 ask — no manual typing, ever): the
+    runner uploads everything; `max_new=N` takes at most N
+    not-yet-described files (name order); files beyond N are
+    DEFERRED — a third class, dropped from the run entirely
+    (defer_files: no rows, no carry, no refusal; a later run
+    takes them). The run says it: "N described (K already
+    done), M remain". The ledger records ONLY what this run
+    described, only after the paid chain succeeded; the
+    no-key degrade records nothing. The skip lands BEFORE 07
+    spec construction (fact voices are paid — a skipped file
+    costs zero, voices included); 05/06/08 always build the
+    WHOLE corpus (local, free — the graph stays whole).
+    Accepted trade (her 3.1): an unchanged file's text never
+    re-reads later arrivals.
+    Locks: test_10_incremental_delivery x7, test_07 skip x2 +
+    defer x1, test_09 l16 + l17.

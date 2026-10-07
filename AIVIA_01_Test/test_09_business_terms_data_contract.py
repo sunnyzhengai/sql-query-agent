@@ -422,3 +422,43 @@ def test_09_l15_assemble_writes_descriptions_preserves_terms(
     assert free["description"]["voice"] == "technical"  # 06 floor
     assert any(t["node_id"] == A_DELIV for t in rep["terms"])
     assert any(t["node_id"] == B_DELIV for t in free["terms"])
+
+
+# --------------------------------------- incremental delivery (D12)
+# 10_work_wheel.md D12, ruled 2026-10-07: a skipped file's terms are
+# never re-proposed — its rows survive in ai_delivery.json untouched
+# (the L13 only_file precedent, inverted: skip names the DONE set).
+
+def test_09_l16_skip_files_no_proposals_terms_carried(tmp_path):
+    bt, delivery1, dirs = _build(tmp_path)        # the prior full run
+    alpha_before = _get(delivery1, A_DELIV)
+
+    called = []
+
+    def spy(spec):
+        called.append(spec["node_id"])
+        return _proposer(spec)
+
+    bt.build09(*dirs, proposer=spy,
+               skip_files={"FIX_RPT_ALPHA"})
+    delivery2 = _delivery(dirs[-1])
+    assert all(not n.startswith(A) for n in called), called
+    assert any(n.startswith(B) for n in called)
+    assert _get(delivery2, A_DELIV) == alpha_before
+    assert _get(delivery2, B_DELIV)
+
+
+def test_09_l17_defer_files_dropped_without_carry(tmp_path):
+    """D12 batch door: a deferred file proposes nothing and lands
+    nothing — and unlike skip, nothing prior is required."""
+    bt, _, dirs = _build(tmp_path)
+
+    called = []
+
+    def spy(spec):
+        called.append(spec["node_id"])
+        return _proposer(spec)
+
+    bt.build09(*dirs, proposer=spy,
+               defer_files={"FIX_RPT_BETA"})
+    assert all(not n.startswith(B) for n in called), called

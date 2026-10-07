@@ -447,13 +447,47 @@ def _field_nodes(dir05, dir02, dir01=None):
     return out
 
 
+# PSEUDO-CODE — D12 incremental delivery, the 07 arm
+# (10_work_wheel.md, ruled 2026-10-07; red tests: test_07
+# skip_files x2). APPROVED by Sunny 2026-10-07; the code follows:
+#
+#   1. New param skip_files=frozenset() — file STEMS already
+#      described (deliver() computes them from the hash ledger;
+#      callers never type names).
+#   2. THE REFUSAL FIRST: skip_files non-empty -> the prior
+#      07_business_sheet.json must exist in out07 and hold rows
+#      for EVERY skipped stem; anything missing -> ValueError
+#      naming the prior sheet. Skipping needs something to carry —
+#      never a silent hole.
+#   3. The skip lands BEFORE spec construction (the only_file
+#      precedent: filter `files`+`six` down to the active set) —
+#      NOT at the propose loop. Reason: live-mode specs render
+#      FACT VOICES per file, which are themselves paid calls; a
+#      skipped file must cost zero, voices included.
+#   4. After the active rows build, the skipped files' rows are
+#      APPENDED from the prior sheet VERBATIM — text, status,
+#      model, basis, untouched. The per-file txt loop keeps the
+#      full file list, so every file's txt regenerates (carried
+#      rows included) and the sheet stays whole.
+#   5. 07_code_sightings.json stays what it is — the audit of
+#      THIS run's proposals; carried nodes add none.
+#   6. only_file and skip_files compose (only_file first, then
+#      skip subtracts); checkpoint behavior among active specs is
+#      unchanged.
+
+
 def build07(dir05, dir06, out07, dir02, no_llm=False,
-            proposer=None, only_file=None):
+            proposer=None, only_file=None,
+            skip_files=frozenset(), defer_files=frozenset()):
     """The build command's door. no_llm=True renders floor-only
     rows deterministically (the suite's path, zero cost). The
     live path (harness laws, amended 2026-10-03): explicit call
     timeout, CHECKPOINT-PER-NODE with resume (completed nodes
-    are never re-paid), one progress line per node."""
+    are never re-paid), one progress line per node.
+    skip_files (D12, 2026-10-07): stems already described — zero
+    cost, voices included; their rows carry from the prior sheet.
+    defer_files (D12 batch door): stems new-but-beyond-max_new —
+    NOT in this run at all: no rows, no carry, no refusal."""
     dir05, dir06 = Path(dir05), Path(dir06)
     out07, dir02 = Path(out07), Path(dir02)
     six = json.loads((dir06 / "06_description_sheet.json")
@@ -464,6 +498,31 @@ def build07(dir05, dir06, out07, dir02, no_llm=False,
         files = [f for f in files if f == only_file]
         six = [r for r in six
                if r["node_id"].split("::")[1] == only_file]
+    defer_files = frozenset(defer_files)
+    if defer_files:
+        files = [f for f in files if f not in defer_files]
+        six = [r for r in six
+               if r["node_id"].split("::")[1] not in defer_files]
+    skip_files = frozenset(skip_files) & set(files)
+    carried = []
+    if skip_files:
+        sheet_path = out07 / "07_business_sheet.json"
+        if not sheet_path.exists():
+            raise ValueError(
+                "skip_files needs the prior 07_business_sheet.json "
+                f"in {out07} — nothing to carry")
+        prior_rows = json.loads(sheet_path.read_text())
+        have = {r["node_id"].split("::")[1] for r in prior_rows}
+        missing = sorted(skip_files - have)
+        if missing:
+            raise ValueError(
+                "the prior 07_business_sheet.json has no rows "
+                "for: " + ", ".join(missing))
+        carried = [r for r in prior_rows
+                   if r["node_id"].split("::")[1] in skip_files]
+    active = [f for f in files if f not in skip_files]
+    six = [r for r in six
+           if r["node_id"].split("::")[1] not in skip_files]
     reg_path = out07 / "07_blessing_registry.json"
     registry = (json.loads(reg_path.read_text())
                 if reg_path.exists()
@@ -473,7 +532,7 @@ def build07(dir05, dir06, out07, dir02, no_llm=False,
     # FILE grain rides DOCKET v2 (FACTS/CONTEXT + fact voices,
     # ruled 2026-10-04); voices are skipped under no_llm.
     specs = []
-    for f in files:
+    for f in active:
         if no_llm:
             docket, _items = docket_v2_for_file(
                 dir05, dir06, dir02, f)
@@ -489,7 +548,7 @@ def build07(dir05, dir06, out07, dir02, no_llm=False,
                      if r["node_id"] == f"file::{f}")
         specs.append((f"file::{f}", "file", docket, floor))
     src_by_file = {f: "\n".join(_source_lines(dir05, dir02, f))
-                   for f in files}
+                   for f in active}
     for r in six:
         if r["grain"] == "scope":
             fname = r["node_id"].split("::")[1]
@@ -502,6 +561,8 @@ def build07(dir05, dir06, out07, dir02, no_llm=False,
     for expr_id, scope_id, item in _field_nodes(dir05, dir02):
         fname = scope_id.split("::")[1]
         if only_file and fname != only_file:
+            continue
+        if fname in skip_files or fname in defer_files:
             continue
         ffacts = render_field_facts(dir05, dir06, dir02, fname,
                                     expr_id, scope_id,
@@ -551,6 +612,7 @@ def build07(dir05, dir06, out07, dir02, no_llm=False,
         if ck_path.exists():
             ck_path.unlink()  # the sheet lands whole below
 
+    rows.extend(carried)  # the skipped files' prior rows, verbatim
     (out07 / "07_business_sheet.json").write_text(
         json.dumps(rows, indent=1))
     (out07 / "07_code_sightings.json").write_text(

@@ -104,11 +104,40 @@ def _binding_of(text):
     return None, None
 
 
+# PSEUDO-CODE — D11 path 2, several workspaces (10_work_wheel.md,
+# ruled 2026-10-07; red tests: test_08 l8 + l9).
+# APPROVED by Sunny 2026-10-07; the code follows:
+#
+#   1. Discovery goes RECURSIVE: glob("**/*.SemanticModel") instead
+#      of the top-level glob — one subfolder per source workspace
+#      becomes legal under Files/tmdl/.
+#   2. Model identity = the model dir's path RELATIVE to tmdl_root,
+#      posix separators, ".SemanticModel" stripped:
+#         top level      ->  "Fix Dashboard"        (unchanged —
+#                            every existing lock stays green)
+#         one workspace  ->  "WS Fix One/Fix Dashboard"
+#      Two workspaces holding the same bare name now coexist as two
+#      distinct models — the silent last-wins overwrite dies here.
+#   3. Sort key = that qualified name (determinism D4/P1 holds).
+#   4. Nothing else changes: the per-model table walk, plumbing
+#      count, and binding kinds are untouched; downstream (08
+#      sheets, 09 report ties, blessings) keys on the model name it
+#      is given, so the qualified name rides through whole.
+#   5. The REFUSAL on bare-name collision is NOT here — it is the
+#      preflight's job (sqldesc_cli, its own pseudo-code round),
+#      where every other environment check lives.
+
+
 def read_models(tmdl_root):
     """{model_name: [ {table, kind, raw, columns} ]} + the
     plumbing count. Deterministic order throughout (D4, P1)."""
+    root = Path(tmdl_root)
+    mdirs = {m.relative_to(root).as_posix()
+             .removesuffix(".SemanticModel"): m
+             for m in root.glob("**/*.SemanticModel")}
     models, plumbing = {}, 0
-    for mdir in sorted(Path(tmdl_root).glob("*.SemanticModel")):
+    for mname in sorted(mdirs):
+        mdir = mdirs[mname]
         rows = []
         tdir = mdir / "definition" / "tables"
         for tf in sorted(tdir.glob("*.tmdl")):
@@ -124,7 +153,7 @@ def read_models(tmdl_root):
                 "columns": [c.strip() for c in
                             _SOURCECOL.findall(text)],
             })
-        models[mdir.name.removesuffix(".SemanticModel")] = rows
+        models[mname] = rows
     return models, plumbing
 
 

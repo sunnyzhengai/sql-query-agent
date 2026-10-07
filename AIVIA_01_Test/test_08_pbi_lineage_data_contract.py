@@ -142,3 +142,61 @@ def test_08_l7_conservation_and_byte_determinism(tmp_path):
     tmdl, corpus = out.parent / "tmdl", out.parent / "sql"
     pl.build08(tmdl, corpus, out)
     assert (out / "08_pbi_reports.json").read_bytes() == first
+
+
+# -------------------------------------- several workspaces (D11 path 2)
+# 10_work_wheel.md D11, ruled 2026-10-07 ("path 1 today, path 2 on the
+# docket"): tmdl/ may hold ONE SUBFOLDER PER SOURCE WORKSPACE. RED until
+# read_models walks recursively; model identity is the relative path
+# ("WS Fix One/Fix Twin"), so a bare name in two workspaces never
+# silently last-wins. Top-level models keep their bare name — every
+# lock above this line must stay green unchanged (back-compat law).
+
+def test_08_l8_workspace_subfolder_discovered(tmp_path):
+    import pbi_lineage as pl
+    tmdl = tmp_path / "tmdl"
+    (tmdl / "WS Fix One").mkdir(parents=True)
+    _model(tmdl / "WS Fix One", "Fix Nested", {
+        "ProcFed": _table(
+            ["Fix Col N"],
+            ['let q = Value.NativeQuery(db,',
+             '"EXEC rpt.USP_FIX_ONE") in q'])})
+    corpus = tmp_path / "sql"
+    corpus.mkdir()
+    (corpus / "USP_FIX_ONE.sql").write_text("SELECT 1\n")
+    out = tmp_path / "08"
+    out.mkdir()
+    reports = pl.build08(tmdl, corpus, out)
+    names = [r["name"] for r in reports]
+    assert "WS Fix One/Fix Nested" in names, names
+    r = next(x for x in reports
+             if x["name"] == "WS Fix One/Fix Nested")
+    assert "USP_FIX_ONE.sql" in r["executes"]
+
+
+def test_08_l9_same_bare_name_in_two_workspaces_both_kept(tmp_path):
+    import pbi_lineage as pl
+    tmdl = tmp_path / "tmdl"
+    for ws, proc in (("WS Fix One", "USP_FIX_ONE"),
+                     ("WS Fix Two", "USP_FIX_TWO")):
+        (tmdl / ws).mkdir(parents=True)
+        _model(tmdl / ws, "Fix Twin", {
+            "ProcFed": _table(
+                ["Fix Col T"],
+                ['let q = Value.NativeQuery(db,',
+                 f'"EXEC rpt.{proc}") in q'])})
+    corpus = tmp_path / "sql"
+    corpus.mkdir()
+    for f in ("USP_FIX_ONE.sql", "USP_FIX_TWO.sql"):
+        (corpus / f).write_text("SELECT 1\n")
+    out = tmp_path / "08"
+    out.mkdir()
+    reports = pl.build08(tmdl, corpus, out)
+    twins = sorted(r["name"] for r in reports
+                   if r["name"].endswith("Fix Twin"))
+    assert twins == ["WS Fix One/Fix Twin", "WS Fix Two/Fix Twin"]
+    by_name = {r["name"]: r for r in reports}
+    assert by_name["WS Fix One/Fix Twin"]["executes"] == \
+        ["USP_FIX_ONE.sql"]
+    assert by_name["WS Fix Two/Fix Twin"]["executes"] == \
+        ["USP_FIX_TWO.sql"]

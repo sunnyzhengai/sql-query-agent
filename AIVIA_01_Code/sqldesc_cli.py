@@ -19,6 +19,7 @@
 #   Zero keys, zero network, stdlib only.
 # =====================================================================
 
+import hashlib
 import json
 import os
 import sys
@@ -240,12 +241,32 @@ def preflight(tmdl_dir, sql_dir, out_dir, dict_dir=None):
     _check(n_sql > 0, f"sql input: {n_sql} *.sql file(s)",
            "upload .sql files WITH the extension (bare names "
            "are invisible to the sweep)")
-    n_mod = len(list(tmdl_dir.glob("*.SemanticModel"))) \
-        if tmdl_dir.exists() else 0
+    # D11 path 2 (2026-10-07): one subfolder per source workspace
+    # is legal — the count walks recursively, and two models
+    # sharing a BARE name is a refusal (the silent last-wins trap).
+    qual_names = sorted(
+        m.relative_to(tmdl_dir).as_posix()
+        .removesuffix(".SemanticModel")
+        for m in tmdl_dir.glob("**/*.SemanticModel")) \
+        if tmdl_dir.exists() else []
+    n_mod = len(qual_names)
     _check(n_mod > 0,
            f"tmdl: {n_mod} *.SemanticModel folder(s)",
            "point at the folder CONTAINING the .SemanticModel "
            "folders (else every term lands report-less)")
+    by_base = {}
+    for n in qual_names:
+        by_base.setdefault(n.rsplit("/", 1)[-1], []).append(n)
+    twins = {b: ns for b, ns in sorted(by_base.items())
+             if len(ns) > 1}
+    for base, ns in twins.items():
+        _check(False,
+               f"tmdl: bare model name collision: {base} "
+               f"({', '.join(ns)})",
+               "two workspaces ship the same report name — "
+               "rename one folder or keep one copy")
+    if n_mod and not twins:
+        _check(True, "tmdl: no bare-name collisions", "")
     if dict_dir:
         d02 = Path(dict_dir)
         missing = [f for f in
@@ -279,7 +300,104 @@ def preflight(tmdl_dir, sql_dir, out_dir, dict_dir=None):
     return failures
 
 
-def deliver(tmdl_dir, sql_dir, out_dir, dict_dir=None):
+# PSEUDO-CODE — D12 the ledger + batch door, D11 the collision
+# refusal (10_work_wheel.md, ruled 2026-10-07; red tests:
+# test_10_incremental_delivery.py x8, test_07 defer x1, test_09
+# l17 x1). APPROVED by Sunny 2026-10-07; the code follows:
+#
+#   THE LEDGER (10_corpus_ledger.json in <out>):
+#   1. record_corpus(sql_dir, out_dir, files=None) — store the
+#      sha256 of each named file's content (default: all corpus
+#      files); merge into the existing ledger, never truncate.
+#   2. plan_corpus(sql_dir, out_dir, max_new=None, force=False)
+#      -> {"new": [...], "done": [...], "remaining": int}
+#      done = hash matches the ledger; new = the rest (force
+#      makes everything new), NAME ORDER; max_new caps new and
+#      counts the overflow in remaining. Corpus selection law =
+#      semantic_graph's (regular, non-hidden, non-.json).
+#
+#   THE THREE CLASSES PER RUN (the batch door):
+#      done     -> skip_files  (carry + refusal — built)
+#      taken    -> the active set (proposes, pays)
+#      deferred -> defer_files (new beyond max_new: DROPPED from
+#                  the run — no rows, no carry, no refusal; a
+#                  later run takes them). defer_files is a new
+#                  param on build07 AND build09, filtering
+#                  exactly like skip_files minus the carry.
+#
+#   DELIVER WIRING:
+#   3. deliver(..., max_new=None, force=False): after the
+#      preflight gate, plan once; 05/06/08 still build over the
+#      WHOLE corpus (local, free — the graph stays whole);
+#      build07/build09 get skip_files=stems(done),
+#      defer_files=stems(deferred).
+#   4. record_corpus runs ONLY after the paid chain succeeded,
+#      and ONLY for the taken files — the honest-degrade path
+#      (no key) records NOTHING: nothing was described.
+#   5. The run SAYS it: "N described, M remain" (M = deferred).
+#
+#   THE PREFLIGHT (D11 path 2):
+#   6. New check row: read_models over tmdl; two model names
+#      sharing a BASENAME (same bare name, different workspace
+#      folders) -> FAIL line naming the twins and both folders.
+#      Rides the existing refusal: deliver() refuses on any
+#      preflight failure except the missing key.
+
+
+LEDGER_NAME = "10_corpus_ledger.json"
+
+
+def _corpus_files(sql_dir):
+    """The corpus selection law — semantic_graph's, verbatim:
+    every regular, non-hidden, non-.json file."""
+    return sorted(p.name for p in Path(sql_dir).iterdir()
+                  if p.is_file() and not p.name.startswith(".")
+                  and p.suffix != ".json")
+
+
+def _read_ledger(out_dir):
+    p = Path(out_dir) / LEDGER_NAME
+    return (json.loads(p.read_text()) if p.exists()
+            else {"hashes": {}})
+
+
+def record_corpus(sql_dir, out_dir, files=None):
+    """D12: mark files DESCRIBED — content sha256 into the
+    ledger; merge, never truncate. deliver() calls this for the
+    taken files only, after the paid chain succeeded."""
+    sql_dir = Path(sql_dir)
+    names = (list(files) if files is not None
+             else _corpus_files(sql_dir))
+    led = _read_ledger(out_dir)
+    led.setdefault("_law", "described = done (D12, 2026-10-07): "
+                   "a matching hash is never re-sent to the seat")
+    for n in names:
+        led["hashes"][n] = hashlib.sha256(
+            (sql_dir / n).read_bytes()).hexdigest()
+    (Path(out_dir) / LEDGER_NAME).write_text(
+        json.dumps(led, indent=1))
+
+
+def plan_corpus(sql_dir, out_dir, max_new=None, force=False):
+    """D12: the run plans itself — nobody types file names.
+    done = content hash matches the ledger; new = the rest, name
+    order; max_new caps new and counts the overflow."""
+    sql_dir = Path(sql_dir)
+    hashes = _read_ledger(out_dir)["hashes"]
+    done, new = [], []
+    for n in _corpus_files(sql_dir):
+        h = hashlib.sha256((sql_dir / n).read_bytes()).hexdigest()
+        (done if not force and hashes.get(n) == h
+         else new).append(n)
+    remaining = 0
+    if max_new is not None and len(new) > max_new:
+        remaining = len(new) - max_new
+        new = new[:max_new]
+    return {"new": new, "done": done, "remaining": remaining}
+
+
+def deliver(tmdl_dir, sql_dir, out_dir, dict_dir=None,
+            max_new=None, force=False):
     """THE 0.5.0 COLLIBRA CHAIN (ruled 2026-10-05, G-1 + G-2):
     08 links -> 05 graph -> 06 technical -> 07 cards -> 09 terms
     -> ai_delivery.json + the official txt. The LLM seat is
@@ -288,7 +406,12 @@ def deliver(tmdl_dir, sql_dir, out_dir, dict_dir=None):
     technical voice, no terms proposed, said out loud.
     THE REFUSAL (Brief_Preflight, 2026-10-06): the preflight
     runs FIRST; any failure except the missing key refuses the
-    run — no paid call into a broken environment, ever."""
+    run — no paid call into a broken environment, ever.
+    D12 (2026-10-07): described = done — the ledger skips every
+    unchanged file in BOTH paid steps; max_new=N caps a run at N
+    new files (name order, the rest deferred to a later run);
+    force=True re-describes everything. The graph itself (05/06/
+    08) always builds over the WHOLE corpus — local and free."""
     blocking = [f for f in preflight(tmdl_dir, sql_dir, out_dir,
                                      dict_dir=dict_dir)
                 if "OPENAI_API_KEY" not in f]
@@ -323,14 +446,26 @@ def deliver(tmdl_dir, sql_dir, out_dir, dict_dir=None):
         semantic_graph.build(sql_dir, d05, d02)
         td.build06(d05, d06, d02, sql_dir)
         pl.build08(tmdl_dir, sql_dir, out)
+        plan = plan_corpus(sql_dir, out, force=force)
+        taken = (plan["new"] if max_new is None
+                 else plan["new"][:max_new])
+        deferred = plan["new"][len(taken):]
+        skip = {Path(n).stem for n in plan["done"]}
+        defer = {Path(n).stem for n in deferred}
         if os.environ.get("OPENAI_API_KEY"):
             import business_descriptions as bd
             import business_terms as bt
-            bd.build07(d05, d06, d07, d02)
-            bt.build09(d05, d06, d02, d07, out, out)
+            bd.build07(d05, d06, d07, d02,
+                       skip_files=skip, defer_files=defer)
+            bt.build09(d05, d06, d02, d07, out, out,
+                       skip_files=skip, defer_files=defer)
+            record_corpus(sql_dir, out, files=taken)
+            print(f"{len(taken)} described ({len(skip)} already "
+                  f"done), {len(deferred)} remain")
         else:
             print("no OPENAI_API_KEY offered: technical voice "
-                  "only, no terms proposed (honest degrade)")
+                  "only, no terms proposed (honest degrade; "
+                  "nothing recorded as described)")
         ai_delivery.assemble(out, d07, out, d06)
     delivery = ai_delivery.load(out)
 

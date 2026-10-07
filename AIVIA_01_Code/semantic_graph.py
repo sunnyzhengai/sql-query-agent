@@ -154,6 +154,11 @@ _UNWRAP = ("CreateProcedureStatement", "CreateOrAlterProcedureStatement",
            "AlterProcedureStatement", "BeginEndBlockStatement",
            "BeginEndAtomicBlockStatement")
 
+# D13 (2026-10-07): the view class — a view's body is ONE
+# SelectStatement, not a StatementList, so it unwraps by its own branch.
+_VIEW_UNWRAP = ("CreateViewStatement", "CreateOrAlterViewStatement",
+                "AlterViewStatement")
+
 
 def _type_name(frag):
     return frag.GetType().Name
@@ -275,11 +280,41 @@ def _deferred_types(library: dict) -> set:
     return out
 
 
+# PSEUDO-CODE — D13 the view class (10_work_wheel.md, ruled
+# 2026-10-07; red tests: test_05 "the view class (D13)").
+# APPROVED by Sunny 2026-10-07; the code follows:
+#
+#   1. _VIEW_UNWRAP = ("CreateViewStatement",
+#      "CreateOrAlterViewStatement", "AlterViewStatement") — the
+#      WHOLE class in one pass (the enumerate-all-cases law; the
+#      proc trio is the precedent).
+#   2. In _unwrapped: a view wrapper yields its stmt.SelectStatement
+#      — a view's body is ONE SelectStatement, not a StatementList,
+#      so it gets its own branch beside the _UNWRAP branch. A None
+#      body (defensive; grammar should forbid it) falls through to
+#      yield the wrapper itself — visible in the remainder, never
+#      silently dropped.
+#   3. NOTHING else changes: the yielded SELECT classifies
+#      "handled" and maps scopes / structures / predicates exactly
+#      as a proc body's SELECT does. File identity stays the
+#      FILENAME (the proc precedent — the object name inside the
+#      file is not consulted).
+#   4. OUT OF SCOPE, flagged for Sunny: a declared column list
+#      (CREATE VIEW v (a, b) AS SELECT x, y ...) renames the
+#      projection in the header. This slice maps the SELECT's own
+#      names and ignores the header list — zero cases in the
+#      corpus so far; a follow-up ruling only if a work view
+#      renames via the header.
+
+
 def _unwrapped(stmts):
     """Ordered executable statements; wrappers contribute children."""
     for stmt in stmts:
-        if _type_name(stmt) in _UNWRAP:
+        t = _type_name(stmt)
+        if t in _UNWRAP:
             yield from _unwrapped(stmt.StatementList.Statements)
+        elif t in _VIEW_UNWRAP and stmt.SelectStatement is not None:
+            yield stmt.SelectStatement
         else:
             yield stmt
 

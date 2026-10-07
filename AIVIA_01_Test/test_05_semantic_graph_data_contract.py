@@ -1024,3 +1024,54 @@ def test_star_mixed_arm_blind_keeps_remainder(tmp_path):
     rows = _resolves(out, ref_text="u.NAME")
     bases = sorted(r.get("match_basis") for r in rows)
     assert bases == ["behind_star", "star_member"]
+
+
+# ------------------------------------------------- the view class (D13)
+# 10_work_wheel.md D13, ruled 2026-10-07 (her work scale-up: "we need to
+# add views, there are hundreds"). RED until semantic_graph unwraps the
+# THREE view wrappers to their SELECT, the proc precedent: a wrapper
+# contributes its body in place. A view's body is ONE SelectStatement
+# (not a StatementList) — the unwrap gets a view branch.
+
+_VIEW_BODY = ("SELECT FIX_COL_A, FIX_COL_B\n"
+              "FROM FIX_TABLE_ONE\nWHERE FIX_COL_A = 1\n")
+_VIEW_VARIANTS = {
+    "v_fix_create.sql": "CREATE VIEW rpt.V_FIX_CREATE AS\n" + _VIEW_BODY,
+    "v_fix_alter.sql": "ALTER VIEW rpt.V_FIX_ALTER AS\n" + _VIEW_BODY,
+    "v_fix_coa.sql":
+        "CREATE OR ALTER VIEW rpt.V_FIX_COA AS\n" + _VIEW_BODY,
+}
+
+
+def test_view_class_all_three_variants_handled(tmp_path):
+    """Every view variant lands handled — zero remainder, zero gap."""
+    out = _build5(tmp_path, dict(_VIEW_VARIANTS))
+    for row in _load(out, "05_file_sheet.json"):
+        assert row["remainder_total"] == 0, row["file_name"]
+        assert row["statements_handled"] == 1, row["file_name"]
+
+
+def test_view_select_is_mapped_as_select(tmp_path):
+    """The statement row speaks SELECT, not the wrapper's type name."""
+    out = _build5(tmp_path, dict(_VIEW_VARIANTS))
+    stmts = _load(out, "05_statement_sheet.json")
+    assert len(stmts) == 3
+    for row in stmts:
+        assert row["statement_kind"] == "SELECT", row["node_id"]
+        assert row["disposition"] == "handled", row["node_id"]
+
+
+def test_view_builds_a_delivery_scope_with_structure(tmp_path):
+    """The view's SELECT builds the same graph a proc's SELECT does:
+    a delivery scope per file, FROM + WHERE structures under it."""
+    out = _build5(tmp_path, dict(_VIEW_VARIANTS))
+    scopes = _load(out, "05_scope_sheet.json")
+    structures = _load(out, "05_structure_sheet.json")
+    for stem in ("v_fix_create", "v_fix_alter", "v_fix_coa"):
+        mine = [s for s in scopes
+                if s["node_id"].split("::")[1] == stem]
+        assert mine, f"no scope for {stem}"
+        assert any(s["scope_kind"] == "delivery" for s in mine), stem
+        kinds = {st["structure_kind"] for st in structures
+                 if st["node_id"].split("::")[1] == stem}
+        assert {"FROM", "WHERE"} <= kinds, (stem, kinds)

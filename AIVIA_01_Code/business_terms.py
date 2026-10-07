@@ -267,12 +267,42 @@ def _propose(proposer, node_id, docket):
 
 
 
+# PSEUDO-CODE — D12 incremental delivery, the 09 arm
+# (10_work_wheel.md, ruled 2026-10-07; red test: test_09 l16).
+# APPROVED by Sunny 2026-10-07; the code follows:
+#
+#   1. New param skip_files=frozenset() — file STEMS already
+#      described (deliver() computes them; nobody types names).
+#   2. The arm is SMALL because L13 already built the carry:
+#      update_terms preserves every file OUTSIDE files_in_run.
+#      So: (a) drop the skipped files' scopes before the propose
+#      loop — zero paid calls, zero concept verdicts for them;
+#      (b) keep skipped stems OUT of files_in_run — their existing
+#      term rows in ai_delivery.json survive verbatim.
+#   3. Conservation stays honest: run_ids is built from the
+#      FILTERED scopes, so the every-scope-accounted equation
+#      checks the active set exactly.
+#   4. NO refusal arm here, deliberately (asymmetric with 07,
+#      said out loud): a described file can legitimately carry
+#      zero term rows (all-plumbing files never propose), so
+#      "skipped but absent from the delivery" is not provably a
+#      hole at this layer. Run integrity is the 07 arm's refusal
+#      + the deliver() ledger. [flag for Sunny at this review]
+#   5. only_file and skip_files compose (only_file first).
+
+
 def build09(dir05, dir06, dir02, dir07, dir08, out09,
-            proposer=None, only_file=None):
+            proposer=None, only_file=None,
+            skip_files=frozenset(), defer_files=frozenset()):
     """only_file (her ask, 2026-10-05): limit the run to one
     corpus file for cheap iteration — the outputs then hold
     THAT file's rows only; the full-estate run is the one that
-    ships to Fabric."""
+    ships to Fabric.
+    skip_files (D12, 2026-10-07): stems already described — their
+    scopes never propose; their delivery rows survive because
+    files_in_run excludes them (the L13 carry).
+    defer_files (D12 batch door): new-but-beyond-max_new — out of
+    this run entirely; nothing prior required, nothing written."""
     dir05, dir06, dir07, dir08 = (Path(dir05), Path(dir06),
                                   Path(dir07), Path(dir08))
     _ = dir02  # reserved: the voice overlay at the Fabric move
@@ -282,6 +312,12 @@ def build09(dir05, dir06, dir02, dir07, dir08, out09,
     if only_file:
         scopes = [s for s in scopes
                   if _file_of(s["node_id"]) == only_file]
+    if skip_files:
+        scopes = [s for s in scopes
+                  if _file_of(s["node_id"]) not in skip_files]
+    if defer_files:
+        scopes = [s for s in scopes
+                  if _file_of(s["node_id"]) not in defer_files]
     structures = _read(dir05 / "05_structure_sheet.json")
     preds = _read(dir05 / "05_predicate_sheet.json")
     params = _read(dir05 / "05_parameter_sheet.json")

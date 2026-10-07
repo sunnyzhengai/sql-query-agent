@@ -34,9 +34,12 @@ blessed-only (no unblessed name reaches Collibra).
       and upload the four json files. Raw extraction carries
       no embeddings — full Clarity lands in the low hundreds
       of MB, fine for Fabric Files.
-- [ ] The runner's LLM API key, entered as a workspace/notebook
-      SECRET — never pasted into a committed cell
-- [ ] The DevOps path of the `*.SemanticModel` folders (TMDL)
+- [ ] The runner's LLM API key, stored in an Azure Key Vault
+      (Step K below); customer tenants vault-only — the paste
+      interim exists solely under Cell 1 Form 2's conditions
+- [ ] The DevOps path of the `*.SemanticModel` folders (TMDL) —
+      Step T below tells how to find it and how to pull the
+      folders (manual zip or the automated notebook cell)
 - [ ] Which SQL files go in (and that their names end `.sql` —
       the rehearsal's bare-name lesson: portal uploads can
       drop extensions; the run sweeps `*.sql` only)
@@ -81,15 +84,178 @@ create in `tenant_intake.md` section 1.
 
 Upload the inputs; eyeball that sql names end `.sql`.
 
+## Step T — getting the TMDL (the `*.SemanticModel` folders)
+
+The engine reads TMDL files, not published Power BI items. A
+workspace's items are files ONLY if the workspace is connected
+to Git — then every Synced item sits in the repo as a
+`<name>.SemanticModel` folder.
+
+Find the right workspace and its repo:
+
+1. A Git-connected workspace shows a **Source control** button
+   in its toolbar and a **Git status** column (Synced /
+   Uncommitted) in the item list. No button, no column = not
+   connected (prod workspaces often aren't — use their
+   git-connected test twin; the TMDL then describes the TEST
+   version of each model, usually identical to prod except
+   connection settings).
+2. In the connected workspace: **Workspace settings** (button
+   top-right of the workspace page, NOT the portal's gear) ->
+   **Git integration** -> copy the organization, project,
+   repo, and branch into `tenant_intake.md`.
+3. Only **Synced** items are in the repo. An **Uncommitted**
+   item you want: Source control button -> select it ->
+   Commit (needs commit rights on that workspace).
+
+### T-manual — browse and download by hand
+
+1. Go to dev.azure.com, sign in, click the organization ->
+   the project.
+2. Left menu -> **Repos** -> **Files**; set the repo picker
+   and the branch picker (top of the file view) to the values
+   from Git integration.
+3. Open the folder holding the reports; each model is a
+   `<name>.SemanticModel` folder (ignore the `.Report`
+   folders — the engine does not read them).
+4. Hover a `.SemanticModel` folder -> **...** -> **Download
+   as Zip** -> unzip locally -> upload the folder into the
+   lakehouse `Files/tmdl/`.
+
+### T-auto — the notebook cell (repeatable; replaces manual)
+
+Needs a DevOps **Personal Access Token (PAT)**: dev.azure.com
+-> top-right user-settings icon (person with gear) ->
+**Personal access tokens** -> **+ New Token** -> scope **Code:
+Read** only, short expiry -> Create -> copy once. A PAT is a
+password-equivalent: it rides the SAME rules as the LLM key —
+vault, or Cell 1 Form 2's paste-interim conditions and scrub.
+
+    import io, os, shutil, zipfile, requests
+
+    ORG, PROJECT, REPO = "<org>", "<project>", "<repo>"
+    BRANCH = "main"
+    FOLDERS = ["<repo folder>", "<another folder>"]  # or ["/"]
+    #            for the WHOLE repo in one pull
+    PAT = "PASTE-PAT-HERE"  # Form 2 rules: scrub after the run
+    TMDL = "/lakehouse/default/Files/tmdl"
+
+    url = (f"https://dev.azure.com/{ORG}/{PROJECT}/_apis/git/"
+           f"repositories/{REPO}/items")
+    os.makedirs(TMDL, exist_ok=True)
+    n = 0
+    for folder in FOLDERS:
+        r = requests.get(url, auth=("", PAT), params={
+            "path": folder, "$format": "zip",
+            "download": "true",
+            "versionDescriptor.version": BRANCH,
+            "api-version": "7.1"})
+        r.raise_for_status()
+        tmp = "/tmp/devops_tmdl"
+        shutil.rmtree(tmp, ignore_errors=True)
+        zipfile.ZipFile(io.BytesIO(r.content)).extractall(tmp)
+        for root, dirs, _ in os.walk(tmp):
+            for d in list(dirs):
+                if d.endswith(".SemanticModel"):
+                    dst = os.path.join(TMDL, d)
+                    shutil.rmtree(dst, ignore_errors=True)
+                    shutil.copytree(os.path.join(root, d), dst)
+                    n += 1
+        print(f"{folder}: done")
+    print("semantic models landed:", n)
+
+SEVERAL SOURCE WORKSPACES (D11, built 2026-10-07, wheel
+0.6.0): run this cell once per workspace, each with that
+workspace's ORG / PROJECT / REPO / FOLDERS — and give each
+workspace its OWN subfolder by setting TMDL per run, e.g.
+`TMDL = "/lakehouse/default/Files/tmdl/WS One"`. The engine
+walks tmdl/ recursively; a model in a subfolder is named
+"<subfolder>/<model>" everywhere downstream (delivery,
+Collibra, blessings). Two workspaces sharing a bare report
+name is caught MECHANICALLY: the preflight fails naming the
+twins, and deliver() refuses to run until one is renamed or
+removed. Flat tmdl/ (no subfolders) stays legal for a
+single-workspace estate.
+
+The cell pulls ONLY `.SemanticModel` folders and overwrites
+each by name — re-run any time the repo moved; nothing else
+in `Files/tmdl/` is touched. The first run: eyeball that the
+landed folder names match the reports you meant.
+
+## Step K — the key vault (once; Azure portal, NOT Fabric)
+
+The key lives in an Azure Key Vault; the notebook reads it at
+run time under YOUR login. Workspace access does NOT grant
+vault access — a workspace colleague who opens or runs the
+notebook fetches with their OWN login and gets denied unless
+someone grants them a vault role. Record vault name, secret
+name, and who granted access in `tenant_intake.md`.
+
+If you cannot create Azure resources at work, hand steps 1-8
+to the Azure admin and ask back for the vault name + secret
+name + a "Key Vault Secrets User" role for you.
+
+1. Go to portal.azure.com (the Azure portal, not Fabric).
+2. Top search bar -> type **Key vaults** -> click **Key vaults**
+   -> **+ Create**.
+3. Basics tab: pick the Subscription and Resource group (ask
+   the admin which to use if unsure), give the vault a name
+   (globally unique, e.g. `<team>-ai01-kv`), pick the same
+   Region as the Fabric capacity.
+4. Access configuration tab: leave **Azure role-based access
+   control** selected. **Review + create** -> **Create** ->
+   wait -> **Go to resource**.
+5. Grant yourself the right to WRITE secrets: left menu
+   **Access control (IAM)** -> **+ Add** -> **Add role
+   assignment** -> role **Key Vault Secrets Officer** ->
+   Members: your account -> **Review + assign**. (Creating the
+   vault does not by itself let you create secrets under RBAC.)
+6. Store the key: left menu **Objects -> Secrets** ->
+   **+ Generate/Import** -> Name: `ai01-openai-key` ->
+   Secret value: paste the API key -> **Create**. This is the
+   ONLY place the key is ever pasted.
+7. Grant READ to everyone who will run the notebook (yourself
+   included if you only did step 5's Officer role — Officer
+   already includes read): **Access control (IAM)** ->
+   **+ Add** -> **Add role assignment** -> role **Key Vault
+   Secrets User** -> Members: the runner's account ->
+   **Review + assign**.
+8. To eyeball a stored secret later: **Objects -> Secrets** ->
+   click the secret -> click the current version -> **Show
+   Secret Value**. Only vault-role holders can do this.
+
 ## Step C — the notebook (fresh session, environment attached)
 
-Cell 1 — the key (from the workspace secret; adjust to however
-the secret is stored at work — vault getSecret or a pipeline/
-notebook secret; NEVER a literal in the cell):
+Cell 1 — the key. Two forms; the vault form is the standard
+and the ONLY form allowed on a customer tenant.
+
+Form 1 — vault read (customer tenants, always; fill in the
+two quoted names from Step K):
 
     import os
-    os.environ["OPENAI_API_KEY"] = <the secret read>
+    from notebookutils import credentials
+    os.environ["OPENAI_API_KEY"] = credentials.getSecret(
+        "https://<vault-name>.vault.azure.net/",
+        "ai01-openai-key")
     print("key loaded:", bool(os.environ["OPENAI_API_KEY"]))
+
+Form 2 — paste interim (RULED 2026-10-06, Sunny): allowed ONLY
+when BOTH conditions hold, checked that day — (a) the runner is
+the workspace's only member (Workspace settings -> Manage
+access) and (b) Git integration is OFF (Workspace settings ->
+Git integration). Either condition false -> Form 1 or stop.
+
+    import os
+    os.environ["OPENAI_API_KEY"] = "PASTE-KEY-HERE"
+    print("key loaded:", bool(os.environ["OPENAI_API_KEY"]))
+
+Paste the key between the quotes. THE SCRUB, same sitting: as
+soon as the Step C run finishes, put "PASTE-KEY-HERE" back in
+the cell and save the notebook before leaving it. The key
+never appears in any other cell, file, or commit.
+
+(Both forms print only True/False on purpose — notebook output
+is saved with the notebook; never print the key itself.)
 
 Cell 2 — THE PREFLIGHT (the same shipped check as the
 rehearsal — tenant-blind; must end `/ 0 fail`; every FAIL
@@ -115,7 +281,9 @@ any failure except a missing key):
         "/lakehouse/default/Files/tmdl",
         "/lakehouse/default/Files/01_sql_input",
         "/lakehouse/default/Files/out",
-        dict_dir="/lakehouse/default/Files/02_dictionary")
+        dict_dir="/lakehouse/default/Files/02_dictionary",
+        max_new=10)  # optional batch cap — see "Adding more
+    #                  files later"; omit to take everything new
 
 Cell 4 — the eye:
 
@@ -138,6 +306,26 @@ Cell 4 — the eye:
    her publish notebook reads it, filters blessed itself,
    maps names to Collibra ids at push time.
 
+## Adding more files later (D12, built 2026-10-07, wheel 0.6.0)
+
+DESCRIBED = DONE. deliver() keeps a content-hash ledger
+(out/10_corpus_ledger.json): a file whose content is unchanged
+since it was described is NEVER re-sent to the seat — its card
+and terms are reused, free. Upload everything; the run plans
+itself (no file names typed, ever).
+
+BATCHES: add `max_new=N` to the deliver call to cap a run at N
+new files (name order); the run ends saying what it did —
+"10 described (25 already done), 37 remain" — and the next run
+takes the next N. A new report tying to an already-described
+file re-uses its text for free. `force=True` re-describes
+everything (a deliberate full re-pay — rare).
+
+The ledger records only what a run actually described, only
+after the paid chain succeeded — a no-key degrade run records
+nothing, and a changed file (new content hash) is described
+again automatically.
+
 ## If a run is canceled or the seat was broken mid-run
 
 build07 checkpoints per node (07_live_checkpoint.json in
@@ -153,4 +341,5 @@ registry, and re-run the chain clean in the SAME session.
 No work file, output, or blessing comes back to the repo (the
 wall). No pytest suites at work (locks live at home; the
 preflight is the shipped check). No second sqldesc wheel. No
-key in any cell, file, or commit.
+key in any file or commit, and in a cell only under Cell 1
+Form 2 (solo workspace + Git off), scrubbed the same sitting.
