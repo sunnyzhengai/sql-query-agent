@@ -189,14 +189,15 @@ printed by convert must equal value + zc.
 2. Upload the `.sql` files to `Files/01_sql_input/`
    (multi-select works; names MUST end `.sql` — the sweep
    reads `*.sql` only).
-   UTF-16 FILES ALREADY UPLOADED (the 0xff error above):
-   convert in place with this cell, then re-run deliver —
-   safe to re-run, plain utf-8 files are skipped:
+   NON-UTF-8 FILES ALREADY UPLOADED (`0xff in position 0` =
+   UTF-16; `0xa0`/other mid-file = ANSI with special chars —
+   both seen on the first tenant): convert in place with this
+   cell, then re-run — safe to re-run, clean files skipped:
 
     import codecs, os
     folder = "/lakehouse/default/Files/01_sql_input/"
     fixed = 0
-    for n in os.listdir(folder):
+    for n in sorted(os.listdir(folder)):
         if not n.endswith(".sql"):
             continue
         with open(folder + n, "rb") as f:
@@ -207,7 +208,11 @@ printed by convert must equal value + zc.
         elif raw.startswith(codecs.BOM_UTF8):
             text = raw.decode("utf-8-sig")
         else:
-            continue
+            try:
+                raw.decode("utf-8")
+                continue                    # already clean
+            except UnicodeDecodeError:
+                text = raw.decode("cp1252")  # Windows ANSI
         with open(folder + n, "w", encoding="utf-8") as f:
             f.write(text)
         fixed += 1
