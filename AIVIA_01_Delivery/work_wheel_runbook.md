@@ -306,6 +306,7 @@ not map yet, across all files at once, zero LLM calls. Rule
 them in as one batch (one wheel update), then pay once —
 instead of a paid run stopping on each surprise.
 
+    import sqldesc_cli
     census = sqldesc_cli.sweep(
         "/lakehouse/default/Files/01_sql_input",
         "/lakehouse/default/Files/out",
