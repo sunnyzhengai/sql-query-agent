@@ -1,160 +1,92 @@
 # work_wheel_runbook — deploying the engine on a customer Fabric tenant
 
-Status: FINAL 2026-10-06 — the rehearsal CLOSED same day (Step 1
-of the TEMP checklist, blessed: 1 on Fabric); every cell below
-is rehearsal-proven. The permanent home for the work-side
-instructions — the TEMP checklist points here and dies at the
-end of the road; this doc stays.
+Status: FINAL 2026-10-06, amended 2026-10-08 (succinct rewrite +
+first-customer-tenant fixes). Every cell below is proven on a
+real tenant.
 
-THE LAWS RIDING EVERY STEP: metadata boundary (the LLM sees
-SQL text + dictionaries, never query results — work's approval
-condition) · the wall (work SQL and work outputs NEVER come
-back to the repo) · the one-wheel law (ONE sqldesc wheel in
-the environment; stop the session after every publish) ·
-blessed-only (no unblessed name reaches Collibra).
+THE LAWS: metadata boundary (the LLM sees SQL text +
+dictionaries, never query results) · the wall (work SQL and
+work outputs never come back to the repo) · one wheel (ONE
+sqldesc wheel in the environment) · blessed-only (no unblessed
+name reaches Collibra).
 
-## Prereqs (pack before the first session — checklist Step 2)
+## Prereqs (pack before the first session)
 
-- [ ] the NEWEST `ai01_sqldesc-*.whl` from wheel/ in this folder (the
-      version ladder law — never two versions installed)
-- [ ] The dictionary (the full-dictionary ruling, 2026-10-06):
-      run the four SHAPE-MATCHED queries in
-      dictionary_extraction/ against the tenant's Clarity
-      dictionary tables (metadata only), unscoped:
-      1. dict_extract_table.sql   -> dict_extract_table.csv
-      2. dict_extract_column.sql  -> dict_extract_column.csv
-         (primary keys + ini/item already folded in)
-      3. dict_extract_join.sql    -> dict_extract_join.csv
-      4. dict_extract_value.sql   -> dict_extract_value.csv,
-         then APPEND the result of the query ASSEMBLED by
-         dict_extract_value_generator.sql (the ZC universe —
-         eyeball the generated SQL before running it)
-      Then: `python tools/csv_to_json.py <csv_dir> <json_dir>`
-      (zero logic — the SQL already speaks the engine's shape)
-      and upload the four json files. Raw extraction carries
-      no embeddings — full Clarity lands in the low hundreds
-      of MB, fine for Fabric Files.
-- [ ] The runner's LLM API key, stored in an Azure Key Vault
-      (Step K below); customer tenants vault-only — the paste
-      interim exists solely under Cell 1 Form 2's conditions
-- [ ] The DevOps path of the `*.SemanticModel` folders (TMDL) —
-      Step T below tells how to find it and how to pull the
-      folders (manual zip or the automated notebook cell)
-- [ ] Which SQL files go in (and that their names end `.sql` —
-      the rehearsal's bare-name lesson: portal uploads can
-      drop extensions; the run sweeps `*.sql` only)
+- [ ] Newest `ai01_sqldesc-*.whl` from wheel/ (never two versions)
+- [ ] `tools/csv_to_json.py` (rides with the wheel)
+- [ ] The five extraction queries in dictionary_extraction/
+- [ ] The LLM API key, stored in Azure Key Vault (Step K)
+- [ ] DevOps org/project/repo/branch of the TMDL (Step T)
+- [ ] Which procs/views go in (Step S)
 
-## Step 0 — create the Fabric items (once; skip any that exist)
+## Step 0 — create the Fabric items (once)
 
-DO NOT mirror any other tenant's folder estate — the engine
-needs ONLY the Step B folders below. Record every name/id you
-create in `tenant_intake.md` section 1.
+Do NOT mirror any other tenant's folders — the engine needs
+only the Step B folders. Record every name/id in
+`tenant_intake.md` section 1.
 
 1. Fabric portal -> your workspace -> **+ New item** ->
-   **Lakehouse** -> name it (your convention) -> Create.
+   **Lakehouse** -> name it -> Create.
 2. **+ New item** -> **Environment** -> name it -> Create.
-3. **+ New item** -> **Notebook** -> name it; in the notebook
-   toolbar set **Environment** to the one you created, and in
-   the Explorer pane **Add data items -> your lakehouse** (it
-   becomes `/lakehouse/default/...` in the cells).
-4. The workspace/lakehouse ids live in the browser URL when
-   the lakehouse is open: `.../groups/<workspace-id>/
-   lakehouses/<lakehouse-id>` — copy both into the intake.
+3. **+ New item** -> **Notebook** -> name it; toolbar: set
+   **Environment** to yours; Explorer: **Add data items ->
+   your lakehouse** (becomes `/lakehouse/default/...`).
+4. Workspace/lakehouse ids are in the browser URL with the
+   lakehouse open: `.../groups/<ws-id>/lakehouses/<lh-id>`.
 
 ## Step A — the environment (once)
 
-1. Work Fabric portal -> the workspace -> New/open the
-   ENVIRONMENT item.
-2. Libraries -> PUBLIC libraries -> add `openai` pinned
-   (3.19.2 — the parity pin) — THIS is what installs the
-   seat's dependency tree (the rehearsal's httpx lesson;
-   custom wheels alone do not resolve it).
-   TENANTS WITHOUT PUBLIC LIBRARIES (External repositories
-   only — found 2026-10-07, first customer tenant): an
-   External-repositories install brings ONE package, no
-   dependency resolution. The seat then needs THREE adds,
-   pinned: `openai 3.19.2`, `httpx 0.28.1`, `httpcore 1.0.9`.
-   (openai requires httpx2 — which the install DID bring —
-   but it also imports plain `httpx`, whose tree needs
-   `httpcore`; the Fabric runtime already carries the rest:
+1. Open the ENVIRONMENT item.
+2. Libraries -> PUBLIC libraries -> add `openai` pinned 3.19.2
+   (the parity pin). Public install resolves dependencies.
+   TENANTS WITH EXTERNAL REPOSITORIES ONLY (no public
+   libraries): those installs bring ONE package, no
+   dependencies. Add THREE, pinned: `openai 3.19.2`,
+   `httpx 0.28.1`, `httpcore 1.0.9`. (openai's httpx2 comes
+   along; plain httpx does not; the runtime carries the
+   rest.) If unsure, probe in a notebook cell —
+   `importlib.import_module` over: httpx, httpx2, httpcore,
    h11, anyio, sniffio, idna, certifi, jiter, pydantic,
-   typing_extensions.) Before publishing, run the probe in
-   a notebook cell — one `importlib.import_module` try per
-   name above, print ADD on ModuleNotFoundError — and add
-   exactly the ADD lines, ALL IN ONE PUBLISH.
-3. Libraries -> CUSTOM libraries -> upload the wheel. ONE
+   typing_extensions — add every miss, ALL IN ONE PUBLISH.
+3. Libraries -> CUSTOM libraries -> upload the wheel. One
    sqldesc wheel, ever.
-4. Publish all -> wait for Success (10-20 min is normal;
-   the library list's per-row "Success" is only the UPLOAD
-   status, not the publish) -> any open notebook session is
-   now STALE: stop it (a session started while the publish
-   still bakes is stale too — the 2026-10-07 lesson: stop
-   and restart AFTER Success, never beside it).
+4. **Publish all** -> wait for publish **Success** (10-20 min;
+   a library row's own "Success" is only the upload) -> THEN
+   stop any open notebook session and start fresh. A session
+   started while the publish bakes is stale too.
 
 ## Step B — the lakehouse folders (once)
 
-    Files/01_sql_input/      <- the work SQL files (*.sql)
-    Files/02_dictionary/     <- the FOUR extraction files
-                                (column, value, table, join)
-    Files/tmdl/              <- the *.SemanticModel folders
+    Files/01_sql_input/      <- work SQL files (*.sql), Step S
+    Files/02_dictionary/     <- the four extraction json, Step E
+    Files/tmdl/              <- *.SemanticModel folders, Step T
     Files/out/               <- the run writes here
 
-Upload the inputs; eyeball that sql names end `.sql`.
+## Step T — the TMDL (`*.SemanticModel` folders)
 
-## Step T — getting the TMDL (the `*.SemanticModel` folders)
+The engine reads TMDL files from the workspace's Git repo, not
+published items. Git-connected workspaces show a **Source
+control** button and a **Git status** column (prod often
+isn't connected — use its git-connected test twin). Only
+**Synced** items are in the repo; commit Uncommitted ones via
+Source control. Find the repo: **Workspace settings -> Git
+integration** -> copy org/project/repo/branch into the intake.
 
-The engine reads TMDL files, not published Power BI items. A
-workspace's items are files ONLY if the workspace is connected
-to Git — then every Synced item sits in the repo as a
-`<name>.SemanticModel` folder.
+Pull with the notebook cell (repeatable; manual alternative:
+dev.azure.com -> Repos -> Files -> hover the `.SemanticModel`
+folder -> ... -> Download as Zip -> unzip -> upload to tmdl/).
 
-Find the right workspace and its repo:
-
-1. A Git-connected workspace shows a **Source control** button
-   in its toolbar and a **Git status** column (Synced /
-   Uncommitted) in the item list. No button, no column = not
-   connected (prod workspaces often aren't — use their
-   git-connected test twin; the TMDL then describes the TEST
-   version of each model, usually identical to prod except
-   connection settings).
-2. In the connected workspace: **Workspace settings** (button
-   top-right of the workspace page, NOT the portal's gear) ->
-   **Git integration** -> copy the organization, project,
-   repo, and branch into `tenant_intake.md`.
-3. Only **Synced** items are in the repo. An **Uncommitted**
-   item you want: Source control button -> select it ->
-   Commit (needs commit rights on that workspace).
-
-### T-manual — browse and download by hand
-
-1. Go to dev.azure.com, sign in, click the organization ->
-   the project.
-2. Left menu -> **Repos** -> **Files**; set the repo picker
-   and the branch picker (top of the file view) to the values
-   from Git integration.
-3. Open the folder holding the reports; each model is a
-   `<name>.SemanticModel` folder (ignore the `.Report`
-   folders — the engine does not read them).
-4. Hover a `.SemanticModel` folder -> **...** -> **Download
-   as Zip** -> unzip locally -> upload the folder into the
-   lakehouse `Files/tmdl/`.
-
-### T-auto — the notebook cell (repeatable; replaces manual)
-
-Needs a DevOps **Personal Access Token (PAT)**: dev.azure.com
--> top-right user-settings icon (person with gear) ->
+Needs a DevOps PAT: dev.azure.com -> user-settings icon ->
 **Personal access tokens** -> **+ New Token** -> scope **Code:
-Read** only, short expiry -> Create -> copy once. A PAT is a
-password-equivalent: it rides the SAME rules as the LLM key —
-vault, or Cell 1 Form 2's paste-interim conditions and scrub.
+Read**, short expiry -> copy once. A PAT is a password: vault,
+or Cell 1 Form 2's paste conditions and same-sitting scrub.
 
     import io, os, shutil, zipfile, requests
 
     ORG, PROJECT, REPO = "<org>", "<project>", "<repo>"
     BRANCH = "main"
-    FOLDERS = ["<repo folder>", "<another folder>"]  # or ["/"]
-    #            for the WHOLE repo in one pull
-    PAT = "PASTE-PAT-HERE"  # Form 2 rules: scrub after the run
+    FOLDERS = ["<repo folder>", "<another>"]  # or ["/"] = whole repo
+    PAT = "PASTE-PAT-HERE"  # scrub after the run
     TMDL = "/lakehouse/default/Files/tmdl"
 
     url = (f"https://dev.azure.com/{ORG}/{PROJECT}/_apis/git/"
@@ -181,73 +113,162 @@ vault, or Cell 1 Form 2's paste-interim conditions and scrub.
         print(f"{folder}: done")
     print("semantic models landed:", n)
 
-SEVERAL SOURCE WORKSPACES (D11, built 2026-10-07, wheel
-0.6.0): run this cell once per workspace, each with that
-workspace's ORG / PROJECT / REPO / FOLDERS — and give each
-workspace its OWN subfolder by setting TMDL per run, e.g.
-`TMDL = "/lakehouse/default/Files/tmdl/WS One"`. The engine
-walks tmdl/ recursively; a model in a subfolder is named
-"<subfolder>/<model>" everywhere downstream (delivery,
-Collibra, blessings). Two workspaces sharing a bare report
-name is caught MECHANICALLY: the preflight fails naming the
-twins, and deliver() refuses to run until one is renamed or
-removed. Flat tmdl/ (no subfolders) stays legal for a
-single-workspace estate.
+SEVERAL SOURCE WORKSPACES: run the cell once per workspace,
+each into its own subfolder (`TMDL = ".../tmdl/WS One"`). The
+engine walks tmdl/ recursively; subfolder models are named
+"<subfolder>/<model>" downstream. Bare-name twins across
+workspaces fail the preflight by name until resolved. Flat
+tmdl/ stays legal for one workspace. Re-run any time — the
+cell overwrites by name and touches nothing else.
 
-The cell pulls ONLY `.SemanticModel` folders and overwrites
-each by name — re-run any time the repo moved; nothing else
-in `Files/tmdl/` is touched. The first run: eyeball that the
-landed folder names match the reports you meant.
+## Step E — the dictionary (four json files)
+
+Run in SSMS against the tenant's Clarity dictionary tables
+(metadata only, unscoped). FIRST, once per SSMS session (the
+setting does not survive non-persistent remote desktops):
+Tools -> Options -> Query Results -> SQL Server -> Results to
+Grid -> check **Include column headers when copying or saving
+results**.
+
+On a Citrix/remote SSMS, save to the mapped laptop drive
+(**This PC -> "C on <your laptop>"**) — the remote profile's
+own folders are invisible to your laptop.
+
+1. Run dict_extract_table / _column / _join / _value .sql ->
+   save each grid as `<same name>.csv`.
+2. The ZC universe: run `dict_extract_value_generator.sql`.
+   Its OUTPUT IS SQL, not data — copy the whole result column
+   into a new query window, delete the trailing `UNION ALL`
+   on the last line, EYEBALL it, run it. Save the result as
+   `dict_extract_value_zc.csv` (too long for one run? save
+   batches `_zc_1.csv`, `_zc_2.csv`, ... — the merge cell
+   takes them all, headers or not).
+3. Upload all csv files + `tools/csv_to_json.py` to
+   `Files/02_dictionary/`.
+4. In the notebook, merge + convert (run ONCE — a rerun
+   doubles the zc rows):
+
+    import csv, glob, sys
+
+    folder = "/lakehouse/default/Files/02_dictionary/"
+    def rd(p):
+        with open(p, newline="", encoding="utf-8-sig") as f:
+            return list(csv.reader(f))
+    value = rd(folder + "dict_extract_value.csv")
+    added = 0
+    for p in sorted(glob.glob(folder + "dict_extract_value_zc*.csv")):
+        rows = rd(p)
+        if rows and rows[0] == value[0]:
+            rows = rows[1:]
+        assert all(len(r) == 3 for r in rows), f"bad rows in {p}"
+        value += rows
+        added += len(rows)
+    with open(folder + "dict_extract_value.csv", "w",
+              newline="", encoding="utf-8") as f:
+        csv.writer(f).writerows(value)
+    print("zc rows folded in:", added)
+    sys.path.append(folder)
+    import csv_to_json
+    csv_to_json.convert(folder, folder)
+
+The four json files land next to the csvs; the value row count
+printed by convert must equal value + zc.
+
+## Step S — the SQL input files
+
+1. SSMS: right-click the database -> **Tasks -> Generate
+   Scripts** -> **Select specific database objects** -> tick
+   the procs/views -> Output: **Save scripts to a specific
+   location** + **One script file per object** -> pick the
+   mapped laptop drive -> AND set **Save as: ANSI text**
+   (or UTF-8 where offered) — the default "Unicode" is
+   UTF-16, which the engine refuses (found 2026-10-07:
+   deliver dies on `UnicodeDecodeError ... byte 0xff in
+   position 0`; the preflight only counts files, so it
+   passes) -> Finish.
+2. Upload the `.sql` files to `Files/01_sql_input/`
+   (multi-select works; names MUST end `.sql` — the sweep
+   reads `*.sql` only).
+   UTF-16 FILES ALREADY UPLOADED (the 0xff error above):
+   convert in place with this cell, then re-run deliver —
+   safe to re-run, plain utf-8 files are skipped:
+
+    import codecs, os
+    folder = "/lakehouse/default/Files/01_sql_input/"
+    fixed = 0
+    for n in os.listdir(folder):
+        if not n.endswith(".sql"):
+            continue
+        with open(folder + n, "rb") as f:
+            raw = f.read()
+        if raw.startswith(codecs.BOM_UTF16_LE) \
+                or raw.startswith(codecs.BOM_UTF16_BE):
+            text = raw.decode("utf-16")
+        elif raw.startswith(codecs.BOM_UTF8):
+            text = raw.decode("utf-8-sig")
+        else:
+            continue
+        with open(folder + n, "w", encoding="utf-8") as f:
+            f.write(text)
+        fixed += 1
+    print("converted:", fixed, "files")
+3. CLEAN THE NAMES BEFORE THE FIRST RUN — the file name minus
+   `.sql` is the identity everywhere downstream (outputs,
+   ledger, Collibra), and renaming later makes the ledger
+   forget what was done. Generate Scripts names files
+   `Schema.Object.ObjectType.sql`; strip to `Object.sql`:
+
+    import os
+    folder = "/lakehouse/default/Files/01_sql_input/"
+    names = [n for n in os.listdir(folder) if n.endswith(".sql")]
+    def clean(n):
+        core = n[:-4]
+        for t in (".StoredProcedure", ".View"):
+            if core.endswith(t):
+                core = core[: -len(t)]
+        return core.split(".")[-1] + ".sql"
+    m = {n: clean(n) for n in names}
+    t = list(m.values())
+    dups = sorted({x for x in t if t.count(x) > 1})
+    assert not dups, f"collisions: {dups}"  # keep schema prefix
+    #                                          for just these
+    for old, new in m.items():
+        if old != new:
+            os.rename(folder + old, folder + new)
+    print("renamed", sum(o != n for o, n in m.items()),
+          "of", len(names))
 
 ## Step K — the key vault (once; Azure portal, NOT Fabric)
 
-The key lives in an Azure Key Vault; the notebook reads it at
-run time under YOUR login. Workspace access does NOT grant
-vault access — a workspace colleague who opens or runs the
-notebook fetches with their OWN login and gets denied unless
-someone grants them a vault role. Record vault name, secret
-name, and who granted access in `tenant_intake.md`.
+The notebook reads the key at run time under YOUR login;
+workspace access does not grant vault access. Record vault
+name, secret name, who granted what in `tenant_intake.md`. No
+Azure rights at work? Hand steps 1-6 to the Azure admin; ask
+back for vault name + secret name + a Secrets User role.
 
-If you cannot create Azure resources at work, hand steps 1-8
-to the Azure admin and ask back for the vault name + secret
-name + a "Key Vault Secrets User" role for you.
+1. portal.azure.com -> search **Key vaults** -> **+ Create**.
+2. Basics: Subscription + Resource group (ask the admin),
+   globally-unique name (e.g. `<team>-ai01-kv`), same Region
+   as the Fabric capacity.
+3. Access configuration: keep **Azure role-based access
+   control** -> **Review + create** -> **Create** -> **Go to
+   resource**.
+4. Let yourself WRITE secrets: **Access control (IAM)** ->
+   **+ Add -> Add role assignment** -> **Key Vault Secrets
+   Officer** -> your account -> **Review + assign**.
+5. Store the key: **Objects -> Secrets -> + Generate/Import**
+   -> Name `ai01-openai-key` -> Value: paste the key ->
+   **Create**. The ONLY place the key is ever pasted.
+6. Grant READ to every runner: **IAM -> + Add -> Add role
+   assignment** -> **Key Vault Secrets User** -> the runner
+   -> **Review + assign**. (Officer already includes read.)
+7. To eyeball later: **Objects -> Secrets** -> the secret ->
+   current version -> **Show Secret Value**.
 
-1. Go to portal.azure.com (the Azure portal, not Fabric).
-2. Top search bar -> type **Key vaults** -> click **Key vaults**
-   -> **+ Create**.
-3. Basics tab: pick the Subscription and Resource group (ask
-   the admin which to use if unsure), give the vault a name
-   (globally unique, e.g. `<team>-ai01-kv`), pick the same
-   Region as the Fabric capacity.
-4. Access configuration tab: leave **Azure role-based access
-   control** selected. **Review + create** -> **Create** ->
-   wait -> **Go to resource**.
-5. Grant yourself the right to WRITE secrets: left menu
-   **Access control (IAM)** -> **+ Add** -> **Add role
-   assignment** -> role **Key Vault Secrets Officer** ->
-   Members: your account -> **Review + assign**. (Creating the
-   vault does not by itself let you create secrets under RBAC.)
-6. Store the key: left menu **Objects -> Secrets** ->
-   **+ Generate/Import** -> Name: `ai01-openai-key` ->
-   Secret value: paste the API key -> **Create**. This is the
-   ONLY place the key is ever pasted.
-7. Grant READ to everyone who will run the notebook (yourself
-   included if you only did step 5's Officer role — Officer
-   already includes read): **Access control (IAM)** ->
-   **+ Add** -> **Add role assignment** -> role **Key Vault
-   Secrets User** -> Members: the runner's account ->
-   **Review + assign**.
-8. To eyeball a stored secret later: **Objects -> Secrets** ->
-   click the secret -> click the current version -> **Show
-   Secret Value**. Only vault-role holders can do this.
+## Step C — the run (fresh session, environment attached)
 
-## Step C — the notebook (fresh session, environment attached)
-
-Cell 1 — the key. Two forms; the vault form is the standard
-and the ONLY form allowed on a customer tenant.
-
-Form 1 — vault read (customer tenants, always; fill in the
-two quoted names from Step K):
+Cell 1 — the key. Vault form, the only form on a customer
+tenant:
 
     import os
     from notebookutils import credentials
@@ -256,27 +277,20 @@ two quoted names from Step K):
         "ai01-openai-key")
     print("key loaded:", bool(os.environ["OPENAI_API_KEY"]))
 
-Form 2 — paste interim (RULED 2026-10-06, Sunny): allowed ONLY
-when BOTH conditions hold, checked that day — (a) the runner is
-the workspace's only member (Workspace settings -> Manage
-access) and (b) Git integration is OFF (Workspace settings ->
-Git integration). Either condition false -> Form 1 or stop.
+Form 2 — paste interim (RULED 2026-10-06): allowed ONLY if,
+checked that day, (a) the runner is the workspace's only
+member AND (b) Git integration is OFF. Paste between the
+quotes; THE SCRUB: the moment the run finishes, put
+"PASTE-KEY-HERE" back and save the notebook. Never print the
+key.
 
     import os
     os.environ["OPENAI_API_KEY"] = "PASTE-KEY-HERE"
     print("key loaded:", bool(os.environ["OPENAI_API_KEY"]))
 
-Paste the key between the quotes. THE SCRUB, same sitting: as
-soon as the Step C run finishes, put "PASTE-KEY-HERE" back in
-the cell and save the notebook before leaving it. The key
-never appears in any other cell, file, or commit.
-
-(Both forms print only True/False on purpose — notebook output
-is saved with the notebook; never print the key itself.)
-
-Cell 2 — THE PREFLIGHT (the same shipped check as the
-rehearsal — tenant-blind; must end `/ 0 fail`; every FAIL
-line names its own fix):
+Cell 2 — the preflight. Must end `/ 0 fail`; every FAIL line
+names its own fix. (Work-side expected: no names asset — the
+ruled fallback; blessing registry starts empty.)
 
     import sqldesc_cli
     sqldesc_cli.preflight(
@@ -285,22 +299,15 @@ line names its own fix):
         "/lakehouse/default/Files/out",
         dict_dir="/lakehouse/default/Files/02_dictionary")
 
-Expected work-side differences from the rehearsal board: the
-names asset is absent (no 03 folder at work) — that is the
-ruled honest fallback, not a failure; the blessing registry
-starts empty — blessings are made here and STAY here.
-
-Cell 3 — THE RUN (the runner's hand; quiet minutes = paid calls
-working; deliver re-runs the preflight itself and refuses on
-any failure except a missing key):
+Cell 3 — the run. Quiet minutes = paid calls working; deliver
+re-runs the preflight and refuses on any failure.
 
     sqldesc_cli.deliver(
         "/lakehouse/default/Files/tmdl",
         "/lakehouse/default/Files/01_sql_input",
         "/lakehouse/default/Files/out",
         dict_dir="/lakehouse/default/Files/02_dictionary",
-        max_new=10)  # optional batch cap — see "Adding more
-    #                  files later"; omit to take everything new
+        max_new=10)  # batch cap; omit to take everything new
 
 Cell 4 — the eye:
 
@@ -311,7 +318,7 @@ Cell 4 — the eye:
 
 1. Read the official txt; check cards + technical definitions
    against the SQL the reviewer knows.
-2. Bless the keeper names:
+2. Bless keeper names:
 
     import business_terms as bt
     bt.bless("/lakehouse/default/Files/out",
@@ -319,44 +326,31 @@ Cell 4 — the eye:
              "<node_id>", "<report name>",
              "RULED <date> (<the blesser>): <the ruling>")
 
-3. The artifact for Collibra: `Files/out/ai_delivery.json` —
-   her publish notebook reads it, filters blessed itself,
-   maps names to Collibra ids at push time.
+3. Collibra reads `Files/out/ai_delivery.json` — her publish
+   notebook filters blessed itself.
 
-## Adding more files later (D12, built 2026-10-07, wheel 0.6.0)
+## Later runs — DESCRIBED = DONE
 
-DESCRIBED = DONE. deliver() keeps a content-hash ledger
-(out/10_corpus_ledger.json): a file whose content is unchanged
-since it was described is NEVER re-sent to the seat — its card
-and terms are reused, free. Upload everything; the run plans
-itself (no file names typed, ever).
+deliver() keeps a content-hash ledger
+(out/10_corpus_ledger.json): an unchanged described file is
+never re-sent — its text is reused free; a changed file is
+described again automatically. Upload everything; the run
+plans itself. `max_new=N` caps a run at N new files (name
+order) and reports "N described (M already done), K remain".
+`force=True` re-describes everything — a deliberate full
+re-pay, rare. The ledger records only what a paid run actually
+described.
 
-BATCHES: add `max_new=N` to the deliver call to cap a run at N
-new files (name order); the run ends saying what it did —
-"10 described (25 already done), 37 remain" — and the next run
-takes the next N. A new report tying to an already-described
-file re-uses its text for free. `force=True` re-describes
-everything (a deliberate full re-pay — rare).
+## If a run was canceled or the seat broke mid-run
 
-The ledger records only what a run actually described, only
-after the paid chain succeeded — a no-key degrade run records
-nothing, and a changed file (new content hash) is described
-again automatically.
-
-## If a run is canceled or the seat was broken mid-run
-
-build07 checkpoints per node (07_live_checkpoint.json in
-<out>/07/). A canceled or broken run leaves its failed nodes
-checkpointed as floors, and a later resume SKIPS them (rehearsal
-find #7: eight file cards stayed floored after the seat was
-fixed). After fixing any seat problem: delete
-<out>/07/07_live_checkpoint.json if present, keep the blessing
-registry, and re-run the chain clean in the SAME session.
+Failed nodes stay checkpointed as floors and a resume would
+skip them. After fixing the seat: delete
+`<out>/07/07_live_checkpoint.json` if present, keep the
+blessing registry, re-run the chain clean in the SAME session.
 
 ## What never happens here
 
-No work file, output, or blessing comes back to the repo (the
-wall). No pytest suites at work (locks live at home; the
-preflight is the shipped check). No second sqldesc wheel. No
-key in any file or commit, and in a cell only under Cell 1
-Form 2 (solo workspace + Git off), scrubbed the same sitting.
+No work file, output, or blessing comes back to the repo. No
+pytest at work (the preflight is the shipped check). No second
+sqldesc wheel. No key in any file or commit — in a cell only
+under Form 2's conditions, scrubbed the same sitting.
