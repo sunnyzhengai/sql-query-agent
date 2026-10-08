@@ -69,10 +69,27 @@ create in `tenant_intake.md` section 1.
    (3.19.2 — the parity pin) — THIS is what installs the
    seat's dependency tree (the rehearsal's httpx lesson;
    custom wheels alone do not resolve it).
+   TENANTS WITHOUT PUBLIC LIBRARIES (External repositories
+   only — found 2026-10-07, first customer tenant): an
+   External-repositories install brings ONE package, no
+   dependency resolution. The seat then needs THREE adds,
+   pinned: `openai 3.19.2`, `httpx 0.28.1`, `httpcore 1.0.9`.
+   (openai requires httpx2 — which the install DID bring —
+   but it also imports plain `httpx`, whose tree needs
+   `httpcore`; the Fabric runtime already carries the rest:
+   h11, anyio, sniffio, idna, certifi, jiter, pydantic,
+   typing_extensions.) Before publishing, run the probe in
+   a notebook cell — one `importlib.import_module` try per
+   name above, print ADD on ModuleNotFoundError — and add
+   exactly the ADD lines, ALL IN ONE PUBLISH.
 3. Libraries -> CUSTOM libraries -> upload the wheel. ONE
    sqldesc wheel, ever.
-4. Publish all -> wait for Success -> any open notebook
-   session is now STALE: stop it.
+4. Publish all -> wait for Success (10-20 min is normal;
+   the library list's per-row "Success" is only the UPLOAD
+   status, not the publish) -> any open notebook session is
+   now STALE: stop it (a session started while the publish
+   still bakes is stale too — the 2026-10-07 lesson: stop
+   and restart AFTER Success, never beside it).
 
 ## Step B — the lakehouse folders (once)
 
