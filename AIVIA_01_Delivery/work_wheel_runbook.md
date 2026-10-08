@@ -212,31 +212,32 @@ printed by convert must equal value + zc.
             f.write(text)
         fixed += 1
     print("converted:", fixed, "files")
-3. CLEAN THE NAMES BEFORE THE FIRST RUN — the file name minus
-   `.sql` is the identity everywhere downstream (outputs,
-   ledger, Collibra), and renaming later makes the ledger
-   forget what was done. Generate Scripts names files
-   `Schema.Object.ObjectType.sql`; strip to `Object.sql`:
+3. CLEAN THE NAMES BEFORE A FILE'S FIRST RUN — the file name
+   minus `.sql` is the identity everywhere downstream
+   (outputs, ledger, Collibra), and renaming later makes the
+   ledger forget what was done. Generate Scripts names files
+   `Schema.Object.ObjectType.sql`; this cell strips the
+   schema prefix and the ObjectType tail, keeps dots INSIDE
+   the object name (the 2026-10-07 `V2.1` lesson), and only
+   touches fresh Generate Scripts output — SAFE TO RE-RUN
+   after each new export, already-clean files untouched:
 
     import os
     folder = "/lakehouse/default/Files/01_sql_input/"
-    names = [n for n in os.listdir(folder) if n.endswith(".sql")]
-    def clean(n):
-        core = n[:-4]
-        for t in (".StoredProcedure", ".View"):
-            if core.endswith(t):
-                core = core[: -len(t)]
-        return core.split(".")[-1] + ".sql"
-    m = {n: clean(n) for n in names}
-    t = list(m.values())
-    dups = sorted({x for x in t if t.count(x) > 1})
-    assert not dups, f"collisions: {dups}"  # keep schema prefix
-    #                                          for just these
-    for old, new in m.items():
-        if old != new:
-            os.rename(folder + old, folder + new)
-    print("renamed", sum(o != n for o, n in m.items()),
-          "of", len(names))
+    TAILS = (".StoredProcedure.sql", ".View.sql")
+    renamed = 0
+    for n in sorted(os.listdir(folder)):
+        tail = next((t for t in TAILS if n.endswith(t)), None)
+        if tail is None:
+            continue  # not fresh wizard output — leave alone
+        core = n[: -len(tail)]
+        new = (core.split(".", 1)[1] if "." in core
+               else core) + ".sql"
+        assert not os.path.exists(folder + new), \
+            f"would collide: {n} -> {new}"
+        os.rename(folder + n, folder + new)
+        renamed += 1
+    print("renamed", renamed, "file(s)")
 
 ## Step K — the key vault (once; Azure portal, NOT Fabric)
 
