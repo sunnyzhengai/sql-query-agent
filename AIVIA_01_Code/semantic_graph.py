@@ -683,6 +683,14 @@ def _emit_expr(ctx, parent_id, expr, role=None, output_name=None,
                         edge_role="condition")
         _emit_expr(ctx, node_id, expr.ThenExpression)
         _emit_expr(ctx, node_id, expr.ElseExpression)
+    elif t == "AtTimeZoneCall":
+        # AT TIME ZONE (ruled 2026-10-07 — the sweep's first field
+        # find): function kind, name verbatim; DateValue is the
+        # subject, TimeZone the second argument.
+        row["expression_kind"] = "function"
+        row["name"] = "AT TIME ZONE"
+        _emit_expr(ctx, node_id, expr.DateValue, role="subject")
+        _emit_expr(ctx, node_id, expr.TimeZone)
     elif t == "ScalarSubquery":
         row["expression_kind"] = "subquery_ref"
         row["scope_id"] = _mint_subquery(ctx, expr.QueryExpression,

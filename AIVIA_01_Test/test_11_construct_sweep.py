@@ -56,6 +56,18 @@ BEGIN
 END
 """
 
+# the sweep's first field find (2026-10-07, 245-file corpus):
+# double application, UTC -> local, verbatim shape from the tenant
+ATZ_SQL = """\
+CREATE PROCEDURE dbo.USP_ATZ AS
+BEGIN
+    SELECT TA.AUDIT_UTC_DTTM
+           AT TIME ZONE 'UTC'
+           AT TIME ZONE 'Central Standard Time' AS LOCAL_DTTM
+    FROM TASK_AUDIT TA;
+END
+"""
+
 
 def _stage(tmp_path, files):
     sql_dir = tmp_path / "sql"
@@ -122,6 +134,20 @@ def test_sweep_census(tmp_path):
     on_disk = json.loads(
         (out_dir / "11_construct_census.json").read_text())
     assert on_disk == census
+
+
+def test_at_time_zone_maps_to_function(tmp_path):
+    """AT TIME ZONE (ruled 2026-10-07): the function kind, name
+    verbatim, DateValue as subject + TimeZone as second argument;
+    the doubled form nests — two rows."""
+    sql_dir, d05, d02 = _stage(tmp_path, {"atz.sql": ATZ_SQL})
+    semantic_graph.build(sql_dir, d05, d02)  # must not raise
+    rows = json.loads((d05 / "05_expression_sheet.json").read_text())
+    atz = [r for r in rows if r.get("name") == "AT TIME ZONE"]
+    assert len(atz) == 2, [r["raw_text"] for r in atz]
+    assert {r["expression_kind"] for r in atz} == {"function"}
+    subjects = [r for r in rows if r.get("role") == "subject"]
+    assert any("AUDIT_UTC_DTTM" in r["raw_text"] for r in subjects)
 
 
 def test_value_route_reads_load_time_index(tmp_path):

@@ -402,6 +402,12 @@ def _map_expression(ctx, e):
                      data_type=_data_type_name(e.DataType),
                      style=_map_expression(ctx, style) if style is not None
                      else None)
+    if t == "AtTimeZoneCall":
+        # AT TIME ZONE (ruled 2026-10-07): function, name verbatim
+        return _node(ctx, "expression", "function", e,
+                     name="AT TIME ZONE",
+                     args=[_map_expression(ctx, e.DateValue),
+                           _map_expression(ctx, e.TimeZone)])
     if t in ("ParseCall", "TryParseCall"):
         # the conversion family's string-input members (ruled
         # 2026-10-07): input is StringValue, optional Culture.
@@ -1061,7 +1067,7 @@ MAPPED_TYPES = frozenset({
     "LeftFunctionCall", "RightFunctionCall", "CoalesceExpression",
     "NullIfExpression", "IIfCall", "CastCall", "TryCastCall",
     "ConvertCall", "TryConvertCall", "ParseCall", "TryParseCall",
-    "BinaryExpression", "UnaryExpression",
+    "AtTimeZoneCall", "BinaryExpression", "UnaryExpression",
     "ParenthesisExpression", "SearchedCaseExpression",
     "SimpleCaseExpression", "ScalarSubquery",
     *LITERAL_TYPES,

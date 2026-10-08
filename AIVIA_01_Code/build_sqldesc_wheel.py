@@ -20,7 +20,10 @@ from pathlib import Path
 CODE = Path(__file__).resolve().parent
 REPO = CODE.parent
 DLL = "Microsoft.SqlServer.TransactSql.ScriptDom.dll"
-VERSION = "0.6.2"  # THE SCALE FIX (2026-10-07, same night): the
+VERSION = "0.6.3"  # AT TIME ZONE ruled in (2026-10-07, the
+# sweep's first field find — 2 hits, 1 file of 245): function
+# kind, name verbatim, DateValue subject + TimeZone argument.
+# 0.6.2 — THE SCALE FIX (2026-10-07, same night): the
 # first full dictionary (1.2M join rows) exposed two per-call
 # full scans — _value_route and the join binder; both now read
 # load-time indexes (route_candidates + pair_index narrowing),
