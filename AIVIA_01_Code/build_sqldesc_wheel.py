@@ -20,7 +20,12 @@ from pathlib import Path
 CODE = Path(__file__).resolve().parent
 REPO = CODE.parent
 DLL = "Microsoft.SqlServer.TransactSql.ScriptDom.dll"
-VERSION = "0.6.0"  # the work scale-up (2026-10-07): D13 views +
+VERSION = "0.6.1"  # the tenant day-1 build (2026-10-07):
+# PARSE/TRY_PARSE join the cast kind (the conversion family's
+# string-input members) + sweep() — the parse-only construct
+# census (collect-and-continue at the four RED BUILD stops;
+# deliver/describe keep the hard stop).
+# 0.6.0 — the work scale-up (2026-10-07): D13 views +
 # D12 incremental (ledger, skip/defer, max_new) + D11 path 2
 # (recursive tmdl, qualified identity, collision preflight).
 # Before 0.6.0 — the rehearsal-night ladder: 0.5.1 env-first

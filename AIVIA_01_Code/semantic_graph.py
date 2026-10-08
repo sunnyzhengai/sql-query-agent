@@ -519,6 +519,26 @@ _LITERAL_TYPES = {
 }
 _CAST_TYPES = {"CastCall", "ConvertCall", "TryCastCall",
                "TryConvertCall"}
+# PARSE / TRY_PARSE (ruled 2026-10-07, first customer tenant): the
+# conversion family's string-input members — same cast kind, but
+# ScriptDom shapes them differently (StringValue + optional Culture,
+# not Parameter), so they get their own emit branch below.
+_PARSE_TYPES = {"ParseCall", "TryParseCall"}
+
+
+def _red_build(ctx, site, construct, ev, message):
+    """THE ONE DOOR for the four honesty stops (ruled 2026-10-07):
+    no collect sink on ctx -> raise exactly as before (deliver/
+    describe keep the stop); a sink (the sweep's parse-only census)
+    -> record {file, site, construct, line, fragment} and keep
+    walking, so ONE free pass surfaces EVERY unmapped construct."""
+    sink = ctx.get("collect_unmapped")
+    if sink is None:
+        raise RuntimeError(message)
+    sink.append({"file": ctx.get("file_name"),
+                 "site": site, "construct": construct,
+                 "line": ev["line"] if ev else None,
+                 "fragment": ev["fragment"][:120] if ev else None})
 
 
 def _next_child(ctx, parent_id, family):
@@ -618,6 +638,14 @@ def _emit_expr(ctx, parent_id, expr, role=None, output_name=None,
     elif t in _CAST_TYPES:
         row["expression_kind"] = "cast"
         _emit_expr(ctx, node_id, expr.Parameter)
+    elif t in _PARSE_TYPES:
+        # input is StringValue; the optional Culture rides as a
+        # counted child (never dropped), role "culture".
+        row["expression_kind"] = "cast"
+        _emit_expr(ctx, node_id, expr.StringValue)
+        culture = getattr(expr, "Culture", None)
+        if culture is not None:
+            _emit_expr(ctx, node_id, culture, role="culture")
     elif t in ("SearchedCaseExpression", "SimpleCaseExpression"):
         row["expression_kind"] = "case"
         if t == "SimpleCaseExpression":
@@ -647,10 +675,12 @@ def _emit_expr(ctx, parent_id, expr, role=None, output_name=None,
         row["scope_id"] = _mint_subquery(ctx, expr.QueryExpression,
                                          _evidence(text, expr))
     else:
-        raise RuntimeError(
+        _red_build(
+            ctx, "expression", t, ev,
             f"RED BUILD: unmapped expression construct {t} at "
             f"L{ev['line']} ({ev['fragment'][:60]!r}) — rule it into "
             "the closed set or the library before building on.")
+        row["expression_kind"] = "remainder_ref"  # collect mode only
     return node_id
 
 
@@ -730,11 +760,13 @@ def _emit_pred_leaf(ctx, parent_id, cond, edge_role, extra_negate):
         row["predicate_kind"] = f"DEFERRED:{t}"  # visible, counted
     else:
         ev = row["evidence"]
-        raise RuntimeError(
+        _red_build(
+            ctx, "predicate", t, ev,
             f"RED BUILD: boolean type {t} is beyond the "
             f"TSQL_Denominator (L{ev['line']}: {ev['fragment'][:60]!r})"
             " — add a denominator row (mapped or DEFERRED) before "
             "building on.")
+        row["predicate_kind"] = f"REMAINDER:{t}"  # collect mode only
 
 
 def _emit_pred_tree(ctx, parent_id, cond, edge_role=None):
@@ -895,8 +927,10 @@ def _emit_structures(ctx, scope_id, owning_statement, query):
                     if el.Qualifier else None)
                 memb["star"] = True
             else:
-                raise RuntimeError(
+                _red_build(
+                    ctx, "select_element", et, _evidence(text, el),
                     f"RED BUILD: unmapped select element {et}")
+                # collect mode: the census names it; element skipped
         if query.TopRowFilter is not None:
             top = query.TopRowFilter
             trow = add("TOP", _evidence(text, top),
@@ -999,9 +1033,12 @@ def _emit_structures(ctx, scope_id, owning_statement, query):
                        _evidence(text, query.GroupByClause))
             for spec in query.GroupByClause.GroupingSpecifications:
                 if _type_name(spec) != "ExpressionGroupingSpecification":
-                    raise RuntimeError(
+                    _red_build(
+                        ctx, "grouping", _type_name(spec),
+                        _evidence(text, spec),
                         "RED BUILD: unmapped grouping specification "
                         f"{_type_name(spec)}")
+                    continue  # collect mode: census names it
                 _emit_expr(ctx, grow["node_id"], spec.Expression)
         if query.HavingClause is not None:
             hrow = add("HAVING", _evidence(text, query.HavingClause))
@@ -1509,10 +1546,14 @@ def _resolve_file(ctx, dic, stem):
                 "evidence": jrow["evidence"]})
 
 
-def build(sql_dir, out_dir, dict_dir):
+def build(sql_dir, out_dir, dict_dir, collect_unmapped=None):
     """STAGES 1-5: statements, scopes, structures, predicates,
     expressions, parameters and resolution against the phase 02
-    dictionary. Returns the census dict it also prints."""
+    dictionary. Returns the census dict it also prints.
+    collect_unmapped (ruled 2026-10-07): pass a list and the four
+    RED BUILD stops record-and-continue into it instead of raising
+    — the sweep's parse-only census mode. None (the default) keeps
+    the stops exactly as they were."""
     sql_dir, out_dir = Path(sql_dir), Path(out_dir)
     library = _load_kind_library(out_dir)
     operational = _operational_types(library)
@@ -1553,6 +1594,8 @@ def build(sql_dir, out_dir, dict_dir):
         scope_count = 0
         name_counts = {}  # the duplicate law: #x, #x#2, ... per file
         ctx = {"text": text, "file_id": file_id,
+               "file_name": sql_path.name,
+               "collect_unmapped": collect_unmapped,
                "scope_rows": scope_rows,
                "structure_rows": structure_rows,
                "predicate_rows": predicate_rows,

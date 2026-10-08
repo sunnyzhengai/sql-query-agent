@@ -402,6 +402,15 @@ def _map_expression(ctx, e):
                      data_type=_data_type_name(e.DataType),
                      style=_map_expression(ctx, style) if style is not None
                      else None)
+    if t in ("ParseCall", "TryParseCall"):
+        # the conversion family's string-input members (ruled
+        # 2026-10-07): input is StringValue, optional Culture.
+        culture = _get(e, "Culture")
+        return _node(ctx, "expression", "cast", e,
+                     expression=_map_expression(ctx, e.StringValue),
+                     data_type=_data_type_name(e.DataType),
+                     culture=_map_expression(ctx, culture)
+                     if culture is not None else None)
     if t == "BinaryExpression":
         return _node(ctx, "expression", "arithmetic", e,
                      op=str(e.BinaryExpressionType),
@@ -1051,7 +1060,8 @@ MAPPED_TYPES = frozenset({
     "ColumnReferenceExpression", "VariableReference", "FunctionCall",
     "LeftFunctionCall", "RightFunctionCall", "CoalesceExpression",
     "NullIfExpression", "IIfCall", "CastCall", "TryCastCall",
-    "ConvertCall", "TryConvertCall", "BinaryExpression", "UnaryExpression",
+    "ConvertCall", "TryConvertCall", "ParseCall", "TryParseCall",
+    "BinaryExpression", "UnaryExpression",
     "ParenthesisExpression", "SearchedCaseExpression",
     "SimpleCaseExpression", "ScalarSubquery",
     *LITERAL_TYPES,

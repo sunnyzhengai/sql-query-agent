@@ -171,6 +171,65 @@ def report_descriptions(tmdl_dir, sql_dir, out_dir,
     return rows
 
 
+def sweep(sql_dir, out_dir, dict_dir=None):
+    """THE CONSTRUCT CENSUS (ruled 2026-10-07, first customer
+    tenant — the step-back after TRY_PARSE stopped a paid run).
+
+    PSEUDO:
+      walk EVERY corpus file through ScriptDom + the stage 1-5
+      mapping with the four RED BUILD stops set to collect-and-
+      continue (semantic_graph.build collect_unmapped) ->
+      aggregate {construct, site} -> count / files / one evidence
+      example -> print the census, write out/11_construct_census
+      .json, return it.
+      ZERO LLM calls — free, repeatable; run BEFORE the first
+      paid run, rule every missing construct in ONE batch, pay
+      once. deliver()/describe() keep the hard stop unchanged.
+    """
+    _point_at_packaged_dll()
+    import semantic_graph
+    out = Path(out_dir)
+    out.mkdir(parents=True, exist_ok=True)
+    collected = []
+    with tempfile.TemporaryDirectory() as tmp:
+        d02 = Path(dict_dir) if dict_dir else _stage_empty_dict(tmp)
+        d05 = Path(tmp) / "05"
+        d05.mkdir()
+        _stage_kind_library(d05)
+        semantic_graph.build(sql_dir, d05, d02,
+                             collect_unmapped=collected)
+    groups = {}
+    for e in collected:
+        g = groups.setdefault((e["construct"], e["site"]), {
+            "construct": e["construct"], "site": e["site"],
+            "count": 0, "files": [],
+            "example": {"file": e["file"], "line": e["line"],
+                        "fragment": e["fragment"]}})
+        g["count"] += 1
+        if e["file"] not in g["files"]:
+            g["files"].append(e["file"])
+    constructs = sorted(groups.values(),
+                        key=lambda g: (-g["count"], g["construct"]))
+    for g in constructs:
+        g["files"].sort()
+    census = {
+        "files_swept": len(_corpus_files(sql_dir)),
+        "files_affected": sorted({e["file"] for e in collected}),
+        "constructs": constructs,
+    }
+    (out / "11_construct_census.json").write_text(
+        json.dumps(census, indent=1))
+    for g in constructs:
+        ex = g["example"]
+        print(f"UNMAPPED {g['construct']} ({g['site']}): "
+              f"{g['count']} hit(s) in {len(g['files'])} file(s) — "
+              f"e.g. {ex['file']} L{ex['line']}: {ex['fragment']!r}")
+    print(f"sweep: {census['files_swept']} file(s), "
+          f"{len(census['files_affected'])} with unmapped "
+          f"constructs, {len(constructs)} distinct construct(s)")
+    return census
+
+
 def preflight(tmdl_dir, sql_dir, out_dir, dict_dir=None):
     """THE PREFLIGHT (her ask, 2026-10-06, after the rehearsal's
     httpx find): check EVERY prereq before any paid call —
@@ -508,6 +567,13 @@ def main(argv=None):
             return 2
         return 1 if preflight(argv[1], argv[2], argv[3],
                               dict_dir=dict_dir) else 0
+    if argv and argv[0] == "--sweep":
+        if len(argv) != 3:
+            print("usage: ai-describe --sweep <sql_dir> <out_dir> "
+                  "[--dict <dir02>]")
+            return 2
+        census = sweep(argv[1], argv[2], dict_dir=dict_dir)
+        return 1 if census["constructs"] else 0
     if argv and argv[0] == "--deliver":
         if len(argv) != 4:
             print("usage: ai-describe --deliver <tmdl_dir> "

@@ -299,6 +299,25 @@ ruled fallback; blessing registry starts empty.)
         "/lakehouse/default/Files/out",
         dict_dir="/lakehouse/default/Files/02_dictionary")
 
+Cell 2b — THE SWEEP (wheel 0.6.1+; run before the FIRST paid
+run on any new corpus, and again after adding files). A free
+parse-only pass: finds EVERY T-SQL construct the engine does
+not map yet, across all files at once, zero LLM calls. Rule
+them in as one batch (one wheel update), then pay once —
+instead of a paid run stopping on each surprise.
+
+    census = sqldesc_cli.sweep(
+        "/lakehouse/default/Files/01_sql_input",
+        "/lakehouse/default/Files/out",
+        dict_dir="/lakehouse/default/Files/02_dictionary")
+
+Ends "N file(s), M with unmapped constructs, K distinct
+construct(s)" and writes out/11_construct_census.json. K = 0:
+go to Cell 3. K > 0: send the census output home; the
+constructs get ruled into the engine, a new wheel lands, then
+Cell 3. deliver() still stops hard on an unmapped construct —
+the sweep exists so it never has to.
+
 Cell 3 — the run. Quiet minutes = paid calls working; deliver
 re-runs the preflight and refuses on any failure.
 
