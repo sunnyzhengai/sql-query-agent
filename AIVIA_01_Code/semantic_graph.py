@@ -238,9 +238,28 @@ def _load_dictionary(dict_dir: Path) -> dict:
         values.setdefault(v["table_name"].upper(), {})[
             str(v["code"])] = v["meaning"]
 
+    # THE SCALE FIX (field fix 2026-10-07 — the first full
+    # dictionary: 1.2M join rows made the per-call scans in
+    # _value_route and the binder the bottleneck; 23 silent
+    # minutes before the first file printed). Precomputed ONCE,
+    # in sorted(join_id) order, so every route choice is
+    # IDENTICAL to the old full scan:
+    #   route_candidates[(t,c)] -> ordered far sides of the
+    #   single-pair declared joins touching (t,c) (the D5 route).
+    route_candidates = {}
+    for join_id in sorted(by_id):
+        rows = by_id[join_id]
+        if len(rows) != 1:
+            continue
+        sides = list(rows[0][1])
+        if len(sides) != 2:
+            continue  # self-pair: the old scan yielded no far side
+        for a, b in ((sides[0], sides[1]), (sides[1], sides[0])):
+            route_candidates.setdefault(a, []).append(b)
+
     return {"tables": tables, "columns": columns, "pks": pks,
             "joins": by_id, "pair_index": pair_index,
-            "values": values}
+            "values": values, "route_candidates": route_candidates}
 
 
 def _basis(token: str, stored: str) -> str:
@@ -254,17 +273,11 @@ def _value_route(dic: dict, table_u: str, col_u: str):
     if table_u in dic["values"] and col_u in dic["pks"].get(table_u,
                                                             ()):
         return table_u
-    for join_id in sorted(dic["joins"]):
-        rows = dic["joins"][join_id]
-        if len(rows) != 1:
-            continue
-        pair = rows[0][1]
-        if (table_u, col_u) in pair:
-            (ot, oc), = [p for p in pair if p != (table_u, col_u)] \
-                or [(None, None)]
-            if (ot in dic["values"]
-                    and oc in dic["pks"].get(ot, ())):
-                return ot
+    # the load-time route index — same joins, same order as the
+    # old sorted full scan (the 2026-10-07 scale fix)
+    for ot, oc in dic["route_candidates"].get((table_u, col_u), ()):
+        if ot in dic["values"] and oc in dic["pks"].get(ot, ()):
+            return ot
     return None
 
 
@@ -1511,7 +1524,15 @@ def _resolve_file(ctx, dic, stem):
         bound = False
         if pairs:
             partials = []
-            for join_id in sorted(dic["joins"]):
+            # only joins sharing >=1 pair can match fully (==) or
+            # as a superset (<) — pair_index narrows 1.2M joins to
+            # the handful touching these pairs; sorted join_id
+            # order keeps the winner IDENTICAL to the old full
+            # scan (the 2026-10-07 scale fix)
+            candidates = set()
+            for pr in pairs:
+                candidates.update(dic["pair_index"].get(pr, ()))
+            for join_id in sorted(candidates):
                 declared = dic["joins"][join_id]
                 dset = {pr for _, pr in declared}
                 if pairs == dset:

@@ -124,6 +124,39 @@ def test_sweep_census(tmp_path):
     assert on_disk == census
 
 
+def test_value_route_reads_load_time_index(tmp_path):
+    """The 2026-10-07 scale fix lock: _value_route answers from the
+    route index built once at load — NEVER by scanning dic["joins"]
+    (1.2M rows on the first full dictionary = 23 silent minutes).
+    Clearing joins after load must not change the route."""
+    d02 = tmp_path / "02"
+    d02.mkdir()
+    (d02 / "02_emr_data_dictionary_extraction_column.json").write_text(
+        json.dumps([
+            {"table_name": "ORDER_MED", "column_name": "STATUS_C",
+             "is_primary_key": "N"},
+            {"table_name": "ZC_STATUS", "column_name": "STATUS_C",
+             "is_primary_key": "Y"},
+        ]))
+    (d02 / "02_emr_data_dictionary_extraction_join.json").write_text(
+        json.dumps([
+            {"join_id": "J1", "ordinal": 1,
+             "source_table_name": "ORDER_MED",
+             "source_column_name": "STATUS_C",
+             "destin_table_name": "ZC_STATUS",
+             "destin_column_name": "STATUS_C"},
+        ]))
+    (d02 / "02_emr_data_dictionary_extraction_value.json").write_text(
+        json.dumps([
+            {"table_name": "ZC_STATUS", "code": "1",
+             "meaning": "Pending"},
+        ]))
+    dic = semantic_graph._load_dictionary(d02)
+    dic["joins"].clear()  # the index, not the scan, must answer
+    assert semantic_graph._value_route(
+        dic, "ORDER_MED", "STATUS_C") == "ZC_STATUS"
+
+
 def test_sweep_clean_folder_is_empty_census(tmp_path):
     sql_dir, d05, d02 = _stage(tmp_path, {"ok.sql": CLEAN_SQL})
     out_dir = tmp_path / "out"

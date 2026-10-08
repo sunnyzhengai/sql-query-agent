@@ -20,7 +20,12 @@ from pathlib import Path
 CODE = Path(__file__).resolve().parent
 REPO = CODE.parent
 DLL = "Microsoft.SqlServer.TransactSql.ScriptDom.dll"
-VERSION = "0.6.1"  # the tenant day-1 build (2026-10-07):
+VERSION = "0.6.2"  # THE SCALE FIX (2026-10-07, same night): the
+# first full dictionary (1.2M join rows) exposed two per-call
+# full scans — _value_route and the join binder; both now read
+# load-time indexes (route_candidates + pair_index narrowing),
+# winner-identical to the old sorted scans, test-locked.
+# 0.6.1 — the tenant day-1 build (2026-10-07):
 # PARSE/TRY_PARSE join the cast kind (the conversion family's
 # string-input members) + sweep() — the parse-only construct
 # census (collect-and-continue at the four RED BUILD stops;
