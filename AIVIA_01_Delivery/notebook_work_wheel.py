@@ -1,7 +1,7 @@
 # ruff: noqa: E402 — a notebook source: every cell imports what
 # it uses, so each cell runs alone (the notebook law).
 # notebook_work_wheel.py — THE WORK NOTEBOOK, whole and clean
-# (2026-10-08, the naming law + D14; requires wheel 0.7.1+).
+# (2026-10-08, the naming law + D14; requires wheel 0.8.0+).
 #
 # This file is the SOURCE OF TRUTH for the tenant notebook.
 # Push it to Fabric with one command from the home repo
@@ -227,6 +227,20 @@ delivery = sqldesc_cli.describe(
 # files_waiting — Collibra waits until waiting is empty.
 print(open("/lakehouse/default/Files/04_run/"
            "12_ai_delivery_output.txt").read()[:4000])
+
+# %%
+# ANSWER — the data owner's hand only (D15): rule on a number
+# the delivery says it is AWAITING. "show" = the number may
+# appear; "omit" = the card must speak without it. To GIVE IT
+# A MEANING instead: add the inline comment in the SQL itself
+# and re-run BUILD + DESCRIBE — the SQL is the one meaning
+# store. After show/omit, re-run DESCRIBE: exactly that card
+# re-proposes, nothing else pays.
+import business_descriptions as bd
+
+bd.answer("/lakehouse/default/Files/04_run/"
+          "07_business_descriptions",
+          "<node_id>", "<number>", "show")
 
 # %%
 # BLESS — the data owner's hand only (edit the placeholders,

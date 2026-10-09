@@ -3,558 +3,558 @@
   "node_id": "file::COOK_RPT_USP_CCHCS_ADT_MONTHLY_INPATIENT_CENSUS_TOTALS_SSRS::scope/delivery::structure/JOIN/5::pred/1::expr/2",
   "class": "column_words_gap",
   "grain": "predicate",
-  "basis_version": "06.3.0"
+  "basis_version": "06.4.0"
  },
  {
   "node_id": "file::COOK_RPT_USP_CCHCS_ADT_MONTHLY_INPATIENT_CENSUS_TOTALS_SSRS::scope/delivery::structure/PROJECTION/1::expr/9",
   "class": "column_words_gap",
   "grain": "predicate",
-  "basis_version": "06.3.0"
+  "basis_version": "06.4.0"
  },
  {
   "node_id": "file::COOK_RPT_USP_CCHCS_ADT_MONTHLY_INPATIENT_CENSUS_TOTALS_SSRS::stmt/1",
   "class": "operational_statement",
   "grain": "statement",
-  "basis_version": "06.3.0"
+  "basis_version": "06.4.0"
  },
  {
   "node_id": "file::COOK_RPT_usp_PTA_CensusDashboard_PBI::scope/delivery::structure/JOIN/5::pred/1::expr/2",
   "class": "column_words_gap",
   "grain": "predicate",
-  "basis_version": "06.3.0"
+  "basis_version": "06.4.0"
  },
  {
   "node_id": "file::COOK_RPT_usp_PTA_CensusDashboard_PBI::scope/delivery::structure/JOIN/9::pred/1::expr/2",
   "class": "column_words_gap",
   "grain": "predicate",
-  "basis_version": "06.3.0"
+  "basis_version": "06.4.0"
  },
  {
   "node_id": "file::COOK_RPT_usp_PTA_CensusDashboard_PBI::scope/delivery::structure/PROJECTION/1::expr/12",
   "class": "column_words_gap",
   "grain": "predicate",
-  "basis_version": "06.3.0"
+  "basis_version": "06.4.0"
  },
  {
   "node_id": "file::COOK_RPT_usp_PTA_CensusDashboard_PBI::scope/delivery::structure/PROJECTION/1::expr/20",
   "class": "column_words_gap",
   "grain": "predicate",
-  "basis_version": "06.3.0"
+  "basis_version": "06.4.0"
  },
  {
   "node_id": "file::COOK_RPT_usp_PTA_CensusDashboard_PBI::stmt/1",
   "class": "operational_statement",
   "grain": "statement",
-  "basis_version": "06.3.0"
+  "basis_version": "06.4.0"
  },
  {
   "node_id": "file::COOK_RPT_usp_PTA_CensusDashboard_PBI::stmt/2",
   "class": "operational_statement",
   "grain": "statement",
-  "basis_version": "06.3.0"
+  "basis_version": "06.4.0"
  },
  {
   "node_id": "file::COOK_RPT_usp_SF_CensusDashboard::scope/delivery::structure/JOIN/5::pred/1::expr/2",
   "class": "column_words_gap",
   "grain": "predicate",
-  "basis_version": "06.3.0"
+  "basis_version": "06.4.0"
  },
  {
   "node_id": "file::COOK_RPT_usp_SF_CensusDashboard::scope/delivery::structure/PROJECTION/1::expr/12",
   "class": "column_words_gap",
   "grain": "predicate",
-  "basis_version": "06.3.0"
+  "basis_version": "06.4.0"
  },
  {
   "node_id": "file::COOK_RPT_usp_SF_CensusDashboard::stmt/1",
   "class": "operational_statement",
   "grain": "statement",
-  "basis_version": "06.3.0"
+  "basis_version": "06.4.0"
  },
  {
   "node_id": "file::COOK_RPT_usp_SF_CensusDashboard::stmt/2",
   "class": "operational_statement",
   "grain": "statement",
-  "basis_version": "06.3.0"
+  "basis_version": "06.4.0"
  },
  {
   "node_id": "file::Reporting_USP_CCHCS_CC_ADT_Monthly_IP_Census_Days_SSRS::stmt/1",
   "class": "operational_statement",
   "grain": "statement",
-  "basis_version": "06.3.0"
+  "basis_version": "06.4.0"
  },
  {
   "node_id": "file::Reporting_USP_CCHCS_CC_ADT_Monthly_IP_Census_Days_SSRS::stmt/2",
   "class": "unvoiced_statement_kind",
   "grain": "statement",
-  "basis_version": "06.3.0"
+  "basis_version": "06.4.0"
  },
  {
   "node_id": "file::Reporting_USP_CCHCS_CC_ADT_Monthly_IP_Census_Days_SSRS::stmt/3",
   "class": "unvoiced_statement_kind",
   "grain": "statement",
-  "basis_version": "06.3.0"
+  "basis_version": "06.4.0"
  },
  {
   "node_id": "file::Reporting_USP_CCHCS_CC_ADT_Monthly_IP_Census_Days_SSRS::stmt/4",
   "class": "unvoiced_statement_kind",
   "grain": "statement",
-  "basis_version": "06.3.0"
+  "basis_version": "06.4.0"
  },
  {
   "node_id": "file::Reporting_USP_CCHCS_CC_ADT_Monthly_IP_Census_Days_SSRS::stmt/5",
   "class": "unvoiced_statement_kind",
   "grain": "statement",
-  "basis_version": "06.3.0"
+  "basis_version": "06.4.0"
  },
  {
   "node_id": "file::Reporting_USP_CCHCS_CC_ADT_Monthly_IP_Census_Days_SSRS::stmt/6",
   "class": "dynamic_sql_gap",
   "grain": "statement",
-  "basis_version": "06.3.0"
+  "basis_version": "06.4.0"
  },
  {
   "node_id": "file::Reporting_USP_CCHCS_CC_ADT_Monthly_IP_Census_Totals_SSRS::stmt/1",
   "class": "operational_statement",
   "grain": "statement",
-  "basis_version": "06.3.0"
+  "basis_version": "06.4.0"
  },
  {
   "node_id": "file::Reporting_USP_CCHCS_CC_ADT_Monthly_IP_Census_Totals_SSRS::stmt/2",
   "class": "unvoiced_statement_kind",
   "grain": "statement",
-  "basis_version": "06.3.0"
+  "basis_version": "06.4.0"
  },
  {
   "node_id": "file::Reporting_USP_CCHCS_CC_ADT_Monthly_IP_Census_Totals_SSRS::stmt/3",
   "class": "unvoiced_statement_kind",
   "grain": "statement",
-  "basis_version": "06.3.0"
+  "basis_version": "06.4.0"
  },
  {
   "node_id": "file::Reporting_USP_CCHCS_CC_ADT_Monthly_IP_Census_Totals_SSRS::stmt/4",
   "class": "unvoiced_statement_kind",
   "grain": "statement",
-  "basis_version": "06.3.0"
+  "basis_version": "06.4.0"
  },
  {
   "node_id": "file::Reporting_USP_CCHCS_CC_ADT_Monthly_IP_Census_Totals_SSRS::stmt/5",
   "class": "unvoiced_statement_kind",
   "grain": "statement",
-  "basis_version": "06.3.0"
+  "basis_version": "06.4.0"
  },
  {
   "node_id": "file::Reporting_USP_CCHCS_CC_ADT_Monthly_IP_Census_Totals_SSRS::stmt/6",
   "class": "dynamic_sql_gap",
   "grain": "statement",
-  "basis_version": "06.3.0"
+  "basis_version": "06.4.0"
  },
  {
   "node_id": "file::Reporting_USP_CCMC_LOTE_Census_Interpreter_Services_Detail_PBI::scope/#caregiver_languages::structure/JOIN/2::pred/1::expr/2",
   "class": "column_words_gap",
   "grain": "predicate",
-  "basis_version": "06.3.0"
+  "basis_version": "06.4.0"
  },
  {
   "node_id": "file::Reporting_USP_CCMC_LOTE_Census_Interpreter_Services_Detail_PBI::scope/#caregiver_languages::structure/PROJECTION/1::expr/2::expr/1::expr/3",
   "class": "column_words_gap",
   "grain": "predicate",
-  "basis_version": "06.3.0"
+  "basis_version": "06.4.0"
  },
  {
   "node_id": "file::Reporting_USP_CCMC_LOTE_Census_Interpreter_Services_Detail_PBI::scope/#caregiver_languages::structure/WHERE/1::structure/AND/1::pred/1",
   "class": "degenerate_never_voiced",
   "grain": "predicate",
-  "basis_version": "06.3.0"
+  "basis_version": "06.4.0"
  },
  {
   "node_id": "file::Reporting_USP_CCMC_LOTE_Census_Interpreter_Services_Detail_PBI::scope/#census_monthly::structure/PROJECTION/1::expr/14::pred/2",
   "class": "annotation_disagreement",
   "grain": "predicate",
-  "basis_version": "06.3.0"
+  "basis_version": "06.4.0"
  },
  {
   "node_id": "file::Reporting_USP_CCMC_LOTE_Census_Interpreter_Services_Detail_PBI::scope/#census_monthly::structure/PROJECTION/1::expr/14::pred/3",
   "class": "annotation_disagreement",
   "grain": "predicate",
-  "basis_version": "06.3.0"
+  "basis_version": "06.4.0"
  },
  {
   "node_id": "file::Reporting_USP_CCMC_LOTE_Census_Interpreter_Services_Detail_PBI::scope/#census_monthly::structure/WHERE/1::structure/AND/1::pred/1",
   "class": "degenerate_never_voiced",
   "grain": "predicate",
-  "basis_version": "06.3.0"
+  "basis_version": "06.4.0"
  },
  {
   "node_id": "file::Reporting_USP_CCMC_LOTE_Census_Interpreter_Services_Detail_PBI::scope/#clinic_monthly::structure/WHERE/1::structure/AND/1::pred/1",
   "class": "degenerate_never_voiced",
   "grain": "predicate",
-  "basis_version": "06.3.0"
+  "basis_version": "06.4.0"
  },
  {
   "node_id": "file::Reporting_USP_CCMC_LOTE_Census_Interpreter_Services_Detail_PBI::scope/delivery::structure/JOIN/11::pred/1::expr/2",
   "class": "column_words_gap",
   "grain": "predicate",
-  "basis_version": "06.3.0"
+  "basis_version": "06.4.0"
  },
  {
   "node_id": "file::Reporting_USP_CCMC_LOTE_Census_Interpreter_Services_Detail_PBI::scope/delivery::structure/JOIN/12::pred/1::expr/2",
   "class": "column_words_gap",
   "grain": "predicate",
-  "basis_version": "06.3.0"
+  "basis_version": "06.4.0"
  },
  {
   "node_id": "file::Reporting_USP_CCMC_LOTE_Census_Interpreter_Services_Detail_PBI::scope/delivery::structure/JOIN/16::pred/1::expr/2",
   "class": "column_words_gap",
   "grain": "predicate",
-  "basis_version": "06.3.0"
+  "basis_version": "06.4.0"
  },
  {
   "node_id": "file::Reporting_USP_CCMC_LOTE_Census_Interpreter_Services_Detail_PBI::scope/delivery::structure/JOIN/17::pred/1::expr/2",
   "class": "column_words_gap",
   "grain": "predicate",
-  "basis_version": "06.3.0"
+  "basis_version": "06.4.0"
  },
  {
   "node_id": "file::Reporting_USP_CCMC_LOTE_Census_Interpreter_Services_Detail_PBI::scope/delivery::structure/JOIN/18::pred/1::expr/2",
   "class": "column_words_gap",
   "grain": "predicate",
-  "basis_version": "06.3.0"
+  "basis_version": "06.4.0"
  },
  {
   "node_id": "file::Reporting_USP_CCMC_LOTE_Census_Interpreter_Services_Detail_PBI::scope/delivery::structure/JOIN/19::pred/1::expr/2",
   "class": "column_words_gap",
   "grain": "predicate",
-  "basis_version": "06.3.0"
+  "basis_version": "06.4.0"
  },
  {
   "node_id": "file::Reporting_USP_CCMC_LOTE_Census_Interpreter_Services_Detail_PBI::scope/delivery::structure/JOIN/1::pred/1",
   "class": "lookup_shaping_attachment",
   "grain": "predicate",
-  "basis_version": "06.3.0"
+  "basis_version": "06.4.0"
  },
  {
   "node_id": "file::Reporting_USP_CCMC_LOTE_Census_Interpreter_Services_Detail_PBI::scope/delivery::structure/JOIN/2::structure/AND/1::pred/1",
   "class": "lookup_shaping_attachment",
   "grain": "predicate",
-  "basis_version": "06.3.0"
+  "basis_version": "06.4.0"
  },
  {
   "node_id": "file::Reporting_USP_CCMC_LOTE_Census_Interpreter_Services_Detail_PBI::scope/delivery::structure/JOIN/2::structure/AND/1::pred/2",
   "class": "lookup_shaping_attachment",
   "grain": "predicate",
-  "basis_version": "06.3.0"
+  "basis_version": "06.4.0"
  },
  {
   "node_id": "file::Reporting_USP_CCMC_LOTE_Census_Interpreter_Services_Detail_PBI::scope/delivery::structure/JOIN/3::pred/1",
   "class": "lookup_shaping_attachment",
   "grain": "predicate",
-  "basis_version": "06.3.0"
+  "basis_version": "06.4.0"
  },
  {
   "node_id": "file::Reporting_USP_CCMC_LOTE_Census_Interpreter_Services_Detail_PBI::scope/delivery::structure/JOIN/4::pred/1",
   "class": "lookup_shaping_attachment",
   "grain": "predicate",
-  "basis_version": "06.3.0"
+  "basis_version": "06.4.0"
  },
  {
   "node_id": "file::Reporting_USP_CCMC_LOTE_Census_Interpreter_Services_Detail_PBI::scope/delivery::structure/JOIN/5::pred/1",
   "class": "lookup_shaping_attachment",
   "grain": "predicate",
-  "basis_version": "06.3.0"
+  "basis_version": "06.4.0"
  },
  {
   "node_id": "file::Reporting_USP_CCMC_LOTE_Census_Interpreter_Services_Detail_PBI::scope/delivery::structure/JOIN/6::structure/AND/1::pred/2",
   "class": "lookup_shaping_attachment",
   "grain": "predicate",
-  "basis_version": "06.3.0"
+  "basis_version": "06.4.0"
  },
  {
   "node_id": "file::Reporting_USP_CCMC_LOTE_Census_Interpreter_Services_Detail_PBI::scope/delivery::structure/JOIN/7::pred/1::expr/2",
   "class": "column_words_gap",
   "grain": "predicate",
-  "basis_version": "06.3.0"
+  "basis_version": "06.4.0"
  },
  {
   "node_id": "file::Reporting_USP_CCMC_LOTE_Census_Interpreter_Services_Detail_PBI::scope/delivery::structure/JOIN/8::pred/1::expr/2",
   "class": "column_words_gap",
   "grain": "predicate",
-  "basis_version": "06.3.0"
+  "basis_version": "06.4.0"
  },
  {
   "node_id": "file::Reporting_USP_CCMC_LOTE_Census_Interpreter_Services_Detail_PBI::scope/delivery::structure/JOIN/9::pred/1::expr/2",
   "class": "column_words_gap",
   "grain": "predicate",
-  "basis_version": "06.3.0"
+  "basis_version": "06.4.0"
  },
  {
   "node_id": "file::Reporting_USP_CCMC_LOTE_Census_Interpreter_Services_Detail_PBI::scope/delivery::structure/PROJECTION/1::expr/24::expr/1",
   "class": "column_words_gap",
   "grain": "predicate",
-  "basis_version": "06.3.0"
+  "basis_version": "06.4.0"
  },
  {
   "node_id": "file::Reporting_USP_CCMC_LOTE_Census_Interpreter_Services_Detail_PBI::scope/delivery::structure/PROJECTION/1::expr/25",
   "class": "column_words_gap",
   "grain": "predicate",
-  "basis_version": "06.3.0"
+  "basis_version": "06.4.0"
  },
  {
   "node_id": "file::Reporting_USP_CCMC_LOTE_Census_Interpreter_Services_Detail_PBI::scope/delivery::structure/PROJECTION/1::expr/26",
   "class": "column_words_gap",
   "grain": "predicate",
-  "basis_version": "06.3.0"
+  "basis_version": "06.4.0"
  },
  {
   "node_id": "file::Reporting_USP_CCMC_LOTE_Census_Interpreter_Services_Detail_PBI::scope/delivery::structure/PROJECTION/1::expr/32::expr/1",
   "class": "column_words_gap",
   "grain": "predicate",
-  "basis_version": "06.3.0"
+  "basis_version": "06.4.0"
  },
  {
   "node_id": "file::Reporting_USP_CCMC_LOTE_Census_Interpreter_Services_Detail_PBI::scope/delivery::structure/PROJECTION/1::expr/32::expr/2",
   "class": "column_words_gap",
   "grain": "predicate",
-  "basis_version": "06.3.0"
+  "basis_version": "06.4.0"
  },
  {
   "node_id": "file::Reporting_USP_CCMC_LOTE_Census_Interpreter_Services_Detail_PBI::scope/delivery::structure/PROJECTION/1::expr/34::expr/1",
   "class": "column_words_gap",
   "grain": "predicate",
-  "basis_version": "06.3.0"
+  "basis_version": "06.4.0"
  },
  {
   "node_id": "file::Reporting_USP_CCMC_LOTE_Census_Interpreter_Services_Detail_PBI::scope/delivery::structure/PROJECTION/1::expr/34::expr/2",
   "class": "column_words_gap",
   "grain": "predicate",
-  "basis_version": "06.3.0"
+  "basis_version": "06.4.0"
  },
  {
   "node_id": "file::Reporting_USP_CCMC_LOTE_Census_Interpreter_Services_Detail_PBI::scope/delivery::structure/WHERE/1::structure/OR/1::structure/AND/1::structure/OR/1::pred/2",
   "class": "annotation_disagreement",
   "grain": "predicate",
-  "basis_version": "06.3.0"
+  "basis_version": "06.4.0"
  },
  {
   "node_id": "file::Reporting_USP_CCMC_LOTE_Census_Interpreter_Services_Detail_PBI::scope/matching_coverages::structure/WHERE/1::structure/AND/1::pred/1",
   "class": "degenerate_never_voiced",
   "grain": "predicate",
-  "basis_version": "06.3.0"
+  "basis_version": "06.4.0"
  },
  {
   "node_id": "file::Reporting_USP_CCMC_LOTE_Census_Interpreter_Services_Detail_PBI::stmt/1",
   "class": "operational_statement",
   "grain": "statement",
-  "basis_version": "06.3.0"
+  "basis_version": "06.4.0"
  },
  {
   "node_id": "file::Reporting_USP_CCMC_LOTE_Census_Interpreter_Services_Detail_PBI::stmt/10",
   "class": "operational_statement",
   "grain": "statement",
-  "basis_version": "06.3.0"
+  "basis_version": "06.4.0"
  },
  {
   "node_id": "file::Reporting_USP_CCMC_LOTE_Census_Interpreter_Services_Detail_PBI::stmt/2",
   "class": "operational_statement",
   "grain": "statement",
-  "basis_version": "06.3.0"
+  "basis_version": "06.4.0"
  },
  {
   "node_id": "file::Reporting_USP_CCMC_LOTE_Census_Interpreter_Services_Detail_PBI::stmt/3",
   "class": "operational_statement",
   "grain": "statement",
-  "basis_version": "06.3.0"
+  "basis_version": "06.4.0"
  },
  {
   "node_id": "file::Reporting_USP_CCMC_LOTE_Census_Interpreter_Services_Detail_PBI::stmt/4",
   "class": "operational_statement",
   "grain": "statement",
-  "basis_version": "06.3.0"
+  "basis_version": "06.4.0"
  },
  {
   "node_id": "file::Reporting_USP_CCMC_LOTE_Census_Interpreter_Services_Detail_PBI::stmt/5",
   "class": "operational_statement",
   "grain": "statement",
-  "basis_version": "06.3.0"
+  "basis_version": "06.4.0"
  },
  {
   "node_id": "file::Reporting_USP_CCMC_LOTE_Census_Interpreter_Services_Detail_PBI::stmt/6",
   "class": "operational_statement",
   "grain": "statement",
-  "basis_version": "06.3.0"
+  "basis_version": "06.4.0"
  },
  {
   "node_id": "file::Reporting_USP_CCMC_LOTE_Census_Interpreter_Services_Detail_PBI::stmt/7",
   "class": "operational_statement",
   "grain": "statement",
-  "basis_version": "06.3.0"
+  "basis_version": "06.4.0"
  },
  {
   "node_id": "file::Reporting_USP_CCMC_LOTE_Census_Interpreter_Services_Detail_PBI::stmt/8",
   "class": "operational_statement",
   "grain": "statement",
-  "basis_version": "06.3.0"
+  "basis_version": "06.4.0"
  },
  {
   "node_id": "file::Reporting_USP_CCMC_LOTE_Census_Interpreter_Services_Detail_PBI::stmt/9",
   "class": "operational_statement",
   "grain": "statement",
-  "basis_version": "06.3.0"
+  "basis_version": "06.4.0"
  },
  {
   "node_id": "file::Reporting_USP_CCMC_LOTE_Census_Interpreter_Services_Summary_PBI::scope/#caregiver_languages::structure/JOIN/2::pred/1::expr/2",
   "class": "column_words_gap",
   "grain": "predicate",
-  "basis_version": "06.3.0"
+  "basis_version": "06.4.0"
  },
  {
   "node_id": "file::Reporting_USP_CCMC_LOTE_Census_Interpreter_Services_Summary_PBI::scope/#caregiver_languages::structure/PROJECTION/1::expr/2::expr/1::expr/3",
   "class": "column_words_gap",
   "grain": "predicate",
-  "basis_version": "06.3.0"
+  "basis_version": "06.4.0"
  },
  {
   "node_id": "file::Reporting_USP_CCMC_LOTE_Census_Interpreter_Services_Summary_PBI::scope/#caregiver_languages::structure/WHERE/1::structure/AND/1::pred/1",
   "class": "degenerate_never_voiced",
   "grain": "predicate",
-  "basis_version": "06.3.0"
+  "basis_version": "06.4.0"
  },
  {
   "node_id": "file::Reporting_USP_CCMC_LOTE_Census_Interpreter_Services_Summary_PBI::scope/#census_monthly::structure/WHERE/1::structure/AND/1::pred/1",
   "class": "degenerate_never_voiced",
   "grain": "predicate",
-  "basis_version": "06.3.0"
+  "basis_version": "06.4.0"
  },
  {
   "node_id": "file::Reporting_USP_CCMC_LOTE_Census_Interpreter_Services_Summary_PBI::scope/#clinic_monthly::structure/WHERE/1::structure/AND/1::pred/1",
   "class": "degenerate_never_voiced",
   "grain": "predicate",
-  "basis_version": "06.3.0"
+  "basis_version": "06.4.0"
  },
  {
   "node_id": "file::Reporting_USP_CCMC_LOTE_Census_Interpreter_Services_Summary_PBI::scope/#combined_census_with_language::structure/JOIN/1::pred/1",
   "class": "lookup_shaping_attachment",
   "grain": "predicate",
-  "basis_version": "06.3.0"
+  "basis_version": "06.4.0"
  },
  {
   "node_id": "file::Reporting_USP_CCMC_LOTE_Census_Interpreter_Services_Summary_PBI::stmt/1",
   "class": "operational_statement",
   "grain": "statement",
-  "basis_version": "06.3.0"
+  "basis_version": "06.4.0"
  },
  {
   "node_id": "file::Reporting_USP_CCMC_LOTE_Census_Interpreter_Services_Summary_PBI::stmt/10",
   "class": "operational_statement",
   "grain": "statement",
-  "basis_version": "06.3.0"
+  "basis_version": "06.4.0"
  },
  {
   "node_id": "file::Reporting_USP_CCMC_LOTE_Census_Interpreter_Services_Summary_PBI::stmt/11",
   "class": "operational_statement",
   "grain": "statement",
-  "basis_version": "06.3.0"
+  "basis_version": "06.4.0"
  },
  {
   "node_id": "file::Reporting_USP_CCMC_LOTE_Census_Interpreter_Services_Summary_PBI::stmt/12",
   "class": "operational_statement",
   "grain": "statement",
-  "basis_version": "06.3.0"
+  "basis_version": "06.4.0"
  },
  {
   "node_id": "file::Reporting_USP_CCMC_LOTE_Census_Interpreter_Services_Summary_PBI::stmt/13",
   "class": "operational_statement",
   "grain": "statement",
-  "basis_version": "06.3.0"
+  "basis_version": "06.4.0"
  },
  {
   "node_id": "file::Reporting_USP_CCMC_LOTE_Census_Interpreter_Services_Summary_PBI::stmt/14",
   "class": "operational_statement",
   "grain": "statement",
-  "basis_version": "06.3.0"
+  "basis_version": "06.4.0"
  },
  {
   "node_id": "file::Reporting_USP_CCMC_LOTE_Census_Interpreter_Services_Summary_PBI::stmt/16",
   "class": "operational_statement",
   "grain": "statement",
-  "basis_version": "06.3.0"
+  "basis_version": "06.4.0"
  },
  {
   "node_id": "file::Reporting_USP_CCMC_LOTE_Census_Interpreter_Services_Summary_PBI::stmt/2",
   "class": "operational_statement",
   "grain": "statement",
-  "basis_version": "06.3.0"
+  "basis_version": "06.4.0"
  },
  {
   "node_id": "file::Reporting_USP_CCMC_LOTE_Census_Interpreter_Services_Summary_PBI::stmt/3",
   "class": "operational_statement",
   "grain": "statement",
-  "basis_version": "06.3.0"
+  "basis_version": "06.4.0"
  },
  {
   "node_id": "file::Reporting_USP_CCMC_LOTE_Census_Interpreter_Services_Summary_PBI::stmt/4",
   "class": "operational_statement",
   "grain": "statement",
-  "basis_version": "06.3.0"
+  "basis_version": "06.4.0"
  },
  {
   "node_id": "file::Reporting_USP_CCMC_LOTE_Census_Interpreter_Services_Summary_PBI::stmt/5",
   "class": "operational_statement",
   "grain": "statement",
-  "basis_version": "06.3.0"
+  "basis_version": "06.4.0"
  },
  {
   "node_id": "file::Reporting_USP_CCMC_LOTE_Census_Interpreter_Services_Summary_PBI::stmt/6",
   "class": "operational_statement",
   "grain": "statement",
-  "basis_version": "06.3.0"
+  "basis_version": "06.4.0"
  },
  {
   "node_id": "file::Reporting_USP_CCMC_LOTE_Census_Interpreter_Services_Summary_PBI::stmt/7",
   "class": "operational_statement",
   "grain": "statement",
-  "basis_version": "06.3.0"
+  "basis_version": "06.4.0"
  },
  {
   "node_id": "file::Reporting_USP_CCMC_LOTE_Census_Interpreter_Services_Summary_PBI::stmt/8",
   "class": "operational_statement",
   "grain": "statement",
-  "basis_version": "06.3.0"
+  "basis_version": "06.4.0"
  },
  {
   "node_id": "file::Reporting_USP_CCMC_LOTE_Census_Interpreter_Services_Summary_PBI::stmt/9",
   "class": "operational_statement",
   "grain": "statement",
-  "basis_version": "06.3.0"
+  "basis_version": "06.4.0"
  },
  {
   "node_id": "file::Reporting_USP_Hospitalist_Daily_Census_Report_92a_PBI::scope/ROWNUM::structure/JOIN/1::pred/1",
   "class": "lookup_shaping_attachment",
   "grain": "predicate",
-  "basis_version": "06.3.0"
+  "basis_version": "06.4.0"
  },
  {
   "node_id": "file::Reporting_USP_Hospitalist_Daily_Census_Report_92a_PBI::stmt/1",
   "class": "operational_statement",
   "grain": "statement",
-  "basis_version": "06.3.0"
+  "basis_version": "06.4.0"
  },
  {
   "node_id": "file::Reporting_USP_Hospitalist_Daily_Census_Report_92a_PBI::stmt/2",
   "class": "operational_statement",
   "grain": "statement",
-  "basis_version": "06.3.0"
+  "basis_version": "06.4.0"
  },
  {
   "node_id": "file::Reporting_USP_Hospitalist_Daily_Census_Report_92a_PBI::stmt/3",
   "class": "operational_statement",
   "grain": "statement",
-  "basis_version": "06.3.0"
+  "basis_version": "06.4.0"
  },
  {
   "node_id": "file::Reporting_USP_Hospitalist_Daily_Census_Report_92a_PBI::stmt/4",
   "class": "operational_statement",
   "grain": "statement",
-  "basis_version": "06.3.0"
+  "basis_version": "06.4.0"
  }
 ]

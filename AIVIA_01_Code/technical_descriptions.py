@@ -416,7 +416,7 @@ import json
 import re
 from pathlib import Path
 
-BASIS_VERSION = "06.3.0"  # 06.3.0: gap-check rulings (7 voicings, Supplemental: strip, instant temporal) 2026-10-03
+BASIS_VERSION = "06.4.0"  # D15 comment-first 2026-10-08 (prior 06.3.0: gap-check rulings 2026-10-03)
 
 _ARTICLE = re.compile(r"^(the|a|an)\s+", re.IGNORECASE)
 _OF_FOR_THE = re.compile(r"^(.+?)\s+(?:of|for)\s+the\s+(.+)$")
@@ -523,6 +523,50 @@ def _comment_at(lines_by_file, node_id, line_no):
         return None
     text = re.sub(r"\s+", " ", line[idx + 2:]).strip()
     return text[:60] if text else None
+
+
+def header_description(sql_dir, stem):
+    """D15 (2026-10-08): the file's own words — the Description:
+    line of a leading block comment (anything before the first
+    CREATE), continuation lines joined until a divider or the
+    next label, whitespace collapsed. Read at build time,
+    STORED NOWHERE (her ruling: the SQL is the one store).
+    None when absent — absence is honest."""
+    p = Path(sql_dir) / f"{stem}.sql"
+    if not p.exists():
+        return None
+    text = p.read_text()
+    # the boundary is a real CREATE statement — "Create date:"
+    # inside the header must not end the search (the first
+    # fixture's own trap)
+    m = re.search(r"(?mi)^\s*CREATE\s+(OR\s+ALTER\s+)?"
+                  r"(VIEW|PROC|PROCEDURE|FUNCTION|TABLE|"
+                  r"TRIGGER)\b", text)
+    head = text[:m.start()] if m else text
+    # both wild shapes: a /* */ block, or a -- line group
+    # (enumerated at the first corpus look: the view used the
+    # block, the census proc used dashes)
+    sources = re.findall(r"/\*.*?\*/", head, re.DOTALL)
+    dash = "\n".join(ln.strip()[2:] for ln in head.splitlines()
+                     if ln.strip().startswith("--"))
+    if dash:
+        sources.append(dash)
+    for block in sources:
+        dm = re.search(r"^[\s*]*Description\s*:(.*)$", block,
+                       re.IGNORECASE | re.MULTILINE)
+        if not dm:
+            continue
+        parts = [dm.group(1)]
+        for ln in block[dm.end():].splitlines()[1:]:
+            s = ln.strip()
+            if (not s or s[0] in "=-*/"
+                    or re.match(r"[A-Za-z][\w ]{0,40}:", s)):
+                break
+            parts.append(s)
+        out = re.sub(r"\s+", " ", " ".join(parts)).strip()
+        if out:
+            return out
+    return None
 
 
 class _Voice:
@@ -770,15 +814,33 @@ def _leaf_sentence(pred, voice, graph, sql_lines):
         return None
     note = _comment_at(sql_lines, pid, pred["evidence"]["line"])
     if note:
-        if meaning and re.sub(r"\s+", " ", note).strip().lower() \
-                != meaning.strip().strip("'").lower():
-            voice.counted.append(
-                {"node_id": pid,
-                 "class": "annotation_disagreement",
-                 "grain": "predicate",
-                 "basis_version": BASIS_VERSION})
-        sentence = (sentence.rstrip(".")
-                    + f" (annotated '{note}' in the source).")
+        # COMMENT-FIRST (D15, 2026-10-08 — R8 precedence
+        # flipped): the comment IS the meaning, 3a's
+        # meaning-first shape; a disagreeing DECLARED meaning
+        # is the counted side now.
+        clean = re.sub(r"\s+", " ", note).strip()
+        if meaning:
+            mclean = meaning.strip().strip("'")
+            if clean.lower() != mclean.lower():
+                voice.counted.append(
+                    {"node_id": pid,
+                     "class": "annotation_disagreement",
+                     "grain": "predicate",
+                     "basis_version": BASIS_VERSION})
+            sentence = sentence.replace(f"'{mclean}'",
+                                        f"'{clean}'", 1)
+        else:
+            # NUMBERS ONLY (the home-estate regression at the
+            # re-pin diff): a trailing WORD is an operand, not
+            # a value — wrapping it makes garbage
+            m = re.search(r" (\d+(?:\.\d+)?)\.$", sentence)
+            if m:  # a bare trailing NUMBER gains the shape
+                sentence = (sentence[:m.start()]
+                            + f" '{clean}' ({m.group(1)}).")
+            else:  # everything else keeps the honest suffix
+                sentence = (sentence.rstrip(".")
+                            + f" (annotated '{clean}' in the "
+                              "source).")
     return sentence
 
 

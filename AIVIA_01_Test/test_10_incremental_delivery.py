@@ -299,3 +299,23 @@ def test_delivery_txt_renders_reportless_files_too(tmp_path):
     assert "no report ties to this file yet" in txt
     assert "Fix view text." in txt
     assert "TERM [proposed]: Fix Term" in txt
+
+
+def test_delivery_txt_says_awaiting_plainly(tmp_path):
+    """D15: an awaiting entry reads as the question it is —
+    never a technical text in the business slot."""
+    delivery = {
+        "reports": [],
+        "reportless_files": [{
+            "file": "FIX_WAIT",
+            "description": {"text": "", "voice": "none",
+                            "status": "awaiting_human"},
+            "questions": [{"number": "999",
+                           "finding": "V-1: number 999 has no "
+                                      "stored basis"}],
+            "terms": []}],
+    }
+    txt = sqldesc_cli._delivery_txt(delivery)
+    assert "AWAITING YOUR ANSWER" in txt
+    assert "999" in txt
+    assert "voice: technical" not in txt

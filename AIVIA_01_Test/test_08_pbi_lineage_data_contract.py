@@ -119,6 +119,78 @@ def test_08_l4_unresolved_is_counted_never_dropped(tmp_path):
     assert not any("GHOST" in e.upper() for e in r["executes"])
 
 
+# ---------------- 0.8.0 THE VIEW TIE (D15, ruled 2026-10-08
+# evening — the first tenant's views were ALL reportless; a
+# report consumes a view by SELECT or Item, never EXEC). RED
+# until the two binding kinds land.
+
+def test_08_v1_select_from_binds_a_view(tmp_path):
+    tmdl = tmp_path / "tmdl"
+    tmdl.mkdir()
+    _model(tmdl, "Fix Views", {
+        "ViewFed": _table(
+            ["Fix Col V"],
+            ['let q = Value.NativeQuery(db,',
+             '"SELECT * FROM COOK_X.V_FIX_VIEW") in q'])})
+    corpus = tmp_path / "sql"
+    corpus.mkdir()
+    (corpus / "V_FIX_VIEW.sql").write_text(
+        "CREATE VIEW COOK_X.V_FIX_VIEW AS SELECT 1 AS A;\n")
+    out = tmp_path / "out"
+    out.mkdir()
+    import pbi_lineage as pl
+    reports = pl.build08(tmdl, corpus, out)
+    r = next(x for x in reports if x["name"] == "Fix Views")
+    assert "V_FIX_VIEW.sql" in r["executes"]
+
+
+def test_08_v2_item_import_binds_a_view(tmp_path):
+    tmdl = tmp_path / "tmdl"
+    tmdl.mkdir()
+    _model(tmdl, "Fix Items", {
+        "ItemFed": _table(
+            ["Fix Col I"],
+            ['let s = Sql.Database("srv", "db"),',
+             'v = s{[Schema="COOK_X",Item="V_FIX_ITEM"]}[Data]',
+             'in v'])})
+    corpus = tmp_path / "sql"
+    corpus.mkdir()
+    (corpus / "V_FIX_ITEM.sql").write_text(
+        "CREATE VIEW COOK_X.V_FIX_ITEM AS SELECT 1 AS A;\n")
+    out = tmp_path / "out"
+    out.mkdir()
+    import pbi_lineage as pl
+    reports = pl.build08(tmdl, corpus, out)
+    r = next(x for x in reports if x["name"] == "Fix Items")
+    assert "V_FIX_ITEM.sql" in r["executes"]
+
+
+def test_08_v3_select_from_no_corpus_match_counted(tmp_path):
+    """A FROM over a raw warehouse table is NOT a corpus file —
+    counted, named, never guessed into executes."""
+    tmdl = tmp_path / "tmdl"
+    tmdl.mkdir()
+    _model(tmdl, "Fix Raw", {
+        "RawFed": _table(
+            ["Fix Col R"],
+            ['let q = Value.NativeQuery(db,',
+             '"SELECT * FROM dbo.FIX_RAW_TABLE") in q'])})
+    corpus = tmp_path / "sql"
+    corpus.mkdir()
+    (corpus / "V_UNRELATED.sql").write_text(
+        "CREATE VIEW dbo.V_UNRELATED AS SELECT 1 AS A;\n")
+    out = tmp_path / "out"
+    out.mkdir()
+    import pbi_lineage as pl
+    reports = pl.build08(tmdl, corpus, out)
+    assert all("FIX_RAW_TABLE.sql" not in r.get("executes", [])
+               for r in reports)
+    ledger = json.loads(
+        (out / "08_pbi_lineage_ledger_output.json").read_text())
+    assert any("FIX_RAW_TABLE" in json.dumps(e)
+               for e in ledger.get("unresolved", [])), ledger
+
+
 def test_08_l5_plumbing_skipped_and_counted(tmp_path):
     reports, ledger, _ = _build(tmp_path)
     assert ledger["counts"]["plumbing_skipped"] == 1

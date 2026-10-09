@@ -190,7 +190,9 @@ def test_api_failure_floors_the_node_never_crashes():
         "field", "docket", "docket", {"names": [],
                                       "sentences": []},
         caller=dying_caller)
-    assert status == "floor"
+    # RE-PINNED 2026-10-08 (D15): the floor retired — a dead
+    # seat is also hers to see; no text ships, never a crash.
+    assert status == "awaiting_human"
     assert any("call failed" in f for f in findings)
     assert used == bd.REPAIR_BUDGET
 
@@ -952,6 +954,214 @@ def test_07_pre_rename_tenant_sheet_and_registry_honored(tmp_path):
     assert {r["node_id"] for r in rows} == set(prior)
     # the write landed the NEW name
     assert (out / "07_business_descriptions_output.json").exists()
+
+
+# ------------------- 0.8.0 — the no-fallback gate (D15, ruled
+# 2026-10-08 evening; pseudo APPROVED). RED until the code lands.
+# Deterministic: callers/proposers injected, zero paid calls.
+
+def test_07_header_rides_the_file_docket(tmp_path):
+    """D15: the file's own Description: words join the FACTS —
+    the card may use them, the gate grounds them."""
+    import technical_descriptions as td
+    head = td.header_description(
+        REPO_ROOT / "AIVIA_01_Data" / "01_subject_sql_files",
+        CENSUS)
+    assert head  # the census proc carries one
+    docket, _ = bd.docket_v2_for_file(DIR05, DIR06, DIR02, CENSUS)
+    assert head in docket["facts"]
+
+
+def test_07_annotated_conditions_ride_the_facts():
+    """The view-test find (2026-10-08 night): the pcp-exclusion
+    pair lived in the 06 sheet but not in FACTS — the card could
+    ground neither words nor digits. Every 06 sentence carrying
+    an annotation pair joins the file docket's FACTS."""
+    import re as _re
+    PTA = "COOK_RPT_usp_PTA_CensusDashboard_PBI"
+    docket, _ = bd.docket_v2_for_file(DIR05, DIR06, DIR02, PTA)
+    pairs = _re.findall(r"'([^']+)'\s*\((\d+)\)",
+                        docket["facts"])
+    assert ("Census", "6") in pairs, docket["facts"][:600]
+
+
+def test_07_join_housed_population_filters_ride_the_facts(
+        tmp_path, monkeypatch):
+    """THE VIEW-SHAPE FIND (2026-10-08 night, the first work
+    view): a view written as chained JOINs carries its WHOLE
+    population in ON clauses — no WHERE at all — and the docket
+    shaped ZERO filter lines; the card had nothing to ground.
+    The 05 layer already classes them population_filter; the
+    docket honors the class, not the housing. Synthetic twin,
+    the estate boundary."""
+    import shutil
+
+    import semantic_graph
+    import technical_descriptions as td
+    sql = tmp_path / "sql"
+    sql.mkdir()
+    (sql / "V_FIX_TWIN.sql").write_text(
+        "CREATE VIEW dbo.V_FIX_TWIN AS\n"
+        "SELECT PAT.PAT_ID\n"
+        "FROM COVERAGE CVG\n"
+        "INNER JOIN PATIENT PAT\n"
+        "  ON PAT.PAT_ID = CVG.PAT_ID\n"
+        "  AND NOT CVG.PCP_ID = 47080 --FIX GENERIC PCP\n;")
+    d05 = tmp_path / "05"
+    d05.mkdir()
+    shutil.copy(DIR05 / "05_kind_library.json",
+                d05 / "05_kind_library.json")
+    d02 = tmp_path / "02"
+    d02.mkdir()
+    for n in ("column", "join", "value", "table"):
+        (d02 / ("02_emr_data_dictionary_extraction_"
+                + n + ".json")).write_text("[]")
+    semantic_graph.build(sql, d05, d02)
+    d06 = tmp_path / "06"
+    d06.mkdir()
+    td.build06(d05, d06, d02, sql)
+    monkeypatch.setenv("AI_SQL_DIR", str(sql))
+    docket, _ = bd.docket_v2_for_file(d05, d06, d02,
+                                      "V_FIX_TWIN", dir01=sql)
+    facts = docket["facts"]
+    head = facts.split("ATTACHMENTS")[0]
+    assert "FIX GENERIC PCP" in head, head
+    assert "47080" in head
+
+
+def test_07_gate_demands_annotation_words_over_digits():
+    """Digits a comment names never ride raw — a REPAIRABLE
+    finding names the words; her 'show' verdict waives it;
+    her 'omit' verdict bans the digits outright."""
+    docket = {"facts": "- the pcp id is not "
+                       "'TAPESTRY GENERIC PCP' (47080)",
+              "text": "- the pcp id is not "
+                      "'TAPESTRY GENERIC PCP' (47080)",
+              "gap": False, "params": False, "population": False}
+    bad = bd.gate("Excludes the generic PCP 47080.",
+                  docket, "scope")
+    assert any("47080" in f and "words" in f.lower()
+               for f in bad), bad
+    good = bd.gate("Excludes the Tapestry generic PCP.",
+                   docket, "scope")
+    assert not any("47080" in f for f in good), good
+    # words AND digits together = an EXPLAINED number — her
+    # intent ("translate using the inline comment"), not a
+    # shape fetish (the round-3 card find, 2026-10-08 night)
+    both = bd.gate("Excludes the TAPESTRY GENERIC PCP with "
+                   "ID 47080.", docket, "scope")
+    assert not any("47080" in f for f in both), both
+    shown = bd.gate("Excludes the generic PCP 47080.",
+                    docket, "scope",
+                    verdicts={"47080": "show"})
+    assert not any("47080" in f for f in shown), shown
+    omitted = bd.gate("Excludes the generic PCP 47080.",
+                      docket, "scope",
+                      verdicts={"47080": "omit"})
+    assert any("47080" in f for f in omitted), omitted
+
+
+def test_07_basis_gap_skips_repairs_one_call():
+    """A number with no annotation and no grounding is not
+    repairable by wording: ONE call, straight to the human —
+    zero paid retries into the same wall."""
+    calls = []
+
+    def caller(prompt):
+        calls.append(prompt)
+        return "This selection keeps the records of 999."
+
+    docket = {"facts": "- a selection of fix records",
+              "text": "- a selection of fix records",
+              "gap": False, "params": False, "population": False}
+    text, status, findings, used = bd._propose_loop(
+        "scope", docket["text"], docket, {}, caller=caller)
+    assert status == "awaiting_human"
+    assert len(calls) == 1 and used == 1
+    assert any("999" in f for f in findings)
+
+
+def test_07_awaiting_row_ships_no_text_and_names_questions(
+        tmp_path):
+    """The floor retires: an awaiting row's audience_text is
+    EMPTY (never the 06 sentence); last_proposal + the named
+    questions stay for her eye."""
+    out = tmp_path / "07"
+    out.mkdir()
+
+    def spy(grain, docket_text, docket, registry):
+        return ("wanted to say 999",
+                "awaiting_human",
+                ["V-1: number 999 has no stored basis"], 1)
+
+    rows = bd.build07(DIR05, DIR06, out, DIR02, no_llm=False,
+                      proposer=spy, only_file=CENSUS)
+    row = next(r for r in rows if r["grain"] == "file")
+    assert row["status"] == "awaiting_human"
+    assert row["audience_text"] == ""
+    assert row["last_proposal"] == "wanted to say 999"
+    (q,) = [q for q in row["questions"] if q["number"] == "999"]
+    assert "999" in q["finding"]
+
+
+def test_07_answer_records_her_verdict(tmp_path):
+    out = tmp_path / "07"
+    out.mkdir()
+
+    def spy(grain, docket_text, docket, registry):
+        return ("wanted 999", "awaiting_human",
+                ["V-1: number 999 has no stored basis"], 1)
+
+    bd.build07(DIR05, DIR06, out, DIR02, no_llm=False,
+               proposer=spy, only_file=CENSUS)
+    node = "file::" + CENSUS
+    bd.answer(out, node, "999", "show")
+    sheet = json.loads(
+        (out / "07_business_descriptions_output.json").read_text())
+    row = next(r for r in sheet if r["node_id"] == node)
+    assert row["verdicts"] == {"999": "show"}
+    import pytest
+    with pytest.raises(ValueError):
+        bd.answer(out, node, "999", "maybe")
+
+
+def test_07_verdict_retakes_only_the_answered_node(tmp_path):
+    """A skipped file's awaiting row WITH a verdict re-proposes
+    — alone. Every other row carries verbatim, zero extra paid
+    calls (the checkpoint-seed mechanics)."""
+    out = tmp_path / "07"
+    out.mkdir()
+    bd.build07(DIR05, DIR06, out, DIR02, no_llm=True)
+    sheet_p = out / "07_business_descriptions_output.json"
+    sheet = json.loads(sheet_p.read_text())
+    node = "file::" + CENSUS
+    for r in sheet:
+        if r["node_id"] == node:
+            r["status"] = "awaiting_human"
+            r["audience_text"] = ""
+            r["last_proposal"] = "wanted 999"
+            r["questions"] = [{"number": "999",
+                               "finding": "no stored basis"}]
+            r["verdicts"] = {"999": "show"}
+    sheet_p.write_text(json.dumps(sheet, indent=1))
+    before = {r["node_id"]: r for r in sheet}
+
+    calls = []
+
+    def spy(grain, docket_text, docket, registry):
+        calls.append(grain)
+        return ("Her answer spoke.", "gate_passed", [], 1)
+
+    all_files = {r["node_id"].split("::")[1] for r in sheet}
+    rows = bd.build07(DIR05, DIR06, out, DIR02, no_llm=False,
+                      proposer=spy, skip_files=all_files)
+    assert calls == ["file"]           # the one node, once
+    after = {r["node_id"]: r for r in rows}
+    assert after[node]["status"] == "gate_passed"
+    assert after[node]["audience_text"] == "Her answer spoke."
+    for nid, r in before.items():
+        if nid != node:
+            assert after[nid] == r, nid
 
 
 def test_07_defer_files_dropped_without_carry_or_refusal(tmp_path):

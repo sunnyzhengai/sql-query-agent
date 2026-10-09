@@ -113,17 +113,28 @@ from pathlib import Path
 PLUMBING = ("LocalDateTable_", "DateTableTemplate_")
 _SOURCECOL = re.compile(r"^\s*sourceColumn:\s*(.+)$", re.M)
 _EXEC = re.compile(r"EXEC\s+([\w.\[\]]+)")
+_SELECT_FROM = re.compile(r"\b(?:FROM|JOIN)\s+([\w.\[\]]+)",
+                          re.IGNORECASE)
 _ENTITY = re.compile(r"^\s*entityName:\s*(.+)$", re.M)
 _SCHEMA = re.compile(r'Schema\s*=\s*"([^"]+)"')
 _ITEM = re.compile(r'(?:Item|Name)\s*=\s*"([^"]+)"')
 
 
 def _binding_of(text):
-    """ONE binding per table, kind order exec > entity > source
-    (the stamped pseudo's judgment call); None = unbound."""
+    """ONE binding per table, kind order exec > select > entity
+    > source (the stamped pseudo's judgment call, D15 adding
+    select 2026-10-08 — a report consumes a VIEW by SELECT,
+    never EXEC; the first tenant's views were all reportless);
+    None = unbound. The select target is the query's FIRST
+    FROM/JOIN object — the one-binding-per-table law stands;
+    a multi-view query is a recorded refinement, not built."""
     m = _EXEC.search(text)
     if m:
         return "exec", m.group(1)
+    if "NativeQuery" in text:
+        m = _SELECT_FROM.search(text)
+        if m:
+            return "select", m.group(1)
     m = _ENTITY.search(text)
     if m:
         return "entity", m.group(1).strip()

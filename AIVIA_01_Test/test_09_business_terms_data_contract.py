@@ -554,6 +554,32 @@ def test_09_l21_no_ledger_is_legacy_unfiltered(tmp_path):
         == ["FIX_RPT_BETA"]
 
 
+def test_09_l23_awaiting_human_ships_no_text_and_its_questions(
+        tmp_path):
+    """D15 (2026-10-08 evening): a described file whose card
+    awaits her ships NO business text — voice none, questions
+    on the entry; never the technical floor in the slot."""
+    import ai_delivery
+    dirs = _fixture(tmp_path)
+    d06, d07, d08, out = dirs[1], dirs[3], dirs[4], dirs[-1]
+    _w(d07, "07_business_descriptions_output.json", [
+        {"node_id": A, "grain": "file",
+         "status": "awaiting_human", "audience_text": "",
+         "last_proposal": "wanted 999",
+         "questions": [{"number": "999",
+                        "finding": "V-1: number 999 has no "
+                                   "stored basis"}]},
+    ])
+    _ledgered(out, "FIX_RPT_ALPHA")
+    ai_delivery.assemble(out, d07, d08, d06)
+    rep = _delivery(out)["reports"][0]
+    assert rep["description"]["status"] == "awaiting_human"
+    assert rep["description"]["text"] == ""
+    assert rep["description"]["voice"] == "none"
+    (q,) = rep["questions"]
+    assert q["number"] == "999"
+
+
 def test_09_l22_load_migrates_the_old_delivery_name(tmp_path):
     """A pre-rename tenant's ai_delivery.json (terms, blessings)
     is read once; every write lands the new name."""

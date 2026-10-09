@@ -52,6 +52,9 @@ pushes = []   # (kind, report, term_name, text, techdef)
 for e in d["reports"]:
     if e.get("files_waiting"):   # ruled 2026-10-08: an
         continue                 # incomplete report never ships
+    if (e.get("description") or {}).get("status") \
+            == "awaiting_human":  # D15: unanswered questions
+        continue                  # never ship either
     desc = e.get("description") or {}
     if desc.get("text"):
         pushes.append(("report_desc", e["report"], None,

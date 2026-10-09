@@ -312,11 +312,22 @@ def assemble(out_dir, dir07, dir08, dir06, described=None):
               if r["grain"] == "file"
               and r.get("status") not in ("gate_passed",
                                           "blessed", None)}
+    # D15 (same day, her reopen): awaiting_human ships NO
+    # business text — voice none, the questions ride the entry;
+    # the technical floor never impersonates the business slot
+    awaiting = {r["node_id"].split("::")[1]:
+                r.get("questions", [])
+                for r in seven
+                if r["grain"] == "file"
+                and r.get("status") == "awaiting_human"}
 
     def _desc(stem):
         if stem in cards:
             return {"text": cards[stem], "voice": "business",
                     "status": "gate_passed"}
+        if stem in awaiting:
+            return {"text": "", "voice": "none",
+                    "status": "awaiting_human"}
         return {"text": floors.get(stem,
                                    "(no description rendered)"),
                 "voice": "technical",
@@ -342,18 +353,28 @@ def assemble(out_dir, dir07, dir08, dir06, described=None):
                      x["voice"] == "business" for x in descs)
                      else "technical"),
                  "status": "assembled"}
-        delivery["reports"].append(
-            {"report": r["name"], "files": sorted(r["executes"]),
-             "files_described": sorted(s + ".sql" for s in have),
-             "files_waiting": sorted(s + ".sql" for s in stems
-                                     if s not in have),
-             "description": d,
-             "terms": old_report_terms.get(r["name"], [])})
-    delivery["reportless_files"] = [
-        {"file": stem, "description": _desc(stem),
-         "terms": old_file_terms.get(stem, [])}
-        for stem in sorted(set(floors) - tied)
-        if member(stem)]
+        entry = {"report": r["name"],
+                 "files": sorted(r["executes"]),
+                 "files_described": sorted(s + ".sql"
+                                           for s in have),
+                 "files_waiting": sorted(s + ".sql"
+                                         for s in stems
+                                         if s not in have),
+                 "description": d,
+                 "terms": old_report_terms.get(r["name"], [])}
+        qs = [q for s in have for q in awaiting.get(s, [])]
+        if qs:
+            entry["questions"] = qs
+        delivery["reports"].append(entry)
+    delivery["reportless_files"] = []
+    for stem in sorted(set(floors) - tied):
+        if not member(stem):
+            continue
+        entry = {"file": stem, "description": _desc(stem),
+                 "terms": old_file_terms.get(stem, [])}
+        if stem in awaiting and awaiting[stem]:
+            entry["questions"] = awaiting[stem]
+        delivery["reportless_files"].append(entry)
     if "09" in delivery["counts"]:
         _recount(delivery)
     return _write(out_dir, delivery)

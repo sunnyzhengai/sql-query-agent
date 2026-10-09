@@ -1,5 +1,5 @@
 ==== Reporting_USP_CCHCS_CC_ADT_Monthly_IP_Census_Totals_SSRS ====
-basis 06.3.0
+basis 06.4.0
 
 -- THE SELECTIONS --
 

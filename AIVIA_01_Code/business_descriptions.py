@@ -152,14 +152,28 @@ def _docket_text(docket):
     return docket["text"] if isinstance(docket, dict) else docket
 
 
-def gate(audience_text, docket, grain, registry=None):
+def gate(audience_text, docket, grain, registry=None,
+         verdicts=None):
     """GATE v2 (contract law, 2026-10-03): the estate boundary —
     customer-specific facts must trace to the docket; general
     domain knowledge is FREE. No whitelist, no word budgets. No
-    model anywhere in here."""
+    model anywhere in here.
+    V-1 AMENDED 2026-10-08 (D15 comment-first): digits a
+    comment names never ride raw — the annotation's words
+    speak; her verdicts (show/omit, recorded on the row) are
+    honored here."""
     findings = []
     dtext = _gate_reference(docket)
     toks = _tokens(audience_text)
+    verdicts = verdicts or {}
+    # the annotation pairs the docket carries: 'words' (digits).
+    # Digits riding WITH their words in the text itself are the
+    # sanctioned meaning-first shape — only BARE digits draw the
+    # use-the-words finding (the fact-voice regression lock).
+    pairs = {d: w for w, d in re.findall(
+        r"'([^']+)'\s*\((\d+(?:\.\d+)?)\)", dtext)}
+    paired_in_text = {d for _, d in re.findall(
+        r"'([^']+)'\s*\((\d+(?:\.\d+)?)\)", audience_text)}
 
     # V-1 grounded values: quoted literals and numbers
     # a quoted VALUE is '-delimited with non-letter boundaries —
@@ -170,6 +184,21 @@ def gate(audience_text, docket, grain, registry=None):
             findings.append(f"V-1: quoted {q} not in the docket")
     unquoted = re.sub(qpat, " ", audience_text)
     for n in set(re.findall(r"\b\d+\b", unquoted)):
+        if verdicts.get(n) == "show":
+            continue                     # her ruling: may ride
+        if verdicts.get(n) == "omit":
+            findings.append(f"V-1: the number {n} must stay "
+                            "out (her ruling: keep it out)")
+            continue
+        if n in pairs and n not in paired_in_text \
+                and pairs[n].lower() not in audience_text.lower():
+            # an EXPLAINED number is fine — words anywhere in
+            # the card (her intent: translate via the comment);
+            # only BARE digits draw the finding
+            findings.append(f"V-1: use the annotation's words "
+                            f"for {n} ('{pairs[n]}'), not the "
+                            "digits")
+            continue
         if n not in dtext:
             findings.append(f"V-1: number {n} has no stored "
                             "basis")
@@ -562,6 +591,11 @@ def build07(dir05, dir06, out07, dir02, no_llm=False,
         six = [r for r in six
                if r["node_id"].split("::")[1] not in defer_files]
     skip_files = frozenset(skip_files) & set(files)
+    # THE RETAKE (D15): a skipped file's awaiting row WITH her
+    # verdict re-proposes — alone; its siblings seed the
+    # checkpoint so nothing else re-pays.
+    retake_verdicts = {}
+    checkpoint_seed = {}
     carried = []
     if skip_files:
         sheet_path = out07 / "07_business_descriptions_output.json"
@@ -584,6 +618,23 @@ def build07(dir05, dir06, out07, dir02, no_llm=False,
                 "for: " + ", ".join(missing))
         carried = [r for r in prior_rows
                    if r["node_id"].split("::")[1] in skip_files]
+        retaking = [r for r in carried
+                    if r.get("status") == "awaiting_human"
+                    and r.get("verdicts")]
+        if retaking:
+            retake_files = {r["node_id"].split("::")[1]
+                            for r in retaking}
+            retake_ids = {r["node_id"] for r in retaking}
+            retake_verdicts = {r["node_id"]: r["verdicts"]
+                               for r in retaking}
+            checkpoint_seed = {
+                r["node_id"]: r for r in carried
+                if r["node_id"].split("::")[1] in retake_files
+                and r["node_id"] not in retake_ids}
+            carried = [r for r in carried
+                       if r["node_id"].split("::")[1]
+                       not in retake_files]
+            skip_files = skip_files - retake_files
     active = [f for f in files if f not in skip_files]
     six = [r for r in six
            if r["node_id"].split("::")[1] not in skip_files]
@@ -656,25 +707,51 @@ def build07(dir05, dir06, out07, dir02, no_llm=False,
     else:
         run = proposer or _propose_loop
         ck_path = out07 / "07_business_descriptions_checkpoint_output.json"
-        done = (json.loads(ck_path.read_text())
-                if ck_path.exists() else {})
+        done = dict(checkpoint_seed)   # the retake's siblings
+        if ck_path.exists():
+            done.update(json.loads(ck_path.read_text()))
         total = len(specs)
         for i, (node_id, grain, docket, floor) in \
                 enumerate(specs, 1):
             if node_id in done:
                 rows.append(done[node_id])
                 continue
-            text, status, findings, used = run(
-                grain, _docket_text(docket), docket, registry)
+            if run is _propose_loop:
+                text, status, findings, used = run(
+                    grain, _docket_text(docket), docket,
+                    registry,
+                    verdicts=retake_verdicts.get(node_id))
+            else:
+                text, status, findings, used = run(
+                    grain, _docket_text(docket), docket,
+                    registry)
+            # D15: awaiting_human ships NO business text — the
+            # floor never rides the business slot again
+            if status == "awaiting_human":
+                shown = ""
+            elif status == "floor":
+                shown = floor
+            else:
+                shown = text
             row = {"node_id": node_id, "grain": grain,
-                   "audience_text": text if status != "floor"
-                   else floor,
+                   "audience_text": shown,
                    "status": status, "gate_findings": findings,
                    "rounds_used": used, "model": _MODEL_NAME,
                    "basis_version": BASIS_VERSION}
-            if status == "floor" and text:
+            if status in ("floor", "awaiting_human") and text:
                 row["last_proposal"] = text  # her eye: what
                 #                      wanted saying, and why not
+            if status == "awaiting_human":
+                # the V-code label's own digit must not win
+                # (the "V-1: number 999" slip, caught by the
+                # suite): strip the label, then read the number
+                row["questions"] = [
+                    {"number": m.group(1) if m else None,
+                     "finding": f}
+                    for f in findings
+                    for m in [re.search(
+                        r"\b(\d+(?:\.\d+)?)\b",
+                        re.sub(r"^V-\d+:", "", f))]]
             rows.append(row)
             done[node_id] = row
             ck_path.write_text(json.dumps(done, indent=1))
@@ -750,9 +827,22 @@ def _openai_caller(prompt):
 
 
 def _propose_loop(grain, docket_text, docket, registry,
-                  caller=None):
+                  caller=None, verdicts=None):
+    """D15 (2026-10-08): no fallback, ever — a BASIS GAP (a
+    number with no annotation and no grounding) is not
+    repairable by wording: ONE call, straight to her; an
+    exhausted budget also lands awaiting_human, never a
+    technical text in the business slot. Her verdicts steer
+    the prompt and the gate."""
     caller = caller or _openai_caller
     findings = []
+    if verdicts:
+        findings = [
+            (f"her ruling: the number {n} may be shown"
+             if v == "show" else
+             f"her ruling: the number {n} must not appear — "
+             "speak without it")
+            for n, v in sorted(verdicts.items())]
     text = ""
     for round_no in range(1, REPAIR_BUDGET + 1):
         prompt = build_prompt(grain, docket_text, findings)
@@ -764,10 +854,13 @@ def _propose_loop(grain, docket_text, docket, registry,
             findings = [f"call failed: {type(exc).__name__}: "
                         f"{str(exc)[:200]}"]
             continue
-        findings = gate(text, docket, grain, registry)
+        findings = gate(text, docket, grain, registry,
+                        verdicts=verdicts)
         if not findings:
             return text, "gate_passed", [], round_no
-    return text, "floor", findings, REPAIR_BUDGET
+        if any("has no stored basis" in f for f in findings):
+            return text, "awaiting_human", findings, round_no
+    return text, "awaiting_human", findings, REPAIR_BUDGET
 
 
 # ==== FIELD DOCKET v2 — PSEUDO CODE (written before code;
@@ -926,6 +1019,15 @@ def render_facts(dir05, dir06, dir02, fname, dir03=None,
             sent = _named_fact(ng, nvoice, nsql, r["node_id"]) \
                 or r["sentence"]
             attachments.append((r["node_id"], sent))
+        elif meta.get("on_class") == "population_filter":
+            # THE VIEW-SHAPE FIND (D15 night, 2026-10-08): a
+            # chained-JOIN view carries its whole population in
+            # ON clauses — the docket honors the 05 layer's
+            # CLASS, never the housing; without this the card
+            # had zero filter lines to ground on.
+            sent = _named_fact(ng, nvoice, nsql, r["node_id"]) \
+                or r["sentence"]
+            filters.append((r["node_id"], sent))
 
     params_line = next((ln for ln in file_s.splitlines()
                         if ln.startswith("Parameters shaping")),
@@ -1030,8 +1132,15 @@ def voice_facts(items, store_path, registry, voicer=None):
 def docket_v2_for_file(dir05, dir06, dir02, fname, voices=None,
                        dir01=None):
     """FACTS (+voices beside their facts) and CONTEXT (raw SQL),
-    with the must-say flags. The gate reads FACTS alone."""
+    with the must-say flags. The gate reads FACTS alone.
+    D15 (2026-10-08): the file's own header Description: rides
+    the FACTS first — the card's first-choice wording, her
+    ruling; read at build time, stored nowhere."""
     facts, items = render_facts(dir05, dir06, dir02, fname)
+    head = td.header_description(_dir01(dir01), fname)
+    if head:
+        facts = ("- THE FILE'S OWN WORDS (its header): "
+                 + head + "\n" + facts)
     if voices:
         lines = []
         bykey = {k: v for k, v in voices.items()}
@@ -1056,6 +1165,32 @@ def docket_v2_for_file(dir05, dir06, dir02, fname, voices=None,
             "grounds nothing):\n" + context,
             "gap": base["gap"], "params": base["params"],
             "population": base["population"]}, items
+
+
+def answer(out07, node_id, number, verdict):
+    """HER HAND ONLY (D15, 2026-10-08): record a verdict on an
+    awaiting_human row — "show" (the number may ride) or
+    "omit" (the card speaks without it). The next describe run
+    re-takes exactly this node. "Give it a meaning" needs no
+    function: she adds the inline comment to the SQL and the
+    changed hash re-takes the file."""
+    if verdict not in ("show", "omit"):
+        raise ValueError("a verdict is 'show' or 'omit' — "
+                         "a meaning belongs in the SQL as an "
+                         "inline comment (her ruling)")
+    out07 = Path(out07)
+    sheet_path = out07 / "07_business_descriptions_output.json"
+    rows = json.loads(sheet_path.read_text())
+    row = next((r for r in rows if r["node_id"] == node_id),
+               None)
+    if row is None:
+        raise ValueError(f"no row {node_id}")
+    if row.get("status") != "awaiting_human":
+        raise ValueError("verdicts land only on awaiting_human "
+                         f"rows; {node_id} is {row.get('status')}")
+    row.setdefault("verdicts", {})[str(number)] = verdict
+    sheet_path.write_text(json.dumps(rows, indent=1))
+    return row
 
 
 # ==== THE NAME LADDER (code; pseudo above) ==========================

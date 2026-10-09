@@ -191,24 +191,82 @@ def test_column_without_description_voices_name_and_counts(tmp_path):
     assert len(gaps) == 1
 
 
-def test_trailing_comment_rides_the_sentence(tmp_path):
+# RE-PINNED 2026-10-08 (D15 comment-first, BASIS 06.4.0, the
+# ruled re-pin path): the comment is voiced AS the meaning in
+# 3a's meaning-first shape; the "(annotated ...)" tail retires
+# where a comment exists; a disagreeing DECLARED meaning is now
+# the counted side. RED until the flip lands.
+
+def test_trailing_comment_is_the_meaning(tmp_path):
     rows, _ = _render(tmp_path,
         "SELECT T1.ID FROM T1 "
         "WHERE T1.BED_COUNT = 5  --five beds\n;")
     assert _sentences(rows) == [
-        "The count of beds is 5 (annotated 'five beds' in the "
-        "source)."]
+        "The count of beds is 'five beds' (5)."]
 
 
-def test_declared_meaning_wins_disagreement_counted(tmp_path):
+def test_comment_wins_disagreement_counted(tmp_path):
     rows, counted = _render(tmp_path,
         "SELECT T1.ID FROM T1 WHERE T1.CAT_C = 7  --Unlucky\n;")
     assert _sentences(rows) == [
-        "The record category is 'Lucky' (7) (annotated 'Unlucky' in "
-        "the source)."]
+        "The record category is 'Unlucky' (7)."]
     dis = [c for c in counted
            if c["class"] == "annotation_disagreement"]
     assert len(dis) == 1
+
+
+def test_non_value_comment_keeps_the_honest_suffix(tmp_path):
+    """The home-estate regression (caught at the 06.4.0 re-pin
+    diff): a column-vs-column predicate with a revision comment
+    must NOT wrap a trailing WORD as if it were a value — the
+    meaning-first wrap is for NUMBERS; words keep the suffix."""
+    rows, _ = _render(tmp_path,
+        "SELECT T1.ID FROM T1 JOIN ZC_CAT Z "
+        "ON T1.CAT_C = Z.CAT_C  --Added on 7/6/2026\n;")
+    (s,) = _sentences(rows)
+    assert "(annotated 'Added on 7/6/2026' in the source)" in s
+    assert "'Added on 7/6/2026' (" not in s
+
+
+def test_no_comment_voices_exactly_as_before(tmp_path):
+    """The flip touches ONLY commented predicates — the declared
+    meaning-first shape stands untouched everywhere else."""
+    rows, _ = _render(tmp_path,
+        "SELECT T1.ID FROM T1 WHERE T1.CAT_C = 7;")
+    assert _sentences(rows) == ["The record category is 'Lucky' (7)."]
+
+
+def test_header_description_read_not_stored(tmp_path):
+    """D15: the header block's Description: line — read at build
+    time, collapsed, None when absent; the SQL is the one store."""
+    sql = tmp_path / "sql"
+    sql.mkdir()
+    (sql / "fab.sql").write_text(
+        "/**********************\n"
+        "Create date: 01/01/2020\n"
+        "Description:\tThis view returns all fix members and\n"
+        "\t\ttheir current fix provider\n"
+        "======================\n"
+        "Revision Detail\n"
+        "**********************/\n"
+        "CREATE VIEW dbo.V_FAB AS SELECT 1 AS A;\n")
+    (sql / "bare.sql").write_text(
+        "CREATE VIEW dbo.V_BARE AS SELECT 1 AS A;\n")
+    got = technical_descriptions.header_description(sql, "fab")
+    assert got == ("This view returns all fix members and "
+                   "their current fix provider")
+    assert technical_descriptions.header_description(
+        sql, "bare") is None
+    # the SECOND header shape in the wild (the home census
+    # proc): -- line comments, divider-terminated
+    (sql / "dash.sql").write_text(
+        "-- =============\n"
+        "-- Author: fix\n"
+        "-- Description:    Replaces the fix Crystal report  \n"
+        "-- =============\n"
+        "CREATE PROCEDURE dbo.USP_FIX AS SELECT 1 AS A;\n")
+    assert technical_descriptions.header_description(
+        sql, "dash") == "Replaces the fix Crystal report"
 
 
 def test_column_comparand_speaks_words_never_raw_tokens(tmp_path):

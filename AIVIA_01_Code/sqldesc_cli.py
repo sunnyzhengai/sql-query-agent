@@ -692,6 +692,18 @@ def _delivery_txt(delivery):
         _terms(e)
     for e in delivery["reportless_files"]:
         d = e.get("description") or {}
+        if d.get("status") == "awaiting_human":
+            qs = "; ".join(
+                f"{q.get('number') or '?'} — {q['finding']}"
+                for q in e.get("questions", []))
+            blocks.append(f"==== FILE: {e['file']} ====\n"
+                          "AWAITING YOUR ANSWER on: "
+                          f"{qs or 'see the 07 sheet'}\n"
+                          "(no business description ships "
+                          "until you rule — fix the SQL "
+                          "comment, or answer show/omit)\n")
+            _terms(e)
+            continue
         blocks.append(f"==== FILE: {e['file']} ====\n"
                       "(no report ties to this file yet — "
                       "terms stay unpublished)\n"

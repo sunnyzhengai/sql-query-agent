@@ -20,7 +20,12 @@ from pathlib import Path
 CODE = Path(__file__).resolve().parent
 REPO = CODE.parent
 DLL = "Microsoft.SqlServer.TransactSql.ScriptDom.dll"
-VERSION = "0.7.1"  # the twin renders reportless files too
+VERSION = "0.8.0"  # D15 (2026-10-08 evening): comment-first
+# voicing (06.4.0 re-pin, header Description: first choice),
+# the no-fallback gate (basis gaps -> awaiting_human, one
+# call; verdicts show/omit via bd.answer; the retake), the
+# delivery awaiting entries + AWAITING txt, the view tie
+# (select binding). 0.7.1: the twin renders reportless files
 # (her view-test find, same day). 0.7.0: THE NAMING LAW +
 # D14 (2026-10-08): the
 # build/describe split + the 13 stamp guard, the key refusal
