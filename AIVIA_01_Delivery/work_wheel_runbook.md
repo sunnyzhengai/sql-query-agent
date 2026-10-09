@@ -19,11 +19,18 @@ guard, the key as a blocking preflight row (no degrade, ever),
 and the delivery = PAID FILES ONLY with files_described /
 files_waiting per report.
 UPGRADING A 0.6.x TENANT: publish the new wheel (one wheel,
-fresh session) -> rename the folders (Setup C) -> KEEP
-04_run/10_corpus_ledger.json and any blessing registry (the
-migration reads honor the old names; nothing re-pays) ->
-delete the old 05/ 06/ 07/ folders and old output files ->
-run the notebook from RUN 2.
+fresh session) -> rename the folders (Setup C) -> KEEP THREE
+THINGS (the first upgrade's lesson, 2026-10-09: the 07 sheet
+IS the paid text — deleting it forces a re-pay):
+  1. 04_run/10_corpus_ledger.json (which files are paid)
+  2. the old 07/07_business_sheet.json — MOVE it to
+     04_run/07_business_descriptions/ (the carry source; the
+     migration read honors the old file name there)
+  3. any blessing registry, moved beside it
+-> delete the rest of the old 05/ 06/ 07/ output files ->
+run the notebook from RUN 2. Deleted the 07 sheet already?
+Delete the ledger too: the files re-describe in batches —
+paid again, said plainly.
 
 ## Prereqs (pack before the first session)
 
