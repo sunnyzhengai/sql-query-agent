@@ -141,7 +141,7 @@ def test_cli_dict_dir_speaks_meanings(tmp_path):
         "is_current_data_model_yn": "Y",
         "is_supplemental_yn": "N", "destin_in_scope": "Y"}]))
     out = tmp_path / "out"
-    sqldesc_cli.describe(sql, out, dict_dir=d02)
+    sqldesc_cli.describe_technical(sql, out, dict_dir=d02)
     text = (out / "USP_FIX_DESCRIBE.txt").read_text()
     assert "'Lucky' (7)" in text or "Lucky" in text
 
@@ -165,7 +165,7 @@ def test_cli_business_dir_serves_the_07_card(tmp_path):
     (sql / "USP_FIX_BIZ.sql").write_text("SELECT 1 AS A\n")
     biz = tmp_path / "07"
     biz.mkdir()
-    (biz / "07_business_sheet.json").write_text(json.dumps([
+    (biz / "07_business_descriptions_output.json").write_text(json.dumps([
         {"node_id": "file::USP_FIX_BIZ", "grain": "file",
          "audience_text": "One row is: a fixture row. "
                           "Time window: HER BLESSED SENTENCE.",
@@ -204,14 +204,18 @@ def test_cli_official_txt_speaks_its_voice(tmp_path):
 
     out1 = tmp_path / "out1"
     sqldesc_cli.report_descriptions(tmdl, sql, out1)
-    t1 = (out1 / "08_report_descriptions.txt").read_text()
+    # THE NAMING LAW (2026-10-08): the --reports door's files are
+    # step-08 outputs — 08_pbi_lineage_descriptions_output.*; the
+    # old 08_report_descriptions name RETIRES. RED until 0.7.0.
+    t1 = (out1 / "08_pbi_lineage_descriptions_output.txt"
+          ).read_text()
     assert "REPORT: Fix" in t1
     assert "feeds from: USP_FIX_OFF.sql" in t1
     assert "voice: technical" in t1
 
     biz = tmp_path / "07"
     biz.mkdir()
-    (biz / "07_business_sheet.json").write_text(json.dumps([
+    (biz / "07_business_descriptions_output.json").write_text(json.dumps([
         {"node_id": "file::USP_FIX_OFF", "grain": "file",
          "audience_text": "One row is: an official fixture "
                           "row. Time window: HER SENTENCE.",
@@ -219,7 +223,8 @@ def test_cli_official_txt_speaks_its_voice(tmp_path):
     out2 = tmp_path / "out2"
     sqldesc_cli.report_descriptions(tmdl, sql, out2,
                                     business_dir=biz)
-    t2 = (out2 / "08_report_descriptions.txt").read_text()
+    t2 = (out2 / "08_pbi_lineage_descriptions_output.txt"
+          ).read_text()
     assert "voice: business" in t2
     assert "HER SENTENCE" in t2
 
@@ -306,8 +311,10 @@ def test_cli_preflight_names_every_missing_prereq(tmp_path,
     model.mkdir(parents=True)
     fails2 = sqldesc_cli.preflight(
         empty_tmdl, bad_sql, tmp_path / "out")
-    assert all("OPENAI_API_KEY" in f or "degrade" in f
-               for f in fails2)
+    # D4 amendment (2026-10-08): the degrade is retired — the key
+    # row's fix line names the vault, never a fallback voice.
+    assert all("OPENAI_API_KEY" in f for f in fails2)
+    assert not any("degrade" in f for f in fails2)
     monkeypatch.setenv("OPENAI_API_KEY", "sk-fake-for-preflight")
     fails3 = sqldesc_cli.preflight(
         empty_tmdl, bad_sql, tmp_path / "out")
@@ -316,10 +323,11 @@ def test_cli_preflight_names_every_missing_prereq(tmp_path,
 
 def test_deliver_refuses_on_preflight_failure(tmp_path,
                                               monkeypatch):
-    """THE REFUSAL (Brief_Preflight, ruled 2026-10-06): deliver
-    runs the preflight first and refuses to start on any
-    failure except the missing key — no paid call ever fires
-    into a broken environment, mechanically."""
+    """THE REFUSAL (Brief_Preflight, ruled 2026-10-06; the
+    missing-key exception retired 2026-10-08 with D4's degrade):
+    deliver runs the preflight first and refuses to start on ANY
+    failure — no paid call ever fires into a broken environment,
+    mechanically."""
     import sqldesc_cli
     monkeypatch.delenv("OPENAI_API_KEY", raising=False)
     empty_sql = tmp_path / "sql"
@@ -334,21 +342,21 @@ def test_deliver_refuses_on_preflight_failure(tmp_path,
         assert "*.sql" in str(e)            # the board rides out
 
 
-def test_cli_deliver_no_key_degrades_honestly(tmp_path,
-                                              monkeypatch):
-    """The 0.5.0 --deliver chain without a key: technical voice
-    only, no terms proposed, ai_delivery.json + the official txt
-    still land — an honest degrade, never a crash, never a
-    silent business claim."""
+def test_cli_deliver_no_key_refuses_loudly(tmp_path,
+                                           monkeypatch):
+    """D4 DEGRADE RETIRED (ruled 2026-10-08, her words: "if the
+    key failed, fail loudly, don't deliver anything"): the chain
+    without a key REFUSES before any work — no delivery file, no
+    txt, nothing recorded. Supersedes the 0.5.0 degrade lock."""
     import sqldesc_cli
     monkeypatch.delenv("OPENAI_API_KEY", raising=False)
     tmdl, sql = _official_fixture(tmp_path)
     out = tmp_path / "out"
-    delivery = sqldesc_cli.deliver(tmdl, sql, out)
-    assert (out / "ai_delivery.json").exists()
-    rep = next(e for e in delivery["reports"]
-               if e["report"] == "Fix")
-    assert rep["description"]["voice"] == "technical"
-    assert rep.get("terms", []) == []      # no key, no proposals
-    txt = (out / "08_report_descriptions.txt").read_text()
-    assert "voice: technical" in txt
+    try:
+        sqldesc_cli.deliver(tmdl, sql, out)
+        raise AssertionError("deliver ran without a key")
+    except ValueError as e:
+        assert "OPENAI_API_KEY" in str(e)
+    assert not (out / "ai_delivery.json").exists()
+    assert not (out / "12_ai_delivery_output.json").exists()
+    assert not (out / "12_ai_delivery_output.txt").exists()

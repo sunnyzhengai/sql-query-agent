@@ -23,7 +23,8 @@ TECHDEF_ATTR_ID = "____"   # technical-definition ATTRIBUTE TYPE id
 REPORT_TYPE_ID  = "____"   # Power BI report ASSET TYPE id
 SANDBOX_DOMAIN  = "____"   # test domain id (the one-row rehearsal)
 
-DELIVERY_JSON = "/lakehouse/default/Files/out/ai_delivery.json"
+DELIVERY_JSON = ("/lakehouse/default/Files/04_run/"
+                 "12_ai_delivery_output.json")
 DRY_RUN  = True    # resolve + print only; flip AFTER reading
 SANDBOX  = True    # True = write terms into SANDBOX_DOMAIN,
                    # limit to ONE report + ONE term (law 5.2)
@@ -49,6 +50,8 @@ import json
 d = json.load(open(DELIVERY_JSON))
 pushes = []   # (kind, report, term_name, text, techdef)
 for e in d["reports"]:
+    if e.get("files_waiting"):   # ruled 2026-10-08: an
+        continue                 # incomplete report never ships
     desc = e.get("description") or {}
     if desc.get("text"):
         pushes.append(("report_desc", e["report"], None,

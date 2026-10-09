@@ -51,6 +51,14 @@ L02 — THE VOICING PORT (design decision 4):
 
 What is the output of this data contract?
 
+
+THE RENAME AMENDMENT (2026-10-08, the naming law — step table in
+10_work_wheel_data_contract.md; approved + built same day):
+- 06_description_sheet.json -> 06_technical_descriptions_output.json
+- 06_voicing_ledger.json    -> 06_technical_descriptions_voicing_output.json
+Older passages below citing the pre-rename names read as the new
+names. The per-file <name>.txt / <name>.svg KEEP their subject names (ruled: the step identity rides the folder; suffixing per-file artifacts adds noise, not truth).
+
 - 06_description_sheet.json — one row per VOICED node:
   - node_id: the 05 node the sentence describes (join key into
     the graph; the sheet never mints its own nodes).
@@ -109,9 +117,15 @@ What is the output of this data contract?
         description voices as the readable form of its name AND
         is counted — never silent),
       annotation_disagreement (AMENDED 2026-10-02 at L03
-        scribing, per R8 precedence: a declared meaning and a
-        trailing comment that disagree — the declared meaning is
-        voiced, the disagreement counted; a steward's finding).
+        scribing; PRECEDENCE FLIPPED 2026-10-08, her ruling
+        "use the inline comment as the first choice": the
+        COMMENT is voiced first, a disagreeing declared meaning
+        is counted here — still a steward's finding, read the
+        other way. The comment is READ from the SQL at build
+        time and stored NOWHERE else — no side dictionary, ever
+        (her ruling; high-occurrence numbers may earn one
+        later, a recorded future option). Effective at the
+        0.8.0 build.)
   - THE EQUATION, a test not advice: per grain and per file,
     description rows + ledger rows == the grain's node total in
     the 05 sheets. A node in neither place has no constructible

@@ -31,7 +31,7 @@ def _scope_docket():
     """The real docket for the #caregiver_languages scope, read
     from the TRACKED 06 sheet (never hardcoded — the gate trusts
     stored rows, so the fixtures must too)."""
-    rows = json.loads((DIR06 / "06_description_sheet.json")
+    rows = json.loads((DIR06 / "06_technical_descriptions_output.json")
                       .read_text())
     sent = next(r["sentence"] for r in rows if r["node_id"]
                 .endswith(LOTE + "::scope/#caregiver_languages"))
@@ -145,7 +145,7 @@ def test_live_harness_checkpoints_resumes_and_reports(tmp_path,
                    proposer=dying_proposer)
     except Boom:
         pass
-    ck = json.loads((out / "07_live_checkpoint.json").read_text())
+    ck = json.loads((out / "07_business_descriptions_checkpoint_output.json").read_text())
     assert len(ck) == 4  # the completed nodes survived the death
 
     calls.clear()
@@ -156,10 +156,10 @@ def test_live_harness_checkpoints_resumes_and_reports(tmp_path,
 
     bd.build07(DIR05, DIR06, out, DIR02, no_llm=False,
                proposer=steady_proposer)
-    rows = json.loads((out / "07_business_sheet.json").read_text())
+    rows = json.loads((out / "07_business_descriptions_output.json").read_text())
     assert len(rows) == 151
     assert len(calls) == 151 - 4   # resume never re-pays
-    assert not (out / "07_live_checkpoint.json").exists()
+    assert not (out / "07_business_descriptions_checkpoint_output.json").exists()
     assert "[5/151]" in capsys.readouterr().out  # progress lines
 
 
@@ -326,11 +326,11 @@ def test_no_llm_build_conserves_and_registry_stays_untouched(
         tmp_path):
     out = tmp_path / "07"
     out.mkdir()
-    reg = out / "07_blessing_registry.json"
+    reg = out / "07_business_descriptions_blessings_output.json"
     reg.write_text(json.dumps({"names": [], "sentences": []}))
     before = reg.read_bytes()
     bd.build07(DIR05, DIR06, out, DIR02, no_llm=True)
-    rows = json.loads((out / "07_business_sheet.json").read_text())
+    rows = json.loads((out / "07_business_descriptions_output.json").read_text())
     assert rows and all(r["status"] == "floor" for r in rows)
     # conservation: one row per docket node (file+scope+field)
     assert len(rows) == len({r["node_id"] for r in rows})
@@ -405,7 +405,7 @@ def test_v1_is_scoped_to_facts_not_context():
 def test_fact_voices_store_reuse_and_ladder(tmp_path):
     """One scoped call per NEW fact; unchanged facts never
     re-pay; blessed > proposed > machine."""
-    store = tmp_path / "07_fact_voices.json"
+    store = tmp_path / "07_business_descriptions_fact_voices_output.json"
     calls = []
 
     def voicer(fact):
@@ -431,7 +431,7 @@ def test_fact_voices_store_reuse_and_ladder(tmp_path):
 
 def test_fact_voice_gate_rejects_foreign_values(tmp_path):
     """A voice may only carry its own fact's values."""
-    store = tmp_path / "07_fact_voices.json"
+    store = tmp_path / "07_business_descriptions_fact_voices_output.json"
 
     def liar(fact):
         return "the category is 'Lucky' (8)"  # 8 is not the fact
@@ -469,7 +469,7 @@ def test_facts_speak_short_names():
     assert "event record category is 'Census' (6)" not in facts
     assert "(CLARITY_ADT)" in facts  # sources: short (NAME) — desc
     # and the 06 floor keeps its dictionary words
-    six = json.loads((DIR06 / "06_description_sheet.json")
+    six = json.loads((DIR06 / "06_technical_descriptions_output.json")
                      .read_text())
     fl = next(r["sentence"] for r in six
               if r["node_id"] == f"file::{TOTALS}")
@@ -777,7 +777,7 @@ def test_walk_blessed_card_line_wins(tmp_path):
     out = tmp_path / "07"
     out.mkdir()
     blessed = "HER EXACT TIME WINDOW SENTENCE"
-    (out / "07_blessing_registry.json").write_text(json.dumps(
+    (out / "07_business_descriptions_blessings_output.json").write_text(json.dumps(
         {"names": [], "sentences": [
             {"node_id": f"file::{CENSUS}::card/time_window",
              "blessed_text": blessed,
@@ -804,7 +804,7 @@ def test_walk_bless_door_requires_her_ruling(tmp_path):
         assert "ruling" in str(e).lower()
     bw.bless(out, nid, "her sentence",
              ruling="RULED 2026-10-04 (Sunny, in chat)")
-    reg = json.loads((out / "07_blessing_registry.json")
+    reg = json.loads((out / "07_business_descriptions_blessings_output.json")
                      .read_text())
     row = next(r for r in reg["sentences"]
                if r["node_id"] == nid)
@@ -812,7 +812,7 @@ def test_walk_bless_door_requires_her_ruling(tmp_path):
     assert row["ruling"] == "RULED 2026-10-04 (Sunny, in chat)"
     bw.bless(out, nid, "her newer sentence",
              ruling="RULED 2026-10-05 (Sunny, in chat)")
-    reg = json.loads((out / "07_blessing_registry.json")
+    reg = json.loads((out / "07_business_descriptions_blessings_output.json")
                      .read_text())
     rows = [r for r in reg["sentences"] if r["node_id"] == nid]
     assert len(rows) == 1
@@ -872,8 +872,8 @@ def test_walk_rerender_applies_registry_without_calls(tmp_path):
     src = Path("AIVIA_01_Data/07_business_descriptions")
     out = tmp_path / "07"
     out.mkdir()
-    for f in ("07_business_sheet.json", "07_walk_trace.json",
-              "07_blessing_registry.json"):
+    for f in ("07_business_descriptions_output.json", "07_walk_trace.json",
+              "07_business_descriptions_blessings_output.json"):
         shutil.copy(src / f, out / f)
     def no_caller(prompt):
         raise AssertionError("rerender must make zero calls")
@@ -890,7 +890,7 @@ def test_walk_rerender_applies_registry_without_calls(tmp_path):
 # --------------------------------------- incremental delivery (D12)
 # 10_work_wheel.md D12, ruled 2026-10-07: described = DONE. RED until
 # build07 takes skip_files (a set of file stems): a skipped file's
-# rows are CARRIED from the prior 07_business_sheet.json in out07 —
+# rows are CARRIED from the prior 07_business_descriptions_output.json in out07 —
 # the seat is never asked about them; only unskipped files propose.
 
 def test_07_skip_files_carries_prior_rows_no_calls(tmp_path):
@@ -898,7 +898,7 @@ def test_07_skip_files_carries_prior_rows_no_calls(tmp_path):
     out.mkdir()
     bd.build07(DIR05, DIR06, out, DIR02, no_llm=True)  # the prior run
     prior = {r["node_id"]: r for r in json.loads(
-        (out / "07_business_sheet.json").read_text())}
+        (out / "07_business_descriptions_output.json").read_text())}
     stems = {n.split("::")[1] for n in prior}
     skip = stems - {LOTE}
 
@@ -928,6 +928,30 @@ def test_07_skip_files_without_prior_sheet_refuses(tmp_path):
     with pytest.raises(ValueError, match="prior"):
         bd.build07(DIR05, DIR06, out, DIR02, no_llm=True,
                    skip_files={LOTE})
+
+
+def test_07_pre_rename_tenant_sheet_and_registry_honored(tmp_path):
+    """THE MIGRATION READS (2026-10-08, the naming law): a
+    pre-rename tenant carries 07_business_sheet.json and
+    07_blessing_registry.json — the carry must not refuse and the
+    blessings must not be lost; writes land the new names."""
+    out = tmp_path / "07"
+    out.mkdir()
+    bd.build07(DIR05, DIR06, out, DIR02, no_llm=True)
+    # stage the OLD-name world: sheet + registry, new names gone
+    (out / "07_business_sheet.json").write_text(
+        (out / "07_business_descriptions_output.json").read_text())
+    (out / "07_business_descriptions_output.json").unlink()
+    (out / "07_blessing_registry.json").write_text(json.dumps(
+        {"_law": "fixture", "names": [], "sentences": []}))
+    prior = {r["node_id"]: r for r in json.loads(
+        (out / "07_business_sheet.json").read_text())}
+    skip = {n.split("::")[1] for n in prior}
+    rows = bd.build07(DIR05, DIR06, out, DIR02, no_llm=True,
+                      skip_files=skip)   # carry from the OLD name
+    assert {r["node_id"] for r in rows} == set(prior)
+    # the write landed the NEW name
+    assert (out / "07_business_descriptions_output.json").exists()
 
 
 def test_07_defer_files_dropped_without_carry_or_refusal(tmp_path):

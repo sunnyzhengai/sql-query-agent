@@ -51,8 +51,40 @@
 #   another-corpus, COUNTED (D3 spirit: only real, only ours)
 # - NO shells (D3): corpus files no model touches land in the
 #   ledger's unconsumed_sql
-# - write 08_pbi_reports.json + 08_lineage_ledger.json; print
+# - write 08_pbi_lineage_output.json + 08_pbi_lineage_ledger_output.json; print
 #   the conservation equation (bindings == resolved + unresolved)
+#
+# ==== PSEUDO — 0.8.0 THE VIEW TIE (D15, ruled 2026-10-08 =====
+# evening; the 08 contract's forward note; AWAITING SUNNY'S
+# APPROVAL; red tests before code):
+#   Today executes come ONLY from the EXEC pattern — a view
+#   consumed by a report is invisible (the first tenant's
+#   views are ALL reportless; reportless terms never publish).
+#   TWO NEW BINDING KINDS, same resolve law as exec (the
+#   object's bare name — schema and brackets stripped — must
+#   match a corpus file stem; no match = counted, named,
+#   never guessed):
+#   1. select_from: inside a NativeQuery text, every
+#      FROM/JOIN <object> — kind "select", the object name
+#      verbatim in the binding row.
+#   2. item_import: a partition's [Item="<name>"] (the plain
+#      table-import shape) whose name matches a corpus stem —
+#      kind "item".
+#   executes stays deduped and ordered; the conservation
+#   equation (bindings == resolved + unresolved) unchanged;
+#   the lineage ledger counts the new kinds per class.
+# ===============================================================
+#
+# ==== PSEUDO — 0.7.0 THE 08 RENAMES (the naming law, ruled ====
+# 2026-10-08, step table row 08; AWAITING SUNNY'S APPROVAL):
+#   08_pbi_reports.json    -> 08_pbi_lineage_output.json
+#   08_lineage_ledger.json -> 08_pbi_lineage_ledger_output.json
+#   No migration read: both regenerate whole on every build.
+#   Readers flip in the same landing: ai_delivery, business_terms,
+#   sqldesc_cli + fixtures. (The VIEW-TIE ruling — SELECT/Item
+#   binding so views reach reports — is the SEPARATE 0.8.0 slice,
+#   contracts first; this landing is names only.)
+# ===============================================================
 #
 # ---------------------------------------------------------------------
 # P4. THE LOCKS (red first, synthetic fixtures only — invented
@@ -231,9 +263,9 @@ def build08(tmdl_root, dir01, out08):
                    "unresolved": len(unresolved)},
     }
     out.mkdir(parents=True, exist_ok=True)
-    (out / "08_pbi_reports.json").write_text(
+    (out / "08_pbi_lineage_output.json").write_text(
         json.dumps(reports, indent=1))
-    (out / "08_lineage_ledger.json").write_text(
+    (out / "08_pbi_lineage_ledger_output.json").write_text(
         json.dumps(ledger, indent=1))
     c = ledger["counts"]
     print(f"08 lineage: {len(reports)} report(s); conservation "

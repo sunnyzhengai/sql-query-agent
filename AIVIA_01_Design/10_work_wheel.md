@@ -40,12 +40,18 @@ D3. WHAT TRAVELS (2026-10-04; LLM AMENDMENT 2026-10-05,
     stay home — they prove the CODE at build; the preflight
     proves the ENVIRONMENT at run, D8).
 
-D4. THE KEY LAW (2026-10-05, amended at the rehearsal): the
-    key NEVER rides. The seat reads OPENAI_API_KEY from the
-    environment FIRST (the notebook sets it from a vault/
-    workspace secret), the repo's .env reader second. Missing
-    key = the ruled HONEST DEGRADE: technical voice, no terms,
-    said out loud — never a crash, never a silent downgrade.
+D4. THE KEY LAW (2026-10-05, amended at the rehearsal;
+    DEGRADE RETIRED 2026-10-08, Sunny — effective wheel
+    0.7.0): the key NEVER rides. The seat reads
+    OPENAI_API_KEY from the environment FIRST (the notebook
+    sets it from a vault/workspace secret), the repo's .env
+    reader second. Missing or failed key = a BLOCKING
+    preflight FAIL like any other — the sequence stops, the
+    runner fixes it, nothing is delivered (her ruling: "if
+    the key failed, fail loudly, don't deliver anything").
+    The 2026-10-05 honest-degrade path (technical voice, no
+    terms) is RETIRED; it stands in code only until 0.7.0
+    ships.
     THE SEAT SPEAKS UNCOMPRESSED (find #6, 2026-10-06): the
     client requests Accept-Encoding identity — Fabric cluster
     images carry stale decompressors that die on compressed
@@ -82,12 +88,18 @@ D7. THE CLI SURFACE: ai-describe <sql> <out> [--dict] ·
     --deliver <tmdl> <sql> <out> [--dict] (the Collibra
     chain: 08 -> 05 -> 06 -> 07 cards -> 09 terms ->
     ai_delivery.json + the official txt) · --preflight (D8).
+    AMENDED 2026-10-08 (D14, wheel 0.7.0): two new doors,
+    build() (free: 05+06+08 + the 13 stamp) and describe()
+    (paid: 07+09+10+12). deliver() SURVIVES as the one-call
+    wrapper — build then describe, nothing more (her ruling:
+    keep it).
 
 D8. THE PREFLIGHT + THE REFUSAL (2026-10-06, her ask after
     the httpx find; built red-first): one zero-cost check of
     EVERY prereq before any paid call — report-all, every
     FAIL names its fix; and deliver() RUNS it first, refusing
-    on any failure except the missing key (D4's degrade).
+    on ANY failure — the missing-key exception retired with
+    D4's degrade (2026-10-08; effective wheel 0.7.0).
     No paid call ever fires into a broken environment —
     mechanically enforced. The check set is closed; a new
     trip-wire earns a row + its lock, dated.
@@ -124,9 +136,10 @@ D10. THE VERSION LADDER: any byte change to the artifact
 D11. MULTI-WORKSPACE TMDL (ruled 2026-10-07, her work
     scale-up — "path 1 today, path 2 on the docket";
     PATH 2 BUILT same day, wheel 0.6.0):
-    - Files/tmdl/ may hold one SUBFOLDER PER SOURCE WORKSPACE;
+    - Files/03_tmdl/ (the 2026-10-08 naming law; was tmdl/)
+      may hold one SUBFOLDER PER SOURCE WORKSPACE;
       read_models walks recursively and model identity = the
-      path relative to tmdl/ ("WS One/Fix Twin") — top-level
+      path relative to 03_tmdl/ ("WS One/Fix Twin") — top-level
       models keep bare names, so the flat layout stays legal
       and unchanged. Same-named models in two workspaces
       coexist; the qualified name rides through 08/09/
@@ -168,12 +181,61 @@ D12. INCREMENTAL DELIVERY (ruled 2026-10-07; BUILT same day,
     (defer_files: no rows, no carry, no refusal; a later run
     takes them). The run says it: "N described (K already
     done), M remain". The ledger records ONLY what this run
-    described, only after the paid chain succeeded; the
-    no-key degrade records nothing. The skip lands BEFORE 07
-    spec construction (fact voices are paid — a skipped file
-    costs zero, voices included); 05/06/08 always build the
-    WHOLE corpus (local, free — the graph stays whole).
+    described, only after the paid chain succeeded (the
+    no-key degrade is retired per D4's 2026-10-08 amendment —
+    an unkeyed run REFUSES and records nothing). The skip
+    lands BEFORE 07 spec construction (fact voices are paid —
+    a skipped file costs zero, voices included); 05/06/08
+    always build the WHOLE corpus (local, free — the graph
+    stays whole; FROM the D14 split they build in the BUILD
+    cell, not per paid run).
     Accepted trade (her 3.1): an unchanged file's text never
     re-reads later arrivals.
     Locks: test_10_incremental_delivery x7, test_07 skip x2 +
     defer x1, test_09 l16 + l17.
+
+D14. THE SPLIT + THE STAMP (ruled 2026-10-08, Sunny — one
+    build, wheel 0.7.0, with the step-table renames in
+    10_work_wheel_data_contract.md):
+    - TWO CELLS: build() = the free whole-corpus work (05
+      graph, 06 technical, 08 links) — run it when the input
+      folders change; describe() = the paid batch (07 cards,
+      09 terms, 10 ledger, 12 delivery) — run it repeatedly
+      until "0 remain". deliver() = build + describe in one
+      call, kept as the shortcut.
+    - THE STAMP (step 13): build() writes
+      13_build_stamp_output.json — a content hash of
+      01_sql_input (the build-side twin of the 10 ledger:
+      the ledger says what the seat described, the stamp
+      says what corpus the build saw).
+    - THE GUARD: describe() recomputes the hash FIRST; a
+      mismatch REFUSES with "run the build cell first" — no
+      paid call against a stale graph, mechanically enforced.
+    - THE SEQUENCE LAW (her words): cells run in order; any
+      FAIL stops the session — fix, re-run that cell, only
+      then proceed. No cell runs past a failing earlier one.
+    - DELIVERY MEMBERSHIP moves to delivered-goods-only with
+      completeness lists — shape owned by the 09 contract
+      (its 2026-10-08 amendment), not re-stated here.
+
+D15. THE 0.8.0 SLICE (RULED 2026-10-08 evening, the view-test
+    arc — the 47080 lesson, her reopen of the floor; contracts
+    amended same day: 06 R8 flip, 07 V-1 + awaiting_human, 09
+    awaiting_human; BUILD PENDING):
+    - COMMENT-FIRST: the inline comment is the meaning, first
+      choice in every voice; a card never writes raw digits a
+      comment names. The SQL is the ONE meaning store — no
+      side dictionary, no registry row, the comment stored
+      nowhere else (her ruling; high-occurrence numbers may
+      earn a store later, recorded option only).
+    - THE HEADER Description: line -> the file card's
+      first-choice wording.
+    - BASIS GAPS go to HER, not to repair rounds and never to
+      a technical fallback: status awaiting_human, questions
+      named, publish skips; her verdicts = fix the SQL
+      comment / let it show / keep it out.
+    - THE VIEW TIE: build08 learns the view consumption
+      patterns (NativeQuery SELECT ... FROM <object>, and
+      [Item="..."] table imports) so views reach their
+      reports — the first tenant's views are all reportless
+      today, and reportless terms never publish.

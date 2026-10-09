@@ -56,7 +56,7 @@ S1-S11 and the gate checks G-1..G-7 are ruled design law.
 #     whose docket carries population-shaping parameters), the
 #     Excludes line (files whose docket carries exclusions).
 #   G-7 S10 UNBOUND CODES: no bare code in prose; every sighting
-#     RECORDED to 07_code_sightings.json (table.column + code +
+#     RECORDED to 07_business_descriptions_code_sightings_output.json (table.column + code +
 #     node) — the dictionary-growth flywheel's second engine.
 #   gate(audience_text, docket, grain) -> findings list; empty ==
 #   pass. Deterministic, byte-testable, fixtures = the dry run's
@@ -82,8 +82,8 @@ S1-S11 and the gate checks G-1..G-7 are ruled design law.
 #   dockets for every file + scope + field node -> one sheet row
 #   each (CONSERVATION: exactly one row per docket node, a test);
 #   no_llm=True renders floor-only rows deterministically (the
-#   suite's path; zero cost); writes 07_business_sheet.json, the
-#   per-file texts (status marks per line), 07_code_sightings
+#   suite's path; zero cost); writes 07_business_descriptions_output.json, the
+#   per-file texts (status marks per line), 07_business_descriptions_code_sightings_output
 #   .json. The registry is READ-ONLY to the build — a byte-
 #   identity test enforces it.
 # ====================================================================
@@ -283,7 +283,7 @@ def _source_lines(dir05, dir02, fname):
     dictionary's own words, for the proposer to translate from."""
     descs = _table_descriptions(dir02)
     tables = set()
-    for r in td._read(Path(dir05) / "05_resolves_edges.json"):
+    for r in td._read(Path(dir05) / "05_semantic_graph_resolves_edges_output.json"):
         if r["to_kind"] == "table" \
                 and r["from_id"].split("::")[1] == fname:
             tables.add(r["to_id"].upper())
@@ -293,7 +293,7 @@ def _source_lines(dir05, dir02, fname):
 
 def docket_for_file(dir05, dir06, dir02, fname):
     rows = json.loads((Path(dir06) /
-                       "06_description_sheet.json").read_text())
+                       "06_technical_descriptions_output.json").read_text())
     file_s = next(r["sentence"] for r in rows
                   if r["node_id"] == f"file::{fname}")
     scope_s = [r["sentence"] for r in rows
@@ -431,7 +431,7 @@ def _field_nodes(dir05, dir02, dir01=None):
     g = td._load_graph(dir05)
     words, values = td._load_words(Path(dir02))
     voice = td._Voice(g, words, values)
-    scopes = td._read(dir05 / "05_scope_sheet.json")
+    scopes = td._read(dir05 / "05_semantic_graph_scope_output.json")
     out = []
     for sc in scopes:
         if sc["scope_kind"] != "delivery":
@@ -455,7 +455,7 @@ def _field_nodes(dir05, dir02, dir01=None):
 #      described (deliver() computes them from the hash ledger;
 #      callers never type names).
 #   2. THE REFUSAL FIRST: skip_files non-empty -> the prior
-#      07_business_sheet.json must exist in out07 and hold rows
+#      07_business_descriptions_output.json must exist in out07 and hold rows
 #      for EVERY skipped stem; anything missing -> ValueError
 #      naming the prior sheet. Skipping needs something to carry —
 #      never a silent hole.
@@ -469,13 +469,71 @@ def _field_nodes(dir05, dir02, dir01=None):
 #      model, basis, untouched. The per-file txt loop keeps the
 #      full file list, so every file's txt regenerates (carried
 #      rows included) and the sheet stays whole.
-#   5. 07_code_sightings.json stays what it is — the audit of
+#   5. 07_business_descriptions_code_sightings_output.json stays what it is — the audit of
 #      THIS run's proposals; carried nodes add none.
 #   6. only_file and skip_files compose (only_file first, then
 #      skip subtracts); checkpoint behavior among active specs is
 #      unchanged.
 
 
+# ==== PSEUDO — 0.8.0 THE NO-FALLBACK GATE (D15, ruled =========
+# 2026-10-08 evening; contracts amended same day; AWAITING
+# SUNNY'S APPROVAL; red tests before code):
+#
+#   THE DOCKET:
+#   1. File grain gains the header line: td.header_description
+#      (the SQL's own "Description:" text) rides the docket
+#      FIRST — the card's first-choice wording (her ruling).
+#
+#   THE GATE (V-1 amendment):
+#   2. ANNOTATED NUMBERS: the docket's meaning-first pairs
+#      ("'<words>' (<digits>)") are extracted mechanically; a
+#      card writing such digits RAW gets the named finding
+#      "use the annotation's words, not the digits" — REPAIRABLE
+#      (the words are right there).
+#   3. BASIS GAPS: a number with NO annotation pair and no
+#      other docket grounding = basis_gap — NOT repairable by
+#      wording: NO repair rounds (zero paid retries), the row
+#      goes straight to awaiting_human.
+#
+#   THE STATUS (the floor retires as a business text):
+#   4. awaiting_human rows: audience_text EMPTY (never the 06
+#      sentence), last_proposal + gate_findings kept, plus
+#      questions: [{"number", "where" (table.column from the
+#      sighting), "finding"}] — her read surface.
+#   5. HER VERDICTS, recorded ON the row (no new file):
+#      bd.answer(out07, node_id, number, "show" | "omit") —
+#      her hand only. "Fix the SQL" needs no function: the
+#      file's hash changes and the batch re-takes it.
+#   6. THE RE-TAKE: build07's skip-carry carries awaiting_human
+#      rows UNCHANGED unless a verdict arrived — a carried row
+#      with a verdict moves back to ACTIVE and re-proposes
+#      (one paid card), the verdict steering the prompt:
+#      show -> the digits may ride; omit -> speak without it.
+#   7. Repair rounds stay 3 for every repairable class;
+#      basis_gap alone skips them (her words: the goal is not
+#      to fall back — surface to the human).
+# ===============================================================
+#
+# ==== PSEUDO — 0.7.0 THE 07 RENAMES (the naming law, ruled ====
+# 2026-10-08, step table row 07; AWAITING SUNNY'S APPROVAL):
+#   07_business_sheet.json    -> 07_business_descriptions_output.json
+#   07_blessing_registry.json -> 07_business_descriptions_blessings_output.json
+#   07_code_sightings.json    -> 07_business_descriptions_code_sightings_output.json
+#   07_fact_voices.json       -> 07_business_descriptions_fact_voices_output.json
+#   07_live_checkpoint.json   -> 07_business_descriptions_checkpoint_output.json
+#   TWO MIGRATION READS here (the ledger precedent — a rename
+#   must never lose paid or ruled content):
+#   - the BLESSING REGISTRY: her ruled truth, carried across
+#     runs — new name read first, old honored once, every write
+#     lands the new name. business_terms.REGISTRY flips with
+#     this landing.
+#   - the PRIOR SHEET for skip-carry: a pre-rename tenant's
+#     D12 carry must find the old 07_business_descriptions_output.json once,
+#     else described files would refuse or re-pay.
+#   The other three regenerate whole. Readers: ai_delivery,
+#   sqldesc_cli + fixtures, same landing.
+# ===============================================================
 def build07(dir05, dir06, out07, dir02, no_llm=False,
             proposer=None, only_file=None,
             skip_files=frozenset(), defer_files=frozenset()):
@@ -490,7 +548,7 @@ def build07(dir05, dir06, out07, dir02, no_llm=False,
     NOT in this run at all: no rows, no carry, no refusal."""
     dir05, dir06 = Path(dir05), Path(dir06)
     out07, dir02 = Path(out07), Path(dir02)
-    six = json.loads((dir06 / "06_description_sheet.json")
+    six = json.loads((dir06 / "06_technical_descriptions_output.json")
                      .read_text())
     files = sorted({r["node_id"].split("::")[1] for r in six
                     if r["grain"] == "file"})
@@ -506,24 +564,37 @@ def build07(dir05, dir06, out07, dir02, no_llm=False,
     skip_files = frozenset(skip_files) & set(files)
     carried = []
     if skip_files:
-        sheet_path = out07 / "07_business_sheet.json"
+        sheet_path = out07 / "07_business_descriptions_output.json"
+        if not sheet_path.exists():
+            # THE MIGRATION READ (2026-10-08): a pre-rename
+            # tenant's carry must not refuse or re-pay
+            legacy = out07 / "07_business_sheet.json"
+            if legacy.exists():
+                sheet_path = legacy
         if not sheet_path.exists():
             raise ValueError(
-                "skip_files needs the prior 07_business_sheet.json "
+                "skip_files needs the prior 07_business_descriptions_output.json "
                 f"in {out07} — nothing to carry")
         prior_rows = json.loads(sheet_path.read_text())
         have = {r["node_id"].split("::")[1] for r in prior_rows}
         missing = sorted(skip_files - have)
         if missing:
             raise ValueError(
-                "the prior 07_business_sheet.json has no rows "
+                "the prior 07_business_descriptions_output.json has no rows "
                 "for: " + ", ".join(missing))
         carried = [r for r in prior_rows
                    if r["node_id"].split("::")[1] in skip_files]
     active = [f for f in files if f not in skip_files]
     six = [r for r in six
            if r["node_id"].split("::")[1] not in skip_files]
-    reg_path = out07 / "07_blessing_registry.json"
+    reg_path = out07 / "07_business_descriptions_blessings_output.json"
+    if not reg_path.exists():
+        # THE MIGRATION READ (2026-10-08): her blessings survive
+        # the rename — the old name is honored when the new one
+        # is absent; every write lands the new name.
+        legacy_reg = out07 / "07_blessing_registry.json"
+        if legacy_reg.exists():
+            reg_path = legacy_reg
     registry = (json.loads(reg_path.read_text())
                 if reg_path.exists()
                 else {"names": [], "sentences": []})
@@ -539,7 +610,7 @@ def build07(dir05, dir06, out07, dir02, no_llm=False,
         else:
             _, items = render_facts(dir05, dir06, dir02, f)
             voices = voice_facts(
-                items, out07 / "07_fact_voices.json", registry)
+                items, out07 / "07_business_descriptions_fact_voices_output.json", registry)
             docket, _items = docket_v2_for_file(
                 dir05, dir06, dir02, f, voices=voices)
         (out07 / f"{f}.facts.txt").write_text(
@@ -584,7 +655,7 @@ def build07(dir05, dir06, out07, dir02, no_llm=False,
                          "basis_version": BASIS_VERSION})
     else:
         run = proposer or _propose_loop
-        ck_path = out07 / "07_live_checkpoint.json"
+        ck_path = out07 / "07_business_descriptions_checkpoint_output.json"
         done = (json.loads(ck_path.read_text())
                 if ck_path.exists() else {})
         total = len(specs)
@@ -613,9 +684,9 @@ def build07(dir05, dir06, out07, dir02, no_llm=False,
             ck_path.unlink()  # the sheet lands whole below
 
     rows.extend(carried)  # the skipped files' prior rows, verbatim
-    (out07 / "07_business_sheet.json").write_text(
+    (out07 / "07_business_descriptions_output.json").write_text(
         json.dumps(rows, indent=1))
-    (out07 / "07_code_sightings.json").write_text(
+    (out07 / "07_business_descriptions_code_sightings_output.json").write_text(
         json.dumps(code_sightings(), indent=1))
 
     by_file = {}
@@ -831,16 +902,16 @@ def render_facts(dir05, dir06, dir02, fname, dir03=None,
     names = load_names(_dir03(dir03),
                        registry or {"names": []})
     ng, nvoice, nsql = _facts_renderer(dir05, dir02, names)
-    six = json.loads((dir06 / "06_description_sheet.json")
+    six = json.loads((dir06 / "06_technical_descriptions_output.json")
                      .read_text())
     file_s = next(r["sentence"] for r in six
                   if r["node_id"] == f"file::{fname}")
     preds = [r for r in six if r["grain"] == "predicate"
              and r["node_id"].split("::")[1] == fname]
     pred_rows = {p["node_id"]: p for p in
-                 td._read(dir05 / "05_predicate_sheet.json")}
+                 td._read(dir05 / "05_semantic_graph_predicate_output.json")}
 
-    scopes_sheet = td._read(dir05 / "05_scope_sheet.json")
+    scopes_sheet = td._read(dir05 / "05_semantic_graph_scope_output.json")
     filters = _shape_filter_lines(ng, nvoice, nsql, scopes_sheet,
                                   fname)
     sub_paths = tuple(sc["node_id"] for sc in scopes_sheet

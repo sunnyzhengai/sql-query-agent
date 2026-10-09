@@ -20,7 +20,14 @@ from pathlib import Path
 CODE = Path(__file__).resolve().parent
 REPO = CODE.parent
 DLL = "Microsoft.SqlServer.TransactSql.ScriptDom.dll"
-VERSION = "0.6.3"  # AT TIME ZONE ruled in (2026-10-07, the
+VERSION = "0.7.1"  # the twin renders reportless files too
+# (her view-test find, same day). 0.7.0: THE NAMING LAW +
+# D14 (2026-10-08): the
+# build/describe split + the 13 stamp guard, the key refusal
+# (D4 degrade retired), delivered-goods-only 12_ai_delivery,
+# every engine file renamed <step>_<content>_output, migration
+# reads for ledger/registry/prior-sheet/delivery.
+# Prior: 0.6.3 — AT TIME ZONE ruled in (2026-10-07, the
 # sweep's first field find — 2 hits, 1 file of 245): function
 # kind, name verbatim, DateValue subject + TimeZone argument.
 # 0.6.2 — THE SCALE FIX (2026-10-07, same night): the

@@ -7,8 +7,8 @@ position paths, the disposition field).
 
 Written test-first: RED until semantic_graph.py exposes
     build(sql_dir, out_dir) -> census dict
-writing 05_file_sheet.json, 05_statement_sheet.json,
-05_contains_edges.json, 05_exclusion_ledger.json into out_dir.
+writing 05_semantic_graph_file_output.json, 05_semantic_graph_statement_output.json,
+05_semantic_graph_contains_edges_output.json, 05_semantic_graph_exclusion_ledger_output.json into out_dir.
 
 Zero API cost — phase 05 is fully deterministic: ScriptDom + plain
 Python, no LLM, no embeddings.
@@ -31,18 +31,22 @@ KIND_LIBRARY = DIR05 / "05_kind_library.json"
 sys.path.insert(0, str(CODE_DIR))
 import semantic_graph  # noqa: E402
 
+# THE NAMING LAW (ruled 2026-10-08, step table row 05; approved
+# same day): <step>_<content>_output.json, "_sheet" dies, the
+# kind library keeps its name (asset, not output). RED until the
+# rename lands.
 SHEETS = [
-    "05_file_sheet.json",
-    "05_statement_sheet.json",
-    "05_scope_sheet.json",
-    "05_structure_sheet.json",
-    "05_predicate_sheet.json",
-    "05_expression_sheet.json",
-    "05_parameter_sheet.json",
-    "05_resolves_edges.json",
-    "05_discovered_joins.json",
-    "05_contains_edges.json",
-    "05_exclusion_ledger.json",
+    "05_semantic_graph_file_output.json",
+    "05_semantic_graph_statement_output.json",
+    "05_semantic_graph_scope_output.json",
+    "05_semantic_graph_structure_output.json",
+    "05_semantic_graph_predicate_output.json",
+    "05_semantic_graph_expression_output.json",
+    "05_semantic_graph_parameter_output.json",
+    "05_semantic_graph_resolves_edges_output.json",
+    "05_semantic_graph_discovered_joins_output.json",
+    "05_semantic_graph_contains_edges_output.json",
+    "05_semantic_graph_exclusion_ledger_output.json",
 ]
 
 PREDICATE_KINDS = {
@@ -113,14 +117,14 @@ def test_ratification_gate_refuses_unratified_library(tmp_path):
 
 def test_all_eight_files_build_with_no_exclusions(built):
     out, _ = built
-    files = _load(out, "05_file_sheet.json")
+    files = _load(out, "05_semantic_graph_file_output.json")
     assert len(files) == 8
-    assert _load(out, "05_exclusion_ledger.json") == []
+    assert _load(out, "05_semantic_graph_exclusion_ledger_output.json") == []
 
 
 def test_conservation_per_file(built):
     out, _ = built
-    for row in _load(out, "05_file_sheet.json"):
+    for row in _load(out, "05_semantic_graph_file_output.json"):
         assert (
             row["statements_handled"]
             + row["statements_operational"]
@@ -133,7 +137,7 @@ def test_conservation_per_file(built):
 
 def test_every_statement_row_carries_evidence(built):
     out, _ = built
-    for row in _load(out, "05_statement_sheet.json"):
+    for row in _load(out, "05_semantic_graph_statement_output.json"):
         ev = row["evidence"]
         assert ev["fragment"].strip(), row["node_id"]
         assert ev["line"] >= 1 and ev["column"] >= 1, row["node_id"]
@@ -145,7 +149,7 @@ def test_identity_law_ids_deterministic_across_runs(built, tmp_path):
     semantic_graph.build(SQL_DIR, out2, DIR02)
     for name in SHEETS:
         a, b = _load(out1, name), _load(out2, name)
-        if name == "05_file_sheet.json":  # parsed_at is the ONE
+        if name == "05_semantic_graph_file_output.json":  # parsed_at is the ONE
             for row in a + b:             # non-deterministic field
                 row.pop("parsed_at")
         assert a == b, name
@@ -153,8 +157,8 @@ def test_identity_law_ids_deterministic_across_runs(built, tmp_path):
 
 def test_node_id_shape(built):
     out, _ = built
-    file_names = {r["file_name"] for r in _load(out, "05_file_sheet.json")}
-    for row in _load(out, "05_statement_sheet.json"):
+    file_names = {r["file_name"] for r in _load(out, "05_semantic_graph_file_output.json")}
+    for row in _load(out, "05_semantic_graph_statement_output.json"):
         prefix, _, pos = row["node_id"].rpartition("::stmt/")
         assert pos == row["position"], row["node_id"]
         assert prefix.removeprefix("file::") in file_names, row["node_id"]
@@ -164,8 +168,8 @@ def test_node_id_shape(built):
 
 def test_every_scope_is_owned_and_evidenced(built):
     out, _ = built
-    stmt_ids = {r["node_id"] for r in _load(out, "05_statement_sheet.json")}
-    scopes = _load(out, "05_scope_sheet.json")
+    stmt_ids = {r["node_id"] for r in _load(out, "05_semantic_graph_statement_output.json")}
+    scopes = _load(out, "05_semantic_graph_scope_output.json")
     assert scopes  # the 8-file corpus is not scope-free
     for s in scopes:
         assert s["owning_statement"] in stmt_ids, s["node_id"]
@@ -174,11 +178,11 @@ def test_every_scope_is_owned_and_evidenced(built):
 
 def test_population_statements_mint_exactly_one_main_scope(built):
     out, _ = built
-    scopes = _load(out, "05_scope_sheet.json")
+    scopes = _load(out, "05_semantic_graph_scope_output.json")
     by_owner = {}
     for s in scopes:
         by_owner.setdefault(s["owning_statement"], []).append(s)
-    for row in _load(out, "05_statement_sheet.json"):
+    for row in _load(out, "05_semantic_graph_statement_output.json"):
         owned = by_owner.get(row["node_id"], [])
         mains = [s for s in owned if s["scope_kind"] in MAIN_SCOPE_KINDS]
         if row["statement_kind"] in POPULATION_KINDS:
@@ -191,8 +195,8 @@ def test_population_statements_mint_exactly_one_main_scope(built):
 
 def test_every_structure_owned_and_evidenced(built):
     out, _ = built
-    scope_ids = {s["node_id"] for s in _load(out, "05_scope_sheet.json")}
-    structures = _load(out, "05_structure_sheet.json")
+    scope_ids = {s["node_id"] for s in _load(out, "05_semantic_graph_scope_output.json")}
+    structures = _load(out, "05_semantic_graph_structure_output.json")
     assert structures  # the corpus is not structure-free
     for s in structures:
         assert s["owning_scope"] in scope_ids, s["node_id"]
@@ -201,9 +205,9 @@ def test_every_structure_owned_and_evidenced(built):
 
 def test_select_scopes_have_exactly_one_projection_or_combination(built):
     out, _ = built
-    scopes = _load(out, "05_scope_sheet.json")
+    scopes = _load(out, "05_semantic_graph_scope_output.json")
     by_scope = {}
-    for s in _load(out, "05_structure_sheet.json"):
+    for s in _load(out, "05_semantic_graph_structure_output.json"):
         by_scope.setdefault(s["owning_scope"], []).append(s)
     arm_parents = {s["node_id"].rsplit("::arm", 1)[0]
                    for s in scopes if s["scope_kind"] == "union_arm"}
@@ -229,10 +233,10 @@ def test_exclusion_is_counted_never_fatal(tmp_path):
     _write_sql(sql, "broken.sql", "SELEC 1 FORM nowhere;;;")
     out = _prep_out(tmp_path)
     semantic_graph.build(sql, out, DIR02)
-    ledger = _load(out, "05_exclusion_ledger.json")
+    ledger = _load(out, "05_semantic_graph_exclusion_ledger_output.json")
     assert [r["file_name"] for r in ledger] == ["broken.sql"]
     assert ledger[0]["reasons"]  # the parser's verbatim strings
-    assert [r["file_name"] for r in _load(out, "05_file_sheet.json")] == ["good"]
+    assert [r["file_name"] for r in _load(out, "05_semantic_graph_file_output.json")] == ["good"]
 
 
 def test_remainder_rows_are_visible_not_just_counted(tmp_path):
@@ -240,12 +244,12 @@ def test_remainder_rows_are_visible_not_just_counted(tmp_path):
     _write_sql(sql, "odd.sql", "WAITFOR DELAY '00:00:01';")
     out = _prep_out(tmp_path)
     semantic_graph.build(sql, out, DIR02)
-    rows = _load(out, "05_statement_sheet.json")
+    rows = _load(out, "05_semantic_graph_statement_output.json")
     assert len(rows) == 1
     row = rows[0]
     assert row["disposition"] == "remainder"
     assert row["statement_kind"] == row["scriptdom_type"]  # repeats it
-    files = _load(out, "05_file_sheet.json")
+    files = _load(out, "05_semantic_graph_file_output.json")
     assert files[0]["remainder_total"] == 1
 
 
@@ -258,14 +262,14 @@ def test_dynamic_sql_is_a_named_gap_never_naked(tmp_path):
     _write_sql(sql, "call.sql", "EXEC dbo.SomeProc;")
     out = _prep_out(tmp_path)
     semantic_graph.build(sql, out, DIR02)
-    rows = {r["node_id"]: r for r in _load(out, "05_statement_sheet.json")}
+    rows = {r["node_id"]: r for r in _load(out, "05_semantic_graph_statement_output.json")}
     dyn = rows["file::dyn::stmt/1"]
     assert dyn["disposition"] == "gap"
     assert dyn["gap_class"] == "dynamic_sql"
     call = rows["file::call::stmt/1"]
     assert call["disposition"] == "remainder"
     assert call["gap_class"] is None
-    files = {r["file_name"]: r for r in _load(out, "05_file_sheet.json")}
+    files = {r["file_name"]: r for r in _load(out, "05_semantic_graph_file_output.json")}
     assert files["dyn"]["statements_gap"] == 1
     assert files["call"]["remainder_total"] == 1
 
@@ -339,7 +343,7 @@ def _build5(tmp_path, sql_texts: dict):
 
 
 def _resolves(out, **filters):
-    rows = _load(out, "05_resolves_edges.json")
+    rows = _load(out, "05_semantic_graph_resolves_edges_output.json")
     for k, v in filters.items():
         rows = [r for r in rows if r.get(k) == v]
     return rows
@@ -347,7 +351,7 @@ def _resolves(out, **filters):
 
 def test_resolution_conservation_and_closed_classes(built5):
     out, _ = built5
-    rows = _load(out, "05_resolves_edges.json")
+    rows = _load(out, "05_semantic_graph_resolves_edges_output.json")
     assert rows
     by_from = {}
     for r in rows:
@@ -359,7 +363,7 @@ def test_resolution_conservation_and_closed_classes(built5):
     # reopened 2026-10-02): one row — or a star_member fan, N rows
     # one per origin (same from_id) plus at most one behind_star
     # remainder for a blind arm
-    ref_exprs = [e for e in _load(out, "05_expression_sheet.json")
+    ref_exprs = [e for e in _load(out, "05_semantic_graph_expression_output.json")
                  if e["expression_kind"] in ("column_ref", "table_ref",
                                              "parameter_ref")]
     for e in ref_exprs:
@@ -373,12 +377,12 @@ def test_resolution_conservation_and_closed_classes(built5):
                 and bases.count("star_member") >= 1
                 and bases.count("behind_star") <= 1), e["node_id"]
     # every qualified JOIN: a declared binding or a discovered row
-    joins = [s for s in _load(out, "05_structure_sheet.json")
+    joins = [s for s in _load(out, "05_semantic_graph_structure_output.json")
              if s["structure_kind"] == "JOIN"
              and s["join_type"] not in ("comma", "Cross")]
     bound = {r["from_id"] for r in rows
              if r["to_kind"] == "declared_join"}
-    discovered = _load(out, "05_discovered_joins.json")
+    discovered = _load(out, "05_semantic_graph_discovered_joins_output.json")
     assert len(joins) == len(bound) + len(discovered)
 
 
@@ -416,7 +420,7 @@ def test_corpus_binds_to_the_dictionary(built5):
     assert _resolves(out, to_kind="column")  # plenty must bind
     stars = [r for r in _resolves(out, to_kind="unresolved")
              if r["class"] == "wildcard"]
-    star_refs = [e for e in _load(out, "05_expression_sheet.json")
+    star_refs = [e for e in _load(out, "05_semantic_graph_expression_output.json")
                  if e["expression_kind"] == "column_ref"
                  and e["ref"] == "*"]
     assert len(stars) == len(star_refs)
@@ -473,7 +477,7 @@ def test_join_coverage_full_partial_discovered(tmp_path):
             if r["coverage"] == "partial"]
     assert [r["to_id"] for r in part] == ["J2"]
     assert part[0]["missing_ordinals"] == [2]
-    disc = _load(out, "05_discovered_joins.json")
+    disc = _load(out, "05_semantic_graph_discovered_joins_output.json")
     assert len(disc) == 1
     assert disc[0]["file_name"] == "disc"
 
@@ -485,7 +489,7 @@ def test_on_class_stamped_by_join_type(tmp_path):
         "outer.sql": "SELECT T1.A FROM T1 LEFT JOIN T2 "
                      "ON T1.ID = T2.ID AND T2.NAME = 'x';",
     })
-    preds = {p["node_id"]: p for p in _load(out, "05_predicate_sheet.json")}
+    preds = {p["node_id"]: p for p in _load(out, "05_semantic_graph_predicate_output.json")}
     by_file = {"inner": [], "outer": []}
     for p in preds.values():
         for f in by_file:
@@ -511,10 +515,10 @@ def test_value_bridge_routes_miss_and_silence(tmp_path):
     assert len(misses) == 1 and "99" in misses[0]["ref_text"]
     # no route -> no attempt: the quiet literal has NO resolves row
     quiet_lits = [e["node_id"]
-                  for e in _load(out, "05_expression_sheet.json")
+                  for e in _load(out, "05_semantic_graph_expression_output.json")
                   if e["node_id"].startswith("file::quiet")
                   and e["expression_kind"] == "literal"]
-    touched = {r["from_id"] for r in _load(out, "05_resolves_edges.json")}
+    touched = {r["from_id"] for r in _load(out, "05_semantic_graph_resolves_edges_output.json")}
     assert not (set(quiet_lits) & touched)
 
 
@@ -542,7 +546,7 @@ def test_parameter_sheet_and_resolution(tmp_path):
                   "WHERE T1.A = @Local AND T1.B = @Ghost "
                   "AND T1.NAME = @Month;\n"
                   "END"})
-    params = {p["name"]: p for p in _load(out, "05_parameter_sheet.json")}
+    params = {p["name"]: p for p in _load(out, "05_semantic_graph_parameter_output.json")}
     assert params["@Month"]["kind"] == "procedure_parameter"
     assert params["@Local"]["kind"] == "local_variable"
     assert params["@Local"]["default_text"].strip() == "5"
@@ -581,11 +585,11 @@ def test_denominator_mirror_is_locked():
 def test_predicates_and_expressions_owned_kinds_closed(built):
     out, _ = built
     known = set()
-    for sheet in ("05_statement_sheet.json", "05_structure_sheet.json",
-                  "05_predicate_sheet.json", "05_expression_sheet.json"):
+    for sheet in ("05_semantic_graph_statement_output.json", "05_semantic_graph_structure_output.json",
+                  "05_semantic_graph_predicate_output.json", "05_semantic_graph_expression_output.json"):
         known |= {r["node_id"] for r in _load(out, sheet)}
-    preds = _load(out, "05_predicate_sheet.json")
-    exprs = _load(out, "05_expression_sheet.json")
+    preds = _load(out, "05_semantic_graph_predicate_output.json")
+    exprs = _load(out, "05_semantic_graph_expression_output.json")
     assert preds and exprs  # the corpus has filters
     for p in preds:
         assert (p["predicate_kind"] in PREDICATE_KINDS
@@ -601,11 +605,11 @@ def test_predicates_and_expressions_owned_kinds_closed(built):
 def test_predicate_roles_complete_per_kind(built):
     out, _ = built
     roles_by_parent = {}
-    for edge in _load(out, "05_contains_edges.json"):
+    for edge in _load(out, "05_semantic_graph_contains_edges_output.json"):
         if edge["role"] and edge["role"] != "condition":
             roles_by_parent.setdefault(edge["from_id"], set()).add(
                 edge["role"])
-    for p in _load(out, "05_predicate_sheet.json"):
+    for p in _load(out, "05_semantic_graph_predicate_output.json"):
         need = REQUIRED_ROLES.get(p["predicate_kind"])
         if need is None:  # DEFERRED rows carry no operand law
             continue
@@ -617,10 +621,10 @@ def test_predicate_roles_complete_per_kind(built):
 def test_projection_conservation_members_plus_stars(built):
     out, _ = built
     owned = {}
-    for e in _load(out, "05_expression_sheet.json"):
+    for e in _load(out, "05_semantic_graph_expression_output.json"):
         owner = e["node_id"].rsplit("::expr/", 1)[0]
         owned[owner] = owned.get(owner, 0) + 1
-    for s in _load(out, "05_structure_sheet.json"):
+    for s in _load(out, "05_semantic_graph_structure_output.json"):
         if s["structure_kind"] == "PROJECTION":
             assert (owned.get(s["node_id"], 0) + s["star_total"]
                     == s["member_total"]), s["node_id"]
@@ -629,10 +633,10 @@ def test_projection_conservation_members_plus_stars(built):
 def test_filter_structures_own_exactly_one_tree_root(built):
     out, _ = built
     structures = {s["node_id"]: s
-                  for s in _load(out, "05_structure_sheet.json")}
-    preds = {p["node_id"] for p in _load(out, "05_predicate_sheet.json")}
+                  for s in _load(out, "05_semantic_graph_structure_output.json")}
+    preds = {p["node_id"] for p in _load(out, "05_semantic_graph_predicate_output.json")}
     roots = {}
-    for e in _load(out, "05_contains_edges.json"):
+    for e in _load(out, "05_semantic_graph_contains_edges_output.json"):
         if e["from_id"] in structures and (
                 e["to_id"] in preds
                 or structures.get(e["to_id"], {}).get("structure_kind")
@@ -655,9 +659,9 @@ def test_boolean_tree_parens_dissolve_negation_folds(tmp_path):
     )
     out = _prep_out(tmp_path)
     semantic_graph.build(sql, out, DIR02)
-    preds = {p["node_id"]: p for p in _load(out, "05_predicate_sheet.json")}
+    preds = {p["node_id"]: p for p in _load(out, "05_semantic_graph_predicate_output.json")}
     structures = {s["node_id"]: s
-                  for s in _load(out, "05_structure_sheet.json")}
+                  for s in _load(out, "05_semantic_graph_structure_output.json")}
     by_kind = {}
     for p in preds.values():
         by_kind.setdefault(p["predicate_kind"], []).append(p)
@@ -681,9 +685,9 @@ def test_range_roles_and_parameter_refs(tmp_path):
                "SELECT a FROM T WHERE dt BETWEEN @s AND @e;")
     out = _prep_out(tmp_path)
     semantic_graph.build(sql, out, DIR02)
-    pred = _load(out, "05_predicate_sheet.json")[0]
+    pred = _load(out, "05_semantic_graph_predicate_output.json")[0]
     assert pred["predicate_kind"] == "RANGE"
-    exprs = {e["role"]: e for e in _load(out, "05_expression_sheet.json")
+    exprs = {e["role"]: e for e in _load(out, "05_semantic_graph_expression_output.json")
              if e["node_id"].startswith(pred["node_id"])}
     assert exprs["subject"]["expression_kind"] == "column_ref"
     assert exprs["lower_bound"]["expression_kind"] == "parameter_ref"
@@ -696,9 +700,9 @@ def test_in_list_comparands_ordered(tmp_path):
                "SELECT a FROM T WHERE x IN ('a', 'b', 'c');")
     out = _prep_out(tmp_path)
     semantic_graph.build(sql, out, DIR02)
-    pred = _load(out, "05_predicate_sheet.json")[0]
+    pred = _load(out, "05_semantic_graph_predicate_output.json")[0]
     assert pred["predicate_kind"] == "IN_LIST"
-    members = [e for e in _load(out, "05_expression_sheet.json")
+    members = [e for e in _load(out, "05_semantic_graph_expression_output.json")
                if e["role"] == "comparand"]
     assert [m["raw_text"] for m in members] == ["'a'", "'b'", "'c'"]
 
@@ -713,17 +717,17 @@ def test_exists_subquery_mints_full_scope(tmp_path):
     out = _prep_out(tmp_path)
     semantic_graph.build(sql, out, DIR02)
     pred_kinds = {p["predicate_kind"]: p
-                  for p in _load(out, "05_predicate_sheet.json")}
+                  for p in _load(out, "05_semantic_graph_predicate_output.json")}
     assert "EXISTS_SELECTION" in pred_kinds
     assert "COMPARE_EQ" in pred_kinds  # the subquery's own WHERE
-    sub = [s for s in _load(out, "05_scope_sheet.json")
+    sub = [s for s in _load(out, "05_semantic_graph_scope_output.json")
            if s["scope_kind"] == "subquery"]
     assert [s["node_id"] for s in sub] == ["file::ex::stmt/1::scope/sub1"]
     sub_structs = {s["structure_kind"]
-                   for s in _load(out, "05_structure_sheet.json")
+                   for s in _load(out, "05_semantic_graph_structure_output.json")
                    if s["owning_scope"] == sub[0]["node_id"]}
     assert {"PROJECTION", "FROM", "WHERE"} <= sub_structs  # never empty
-    sel = [e for e in _load(out, "05_expression_sheet.json")
+    sel = [e for e in _load(out, "05_semantic_graph_expression_output.json")
            if e["role"] == "selection"]
     assert sel[0]["expression_kind"] == "subquery_ref"
 
@@ -734,11 +738,11 @@ def test_if_condition_attaches_to_the_statement(tmp_path):
                "IF 1 = 1\nBEGIN\n  SELECT 1 AS a;\nEND")
     out = _prep_out(tmp_path)
     semantic_graph.build(sql, out, DIR02)
-    preds = _load(out, "05_predicate_sheet.json")
+    preds = _load(out, "05_semantic_graph_predicate_output.json")
     on_stmt = [p for p in preds
                if p["node_id"].startswith("file::ifc::stmt/1::pred/")]
     assert len(on_stmt) == 1
-    edge = [e for e in _load(out, "05_contains_edges.json")
+    edge = [e for e in _load(out, "05_semantic_graph_contains_edges_output.json")
             if e["to_id"] == on_stmt[0]["node_id"]][0]
     assert edge["from_id"] == "file::ifc::stmt/1"
     assert edge["role"] == "condition"
@@ -752,13 +756,13 @@ def test_case_whens_hold_predicates(tmp_path):
     )
     out = _prep_out(tmp_path)
     semantic_graph.build(sql, out, DIR02)
-    case = [e for e in _load(out, "05_expression_sheet.json")
+    case = [e for e in _load(out, "05_semantic_graph_expression_output.json")
             if e["expression_kind"] == "case"][0]
     assert case["output_name"] == "c"
-    when = [p for p in _load(out, "05_predicate_sheet.json")
+    when = [p for p in _load(out, "05_semantic_graph_predicate_output.json")
             if p["node_id"].startswith(case["node_id"])]
     assert when[0]["predicate_kind"] == "COMPARE_GT"
-    children = [e for e in _load(out, "05_expression_sheet.json")
+    children = [e for e in _load(out, "05_semantic_graph_expression_output.json")
                 if e["node_id"].startswith(case["node_id"] + "::expr/")]
     kinds = {e["expression_kind"] for e in children}
     assert {"literal", "column_ref"} <= kinds  # THEN 'hi', ELSE b
@@ -779,7 +783,7 @@ def test_structure_kinds_properties_and_sibling_numbering(tmp_path):
     )
     out = _prep_out(tmp_path)
     semantic_graph.build(sql, out, DIR02)
-    structures = _load(out, "05_structure_sheet.json")
+    structures = _load(out, "05_semantic_graph_structure_output.json")
     scope_id = "file::full::scope/delivery"
     assert {s["owning_scope"] for s in structures} == {scope_id}
     by_kind = {}
@@ -807,7 +811,7 @@ def test_comma_join_is_named_not_invisible(tmp_path):
                "SELECT a FROM T1, T2 WHERE T1.k = T2.k;")
     out = _prep_out(tmp_path)
     semantic_graph.build(sql, out, DIR02)
-    joins = [s for s in _load(out, "05_structure_sheet.json")
+    joins = [s for s in _load(out, "05_semantic_graph_structure_output.json")
              if s["structure_kind"] == "JOIN"]
     assert len(joins) == 1
     assert joins[0]["join_type"] == "comma"
@@ -820,8 +824,8 @@ def test_union_arms_are_full_scopes_never_empty(tmp_path):
     out = _prep_out(tmp_path)
     semantic_graph.build(sql, out, DIR02)
     scope_id = "file::un::scope/delivery"
-    scopes = {s["node_id"]: s for s in _load(out, "05_scope_sheet.json")}
-    structures = _load(out, "05_structure_sheet.json")
+    scopes = {s["node_id"]: s for s in _load(out, "05_semantic_graph_scope_output.json")}
+    structures = _load(out, "05_semantic_graph_structure_output.json")
     combos = [s for s in structures
               if s["structure_kind"] == "COMBINATION"]
     assert len(combos) == 1
@@ -836,7 +840,7 @@ def test_union_arms_are_full_scopes_never_empty(tmp_path):
         assert arm_kinds.count("PROJECTION") == 1, arm_id  # FULL scopes
         assert arm_kinds.count("FROM") == 1, arm_id
     edge_pairs = {(e["from_id"], e["to_id"])
-                  for e in _load(out, "05_contains_edges.json")}
+                  for e in _load(out, "05_semantic_graph_contains_edges_output.json")}
     assert (combos[0]["node_id"], f"{scope_id}::arm1") in edge_pairs
     assert (combos[0]["node_id"], f"{scope_id}::arm2") in edge_pairs
 
@@ -846,7 +850,7 @@ def test_star_elements_count_in_member_total(tmp_path):
     _write_sql(sql, "star.sql", "SELECT T.*, a FROM T;")
     out = _prep_out(tmp_path)
     semantic_graph.build(sql, out, DIR02)
-    proj = [s for s in _load(out, "05_structure_sheet.json")
+    proj = [s for s in _load(out, "05_semantic_graph_structure_output.json")
             if s["structure_kind"] == "PROJECTION"][0]
     assert proj["member_total"] == 2  # the star is COUNTED, not skipped
 
@@ -860,7 +864,7 @@ def test_cte_scopes_name_keyed_in_declaration_order(tmp_path):
     )
     out = _prep_out(tmp_path)
     semantic_graph.build(sql, out, DIR02)
-    scopes = {s["node_id"]: s for s in _load(out, "05_scope_sheet.json")}
+    scopes = {s["node_id"]: s for s in _load(out, "05_semantic_graph_scope_output.json")}
     assert scopes["file::wcte::scope/c1"]["scope_kind"] == "cte"
     assert scopes["file::wcte::scope/c2"]["scope_kind"] == "cte"
     delivery = scopes["file::wcte::scope/delivery"]
@@ -868,7 +872,7 @@ def test_cte_scopes_name_keyed_in_declaration_order(tmp_path):
     assert delivery["scope_name"] == "delivery"
     # declaration order on the statement->scope edges; main scope last
     pos = {e["to_id"]: e["position"]
-           for e in _load(out, "05_contains_edges.json")
+           for e in _load(out, "05_semantic_graph_contains_edges_output.json")
            if e["to_id"].startswith("file::wcte::scope/")}
     assert pos["file::wcte::scope/c1"] < pos["file::wcte::scope/c2"] \
         < pos["file::wcte::scope/delivery"]
@@ -882,7 +886,7 @@ def test_select_into_temp_scope_and_duplicate_names(tmp_path):
     )
     out = _prep_out(tmp_path)
     semantic_graph.build(sql, out, DIR02)
-    scopes = {s["node_id"]: s for s in _load(out, "05_scope_sheet.json")}
+    scopes = {s["node_id"]: s for s in _load(out, "05_semantic_graph_scope_output.json")}
     first = scopes["file::tt::scope/#x"]
     second = scopes["file::tt::scope/#x#2"]  # the duplicate law
     for s in (first, second):
@@ -900,7 +904,7 @@ def test_write_target_scopes_carry_their_operation(tmp_path):
     )
     out = _prep_out(tmp_path)
     semantic_graph.build(sql, out, DIR02)
-    scopes = _load(out, "05_scope_sheet.json")
+    scopes = _load(out, "05_semantic_graph_scope_output.json")
     by_op = {s["operation"]: s for s in scopes}
     assert set(by_op) == {"insert", "delete"}
     for s in scopes:
@@ -916,7 +920,7 @@ def test_from_level_subquery_is_positional_and_nameless(tmp_path):
                "SELECT a FROM (SELECT 1 AS a) AS t;")
     out = _prep_out(tmp_path)
     semantic_graph.build(sql, out, DIR02)
-    scopes = {s["node_id"]: s for s in _load(out, "05_scope_sheet.json")}
+    scopes = {s["node_id"]: s for s in _load(out, "05_semantic_graph_scope_output.json")}
     sub = scopes["file::sub::stmt/1::scope/sub1"]
     assert sub["scope_kind"] == "subquery"
     assert sub["scope_name"] is None
@@ -932,9 +936,9 @@ def test_nested_statements_recurse_with_dotted_paths(tmp_path):
     )
     out = _prep_out(tmp_path)
     semantic_graph.build(sql, out, DIR02)
-    by_pos = {r["position"]: r for r in _load(out, "05_statement_sheet.json")}
+    by_pos = {r["position"]: r for r in _load(out, "05_semantic_graph_statement_output.json")}
     assert set(by_pos) == {"1", "1.1", "1.2"}  # nothing silently skipped
-    edges = _load(out, "05_contains_edges.json")
+    edges = _load(out, "05_semantic_graph_contains_edges_output.json")
     pairs = {(e["from_id"], e["to_id"]) for e in edges}
     assert ("file::nested", "file::nested::stmt/1") in pairs
     assert ("file::nested::stmt/1", "file::nested::stmt/1.1") in pairs
@@ -1046,7 +1050,7 @@ _VIEW_VARIANTS = {
 def test_view_class_all_three_variants_handled(tmp_path):
     """Every view variant lands handled — zero remainder, zero gap."""
     out = _build5(tmp_path, dict(_VIEW_VARIANTS))
-    for row in _load(out, "05_file_sheet.json"):
+    for row in _load(out, "05_semantic_graph_file_output.json"):
         assert row["remainder_total"] == 0, row["file_name"]
         assert row["statements_handled"] == 1, row["file_name"]
 
@@ -1054,7 +1058,7 @@ def test_view_class_all_three_variants_handled(tmp_path):
 def test_view_select_is_mapped_as_select(tmp_path):
     """The statement row speaks SELECT, not the wrapper's type name."""
     out = _build5(tmp_path, dict(_VIEW_VARIANTS))
-    stmts = _load(out, "05_statement_sheet.json")
+    stmts = _load(out, "05_semantic_graph_statement_output.json")
     assert len(stmts) == 3
     for row in stmts:
         assert row["statement_kind"] == "SELECT", row["node_id"]
@@ -1065,8 +1069,8 @@ def test_view_builds_a_delivery_scope_with_structure(tmp_path):
     """The view's SELECT builds the same graph a proc's SELECT does:
     a delivery scope per file, FROM + WHERE structures under it."""
     out = _build5(tmp_path, dict(_VIEW_VARIANTS))
-    scopes = _load(out, "05_scope_sheet.json")
-    structures = _load(out, "05_structure_sheet.json")
+    scopes = _load(out, "05_semantic_graph_scope_output.json")
+    structures = _load(out, "05_semantic_graph_structure_output.json")
     for stem in ("v_fix_create", "v_fix_alter", "v_fix_coa"):
         mine = [s for s in scopes
                 if s["node_id"].split("::")[1] == stem]

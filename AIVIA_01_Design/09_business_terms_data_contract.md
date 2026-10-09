@@ -2,7 +2,10 @@
 
 Status: DRAFT — rides the 09 design doc's decisions D1-D8;
 complete BEFORE the first red test per the amendments-first
-law. Scribed by Claude 2026-10-05; Sunny owns it.
+law. Scribed by Claude 2026-10-05; Sunny owns it. AMENDED
+2026-10-08 (the delivered-goods ruling: ledger-only
+membership, report completeness lists, 12_* names, key
+refusal — effective wheel 0.7.0).
 
 Who is the owner of this data contract?
 - Sunny Zheng
@@ -42,7 +45,42 @@ report tie yet), counts (the conservation equations, one block
 per step). Each step rewrites ONLY its own keys, whole and
 re-runnable; bless() flips statuses in place; the Collibra
 notebook reads this one file and filters bt_name_status ==
-blessed itself. RETIRED by this ruling: 09_collibra_export
+blessed itself.
+
+THE DELIVERED-GOODS RULING (2026-10-08, Sunny; lands in WHEEL
+0.7.0 with the step-table renames — until then the 2026-10-05
+shape above stands in code):
+- THE NAME: the file is 12_ai_delivery_output.json + its human
+  twin 12_ai_delivery_output.txt (the naming law, step 12 in
+  10_work_wheel_data_contract.md; the txt replaces
+  08_report_descriptions.txt).
+- MEMBERSHIP = THE LEDGER: an entry (report file or reportless
+  file) exists ONLY for a file recorded in 10_corpus_ledger —
+  a file that had its paid turn. Waiting files appear NOWHERE
+  in the delivery; the whole-corpus technical view lives in
+  the 06 sheet, not here. A ledger file whose card failed the
+  gate DOES appear — technical voice + its failure status
+  (processed, honest).
+- REPORT COMPLETENESS (her ruling: "let the report appear
+  even if incomplete; I won't run Collibra until all files
+  are completed"): a reports[] entry appears as soon as ANY
+  of its files is described and carries two plain lists —
+  files_described[] and files_waiting[] (names, not counts).
+  files_waiting empty == the report is complete. The Collibra
+  notebook filters blessed AND skips any report with a
+  non-empty files_waiting (the belt under her wait rule).
+- THE KEY (same day): no key or failed key = the preflight
+  refuses the run — the degraded technical-voice delivery is
+  RETIRED; this file is never written by an unpaid run.
+- AWAITING_HUMAN (RULED 2026-10-08 evening, the no-fallback
+  reopen; effective at the 0.8.0 build): a described file
+  whose card failed the gate ships NO business description —
+  its entry carries status awaiting_human and the named
+  questions (the 07 contract's verdicts); the technical text
+  never rides the business slot. The Collibra notebook skips
+  awaiting_human entries exactly as it skips files_waiting.
+  (Supersedes this ruling's earlier gate-failed-shows-floor
+  line, two paragraphs up — same day, her reopen.) RETIRED by this ruling: 09_collibra_export
 .json (a pure subset), 09_terms_ledger.json (folds into
 counts.09), the standalone 09_business_terms.json sheet (the
 terms[] section is the rows' one home). THE ROW DIET (the

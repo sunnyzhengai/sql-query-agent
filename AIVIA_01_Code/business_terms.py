@@ -21,16 +21,16 @@ Tests: AIVIA_01_Test/test_09_business_terms_data_contract.py
 #   one import, never a second constant to drift.
 #
 # THE INPUTS (all read-only; the build writes only out09):
-#   dir05: 05_scope_sheet / 05_structure_sheet /
-#     05_predicate_sheet / 05_parameter_sheet /
-#     05_resolves_edges
-#   dir06: 06_description_sheet (scope + predicate sentences —
+#   dir05: 05_semantic_graph_scope_output / 05_semantic_graph_structure_output /
+#     05_semantic_graph_predicate_output / 05_semantic_graph_parameter_output /
+#     05_semantic_graph_resolves_edges_output
+#   dir06: 06_technical_descriptions_output (scope + predicate sentences —
 #     already dictionary-voiced; the build NEVER re-words them)
 #   dir02: reserved for the voice overlay at the Fabric move;
 #     unread this slice (named here so the signature is stable)
-#   dir07: 07_blessing_registry.json — ruled truth; the build
+#   dir07: 07_business_descriptions_blessings_output.json — ruled truth; the build
 #     READS blessings and NEVER writes (bless() is the one door)
-#   dir08: 08_pbi_reports.json — the (sql file -> report) tie;
+#   dir08: 08_pbi_lineage_output.json — the (sql file -> report) tie;
 #     FILE MAY BE ABSENT locally (it lives on Fabric): absent ->
 #     every row lands report-less, counted, honest.
 #
@@ -178,7 +178,8 @@ BASIS_VERSION = bd.BASIS_VERSION  # the 07 grammar constant — one truth
 # _propose_loop precedent; the one-round debt retired the day
 # its Echo trigger fired).
 REPAIR_BUDGET = 3
-REGISTRY = "07_blessing_registry.json"
+REGISTRY = "07_business_descriptions_blessings_output.json"
+REGISTRY_OLD = "07_blessing_registry.json"   # pre-0.7.0 tenants
 
 
 def _read(path):
@@ -307,7 +308,7 @@ def build09(dir05, dir06, dir02, dir07, dir08, out09,
                                   Path(dir07), Path(dir08))
     _ = dir02  # reserved: the voice overlay at the Fabric move
     proposer = proposer or _openai_proposer
-    scopes = sorted(_read(dir05 / "05_scope_sheet.json"),
+    scopes = sorted(_read(dir05 / "05_semantic_graph_scope_output.json"),
                     key=lambda s: s["node_id"])
     if only_file:
         scopes = [s for s in scopes
@@ -318,17 +319,19 @@ def build09(dir05, dir06, dir02, dir07, dir08, out09,
     if defer_files:
         scopes = [s for s in scopes
                   if _file_of(s["node_id"]) not in defer_files]
-    structures = _read(dir05 / "05_structure_sheet.json")
-    preds = _read(dir05 / "05_predicate_sheet.json")
-    params = _read(dir05 / "05_parameter_sheet.json")
-    edges = _read(dir05 / "05_resolves_edges.json")
+    structures = _read(dir05 / "05_semantic_graph_structure_output.json")
+    preds = _read(dir05 / "05_semantic_graph_predicate_output.json")
+    params = _read(dir05 / "05_semantic_graph_parameter_output.json")
+    edges = _read(dir05 / "05_semantic_graph_resolves_edges_output.json")
     sentences = {r["node_id"]: r["sentence"]
-                 for r in _read(dir06 / "06_description_sheet.json")}
-    registry = _maybe(dir07 / REGISTRY, {})
+                 for r in _read(dir06 / "06_technical_descriptions_output.json")}
+    registry = _maybe(dir07 / REGISTRY, None)
+    if registry is None:   # the migration read (2026-10-08)
+        registry = _maybe(dir07 / REGISTRY_OLD, {})
     blessed = {(t["node_id"], t["report"]): t
                for t in registry.get("terms", [])}
     by_file = {}
-    for rep in _maybe(dir08 / "08_pbi_reports.json", []):
+    for rep in _maybe(dir08 / "08_pbi_lineage_output.json", []):
         for f in rep.get("executes", []):
             key = f[:-4] if f.endswith(".sql") else f
             by_file.setdefault(key, []).append(rep["name"])

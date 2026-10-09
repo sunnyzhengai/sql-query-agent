@@ -60,7 +60,7 @@ def _fixture(tmp_path):
     for d in (d05, d06, d02, d07, d08, out):
         d.mkdir()
 
-    _w(d05, "05_scope_sheet.json", [
+    _w(d05, "05_semantic_graph_scope_output.json", [
         {"node_id": A_DELIV, "scope_name": "delivery",
          "scope_kind": "delivery", "operation": "select",
          "owning_statement": A + "::stmt/1",
@@ -74,7 +74,7 @@ def _fixture(tmp_path):
          "owning_statement": B + "::stmt/1",
          "evidence": {"fragment": "SELECT fix"}},
     ])
-    _w(d05, "05_structure_sheet.json", [
+    _w(d05, "05_semantic_graph_structure_output.json", [
         {"node_id": A_DELIV + "::structure/FROM/1",
          "structure_kind": "FROM", "position": 1,
          "owning_scope": A_DELIV, "evidence": {"fragment": "f"}},
@@ -91,7 +91,7 @@ def _fixture(tmp_path):
          "structure_kind": "WHERE", "position": 2,
          "owning_scope": B_DELIV, "evidence": {"fragment": "w"}},
     ])
-    _w(d05, "05_predicate_sheet.json", [
+    _w(d05, "05_semantic_graph_predicate_output.json", [
         {"node_id": A_DELIV + "::structure/WHERE/1::pred/1",
          "predicate_kind": "COMPARE_EQ", "negated": False,
          "position": 1, "on_class": "where",
@@ -105,13 +105,13 @@ def _fixture(tmp_path):
          "position": 1, "on_class": "where",
          "evidence": {"fragment": "fx.FLAG = 1"}},
     ])
-    _w(d05, "05_parameter_sheet.json", [
+    _w(d05, "05_semantic_graph_parameter_output.json", [
         {"node_id": A + "::param/@FixStart", "name": "@FixStart",
          "kind": "procedure_parameter", "data_type": "DATE",
          "default_text": None,
          "evidence": {"fragment": "@FixStart DATE"}},
     ])
-    _w(d05, "05_resolves_edges.json", [
+    _w(d05, "05_semantic_graph_resolves_edges_output.json", [
         {"from_id": A_DELIV + "::structure/FROM/1::expr/1",
          "ref_text": "fixdb..FIX_TABLE_ONE", "to_kind": "table",
          "to_id": "FIX_TABLE_ONE", "match_basis": "exact"},
@@ -124,7 +124,7 @@ def _fixture(tmp_path):
         return {"node_id": nid, "grain": grain,
                 "sentence": sentence, "basis_version": "06.3.0",
                 "evidence_refs": [nid]}
-    _w(d06, "06_description_sheet.json", [
+    _w(d06, "06_technical_descriptions_output.json", [
         _row(A, "file", "Delivers a selection of alpha records."),
         _row(B, "file", "Delivers a selection of beta records."),
         _row(A_DELIV, "scope",
@@ -141,9 +141,9 @@ def _fixture(tmp_path):
              "The fix flag of the beta record is recorded."),
     ])
 
-    _w(d07, "07_blessing_registry.json",
+    _w(d07, "07_business_descriptions_blessings_output.json",
        {"_law": "test fixture", "names": [], "sentences": []})
-    _w(d08, "08_pbi_reports.json", [
+    _w(d08, "08_pbi_lineage_output.json", [
         {"name": "Fix Dashboard",
          "executes": ["FIX_RPT_ALPHA.sql"], "bound_fields": {},
          "bindings": [], "source": "tmdl (fix)"},
@@ -167,7 +167,10 @@ def _proposer(spec):
 
 
 def _delivery(out):
-    return json.loads((out / "ai_delivery.json").read_text())
+    # THE NAMING LAW (2026-10-08): the delivery writes
+    # 12_ai_delivery_output.json. RED until the 0.7.0 code lands.
+    return json.loads(
+        (out / "12_ai_delivery_output.json").read_text())
 
 
 def _terms(delivery):
@@ -320,8 +323,8 @@ def test_09_l9_byte_determinism(tmp_path):
     f1, f2 = _fixture(d1), _fixture(d2)
     bt.build09(*f1, proposer=_proposer)
     bt.build09(*f2, proposer=_proposer)
-    assert (f1[-1] / "ai_delivery.json").read_bytes() == \
-        (f2[-1] / "ai_delivery.json").read_bytes()
+    assert (f1[-1] / "12_ai_delivery_output.json").read_bytes() \
+        == (f2[-1] / "12_ai_delivery_output.json").read_bytes()
 
 
 def test_09_l10_one_gate_no_local_gate(tmp_path, monkeypatch):
@@ -407,7 +410,7 @@ def test_09_l15_assemble_writes_descriptions_preserves_terms(
     dirs = _fixture(tmp_path)
     d06, d07, d08, out = dirs[1], dirs[3], dirs[4], dirs[-1]
     bt.build09(*dirs, proposer=_proposer)
-    _w(d07, "07_business_sheet.json", [
+    _w(d07, "07_business_descriptions_output.json", [
         {"node_id": A, "grain": "file", "status": "gate_passed",
          "audience_text": "One row is: one alpha fix record."},
     ])
@@ -462,3 +465,105 @@ def test_09_l17_defer_files_dropped_without_carry(tmp_path):
     bt.build09(*dirs, proposer=spy,
                defer_files={"FIX_RPT_BETA"})
     assert all(not n.startswith(B) for n in called), called
+
+
+# ------------------- the delivered-goods ruling (2026-10-08, 0.7.0)
+# 09 contract amendment + D14: membership = the ledger; a report
+# appears from its first described file with files_described[] +
+# files_waiting[]; waiting files appear nowhere; gate_failed rides
+# out honestly; no ledger at all = legacy unfiltered (home estate).
+
+LEDGER_OUT = "10_corpus_ledger_output.json"
+
+
+def _ledgered(out, *stems):
+    _w(out, LEDGER_OUT,
+       {"hashes": {s + ".sql": "fix-hash" for s in stems}})
+
+
+def test_09_l18_membership_is_the_ledger(tmp_path):
+    """Alpha described, beta waiting: beta appears NOWHERE."""
+    import ai_delivery
+    dirs = _fixture(tmp_path)
+    d06, d07, d08, out = dirs[1], dirs[3], dirs[4], dirs[-1]
+    _ledgered(out, "FIX_RPT_ALPHA")
+    ai_delivery.assemble(out, d07, d08, d06)
+    delivery = _delivery(out)
+    rep = next(e for e in delivery["reports"]
+               if e["report"] == "Fix Dashboard")
+    assert rep["files_described"] == ["FIX_RPT_ALPHA.sql"]
+    assert rep["files_waiting"] == []          # complete
+    assert delivery["reportless_files"] == []  # beta is waiting
+
+
+def test_09_l19_half_described_report_says_its_lists(tmp_path):
+    """A two-file report enters on its first described file and
+    names what is missing; a zero-described report is absent."""
+    import ai_delivery
+    dirs = _fixture(tmp_path)
+    d06, d07, d08, out = dirs[1], dirs[3], dirs[4], dirs[-1]
+    _w(d08, "08_pbi_lineage_output.json", [
+        {"name": "Fix Dashboard",
+         "executes": ["FIX_RPT_ALPHA.sql", "FIX_RPT_BETA.sql"],
+         "bound_fields": {}, "bindings": [],
+         "source": "tmdl (fix)"},
+        {"name": "Fix Other",
+         "executes": ["FIX_RPT_BETA.sql"], "bound_fields": {},
+         "bindings": [], "source": "tmdl (fix)"},
+    ])
+    _ledgered(out, "FIX_RPT_ALPHA")
+    ai_delivery.assemble(out, d07, d08, d06)
+    delivery = _delivery(out)
+    assert [e["report"] for e in delivery["reports"]] \
+        == ["Fix Dashboard"]                    # Fix Other: zero
+    rep = delivery["reports"][0]
+    assert rep["files_described"] == ["FIX_RPT_ALPHA.sql"]
+    assert rep["files_waiting"] == ["FIX_RPT_BETA.sql"]
+    assert "alpha" in rep["description"]["text"]
+    assert "beta" not in rep["description"]["text"]
+
+
+def test_09_l20_gate_failed_status_rides_out(tmp_path):
+    """Processed-but-failed is honest: technical voice, status
+    gate_failed — distinguishable from never-processed."""
+    import ai_delivery
+    dirs = _fixture(tmp_path)
+    d06, d07, d08, out = dirs[1], dirs[3], dirs[4], dirs[-1]
+    _w(d07, "07_business_descriptions_output.json", [
+        {"node_id": A, "grain": "file", "status": "gate_failed",
+         "audience_text": "A card that failed the gate."},
+    ])
+    _ledgered(out, "FIX_RPT_ALPHA")
+    ai_delivery.assemble(out, d07, d08, d06)
+    rep = _delivery(out)["reports"][0]
+    assert rep["description"]["voice"] == "technical"
+    assert rep["description"]["status"] == "gate_failed"
+
+
+def test_09_l21_no_ledger_is_legacy_unfiltered(tmp_path):
+    """The home estate has no ledger: membership unfiltered —
+    one law, two honest modes (work always has a ledger)."""
+    import ai_delivery
+    dirs = _fixture(tmp_path)
+    d06, d07, d08, out = dirs[1], dirs[3], dirs[4], dirs[-1]
+    ai_delivery.assemble(out, d07, d08, d06)
+    delivery = _delivery(out)
+    assert [e["report"] for e in delivery["reports"]] \
+        == ["Fix Dashboard"]
+    assert [e["file"] for e in delivery["reportless_files"]] \
+        == ["FIX_RPT_BETA"]
+
+
+def test_09_l22_load_migrates_the_old_delivery_name(tmp_path):
+    """A pre-rename tenant's ai_delivery.json (terms, blessings)
+    is read once; every write lands the new name."""
+    import ai_delivery
+    dirs = _fixture(tmp_path)
+    d06, d07, d08, out = dirs[1], dirs[3], dirs[4], dirs[-1]
+    _w(out, "ai_delivery.json", {
+        "basis": {"fix": "old-name-marker"}, "reports": [],
+        "reportless_files": [], "counts": {}})
+    assert ai_delivery.load(out)["basis"] \
+        == {"fix": "old-name-marker"}
+    ai_delivery.assemble(out, d07, d08, d06)
+    assert (out / "12_ai_delivery_output.json").exists()

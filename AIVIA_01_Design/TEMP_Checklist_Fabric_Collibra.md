@@ -10,7 +10,7 @@ order; delete the file when Step 5 closes.
 lakehouse id table + the ready-filled sync command.
 
 **Decided already (2026-10-05, all ruled):** wheel carries the LLM
-phases, key never rides · one delivery file `ai_delivery.json` ·
+phases, key never rides · one delivery file `12_ai_delivery_output.json` (renamed 2026-10-08; pre-rename records below keep the old name) ·
 work seat = her OpenAI key, metadata only · 02 upload = 3 files ·
 Collibra = five checks, sandbox first.
 
@@ -186,19 +186,20 @@ there is the customer checklist).
 The boxes below are the summary; the runbook is the instruction.
 
 - [ ] 4.1 ACTION: create `Files/01_sql_input/`, `Files/02_dictionary/`,
-      `Files/out/` in the work lakehouse.
+      `Files/03_tmdl/`, `Files/04_run/` in the work lakehouse
+      (naming law 2026-10-08; were tmdl/ and out/).
 - [ ] 4.2 ACTION: upload the 3 dictionary files + the work SQL
       files; install the wheel in the work environment (the
       one-wheel law; stop session after publish).
 - [ ] 4.3 ACTION: run `ai-describe --deliver` over ALL files in
       `01_sql_input/` — her hand.
-      ARTIFACTS: `Files/out/ai_delivery.json` ·
-      `Files/out/08_report_descriptions.txt` · parse failures as
+      ARTIFACTS: `Files/04_run/12_ai_delivery_output.json` ·
+      `Files/04_run/08_report_descriptions.txt` · parse failures as
       counted rows in the output, never silent.
 - [ ] 4.4 ACTION: gap-check the official txt (cards + technical
       definitions) with her eye.
 - [ ] 4.5 ACTION: bless the keeper names.
-      ARTIFACT: blessed rows in the work ai_delivery.json +
+      ARTIFACT: blessed rows in the work 12_ai_delivery_output.json +
       the work-side registry.
 
 ## STEP 5 — Collibra publish (her notebook, outside this repo)
@@ -210,7 +211,7 @@ The boxes below are the summary; the runbook is the instruction.
       to a test domain. ARTIFACT: the rendered Collibra page, line
       breaks intact (else switch to <br>/rich text).
 - [ ] 5.3 ACTION: the notebook written — create-or-update BY NAME,
-      re-runnable, reads ai_delivery.json, filters blessed itself.
+      re-runnable, reads 12_ai_delivery_output.json, filters blessed itself and skips reports with files_waiting.
       ARTIFACT: the notebook in her work workspace.
 - [ ] 5.4 THE BATCH. ARTIFACT: the counted result printed —
       reports updated / terms created / terms updated / failures.

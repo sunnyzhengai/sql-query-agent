@@ -164,7 +164,7 @@
 # ---------------------------------------------------------------------
 # P7. OUTPUTS (contract F — shapes unchanged)
 # ---------------------------------------------------------------------
-# 07_business_sheet.json rows: same shape, same 151-row conservation,
+# 07_business_descriptions_output.json rows: same shape, same 151-row conservation,
 #   docket_refs becomes room_refs (the node ids the room carried).
 # <file>.txt: same five-line card + scope + field layout.
 # <file>.facts.txt: unchanged (the 06 machinery still renders it).
@@ -256,21 +256,21 @@ class WalkStore:
         self.rows06, self.six = [], {}
         if dir06:
             self.rows06 = _read(
-                Path(dir06) / "06_description_sheet.json")
+                Path(dir06) / "06_technical_descriptions_output.json")
             self.six = {r["node_id"]: r["sentence"]
                         for r in self.rows06}
         self.preds = {r["node_id"]: r
-                      for r in _read(d5 / "05_predicate_sheet.json")}
+                      for r in _read(d5 / "05_semantic_graph_predicate_output.json")}
         self.structs = {r["node_id"]: r
-                        for r in _read(d5 / "05_structure_sheet.json")}
+                        for r in _read(d5 / "05_semantic_graph_structure_output.json")}
         self.scopes = {r["node_id"]: r
-                       for r in _read(d5 / "05_scope_sheet.json")}
+                       for r in _read(d5 / "05_semantic_graph_scope_output.json")}
         self.exprs = {r["node_id"]: r
-                      for r in _read(d5 / "05_expression_sheet.json")}
+                      for r in _read(d5 / "05_semantic_graph_expression_output.json")}
         self.params = {r["node_id"]: r
-                       for r in _read(d5 / "05_parameter_sheet.json")}
+                       for r in _read(d5 / "05_semantic_graph_parameter_output.json")}
         kids = {}
-        for e in _read(d5 / "05_contains_edges.json"):
+        for e in _read(d5 / "05_semantic_graph_contains_edges_output.json"):
             kids.setdefault(e["from_id"], []).append(e)
 
         def _pos(e):
@@ -281,7 +281,7 @@ class WalkStore:
         self._kids = {k: [e["to_id"] for e in sorted(v, key=_pos)]
                       for k, v in kids.items()}
         self._res = {}
-        for e in _read(d5 / "05_resolves_edges.json"):
+        for e in _read(d5 / "05_semantic_graph_resolves_edges_output.json"):
             self._res.setdefault(e["from_id"], []).append(e)
         self.col_desc = {
             f"{r['table_name']}.{r['column_name']}":
@@ -301,7 +301,7 @@ class WalkStore:
         self._blessed = {}
         self._blessed_sent = {}
         if dir07:
-            reg = Path(dir07) / "07_blessing_registry.json"
+            reg = Path(dir07) / "07_business_descriptions_blessings_output.json"
             if reg.exists():
                 data = _read(reg)
                 for n in data.get("names", []):
@@ -840,7 +840,7 @@ def build07_walk(dir05, dir06, out07, dir02, dir03,
         # landing a blessing never rerolls the unpinned lines —
         # the card rebuilds from registry + stored trace; every
         # other row rides through byte-identical.
-        sheet_path = out / "07_business_sheet.json"
+        sheet_path = out / "07_business_descriptions_output.json"
         rows = _read(sheet_path) if sheet_path.exists() else []
         trace = _read(out / "07_walk_trace.json") if \
             (out / "07_walk_trace.json").exists() else {}
@@ -1031,7 +1031,7 @@ def build07_walk(dir05, dir06, out07, dir02, dir03,
                         f"{r['audience_text']}")
         txt_path.write_text("\n".join(body) + "\n")
 
-    sheet_path = out / "07_business_sheet.json"
+    sheet_path = out / "07_business_descriptions_output.json"
     rows = _read(sheet_path) if sheet_path.exists() else []
     keep = [r for r in rows
             if r["node_id"].split("::")[1] not in fnames]
@@ -1060,7 +1060,7 @@ def bless(out07, node_id, blessed_text, ruling, kind="sentence"):
         raise ValueError(
             "REFUSED: a registry write requires Sunny's explicit "
             "ruling string (dated, her word recorded verbatim).")
-    reg_path = Path(out07) / "07_blessing_registry.json"
+    reg_path = Path(out07) / "07_business_descriptions_blessings_output.json"
     reg = _read(reg_path) if reg_path.exists() else \
         {"names": [], "sentences": []}
     if kind == "name":

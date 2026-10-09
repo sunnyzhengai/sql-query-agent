@@ -8,6 +8,33 @@
 # STATUS: PSEUDO CODE ONLY — awaiting Sunny's approval before any code
 # is written below the pseudo code (the standing process).
 #
+# ==== PSEUDO — 0.7.0 THE SHEET RENAMES (the naming law, ruled =====
+# 2026-10-08, step table row 05; APPROVED same day; EXECUTED in
+# this landing — one representative lock red first, then the
+# mechanical flip across writer + readers):
+#
+#   THE MAP (writer here; readers flipped in the same landing —
+#   technical_descriptions, business_descriptions, business_terms,
+#   sqldesc_cli, business_walk + the test fixtures; a rename is
+#   atomic or the suite lies). Old names, historical:
+#     the <sheet>_sheet.json / _edges.json / _ledger.json /
+#     _joins.json family -> 05_semantic_graph_<content>_output
+#     .json ("_sheet" dies — "_output" already says what it is;
+#     the step prefix says who made it).
+#
+#   THE EXCEPTION: 05_kind_library.json KEEPS ITS NAME — it is the
+#   ratified ASSET that travels in the wheel (allowlist-locked),
+#   an input to the build, not an engine output; the _output
+#   suffix marks engine-made files only. [flagged for Sunny]
+#
+#   NO MIGRATION READ here (unlike the ledger): these sheets are
+#   working files, regenerated whole by every build — on a 0.7.0
+#   tenant the missing 13 stamp already forces one free build
+#   before any paid call, so the new names exist before anything
+#   reads them. The runbook's wheel-upgrade note tells the tenant:
+#   keep the ledger (+ registry), delete the old 05/06/07 folders.
+# ====================================================================
+#
 # ============================================================ PSEUDO CODE
 #
 # CONSTANTS
@@ -80,8 +107,8 @@
 #      contract.)
 #
 # WRITE (all files, every run — rebuild is the only edit path)
-#  14. 05_file_sheet.json, 05_statement_sheet.json,
-#      05_contains_edges.json, 05_exclusion_ledger.json — json,
+#  14. 05_semantic_graph_file_output.json, 05_semantic_graph_statement_output.json,
+#      05_semantic_graph_contains_edges_output.json, 05_semantic_graph_exclusion_ledger_output.json — json,
 #      indent 2, keys in the contract's listed order, rows in
 #      deterministic order (file name, then position path).
 #  15. Print the census to stdout: per file "name: N statements
@@ -113,17 +140,17 @@ from scriptdom_loader import parse_tsql
 BUILDER_VERSION = "0.1.0"
 PARSER_VERSION = "ScriptDom 18.0.78.1 / TSql160Parser"
 
-FILE_SHEET = "05_file_sheet.json"
-STATEMENT_SHEET = "05_statement_sheet.json"
-SCOPE_SHEET = "05_scope_sheet.json"
-STRUCTURE_SHEET = "05_structure_sheet.json"
-PREDICATE_SHEET = "05_predicate_sheet.json"
-EXPRESSION_SHEET = "05_expression_sheet.json"
-PARAMETER_SHEET = "05_parameter_sheet.json"
-RESOLVES_EDGES = "05_resolves_edges.json"
-DISCOVERED_JOINS = "05_discovered_joins.json"
-CONTAINS_EDGES = "05_contains_edges.json"
-EXCLUSION_LEDGER = "05_exclusion_ledger.json"
+FILE_SHEET = "05_semantic_graph_file_output.json"
+STATEMENT_SHEET = "05_semantic_graph_statement_output.json"
+SCOPE_SHEET = "05_semantic_graph_scope_output.json"
+STRUCTURE_SHEET = "05_semantic_graph_structure_output.json"
+PREDICATE_SHEET = "05_semantic_graph_predicate_output.json"
+EXPRESSION_SHEET = "05_semantic_graph_expression_output.json"
+PARAMETER_SHEET = "05_semantic_graph_parameter_output.json"
+RESOLVES_EDGES = "05_semantic_graph_resolves_edges_output.json"
+DISCOVERED_JOINS = "05_semantic_graph_discovered_joins_output.json"
+CONTAINS_EDGES = "05_semantic_graph_contains_edges_output.json"
+EXCLUSION_LEDGER = "05_semantic_graph_exclusion_ledger_output.json"
 KIND_LIBRARY = "05_kind_library.json"
 
 # STAGE 2 (L04, contract stage-2 amendment APPROVED 2026-10-02):

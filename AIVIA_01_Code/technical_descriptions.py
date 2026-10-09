@@ -122,7 +122,7 @@ _voice_predicate/_voice_negated (the ruled negation closed set).
 #              basis_version, evidence_refs (the pred node +
 #              its operand expr ids + any resolves rows used).
 #     counted: ledger rows minted HERE, landing in
-#              06_voicing_ledger.json at L06 (the contract names
+#              06_technical_descriptions_voicing_output.json at L06 (the contract names
 #              the landing step — the placeholder law's ledger
 #              arm): degenerate_never_voiced, column_words_gap,
 #              annotation_disagreement.
@@ -334,10 +334,49 @@ _voice_predicate/_voice_negated (the ruled negation closed set).
 # (contract): technical_descriptions.py <dir05> <out06> <dir02>
 # <dir01> -> writes into AIVIA_01_Data/06_technical_descriptions/.
 #
+# ==== PSEUDO — 0.8.0 COMMENT-FIRST (D15, ruled 2026-10-08 ====
+# evening; contracts amended same day; AWAITING SUNNY'S
+# APPROVAL; red tests before code):
+#
+#   R8 PRECEDENCE FLIPS (the 06 contract's amendment):
+#   1. A trailing same-line comment on a value predicate is
+#      voiced AS THE MEANING, 3a's meaning-first shape:
+#        "The pcp id is not 'TAPESTRY GENERIC PCP' (47080)."
+#      The "(annotated '...' in the source)" suffix retires for
+#      predicates that carry a comment — the comment IS the
+#      voice now. A DECLARED dictionary meaning that disagrees
+#      is the counted annotation_disagreement (read the other
+#      way from 2026-10-02). No comment -> everything exactly
+#      as today. BASIS_VERSION bumps 06.3.0 -> 06.4.0; the two
+#      pinned sentences re-pin (the byte-exact posture's ruled
+#      path, never a drift).
+#   2. THE HEADER READ (one new helper beside _comment_at, the
+#      same one-permitted-raw-read law): header_description(
+#      sql_dir, stem) -> the text after "Description:" in the
+#      file's leading block comment (up to the next labeled
+#      line or the comment's end, whitespace collapsed), or
+#      None. Stored NOWHERE — read at build time, offered to
+#      the 07 docket (her no-side-store ruling).
+# ===============================================================
+#
+# ==== PSEUDO — 0.7.0 THE 06 RENAMES (the naming law, ruled ====
+# 2026-10-08, step table row 06; AWAITING SUNNY'S APPROVAL):
+#   06_description_sheet.json -> 06_technical_descriptions_output.json
+#   06_voicing_ledger.json    -> 06_technical_descriptions_voicing_output.json
+#   THE PER-FILE <name>.txt / <name>.svg KEEP THEIR NAMES
+#   [flagged]: they are named by their subject sql file — the
+#   step identity rides the folder; suffixing hundreds of
+#   per-file artifacts adds noise, not truth.
+#   No migration read: regenerated whole by every build (the 05
+#   precedent). Readers flip in the same landing: ai_delivery,
+#   sqldesc_cli (report_descriptions), business_descriptions,
+#   business_terms, business_walk + fixtures.
+# ===============================================================
+#
 # build06(dir05, out06, dir02, dir01):
 #   rows, ledger = render_all(...)
-#   writes 06_description_sheet.json (the rows, five grains),
-#          06_voicing_ledger.json   (the counted rows),
+#   writes 06_technical_descriptions_output.json (the rows, five grains),
+#          06_technical_descriptions_voicing_output.json   (the counted rows),
 #          <file_name>.txt  one per corpus file,
 #          <file_name>.svg  one per corpus file;
 #   prints the census (rows per grain, ledger per class) and
@@ -432,15 +471,15 @@ def _load_words(dict_dir: Path):
 
 def _load_graph(dir05: Path):
     g = {
-        "preds": _read(dir05 / "05_predicate_sheet.json"),
+        "preds": _read(dir05 / "05_semantic_graph_predicate_output.json"),
         "exprs": {e["node_id"]: e for e in
-                  _read(dir05 / "05_expression_sheet.json")},
+                  _read(dir05 / "05_semantic_graph_expression_output.json")},
     }
     g["pred_by_id"] = {p["node_id"]: p for p in g["preds"]}
     g["struct_kind"] = {s["node_id"]: s["structure_kind"] for s in
-                        _read(dir05 / "05_structure_sheet.json")}
+                        _read(dir05 / "05_semantic_graph_structure_output.json")}
     g["roles"], g["children"] = {}, {}
-    for e in _read(dir05 / "05_contains_edges.json"):
+    for e in _read(dir05 / "05_semantic_graph_contains_edges_output.json"):
         if e.get("role"):
             g["roles"].setdefault(e["from_id"], []).append(e)
         pos = str(e["position"]).split(".")[0]
@@ -453,7 +492,7 @@ def _load_graph(dir05: Path):
     g["children"] = {k: [t for _, t in sorted(v)]
                      for k, v in g["children"].items()}
     g["resolves"] = {}
-    for r in _read(dir05 / "05_resolves_edges.json"):
+    for r in _read(dir05 / "05_semantic_graph_resolves_edges_output.json"):
         g["resolves"].setdefault(r["from_id"], []).append(r)
     return g
 
@@ -746,7 +785,7 @@ def _leaf_sentence(pred, voice, graph, sql_lines):
 def render_predicates(dir05, dir02, dir01):
     """L03's public door: every predicate leaf -> its description
     row (grain 'predicate'), plus the counted rows minted here
-    (landing in 06_voicing_ledger.json at L06)."""
+    (landing in 06_technical_descriptions_voicing_output.json at L06)."""
     dir05, dir02, dir01 = Path(dir05), Path(dir02), Path(dir01)
     graph = _load_graph(dir05)
     words, values = _load_words(dir02)
@@ -1203,7 +1242,7 @@ def render_scopes(dir05, dir02, dir01):
     """L05's public door: one central sentence per scope."""
     dir05, dir02, dir01 = Path(dir05), Path(dir02), Path(dir01)
     graph = _load_graph(dir05)
-    scopes = _read(dir05 / "05_scope_sheet.json")
+    scopes = _read(dir05 / "05_semantic_graph_scope_output.json")
     words, values = _load_words(dir02)
     sql_lines = _load_sql(dir01)
     voice = _Voice(graph, words, values)
@@ -1337,7 +1376,7 @@ def _struct_rows(dir05):
     if key not in _STRUCT_CACHE:
         _STRUCT_CACHE[key] = {
             s["node_id"]: s for s in
-            _read(Path(dir05) / "05_structure_sheet.json")}
+            _read(Path(dir05) / "05_semantic_graph_structure_output.json")}
     return _STRUCT_CACHE[key]
 
 
@@ -1418,8 +1457,8 @@ def render_statements(dir05, dir02, dir01):
     """R11's door: one row per VOICED statement; operational /
     gap / unvoiced-kind land counted."""
     dir05 = Path(dir05)
-    stmts = _read(dir05 / "05_statement_sheet.json")
-    scopes = _read(dir05 / "05_scope_sheet.json")
+    stmts = _read(dir05 / "05_semantic_graph_statement_output.json")
+    scopes = _read(dir05 / "05_semantic_graph_scope_output.json")
     scopes_by_stmt = {}
     for s in scopes:
         scopes_by_stmt.setdefault(s["owning_statement"],
@@ -1627,10 +1666,10 @@ def render_files(dir05, dir02, dir01):
     words, values = _load_words(dir02)
     sql_lines = _load_sql(dir01)
     voice = _Voice(graph, words, values)
-    files = _read(dir05 / "05_file_sheet.json")
-    stmts = _read(dir05 / "05_statement_sheet.json")
-    scopes = _read(dir05 / "05_scope_sheet.json")
-    params = _read(dir05 / "05_parameter_sheet.json")
+    files = _read(dir05 / "05_semantic_graph_file_output.json")
+    stmts = _read(dir05 / "05_semantic_graph_statement_output.json")
+    scopes = _read(dir05 / "05_semantic_graph_scope_output.json")
+    params = _read(dir05 / "05_semantic_graph_parameter_output.json")
     scope_rows, _ = render_scopes(dir05, dir02, dir01)
     scope_sentences = {r["node_id"]: r["sentence"]
                        for r in scope_rows}
@@ -1666,7 +1705,7 @@ def render_all(dir05, dir02, dir01):
               "class": "lookup_shaping_attachment",
               "grain": "predicate",
               "basis_version": BASIS_VERSION}
-             for p in _read(dir05 / "05_predicate_sheet.json")
+             for p in _read(dir05 / "05_semantic_graph_predicate_output.json")
              if p.get("on_class") == "lookup_shaping"]
 
     ledger, seen = [], set()
@@ -1865,16 +1904,16 @@ def build06(dir05, out06, dir02, dir01):
     dir05, out06 = Path(dir05), Path(out06)
     dir02, dir01 = Path(dir02), Path(dir01)
     rows, ledger = render_all(dir05, dir02, dir01)
-    (out06 / "06_description_sheet.json").write_text(
+    (out06 / "06_technical_descriptions_output.json").write_text(
         json.dumps(rows, indent=1))
-    (out06 / "06_voicing_ledger.json").write_text(
+    (out06 / "06_technical_descriptions_voicing_output.json").write_text(
         json.dumps(ledger, indent=1))
 
     graph = _load_graph(dir05)
     _, values = _load_words(dir02)
-    files = _read(dir05 / "05_file_sheet.json")
-    stmts = _read(dir05 / "05_statement_sheet.json")
-    scopes = _read(dir05 / "05_scope_sheet.json")
+    files = _read(dir05 / "05_semantic_graph_file_output.json")
+    stmts = _read(dir05 / "05_semantic_graph_statement_output.json")
+    scopes = _read(dir05 / "05_semantic_graph_scope_output.json")
     scope_labels = {s["node_id"]: s["scope_name"] for s in scopes}
     stmt_sent = {r["node_id"]: r["sentence"] for r in rows
                  if r["grain"] == "statement"}

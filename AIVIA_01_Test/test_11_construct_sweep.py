@@ -87,7 +87,7 @@ def test_parse_family_maps_to_cast(tmp_path):
     argument rides as a counted child, never dropped."""
     sql_dir, d05, d02 = _stage(tmp_path, {"pf.sql": PARSE_SQL})
     semantic_graph.build(sql_dir, d05, d02)  # must not raise
-    rows = json.loads((d05 / "05_expression_sheet.json").read_text())
+    rows = json.loads((d05 / "05_semantic_graph_expression_output.json").read_text())
     casts = [r for r in rows if r["expression_kind"] == "cast"
              and "PARSE" in r["raw_text"].upper()]
     assert len(casts) == 2, [r["raw_text"] for r in casts]
@@ -131,8 +131,10 @@ def test_sweep_census(tmp_path):
     assert hit["construct"] == "NextValueForExpression"
     assert hit["count"] == 1
     assert hit["files"] == ["m.sql"]
+    # THE NAMING LAW (ruled 2026-10-08): engine-made files end
+    # _output. RED until the 0.7.0 rename lands.
     on_disk = json.loads(
-        (out_dir / "11_construct_census.json").read_text())
+        (out_dir / "11_construct_census_output.json").read_text())
     assert on_disk == census
 
 
@@ -142,7 +144,7 @@ def test_at_time_zone_maps_to_function(tmp_path):
     the doubled form nests — two rows."""
     sql_dir, d05, d02 = _stage(tmp_path, {"atz.sql": ATZ_SQL})
     semantic_graph.build(sql_dir, d05, d02)  # must not raise
-    rows = json.loads((d05 / "05_expression_sheet.json").read_text())
+    rows = json.loads((d05 / "05_semantic_graph_expression_output.json").read_text())
     atz = [r for r in rows if r.get("name") == "AT TIME ZONE"]
     assert len(atz) == 2, [r["raw_text"] for r in atz]
     assert {r["expression_kind"] for r in atz} == {"function"}

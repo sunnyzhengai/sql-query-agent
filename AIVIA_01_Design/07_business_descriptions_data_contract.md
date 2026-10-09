@@ -51,6 +51,17 @@ What is the input of this data contract?
 - The importable 06 renderers (technical_descriptions.py) — the
   field grain's defining phrases (design ruling 4 / G2a); 06 is
   never reopened by this phase.
+
+THE RENAME AMENDMENT (2026-10-08, the naming law — step table in
+10_work_wheel_data_contract.md; approved + built same day):
+- 07_business_sheet.json    -> 07_business_descriptions_output.json
+- 07_blessing_registry.json -> 07_business_descriptions_blessings_output.json
+- 07_code_sightings.json    -> 07_business_descriptions_code_sightings_output.json
+- 07_fact_voices.json       -> 07_business_descriptions_fact_voices_output.json
+- 07_live_checkpoint.json   -> 07_business_descriptions_checkpoint_output.json
+Older passages below citing the pre-rename names read as the new
+names. TWO MIGRATION READS (test-locked): the prior sheet for the D12 skip-carry and the BLESSING REGISTRY — old names honored once, every write lands the new name; a rename never loses paid or ruled content.
+
 - THE BLESSING REGISTRY (07_blessing_registry.json) — Sunny's
   RULING only. THE RATIFY CLAUSE (AMENDED 2026-10-04, Sunny in
   chat: "i need this step to be automated. because i'll run the
@@ -93,6 +104,21 @@ What is the output of this data contract?
   - status: proposed | gate_passed | blessed | floor — the
     EFFECTIVE text ladder is blessed > gate_passed > floor; a
     floor row's audience_text IS the 06 sentence, verbatim.
+    THE FLOOR RETIRES AS A BUSINESS TEXT (RULED 2026-10-08,
+    her words: "a fallback is not going to be a candidate to
+    replace business description"; effective at the 0.8.0
+    build): a card that cannot pass the gate ships NO
+    business description — status becomes awaiting_human,
+    the row keeps last_proposal + gate_findings + the named
+    QUESTIONS (file, line, the ungrounded number, the column
+    words), and the delivery says "awaiting your answer".
+    The 06 technical layer stands untouched in its own
+    outputs — it never again impersonates the business slot.
+    Her verdicts per question: FIX THE SQL (add the inline
+    comment — the file's hash changes, the batch re-takes it;
+    the one meaning store is the SQL itself) · LET THE NUMBER
+    SHOW (a recorded waiver on the row) · KEEP IT OUT (the
+    card must speak without it).
   - gate_findings: the named objections (empty when clean);
     after the repair budget (3 rounds) the LAST findings stay
     on the row for Sunny's eye.
@@ -159,6 +185,19 @@ whitelist is RETIRED — see the design doc's Gate v2 section):
       docket's FACTS part — CONTEXT grounds nothing; an
       ungrounded number fails AND lands a code sighting (S10
       narrowed: grounded numbers may speak).
+      AMENDED 2026-10-08 (comment-first + the basis-gap class;
+      effective at the 0.8.0 build): a number carrying an
+      inline annotation is spoken through the ANNOTATION'S
+      WORDS — the card never writes the raw digits when a
+      comment names them (the 47080 lesson: a good card died
+      for one token). A number with NO annotation and NO
+      value-set mapping is a BASIS GAP: not repairable by
+      rewording — it SKIPS the repair rounds entirely (no
+      paid retries into the same wall) and lands as a named
+      question for her (the awaiting_human path above). The
+      header block comment's Description: line joins the file
+      card's docket as the FIRST-CHOICE wording (her ruling,
+      same day).
       (SUPERSEDED AT THE GRAPH-WALK REOPEN'S BUILD — brief
       Q7/Q8: grows to the RESOLVE-BACK CHECKER, both
       directions — specific claims (quoted values, proper

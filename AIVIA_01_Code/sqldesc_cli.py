@@ -82,8 +82,11 @@ def _stage_empty_dict(tmp):
     return d
 
 
-def describe(sql_dir, out_dir, dict_dir=None):
+def describe_technical(sql_dir, out_dir, dict_dir=None):
     """Folder of .sql in -> per-file technical .txt out.
+    (RENAMED from describe() 2026-10-08, the naming law: the
+    ruled name describe() now belongs to the PAID batch door;
+    this free door keeps the CLI bare mode unchanged.)
     dict_dir (RULED 2026-10-04, her post-D8 ask): a RUNTIME-
     OFFERED 02 dictionary folder — value meanings and column
     words speak; None = the empty-dictionary work mode (the
@@ -114,15 +117,15 @@ def report_descriptions(tmdl_dir, sql_dir, out_dir,
     import pbi_lineage as pl
     out = Path(out_dir)
     reports = pl.build08(tmdl_dir, sql_dir, out)
-    describe(sql_dir, out, dict_dir=dict_dir)
+    describe_technical(sql_dir, out, dict_dir=dict_dir)
     sheet = json.loads(
-        (out / "06_description_sheet.json").read_text())
+        (out / "06_technical_descriptions_output.json").read_text())
     file_sentence = {r["node_id"].split("::")[1]: r["sentence"]
                      for r in sheet if r["grain"] == "file"}
     business_card = {}
     if business_dir:
         biz = json.loads(
-            (Path(business_dir) / "07_business_sheet.json")
+            (Path(business_dir) / "07_business_descriptions_output.json")
             .read_text())
         business_card = {
             r["node_id"].split("::")[1]: r["audience_text"]
@@ -163,9 +166,10 @@ def report_descriptions(tmdl_dir, sql_dir, out_dir,
             blocks.append(f"==== REPORT: {row['report']} ====\n"
                           f"feeds from: {f}\n"
                           f"voice: {voice}\n\n{card}\n")
-    (out / "08_report_descriptions.txt").write_text(
+    # the naming law (2026-10-08): step-08 door, step-08 names
+    (out / "08_pbi_lineage_descriptions_output.txt").write_text(
         "\n".join(blocks))
-    (out / "08_report_descriptions.json").write_text(
+    (out / "08_pbi_lineage_descriptions_output.json").write_text(
         json.dumps(rows, indent=1))
     print(f"08 report descriptions: {len(rows)} report(s)")
     return rows
@@ -217,7 +221,7 @@ def sweep(sql_dir, out_dir, dict_dir=None):
         "files_affected": sorted({e["file"] for e in collected}),
         "constructs": constructs,
     }
-    (out / "11_construct_census.json").write_text(
+    (out / "11_construct_census_output.json").write_text(
         json.dumps(census, indent=1))
     for g in constructs:
         ex = g["example"]
@@ -288,11 +292,13 @@ def preflight(tmdl_dir, sql_dir, out_dir, dict_dir=None):
                f"{type(exc).__name__}",
                "add openai (pinned) as a PUBLIC library in the "
                "environment; publish; FRESH session")
-    # 4. the key (presence only — never printed)
+    # 4. the key (presence only — never printed). BLOCKING since
+    # 2026-10-08 (D4 degrade retired): the sequence law — fix,
+    # re-run this cell, only then proceed.
     _check(bool(os.environ.get("OPENAI_API_KEY")),
            "OPENAI_API_KEY offered",
-           "set it from the vault secret BEFORE the run, else "
-           "honest degrade: technical voice, no terms")
+           "set it from the vault secret (the key cell), then "
+           "re-run this cell")
     # 5. the folders
     sql_dir, tmdl_dir = Path(sql_dir), Path(tmdl_dir)
     n_sql = len(list(sql_dir.glob("*.sql"))) \
@@ -403,7 +409,90 @@ def preflight(tmdl_dir, sql_dir, out_dir, dict_dir=None):
 #      preflight failure except the missing key.
 
 
-LEDGER_NAME = "10_corpus_ledger.json"
+# =====================================================================
+# PSEUDO-CODE — 0.7.0: D14 THE SPLIT + THE STAMP, THE NAMING LAW,
+# D4 DEGRADE RETIRED (10_work_wheel.md D4/D7/D8/D12/D14 + the step
+# table in 10_work_wheel_data_contract.md + the 09 contract's
+# delivered-goods ruling, all RULED 2026-10-08). AWAITING SUNNY'S
+# APPROVAL; red tests before code; the code follows this block.
+#
+#   THE TWO DOORS (D14):
+#   1. build(tmdl_dir, sql_dir, out_dir, dict_dir=None) — FREE,
+#      whole corpus, run when inputs change:
+#        preflight FIRST — ANY failure refuses (the sequence law;
+#        the missing-key exception is DEAD, build included) ->
+#        05 graph + 06 technical + 08 links over ALL files ->
+#        write the stamp: 13_build_stamp_output.json =
+#        {"corpus": sha256 over the sorted "name:content-sha256"
+#         lines of 01_sql_input, "files": N, "_law": ...} ->
+#        print "built: N file(s), stamp written".
+#   2. describe(tmdl_dir, sql_dir, out_dir, dict_dir=None,
+#      max_new=None, force=False) — PAID, the batch:
+#        preflight FIRST (same refusal) ->
+#        THE GUARD: recompute the corpus fingerprint; stamp
+#        missing or mismatched -> refuse: "the build is stale:
+#        run the build cell first" (no paid call against a
+#        stale graph — a test, not advice) ->
+#        plan_corpus -> done/taken/deferred (D12 unchanged) ->
+#        build07 cards + build09 terms (skip/defer as built) ->
+#        record_corpus(taken) ->
+#        assemble the delivery (LEDGER-ONLY membership +
+#        files_described[]/files_waiting[] — ai_delivery.py's
+#        own pseudo, next file) ->
+#        write 12_ai_delivery_output.txt (the human twin; the
+#        old 08_report_descriptions.txt name RETIRES) ->
+#        say it: "N described (K already done), M remain".
+#   3. deliver(...) SURVIVES as the wrapper (her ruling): build
+#      then describe, same signature as today, nothing more.
+#
+#   THE NAME COLLISION (flagged for Sunny): this file already
+#   owns describe() — the FREE technical-txt door (ai-describe's
+#   bare mode, built 2026-10-04). RECOMMENDATION: rename it
+#   describe_technical() (the CLI bare mode calls it unchanged);
+#   the paid batch door takes the ruled name describe().
+#
+#   THE RENAMES THIS FILE OWNS (the step table):
+#   4. LEDGER_NAME -> "10_corpus_ledger_output.json";
+#      11_construct_census.json -> 11_construct_census_output
+#      .json (sweep); the official txt -> 12_ai_delivery_output
+#      .txt; the working dirs out/05 -> out/05_semantic_graph,
+#      out/06 dies (06 files land in out root per the table),
+#      out/07 -> out/07_business_descriptions.
+#   5. THE MIGRATION READ (first customer tenant already holds
+#      a 20-file ledger — renaming must never cause a re-pay):
+#      _read_ledger reads the NEW name; absent, it reads the OLD
+#      10_corpus_ledger.json once and the next record writes the
+#      new name. Same one-time fallback where the registry is
+#      read (07_business_descriptions_blessings_output.json -> its _output name).
+#      Delivery/txt need no migration — regenerated every run.
+#   6. The --reports door (report_descriptions / home-side
+#      convenience): its 08_report_descriptions.{txt,json} —
+#      the txt name now belongs to nobody; per the law they
+#      become 08_pbi_lineage_descriptions_output.{txt,json}
+#      [flagged: or retire the door — Sunny's call].
+#
+#   THE PREFLIGHT AMENDMENT (D4/D8):
+#   7. The key row's fix line drops the degrade words: "set it
+#      from the vault secret, then re-run this cell" — and the
+#      callers stop filtering it: build/describe/deliver refuse
+#      on ANY failure. The degrade branch in the describe door
+#      (the else-print) is DELETED.
+#
+#   THE LOCKS (red before code):
+#   8. test_10_incremental_delivery: the split (build alone
+#      writes no 07/12; describe without build refuses; stamp
+#      mismatch refuses with the fix line; deliver == build +
+#      describe); the migration read (old ledger name honored
+#      once, no re-pay). test_packaging_wheel: the degrade lock
+#      FLIPS (no key -> ValueError refusal, nothing written);
+#      the official-txt lock moves to the 12 name. The rename
+#      sweep itself locks in each module's own test file as its
+#      pseudo lands (one file at a time).
+# =====================================================================
+
+LEDGER_NAME = "10_corpus_ledger_output.json"
+LEDGER_OLD = "10_corpus_ledger.json"   # pre-0.7.0 tenants
+STAMP_NAME = "13_build_stamp_output.json"
 
 
 def _corpus_files(sql_dir):
@@ -415,9 +504,14 @@ def _corpus_files(sql_dir):
 
 
 def _read_ledger(out_dir):
-    p = Path(out_dir) / LEDGER_NAME
-    return (json.loads(p.read_text()) if p.exists()
-            else {"hashes": {}})
+    """THE MIGRATION READ (2026-10-08): the new name first; a
+    pre-rename tenant's old ledger is honored so the rename
+    never causes a re-pay. The next record writes the new name."""
+    for name in (LEDGER_NAME, LEDGER_OLD):
+        p = Path(out_dir) / name
+        if p.exists():
+            return json.loads(p.read_text())
+    return {"hashes": {}}
 
 
 def record_corpus(sql_dir, out_dir, files=None):
@@ -455,98 +549,167 @@ def plan_corpus(sql_dir, out_dir, max_new=None, force=False):
     return {"new": new, "done": done, "remaining": remaining}
 
 
-def deliver(tmdl_dir, sql_dir, out_dir, dict_dir=None,
-            max_new=None, force=False):
-    """THE 0.5.0 COLLIBRA CHAIN (ruled 2026-10-05, G-1 + G-2):
-    08 links -> 05 graph -> 06 technical -> 07 cards -> 09 terms
-    -> ai_delivery.json + the official txt. The LLM seat is
-    RUNTIME-OFFERED: OPENAI_API_KEY in the environment (the
-    notebook sets it from a secret). No key -> HONEST DEGRADE:
-    technical voice, no terms proposed, said out loud.
-    THE REFUSAL (Brief_Preflight, 2026-10-06): the preflight
-    runs FIRST; any failure except the missing key refuses the
-    run — no paid call into a broken environment, ever.
-    D12 (2026-10-07): described = done — the ledger skips every
-    unchanged file in BOTH paid steps; max_new=N caps a run at N
-    new files (name order, the rest deferred to a later run);
-    force=True re-describes everything. The graph itself (05/06/
-    08) always builds over the WHOLE corpus — local and free."""
-    blocking = [f for f in preflight(tmdl_dir, sql_dir, out_dir,
-                                     dict_dir=dict_dir)
-                if "OPENAI_API_KEY" not in f]
+def _refuse_on_preflight(tmdl_dir, sql_dir, out_dir, dict_dir):
+    """D8 as amended 2026-10-08: ANY failure refuses — the
+    missing-key exception retired with D4's degrade."""
+    blocking = preflight(tmdl_dir, sql_dir, out_dir,
+                         dict_dir=dict_dir)
     if blocking:
         raise ValueError("preflight refused the run:\n  "
                          + "\n  ".join(blocking))
+
+
+def _offer_runtime_assets(sql_dir, dict_dir):
+    """The runtime-offered pair (2026-10-05, both rehearsal
+    crashes): the names asset beside the dictionary and the
+    corpus home — offered to the paid voices via env."""
+    d03 = Path(dict_dir).parent / "03_chat_bot" \
+        if dict_dir else None
+    if d03 and d03.exists() \
+            and not os.environ.get("AI_NAMES_DIR"):
+        os.environ["AI_NAMES_DIR"] = str(d03)
+    os.environ.setdefault("AI_SQL_DIR", str(Path(sql_dir)))
+
+
+def _corpus_fingerprint(sql_dir):
+    """The stamp's one number: sha256 over the sorted
+    name:content-hash lines of the corpus."""
+    sql_dir = Path(sql_dir)
+    lines = sorted(
+        f"{n}:{hashlib.sha256((sql_dir / n).read_bytes()).hexdigest()}"
+        for n in _corpus_files(sql_dir))
+    return hashlib.sha256("\n".join(lines).encode()).hexdigest()
+
+
+def build(tmdl_dir, sql_dir, out_dir, dict_dir=None):
+    """THE BUILD DOOR (D14, ruled 2026-10-08): the free
+    whole-corpus work — 05 graph + 06 technical + 08 links —
+    run it when the input folders change. Writes the step-13
+    stamp so describe() can prove its graph is current. The
+    preflight refuses on ANY failure (the sequence law)."""
+    _refuse_on_preflight(tmdl_dir, sql_dir, out_dir, dict_dir)
     _point_at_packaged_dll()
-    import ai_delivery
     import pbi_lineage as pl
     import semantic_graph
     import technical_descriptions as td
     out = Path(out_dir)
     out.mkdir(parents=True, exist_ok=True)
-    d05, d06, d07 = out / "05", out / "06", out / "07"
-    for d in (d05, d06, d07):
-        d.mkdir(exist_ok=True)
+    d05 = out / "05_semantic_graph"
+    d05.mkdir(exist_ok=True)
     with tempfile.TemporaryDirectory() as tmp:
         d02 = Path(dict_dir) if dict_dir else \
             _stage_empty_dict(tmp)
-        # the naming asset, runtime-offered (2026-10-05): when a
-        # dictionary is offered and a 03_chat_bot folder sits
-        # beside it, its names speak; absent = honest fallback
-        d03 = Path(dict_dir).parent / "03_chat_bot" \
-            if dict_dir else None
-        if d03 and d03.exists() \
-                and not os.environ.get("AI_NAMES_DIR"):
-            os.environ["AI_NAMES_DIR"] = str(d03)
-        # the corpus home, same law (the second rehearsal
-        # crash): the runner knows its sql folder — offer it
-        os.environ.setdefault("AI_SQL_DIR", str(Path(sql_dir)))
+        _offer_runtime_assets(sql_dir, dict_dir)
         _stage_kind_library(d05)
         semantic_graph.build(sql_dir, d05, d02)
-        td.build06(d05, d06, d02, sql_dir)
+        td.build06(d05, out, d02, sql_dir)
         pl.build08(tmdl_dir, sql_dir, out)
+    n = len(_corpus_files(sql_dir))
+    (out / STAMP_NAME).write_text(json.dumps({
+        "corpus": _corpus_fingerprint(sql_dir),
+        "files": n,
+        "_law": "the guard (D14, 2026-10-08): describe() "
+                "refuses when 01_sql_input no longer matches "
+                "this stamp — run the build cell first"},
+        indent=1))
+    print(f"built: {n} file(s), stamp written")
+    return out
+
+
+def describe(tmdl_dir, sql_dir, out_dir, dict_dir=None,
+             max_new=None, force=False):
+    """THE DESCRIBE DOOR (D14): the paid batch — 07 cards + 09
+    terms + the 10 ledger + the 12 delivery. Preflight refuses
+    on ANY failure; THE GUARD refuses a stale or missing build
+    before any paid call. D12 unchanged: described = done,
+    max_new caps the batch (name order), force re-pays all."""
+    _refuse_on_preflight(tmdl_dir, sql_dir, out_dir, dict_dir)
+    out = Path(out_dir)
+    stamp_p = out / STAMP_NAME
+    stale = (not stamp_p.exists()
+             or json.loads(stamp_p.read_text())["corpus"]
+             != _corpus_fingerprint(sql_dir))
+    if stale:
+        raise ValueError("the build is stale or missing: "
+                         "run the build cell first")
+    _point_at_packaged_dll()
+    import ai_delivery
+    import business_descriptions as bd
+    import business_terms as bt
+    d05 = out / "05_semantic_graph"
+    d07 = out / "07_business_descriptions"
+    d07.mkdir(exist_ok=True)
+    with tempfile.TemporaryDirectory() as tmp:
+        d02 = Path(dict_dir) if dict_dir else \
+            _stage_empty_dict(tmp)
+        _offer_runtime_assets(sql_dir, dict_dir)
         plan = plan_corpus(sql_dir, out, force=force)
         taken = (plan["new"] if max_new is None
                  else plan["new"][:max_new])
         deferred = plan["new"][len(taken):]
         skip = {Path(n).stem for n in plan["done"]}
         defer = {Path(n).stem for n in deferred}
-        if os.environ.get("OPENAI_API_KEY"):
-            import business_descriptions as bd
-            import business_terms as bt
-            bd.build07(d05, d06, d07, d02,
-                       skip_files=skip, defer_files=defer)
-            bt.build09(d05, d06, d02, d07, out, out,
-                       skip_files=skip, defer_files=defer)
-            record_corpus(sql_dir, out, files=taken)
-            print(f"{len(taken)} described ({len(skip)} already "
-                  f"done), {len(deferred)} remain")
-        else:
-            print("no OPENAI_API_KEY offered: technical voice "
-                  "only, no terms proposed (honest degrade; "
-                  "nothing recorded as described)")
-        ai_delivery.assemble(out, d07, out, d06)
+        bd.build07(d05, out, d07, d02,
+                   skip_files=skip, defer_files=defer)
+        bt.build09(d05, out, d02, d07, out, out,
+                   skip_files=skip, defer_files=defer)
+        record_corpus(sql_dir, out, files=taken)
+        print(f"{len(taken)} described ({len(skip)} already "
+              f"done), {len(deferred)} remain")
+        ai_delivery.assemble(out, d07, out, out)
     delivery = ai_delivery.load(out)
+    (out / "12_ai_delivery_output.txt").write_text(
+        _delivery_txt(delivery))
+    print(f"delivery: {len(delivery['reports'])} report(s), "
+          f"{len(delivery['reportless_files'])} reportless "
+          "file(s)")
+    return delivery
 
-    # the official txt — the human read view, regenerated from
-    # the delivery file (the consolidation ruling)
+
+def _delivery_txt(delivery):
+    """The human twin — regenerated from the delivery file (the
+    consolidation ruling; 12_* per the naming law). BOTH sections
+    render (her find, 2026-10-08: reports-only printed EMPTY on a
+    views-heavy corpus while the json held everything)."""
     blocks = []
-    for e in delivery["reports"]:
-        d = e.get("description") or {}
-        blocks.append(f"==== REPORT: {e['report']} ====\n"
-                      f"feeds from: {', '.join(e['files'])}\n"
-                      f"voice: {d.get('voice', 'technical')}\n\n"
-                      f"{d.get('text', '')}\n")
+
+    def _terms(e):
         for t in e.get("terms", []):
             blocks.append(
                 f"-- TERM [{t['bt_name_status']}]: "
                 f"{t['bt_name']}\n{t['business_description']}\n")
-    (out / "08_report_descriptions.txt").write_text(
-        "\n".join(blocks))
-    print(f"ai_delivery.json: {len(delivery['reports'])} "
-          f"report(s), {len(delivery['reportless_files'])} "
-          "reportless file(s)")
-    return delivery
+
+    for e in delivery["reports"]:
+        d = e.get("description") or {}
+        waiting = e.get("files_waiting", [])
+        blocks.append(f"==== REPORT: {e['report']} ====\n"
+                      f"feeds from: {', '.join(e['files'])}\n"
+                      + (f"waiting: {', '.join(waiting)} "
+                         "(incomplete — not published)\n"
+                         if waiting else "")
+                      + f"voice: {d.get('voice', 'technical')}\n\n"
+                      f"{d.get('text', '')}\n")
+        _terms(e)
+    for e in delivery["reportless_files"]:
+        d = e.get("description") or {}
+        blocks.append(f"==== FILE: {e['file']} ====\n"
+                      "(no report ties to this file yet — "
+                      "terms stay unpublished)\n"
+                      f"voice: {d.get('voice', 'technical')}\n\n"
+                      f"{d.get('text', '')}\n")
+        _terms(e)
+    return "\n".join(blocks)
+
+
+def deliver(tmdl_dir, sql_dir, out_dir, dict_dir=None,
+            max_new=None, force=False):
+    """THE WRAPPER (her ruling, 2026-10-08): build then
+    describe, nothing more — the one-call shortcut for a small
+    corpus; the runbook's cells call the two doors directly."""
+    build(tmdl_dir, sql_dir, out_dir, dict_dir=dict_dir)
+    return describe(tmdl_dir, sql_dir, out_dir,
+                    dict_dir=dict_dir, max_new=max_new,
+                    force=force)
 
 
 def main(argv=None):
@@ -595,7 +758,7 @@ def main(argv=None):
         print("usage: ai-describe <sql_dir> <out_dir> "
               "[--dict <dir02>]")
         return 2
-    describe(argv[0], argv[1], dict_dir=dict_dir)
+    describe_technical(argv[0], argv[1], dict_dir=dict_dir)
     return 0
 
 

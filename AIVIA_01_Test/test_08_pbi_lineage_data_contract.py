@@ -80,7 +80,7 @@ def _build(tmp_path):
     tmdl, corpus, out = _fixture(tmp_path)
     reports = pl.build08(tmdl, corpus, out)
     ledger = json.loads(
-        (out / "08_lineage_ledger.json").read_text())
+        (out / "08_pbi_lineage_ledger_output.json").read_text())
     return reports, ledger, out
 
 
@@ -138,10 +138,10 @@ def test_08_l7_conservation_and_byte_determinism(tmp_path):
     _, ledger, out = _build(tmp_path)
     c = ledger["counts"]
     assert c["bindings"] == c["resolved"] + c["unresolved"]
-    first = (out / "08_pbi_reports.json").read_bytes()
+    first = (out / "08_pbi_lineage_output.json").read_bytes()
     tmdl, corpus = out.parent / "tmdl", out.parent / "sql"
     pl.build08(tmdl, corpus, out)
-    assert (out / "08_pbi_reports.json").read_bytes() == first
+    assert (out / "08_pbi_lineage_output.json").read_bytes() == first
 
 
 # -------------------------------------- several workspaces (D11 path 2)

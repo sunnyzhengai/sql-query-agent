@@ -16,6 +16,19 @@ What is the input of this data contract?
   *.sql — the resolution target (read only).
 
 What is the output of this data contract?
+
+THE RENAME AMENDMENT (2026-10-08, the naming law — step table in
+10_work_wheel_data_contract.md; approved + built same day):
+- 08_pbi_reports.json    -> 08_pbi_lineage_output.json
+- 08_lineage_ledger.json -> 08_pbi_lineage_ledger_output.json
+Older passages below citing the pre-rename names read as the new
+names. Names only — the view-tie ruling (SELECT/Item binding)
+is the 0.8.0 slice: RULED same day (10_work_wheel.md D15) —
+build08 learns NativeQuery SELECT ... FROM <object> and
+[Item="..."] table-import bindings so views reach their
+reports (the first tenant's views are all reportless today);
+binding kinds and the resolve law amend here at that build.
+
 - AIVIA_01_Data/08_pbi_lineage/08_pbi_reports.json — one row
   per REAL semantic model (D3):
   - name: the model folder name without .SemanticModel

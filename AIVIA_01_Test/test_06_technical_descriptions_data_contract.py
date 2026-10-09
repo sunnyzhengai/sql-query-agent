@@ -689,13 +689,13 @@ def test_the_equation_closes_on_the_real_corpus():
     counted = [c for c in ledger if c["class"] in silence]
 
     preds = json.loads(
-        (DIR05 / "05_predicate_sheet.json").read_text())
+        (DIR05 / "05_semantic_graph_predicate_output.json").read_text())
     stmts = json.loads(
-        (DIR05 / "05_statement_sheet.json").read_text())
+        (DIR05 / "05_semantic_graph_statement_output.json").read_text())
     scopes = json.loads(
-        (DIR05 / "05_scope_sheet.json").read_text())
+        (DIR05 / "05_semantic_graph_scope_output.json").read_text())
     files = json.loads(
-        (DIR05 / "05_file_sheet.json").read_text())
+        (DIR05 / "05_semantic_graph_file_output.json").read_text())
 
     def by_file(items, key="node_id"):
         out = {}
@@ -757,11 +757,14 @@ TWO_STEP = ("SELECT T1.ID AS out_a INTO #t FROM T1 "
 def test_build_writes_all_artifacts(tmp_path):
     out = _build06(tmp_path, TWO_STEP)
     names = {p.name for p in out.iterdir()}
-    assert names == {"06_description_sheet.json",
-                     "06_voicing_ledger.json",
+    # THE NAMING LAW (ruled 2026-10-08, step table row 06; the
+    # per-file txt/svg keep their subject names — approved).
+    # RED until the rename lands.
+    assert names == {"06_technical_descriptions_output.json",
+                     "06_technical_descriptions_voicing_output.json",
                      "fab.txt", "fab.svg"}
     rows = json.loads(
-        (out / "06_description_sheet.json").read_text())
+        (out / "06_technical_descriptions_output.json").read_text())
     grains = {r["grain"] for r in rows}
     assert grains == {"predicate", "condition", "scope",
                       "statement", "file"}
@@ -840,14 +843,14 @@ def test_corpus_build_lands_everything(tmp_path):
     technical_descriptions.build06(
         DIR05, out06, DIR02, SQL_DIR_06)
     files = {p.name for p in out06.iterdir()}
-    assert "06_description_sheet.json" in files
-    assert "06_voicing_ledger.json" in files
+    assert "06_technical_descriptions_output.json" in files
+    assert "06_technical_descriptions_voicing_output.json" in files
     assert len([f for f in files if f.endswith(".txt")]) == 8
     assert len([f for f in files if f.endswith(".svg")]) == 8
     rows = json.loads(
-        (out06 / "06_description_sheet.json").read_text())
+        (out06 / "06_technical_descriptions_output.json").read_text())
     ledger = json.loads(
-        (out06 / "06_voicing_ledger.json").read_text())
+        (out06 / "06_technical_descriptions_voicing_output.json").read_text())
     # the measured corpus census, pinned (re-base by measurement
     # with the finding recorded, never silently)
     assert len(rows) == 362

@@ -44,21 +44,34 @@ Input File 1: the kind library
   prior process sheets.
 
 What is the output of this data contract?
+
+THE RENAME AMENDMENT (2026-10-08, the naming law — step table
+row 05 in 10_work_wheel_data_contract.md; approved + built same
+day): every output below is `05_semantic_graph_<content>_output
+.json` — "_sheet" dies, the step prefix says who made it. Older
+passages in this contract citing the pre-rename names
+(05_<content>_sheet.json / _edges.json / _ledger.json /
+_joins.json) read as their new names below. 05_kind_library.json
+keeps its name: it is the ratified ASSET (an input), not an
+engine output.
+
 - The semantic graph sheets, one per node kind + two edge sheets +
   two ledgers, written stage by stage (design decision 8, L03-L07):
-  1. 05_file_sheet.json            (stage 1, L03)
-  2. 05_statement_sheet.json       (stage 1, L03)
-  3. 05_scope_sheet.json           (stage 2, L04)
-  4. 05_structure_sheet.json       (stage 3, L05)
-  5. 05_predicate_sheet.json       (stage 4, L06)
-  6. 05_expression_sheet.json      (stage 4, L06)
-  7. 05_contains_edges.json        (grows at every stage)
-  8. 05_resolves_edges.json        (stage 5, L07)
-  9. 05_exclusion_ledger.json      (parse failures — counted, named)
-  10. 05_discovered_joins.json     (stage 5 — joins used in SQL with
-      no declared dictionary join row; counted, named, flywheel ore)
-  11. 05_parameter_sheet.json      (stage 5 — D6, the stage-5
-      amendment)
+  1. 05_semantic_graph_file_output.json        (stage 1, L03)
+  2. 05_semantic_graph_statement_output.json   (stage 1, L03)
+  3. 05_semantic_graph_scope_output.json       (stage 2, L04)
+  4. 05_semantic_graph_structure_output.json   (stage 3, L05)
+  5. 05_semantic_graph_predicate_output.json   (stage 4, L06)
+  6. 05_semantic_graph_expression_output.json  (stage 4, L06)
+  7. 05_semantic_graph_contains_edges_output.json (grows at every stage)
+  8. 05_semantic_graph_resolves_edges_output.json (stage 5, L07)
+  9. 05_semantic_graph_exclusion_ledger_output.json (parse failures —
+      counted, named)
+  10. 05_semantic_graph_discovered_joins_output.json (stage 5 — joins
+      used in SQL with no declared dictionary join row; counted,
+      named, flywheel ore)
+  11. 05_semantic_graph_parameter_output.json  (stage 5 — D6, the
+      stage-5 amendment)
 - NO LLM output and NO embeddings in this phase: phase 05 is fully
   deterministic — zero paid calls. Descriptions are phase 06;
   embeddings are phase 07.

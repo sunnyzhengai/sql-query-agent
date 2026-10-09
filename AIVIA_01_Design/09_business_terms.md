@@ -122,6 +122,15 @@ D6. THE DELIVERY (AMENDED 2026-10-05, the consolidation
     report) tie rides phase 08's lineage; files no report
     touches live under reportless_files[], counted, never
     silently dropped and never pushed.
+    AMENDED 2026-10-08 (the delivered-goods ruling, wheel
+    0.7.0 — full text in the 09 contract): membership is
+    LEDGER-ONLY (a file appears only after its paid turn;
+    waiting files appear nowhere — the 06 sheet is the
+    whole-corpus view); a report entry appears from its
+    first described file and carries files_described[] +
+    files_waiting[] (empty waiting == complete; the push
+    notebook skips incomplete); the file is renamed
+    12_ai_delivery_output.json + .txt per the naming law.
 
 D7. HOMES — code: AIVIA_01_Code/business_terms.py (one file).
     Data: AIVIA_01_Data/09_business_terms/ (machine-written per

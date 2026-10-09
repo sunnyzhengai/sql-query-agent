@@ -30,8 +30,11 @@ What is the input of this data contract?
     it bites. Per-corpus scoping is RETIRED for work.
   - the names asset beside the dictionary (03_chat_bot/) —
     optional; absence honest
-  - OPENAI_API_KEY in the environment — optional; absence =
-    the honest degrade (D4)
+  - OPENAI_API_KEY in the environment — REQUIRED (ruled
+    2026-10-08, supersedes the D4 degrade; effective wheel
+    0.7.0): a missing or failed key is a blocking preflight
+    FAIL — fix it, then proceed; no degraded delivery. Until
+    0.7.0 ships, the old degrade text below stands in code.
   - a registry copy at <out>/07/07_blessing_registry.json —
     optional; blessings restore when present
 
@@ -78,11 +81,63 @@ What is the output of this data contract?
   wall: one direction, nothing customer-made returns.
 
 Definitions:
-- THE REFUSAL (D8): deliver() runs the preflight first; any
-  failure except the missing key raises with the full board —
-  no paid call into a broken environment, a test not advice.
+- THE REFUSAL (D8, amended 2026-10-08): deliver() runs the
+  preflight first; ANY failure raises with the full board —
+  including the missing key (the exception retired with D4;
+  effective wheel 0.7.0) — no paid call into a broken
+  environment, a test not advice.
 - THE ONE-WHEEL LAW (D9) and THE VERSION LADDER (D10) govern
   every environment this artifact enters.
+
+THE STEP TABLE — the naming law (RULED 2026-10-08, Sunny):
+One number, one meaning: a number names a step; the same
+number appears on its runbook heading, the folder/file it
+fills, and the design doc that defines it. Nothing is
+unnumbered. Engine-made files end `_output`; a step with
+several outputs names each `<step>_<content>_output`.
+Uploaded inputs keep their real object names (no suffix).
+Folder renames (03_tmdl, 04_run) are effective NOW (paths are
+run-cell parameters); output FILE renames and the behavior
+rulings below land together in WHEEL 0.7.0 (queued; the old
+names stand in code until then).
+
+| # | Step | Who runs it | Fills / writes | Output file(s) |
+|---|------|-------------|----------------|----------------|
+| 01 | sql_input | Sunny (upload) | Files/01_sql_input/ | the *.sql files (inputs, real object names) |
+| 02 | dictionary | Sunny (SSMS + convert cell) | Files/02_dictionary/ | 02_dictionary_table_output.json · 02_dictionary_column_output.json · 02_dictionary_join_output.json · 02_dictionary_value_output.json |
+| 03 | tmdl | Sunny (pull cell) | Files/03_tmdl/ | the *.SemanticModel folders (inputs, real model names) |
+| 04 | run | the engine | Files/04_run/ (was out/) | the container for steps 05–12; delete it = clean slate, inputs untouched |
+| 05 | semantic_graph | build cell (free, whole corpus) | 04_run/05_semantic_graph/ | 05_semantic_graph_<sheet>_output.json (one per sheet) |
+| 06 | technical_descriptions | build cell | 04_run/ | 06_technical_descriptions_output.json |
+| 07 | business_descriptions | describe cell (paid, batch) | 04_run/07_business_descriptions/ | 07_business_descriptions_output.json · 07_business_descriptions_blessings_output.json |
+| 08 | pbi_lineage | build cell | 04_run/ | 08_pbi_lineage_output.json |
+| 09 | business_terms | describe cell (paid, same batch) | — | no file of its own: terms are rows inside 07 and 12 (by design, not an orphan) |
+| 10 | corpus_ledger | describe cell (bookkeeping) | 04_run/ | 10_corpus_ledger_output.json |
+| 11 | construct_census | sweep cell (free) | 04_run/ | 11_construct_census_output.json |
+| 12 | ai_delivery | describe cell (assembled last) | 04_run/ | 12_ai_delivery_output.json · 12_ai_delivery_output.txt (human twin) |
+| 13 | build_stamp | build cell (bookkeeping) | 04_run/ | 13_build_stamp_output.json — hash of 01_sql_input at build time (ruled 2026-10-08) |
+
+THE 2026-10-08 RULINGS (land in WHEEL 0.7.0, one build):
+- THE SPLIT: the free whole-corpus work (05 + 06 + 08) moves
+  to its own BUILD cell; the paid batch (07 + 09 + 10 + 12)
+  stays in the DESCRIBE cell. deliver() survives as the
+  one-call wrapper (build then describe; her ruling). The
+  build cell stamps a content hash of 01_sql_input into
+  13_build_stamp_output.json; the describe cell recomputes
+  it FIRST and refuses on mismatch ("run the build cell
+  first") — no paid call against a stale graph.
+- DELIVERY = DELIVERED GOODS ONLY: 12_ai_delivery carries
+  only files that had their paid turn (they are in the 10
+  ledger). A gate-failed ledger file appears with technical
+  voice + its failure status (processed, honest). Waiting
+  files do NOT appear — the whole-corpus technical view lives
+  in 06, not in the delivery. A PBI report appears as soon as
+  ANY of its files is described, marked incomplete until all
+  are (her ruling: Collibra publish waits for completion —
+  her hand, her timing).
+- THE KEY IS A BLOCKING CHECK: cells run in sequence; a
+  failed prereq (key included) stops the sequence — fix,
+  then proceed. The degrade path dies.
 
 Who writes what (authorship)?
 - The artifact: machine-built by build_sqldesc_wheel.py,

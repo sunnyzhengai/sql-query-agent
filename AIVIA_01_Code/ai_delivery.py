@@ -32,7 +32,7 @@ keys.
 #   BEFORE writing (a red block does not ship -> raise).
 #
 # assemble(out_dir, dir07, dir08, dir06) — the 08+07 keys:
-#   rebuilds reports[] from 08_pbi_reports.json (absent file ->
+#   rebuilds reports[] from 08_pbi_lineage_output.json (absent file ->
 #   no reports, everything reportless) and reportless_files[]
 #   from the 06 file-grain rows; description per entry = the 07
 #   file card when the sheet carries one (voice: business), else
@@ -52,11 +52,79 @@ keys.
 # unchanged (her ruling: keep the per-files).
 # ====================================================================
 
+# ==== PSEUDO — 0.7.0 THE DELIVERED-GOODS RULING (2026-10-08; ====
+# the 09 contract's amendment + D14; AWAITING SUNNY'S APPROVAL;
+# red tests before code; the code follows).
+#
+#   THE NAME:
+#   1. FILE -> "12_ai_delivery_output.json". THE MIGRATION READ:
+#      load() reads the new name first; absent, the old
+#      ai_delivery.json once (a pre-rename tenant's terms and
+#      blessings survive); _write() always writes the new name.
+#
+#   MEMBERSHIP = THE LEDGER (assemble):
+#   2. assemble(out_dir, dir07, dir08, dir06, described=None) —
+#      described = the set of file stems that had their paid
+#      turn. None -> assemble reads the ledger itself from
+#      out_dir (new name, then old).
+#      NO LEDGER FILE AT ALL -> legacy mode: membership
+#      unfiltered (the home/repo flows have no ledger; work
+#      always has one — describe() records before assembling).
+#      [flagged for Sunny: this keeps the home estate green
+#      without a second delivery law — the work path always
+#      filters.]
+#   3. reportless_files[]: only described stems.
+#      reports[]: a report enters when ANY of its stems is
+#      described (her ruling) and carries two lists —
+#      files_described[] + files_waiting[] (full file names,
+#      same form as files[]). files_waiting empty == complete.
+#      Description blocks cover the DESCRIBED files only; voice
+#      business only when every described file carries a card.
+#      A report with zero described files appears NOWHERE.
+#   4. THE FAILURE STATUS (honest processed-but-failed): a
+#      described stem whose 07 row exists but is not
+#      gate_passed/blessed renders floor text with status
+#      "gate_failed" (today it hides as "floor"); a described
+#      stem with no 07 row at all stays status "floor".
+#
+#   UNCHANGED: update_terms (runs only over described files by
+#   construction), bless_term, _recount + the equations, the
+#   determinism laws (sorted, indent=1, no timestamps).
+#
+#   THE LOCKS (red before code, test_09 the shape owner):
+#   5. waiting file absent from reportless_files; half-described
+#      report present with correct lists; fully-described report
+#      files_waiting == []; zero-described report absent;
+#      gate_failed status rides out; no-ledger legacy mode
+#      unfiltered; load() migration (old-name delivery read,
+#      new name written).
+# ====================================================================
+
+# ==== PSEUDO — 0.8.0 AWAITING_HUMAN IN THE DELIVERY (D15, ====
+# ruled 2026-10-08 evening; the 09 contract's amendment;
+# AWAITING SUNNY'S APPROVAL; red tests before code):
+#   1. assemble's _desc: a described stem whose 07 row is
+#      awaiting_human ships NO business text — description =
+#      {"text": "", "voice": "none", "status":
+#      "awaiting_human"}; the entry gains "questions": the 07
+#      row's questions verbatim. The 2026-10-08-morning
+#      gate_failed/floor passthrough is SUPERSEDED (her
+#      evening reopen: a fallback is not a candidate).
+#   2. The txt twin renders it honestly: "AWAITING YOUR
+#      ANSWER on: <the questions>" — never a technical text
+#      in the business slot.
+#   3. The Collibra publish notebook skips awaiting_human
+#      entries (doc edit, same landing).
+# ===============================================================
+
 import json
 import re
 from pathlib import Path
 
-FILE = "ai_delivery.json"
+FILE = "12_ai_delivery_output.json"
+FILE_OLD = "ai_delivery.json"      # pre-0.7.0 tenants
+LEDGERS = ("10_corpus_ledger_output.json",
+           "10_corpus_ledger.json")
 
 
 def _read_json(path, default):
@@ -65,10 +133,15 @@ def _read_json(path, default):
 
 
 def load(out_dir):
-    return _read_json(
-        Path(out_dir) / FILE,
-        {"basis": {}, "reports": [], "reportless_files": [],
-         "counts": {}})
+    """THE MIGRATION READ (2026-10-08): new name first; a
+    pre-rename delivery (terms, blessings) is honored once —
+    every write lands the new name."""
+    for name in (FILE, FILE_OLD):
+        p = Path(out_dir) / name
+        if p.exists():
+            return json.loads(p.read_text())
+    return {"basis": {}, "reports": [], "reportless_files": [],
+            "counts": {}}
 
 
 def _write(out_dir, delivery):
@@ -193,22 +266,52 @@ def update_terms(out_dir, placed, skipped, basis, files_in_run):
     return _write(out_dir, delivery)
 
 
-def assemble(out_dir, dir07, dir08, dir06):
-    """The 08 + 07 keys; terms preserved by entry key."""
+def _described_stems(out_dir):
+    """The ledger's stems, or None when no ledger exists at all
+    — legacy mode: the home estate has no ledger; a work tenant
+    always does (describe() records before assembling)."""
+    for name in LEDGERS:
+        p = Path(out_dir) / name
+        if p.exists():
+            return {Path(n).stem for n in
+                    json.loads(p.read_text()).get("hashes", {})}
+    return None
+
+
+def assemble(out_dir, dir07, dir08, dir06, described=None):
+    """The 08 + 07 keys; terms preserved by entry key.
+    THE DELIVERED-GOODS RULING (2026-10-08): membership = the
+    ledger (described; None = read it from out_dir). A waiting
+    file appears NOWHERE; a report enters on its first described
+    file with files_described[] + files_waiting[] (empty waiting
+    == complete); description blocks cover described files only;
+    a zero-described report is absent. No ledger at all = legacy
+    unfiltered."""
     dir07, dir08, dir06 = Path(dir07), Path(dir08), Path(dir06)
+    if described is None:
+        described = _described_stems(out_dir)
+    def member(stem):
+        return described is None or stem in described
     delivery = load(out_dir)
     old_report_terms = {e["report"]: e.get("terms", [])
                         for e in delivery["reports"]}
     old_file_terms = {e["file"]: e.get("terms", [])
                       for e in delivery["reportless_files"]}
-    six = _read_json(dir06 / "06_description_sheet.json", [])
+    six = _read_json(dir06 / "06_technical_descriptions_output.json", [])
     floors = {r["node_id"].split("::")[1]: r["sentence"]
               for r in six if r["grain"] == "file"}
-    seven = _read_json(dir07 / "07_business_sheet.json", [])
+    seven = _read_json(dir07 / "07_business_descriptions_output.json", [])
     cards = {r["node_id"].split("::")[1]: r["audience_text"]
              for r in seven
              if r["grain"] == "file"
              and r.get("status") in ("gate_passed", "blessed")}
+    # processed-but-failed is honest (2026-10-08): a described
+    # file whose card missed the gate says so, never "floor"
+    failed = {r["node_id"].split("::")[1]: r["status"]
+              for r in seven
+              if r["grain"] == "file"
+              and r.get("status") not in ("gate_passed",
+                                          "blessed", None)}
 
     def _desc(stem):
         if stem in cards:
@@ -216,33 +319,41 @@ def assemble(out_dir, dir07, dir08, dir06):
                     "status": "gate_passed"}
         return {"text": floors.get(stem,
                                    "(no description rendered)"),
-                "voice": "technical", "status": "floor"}
+                "voice": "technical",
+                "status": failed.get(stem, "floor")}
 
-    reports = _read_json(dir08 / "08_pbi_reports.json", [])
+    reports = _read_json(dir08 / "08_pbi_lineage_output.json", [])
     delivery["reports"] = []
     tied = set()
     for r in sorted(reports, key=lambda r: r["name"]):
         stems = [f.removesuffix(".sql") for f in r["executes"]]
+        have = [s for s in stems if member(s)]
+        if not have:
+            continue      # zero described: not yet delivered
         tied.update(stems)
-        descs = [_desc(s) for s in stems]
+        descs = [_desc(s) for s in have]
         if len(descs) == 1:
             d = descs[0]
         else:  # one block per file; business only when all are
             d = {"text": "\n\n".join(
                     f"[{s}]\n{x['text']}"
-                    for s, x in zip(stems, descs)),
+                    for s, x in zip(have, descs)),
                  "voice": ("business" if all(
                      x["voice"] == "business" for x in descs)
                      else "technical"),
                  "status": "assembled"}
         delivery["reports"].append(
             {"report": r["name"], "files": sorted(r["executes"]),
+             "files_described": sorted(s + ".sql" for s in have),
+             "files_waiting": sorted(s + ".sql" for s in stems
+                                     if s not in have),
              "description": d,
              "terms": old_report_terms.get(r["name"], [])})
     delivery["reportless_files"] = [
         {"file": stem, "description": _desc(stem),
          "terms": old_file_terms.get(stem, [])}
-        for stem in sorted(set(floors) - tied)]
+        for stem in sorted(set(floors) - tied)
+        if member(stem)]
     if "09" in delivery["counts"]:
         _recount(delivery)
     return _write(out_dir, delivery)
@@ -261,8 +372,13 @@ def bless_term(out_dir, dir07, node_id, report, ruling):
     if row.get("name_collision") is not None:
         raise ValueError("a collided row must not bless (D5); "
                          "collides with: " + row["name_collision"])
-    reg_path = Path(dir07) / "07_blessing_registry.json"
-    registry = _read_json(reg_path, {})
+    reg_path = Path(dir07) / "07_business_descriptions_blessings_output.json"
+    registry = _read_json(reg_path, None)
+    if registry is None:   # the migration read (2026-10-08):
+        # honor a pre-rename registry once; the write below
+        # lands the new name — no blessing is ever lost
+        registry = _read_json(
+            Path(dir07) / "07_blessing_registry.json", {})
     terms = [t for t in registry.get("terms", [])
              if (t["node_id"], t["report"]) != (node_id, report)]
     terms.append({"node_id": node_id, "report": report,

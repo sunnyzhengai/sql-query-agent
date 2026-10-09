@@ -22,7 +22,11 @@ sys.path.insert(0, str(CODE_DIR))
 
 import sqldesc_cli  # noqa: E402
 
-LEDGER = "10_corpus_ledger.json"
+# THE NAMING LAW (ruled 2026-10-08, the step table): engine-made
+# files end _output. RED until the 0.7.0 renames land.
+LEDGER = "10_corpus_ledger_output.json"
+LEDGER_OLD = "10_corpus_ledger.json"
+STAMP = "13_build_stamp_output.json"
 
 
 def _corpus(tmp_path, names=("fix_a.sql", "fix_b.sql", "fix_c.sql")):
@@ -126,3 +130,172 @@ def test_preflight_fails_on_bare_name_collision(tmp_path):
     out.mkdir()
     fails = sqldesc_cli.preflight(tmdl, sql, out)
     assert any("Fix Twin" in f for f in fails), fails
+
+
+# =================================================================
+# 0.7.0 — D14 THE SPLIT + THE STAMP + THE NAMING LAW (ruled
+# 2026-10-08; pseudo APPROVED same day). RED until the code lands.
+# Free paths only: build() makes no paid call; describe() is
+# tested up to its refusals; its paid internals stay module-owned.
+# =================================================================
+
+
+def _tmdl_one(tmp_path):
+    """One workspace, one model — a preflight-clean tmdl."""
+    d = (tmp_path / "tmdl" / "Fix Model.SemanticModel" /
+         "definition" / "tables")
+    d.mkdir(parents=True)
+    (d / "T.tmdl").write_text(
+        "table T\n\n\tcolumn Fix Col\n"
+        "\t\tsourceColumn: Fix Col\n\n"
+        "\tpartition p1 = m\n\t\tmode: import\n\t\tsource =\n"
+        '\t\t\tlet q = Value.NativeQuery(db,\n'
+        '\t\t\t"EXEC rpt.FIX_A") in q\n')
+    return tmp_path / "tmdl"
+
+
+# --------------------------------------------- build(): the free door
+
+def test_build_writes_stamp_and_no_paid_outputs(tmp_path,
+                                                monkeypatch):
+    monkeypatch.setenv("OPENAI_API_KEY", "fix-dummy-key")
+    sql, out = _corpus(tmp_path)
+    tmdl = _tmdl_one(tmp_path)
+    sqldesc_cli.build(tmdl, sql, out)
+    stamp = out / STAMP
+    assert stamp.exists()
+    import json
+    body = json.loads(stamp.read_text())
+    assert set(body) >= {"corpus", "files"}
+    assert body["files"] == 3
+    assert (out / "05_semantic_graph").is_dir()
+    assert not (out / "07_business_descriptions").exists()
+    assert not (out / "12_ai_delivery_output.json").exists()
+    assert not (out / LEDGER).exists()
+
+
+def test_build_refuses_without_key(tmp_path, monkeypatch):
+    """D4 amendment: the key is a BLOCKING row for every door —
+    the sequence law, no degrade anywhere."""
+    monkeypatch.delenv("OPENAI_API_KEY", raising=False)
+    sql, out = _corpus(tmp_path)
+    tmdl = _tmdl_one(tmp_path)
+    try:
+        sqldesc_cli.build(tmdl, sql, out)
+        raise AssertionError("build ran without a key")
+    except ValueError as exc:
+        assert "OPENAI_API_KEY" in str(exc)
+    assert not (out / STAMP).exists()
+
+
+# ------------------------------------------ describe(): the guard
+
+def test_describe_without_build_refuses(tmp_path, monkeypatch):
+    monkeypatch.setenv("OPENAI_API_KEY", "fix-dummy-key")
+    sql, out = _corpus(tmp_path)
+    tmdl = _tmdl_one(tmp_path)
+    try:
+        sqldesc_cli.describe(tmdl, sql, out)
+        raise AssertionError("describe ran with no build stamp")
+    except ValueError as exc:
+        assert "run the build cell first" in str(exc)
+
+
+def test_describe_stale_stamp_refuses_before_paying(tmp_path,
+                                                    monkeypatch):
+    """A changed corpus after build = refusal, ledger untouched —
+    no paid call against a stale graph."""
+    monkeypatch.setenv("OPENAI_API_KEY", "fix-dummy-key")
+    sql, out = _corpus(tmp_path)
+    tmdl = _tmdl_one(tmp_path)
+    sqldesc_cli.build(tmdl, sql, out)
+    (sql / "fix_b.sql").write_text("SELECT 99 -- drifted\n")
+    try:
+        sqldesc_cli.describe(tmdl, sql, out)
+        raise AssertionError("describe ran against a stale build")
+    except ValueError as exc:
+        assert "run the build cell first" in str(exc)
+    assert not (out / LEDGER).exists()
+
+
+def test_describe_is_the_paid_door_signature(tmp_path):
+    """The ruled names: describe() is the batch door (max_new,
+    force); the old free txt door lives on as
+    describe_technical() — the CLI bare mode unchanged."""
+    import inspect
+    params = inspect.signature(sqldesc_cli.describe).parameters
+    assert "max_new" in params and "force" in params
+    assert hasattr(sqldesc_cli, "describe_technical")
+
+
+# ------------------------------------------- deliver(): the wrapper
+
+def test_deliver_is_build_then_describe(tmp_path, monkeypatch):
+    """Her ruling: deliver() survives as build + describe, nothing
+    more. Structural: the two doors record their calls; no engine
+    work, no seat, no cost."""
+    calls = []
+    monkeypatch.setattr(
+        sqldesc_cli, "build",
+        lambda *a, **k: calls.append(("build", k.get("dict_dir"))))
+    monkeypatch.setattr(
+        sqldesc_cli, "describe",
+        lambda *a, **k: calls.append(("describe", k.get("max_new"))))
+    sqldesc_cli.deliver("t", "s", "o", dict_dir=None, max_new=2)
+    assert [c[0] for c in calls] == ["build", "describe"]
+    assert calls[1][1] == 2
+
+
+# ------------------------- the migration read (the 20-file ledger)
+
+def test_old_ledger_name_still_counts_as_done(tmp_path):
+    """The first tenant holds 10_corpus_ledger.json with paid
+    files — the rename must NEVER cause a re-pay: the old name is
+    read when the new one is absent."""
+    import hashlib
+    import json
+    sql, out = _corpus(tmp_path)
+    h = hashlib.sha256((sql / "fix_a.sql").read_bytes()).hexdigest()
+    (out / LEDGER_OLD).write_text(
+        json.dumps({"hashes": {"fix_a.sql": h}}))
+    plan = sqldesc_cli.plan_corpus(sql, out)
+    assert plan["done"] == ["fix_a.sql"]
+    assert plan["new"] == ["fix_b.sql", "fix_c.sql"]
+
+
+def test_record_writes_the_new_ledger_name(tmp_path):
+    sql, out = _corpus(tmp_path)
+    sqldesc_cli.record_corpus(sql, out, files=["fix_a.sql"])
+    assert (out / LEDGER).exists()
+
+
+def test_delivery_txt_renders_reportless_files_too(tmp_path):
+    """Her find (2026-10-08, the view test): the human twin only
+    rendered reports[] — a views-heavy corpus printed EMPTY while
+    the json held everything. The twin renders BOTH sections."""
+    delivery = {
+        "reports": [{
+            "report": "Fix Dashboard",
+            "files": ["fix_a.sql"],
+            "files_described": ["fix_a.sql"],
+            "files_waiting": ["fix_b.sql"],
+            "description": {"text": "Alpha fix text.",
+                            "voice": "business",
+                            "status": "gate_passed"},
+            "terms": []}],
+        "reportless_files": [{
+            "file": "FIX_VIEW",
+            "description": {"text": "Fix view text.",
+                            "voice": "technical",
+                            "status": "floor"},
+            "terms": [{"bt_name": "Fix Term",
+                       "bt_name_status": "proposed",
+                       "business_description": "Fix card."}]}],
+    }
+    txt = sqldesc_cli._delivery_txt(delivery)
+    assert "REPORT: Fix Dashboard" in txt
+    assert "waiting: fix_b.sql" in txt
+    assert "FILE: FIX_VIEW" in txt        # reportless rendered
+    assert "no report ties to this file yet" in txt
+    assert "Fix view text." in txt
+    assert "TERM [proposed]: Fix Term" in txt
