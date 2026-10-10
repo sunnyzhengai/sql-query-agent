@@ -286,6 +286,28 @@ Read**, short expiry -> copy once. A PAT is a password: vault,
 or Step 04 Cell 1 Form 2's paste conditions and same-sitting
 scrub.
 
+ROTATE THE PAT AFTER EVERY PASTE-INTERIM USE (added
+2026-10-10 — a pasted PAT lands in cell history, screenshots,
+and screens shared in meetings; rotation makes every stray
+copy worthless):
+1. Finish the pull; scrub the cell back to `PASTE-PAT-HERE`
+   and save the notebook.
+2. Go to `dev.azure.com` -> click the **user-settings icon**
+   (the little person-with-gear, top right, next to your
+   avatar) -> **Personal access tokens**.
+3. Find the token in the list (name it by purpose when you
+   mint it, e.g. `tmdl-pull-2026-10-10`, so this step is a
+   one-glance find).
+4. Click the row's **...** menu -> **Revoke** -> confirm.
+   Revoke, not just let-expire — expiry still leaves a live
+   window.
+5. Verify: the row shows **Revoked**; re-running the pull
+   cell with the old value must now fail 401 (that failure
+   is the proof the stray copies are dead).
+6. Next pull day: **+ New Token**, scope **Code: Read**
+   only, expiry **7 days or less**, named by purpose; copy
+   once, paste, pull, scrub, and repeat this rotation.
+
     import io, os, shutil, zipfile, requests
 
     ORG, PROJECT, REPO = "<org>", "<project>", "<repo>"
