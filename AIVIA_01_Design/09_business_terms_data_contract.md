@@ -80,7 +80,24 @@ shape above stands in code):
   never rides the business slot. The Collibra notebook skips
   awaiting_human entries exactly as it skips files_waiting.
   (Supersedes this ruling's earlier gate-failed-shows-floor
-  line, two paragraphs up — same day, her reopen.) RETIRED by this ruling: 09_collibra_export
+  line, two paragraphs up — same day, her reopen.)
+  (AMENDED 2026-10-10, the 0.10.0 show-and-log ruling:
+  awaiting_human NARROWS to wording failures that exhaust
+  the repair budget. A file whose card ships WITH open
+  questions (a basis gap shown plainly) is DELIVERED — it
+  carries its normal status plus the "delivered with
+  questions" marker in the delivery txt, and it PUBLISHES
+  to Collibra; the marker lives in the delivery txt and the
+  scorecard, never in Collibra. The Collibra skip stays for
+  awaiting_human and files_waiting only.)
+  (AMENDED 2026-10-10 evening, the 0.11.0 uniform-ship
+  ruling: a gate_failed FILE CARD now ships its final text
+  in the BUSINESS voice — the technical floor no longer
+  stands in for it; the entry carries the registered
+  findings and PUBLISHES immediately (her ruling).
+  awaiting_human narrows to the empty-text class — three
+  failed calls, nothing to ship; only that class and
+  files_waiting keep the Collibra skip.) RETIRED by this ruling: 09_collibra_export
 .json (a pure subset), 09_terms_ledger.json (folds into
 counts.09), the standalone 09_business_terms.json sheet (the
 terms[] section is the rows' one home). THE ROW DIET (the

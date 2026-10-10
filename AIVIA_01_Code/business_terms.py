@@ -248,22 +248,38 @@ def _propose(proposer, node_id, docket):
     """THE REPAIR LOOP over THE ONE GATE (business_descriptions
     .gate, grain term_card — 09 ships no gate of its own). Named
     findings return to the proposer; budget 3; a call failure is
-    a failed round, never a dead build (the 07 precedent)."""
-    findings, prop = [], None
+    a failed round, never a dead build (the 07 precedent).
+    TIERED (11 D2/D3): the round rides the spec; the paid
+    proposer seats SMALL on rounds 1-2, LARGE on round 3, and
+    reports its seat as "_seat" — the row's honest model record.
+    An AccountRefusal stops the batch at the first refusal."""
+    findings, prop, seat = [], None, None
     for round_no in range(1, REPAIR_BUDGET + 1):
         try:
             prop = proposer({"node_id": node_id, "docket": docket,
-                             "findings": list(findings)})
+                             "findings": list(findings),
+                             "round": round_no})
+        except bd.AccountRefusal:
+            raise  # D6b: never a failed round
         except Exception as exc:  # noqa: BLE001
             findings = [f"call failed: {type(exc).__name__}: "
                         f"{str(exc)[:200]}"]
+            bd._meter_causes(findings)
             continue
+        if isinstance(prop, dict) and "_seat" in prop:
+            seat = prop.pop("_seat")
+            if seat == bd._MODEL_LARGE:
+                bd._METER["escalations"]["fired"] += 1
         findings = bd.gate(prop["business_description"], docket,
                            "term_card")
         if not findings:
-            return prop, "gate_passed", [], round_no
+            bd._meter_round(round_no)
+            if seat == bd._MODEL_LARGE:
+                bd._METER["escalations"]["landed"] += 1
+            return prop, "gate_passed", [], round_no, seat
+        bd._meter_causes(findings)
     prop = prop or {"bt_name": None, "business_description": None}
-    return prop, "gate_failed", findings, REPAIR_BUDGET
+    return prop, "gate_failed", findings, REPAIR_BUDGET, seat
 
 
 
@@ -350,7 +366,7 @@ def build09(dir05, dir06, dir02, dir07, dir08, out09,
                                    sentences, fparams)
         docket = "\n\n".join(
             x for x in (sentences.get(sid, ""), td) if x)
-        prop, status, findings, rounds = _propose(
+        prop, status, findings, rounds, seat = _propose(
             proposer, sid, docket)
         tied = sorted(by_file.get(fname, []))
         for rep in (tied or [None]):
@@ -363,6 +379,8 @@ def build09(dir05, dir06, dir02, dir07, dir08, out09,
                     prop["business_description"],
                 "technical_definition": td,
                 "status": status,
+                "model": seat,  # D4: the actual seat, or None
+                #                 for an injected proposer
             }
             if status == "gate_failed":  # audit only on failure
                 row["gate_findings"] = findings
@@ -420,8 +438,33 @@ TERM_INSTRUCTION = (
     "function calls, or numeric codes.")
 
 
+# ==== TIERED SEATS, THE 09 ARM — PSEUDO CODE (written BEFORE
+#      code; 11_tiered_seats.md D2/D3, Q1 RULED "use SMALL";
+#      awaiting Sunny's approval) ================================
+#
+# _propose passes the round into the spec:
+#   spec = {"node_id", "docket", "findings", "round": round_no}
+# _openai_proposer seats by the ruled ladder:
+#   seat = SMALL on rounds 1-2, LARGE on round 3 (the
+#   escalation; bd's meter counts fired/landed) — via
+#   bd._openai_caller(prompt, seat), so usage and the seat
+#   record ride bd's one meter.
+# The term row's "model" = the seat of the LAST attempt
+# (D4's honesty rule, same as the 07 rows).
+# AccountRefusal re-raises BEFORE the catch-all in _propose
+# (D6b): a dead wallet stops the batch at the first refusal.
+# Injected test proposers see "round" in the spec — the
+# seat-by-grain lock proves the ladder without one paid call.
+# ================================================================
+
+
 def _openai_proposer(spec):
-    """The paid seat (build-time only; tests always inject)."""
+    """The paid seat (build-time only; tests always inject).
+    TIERED (11 D2/D3): term cards are a SMALL grain — rounds
+    1-2 on the small seat, round 3 on the large one."""
+    seat = (bd._MODEL_SMALL
+            if spec.get("round", 1) < REPAIR_BUDGET
+            else bd._MODEL_LARGE)
     prompt = (bd.SYSTEM_PROMPT + "\n\n" + TERM_INSTRUCTION
               + "\n\nTHE BLOCK'S MEANING:\n" + spec["docket"]
               + "\n\nReturn line 1 as 'NAME: <the name>' then "
@@ -430,10 +473,11 @@ def _openai_proposer(spec):
         prompt += ("\n\nREPAIR — your previous card failed "
                    "these checks; fix every one:\n- "
                    + "\n- ".join(spec["findings"]))
-    text = bd._openai_caller(prompt)
+    text = bd._openai_caller(prompt, seat)
     lines = [ln for ln in text.split("\n") if ln.strip()]
     name = ""
     if lines and lines[0].upper().startswith("NAME:"):
         name = lines.pop(0).split(":", 1)[1].strip()
     return {"bt_name": name,
-            "business_description": "\n".join(lines)}
+            "business_description": "\n".join(lines),
+            "_seat": seat}

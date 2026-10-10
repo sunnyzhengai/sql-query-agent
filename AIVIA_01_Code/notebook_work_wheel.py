@@ -1,7 +1,8 @@
 # ruff: noqa: E402 — a notebook source: every cell imports what
 # it uses, so each cell runs alone (the notebook law).
 # notebook_work_wheel.py — THE WORK NOTEBOOK, whole and clean
-# (2026-10-08, the naming law + D14; requires wheel 0.8.0+).
+# (2026-10-09, tiered seats + the run scorecard; requires
+# wheel 0.9.0+).
 #
 # This file is the SOURCE OF TRUTH for the tenant notebook.
 # Push it to Fabric with one command from the home repo
@@ -212,6 +213,11 @@ sqldesc_cli.build(
 # RUN 5 — DESCRIBE (paid, the batch): the next 10 new files go
 # to the LLM; cards + terms + the ledger + the delivery. Quiet
 # minutes = paid calls working. Re-run until "0 remain".
+# The cell ends by printing THE RUN SCORECARD (also written to
+# 04_run/14_run_scorecard_output.txt): status by grain, failure
+# causes biggest first, rounds, your open questions (the
+# answers file) and AWAITING items, step timings, and per-seat
+# tokens + dollars.
 import sqldesc_cli
 
 delivery = sqldesc_cli.describe(
@@ -229,18 +235,35 @@ print(open("/lakehouse/default/Files/04_run/"
            "12_ai_delivery_output.txt").read()[:4000])
 
 # %%
-# ANSWER — the data owner's hand only (D15): rule on a number
-# the delivery says it is AWAITING. "show" = the number may
-# appear; "omit" = the card must speak without it. To GIVE IT
-# A MEANING instead: add the inline comment in the SQL itself
-# and re-run BUILD + DESCRIBE — the SQL is the one meaning
-# store. After show/omit, re-run DESCRIBE: exactly that card
-# re-proposes, nothing else pays.
-import business_descriptions as bd
-
-bd.answer("/lakehouse/default/Files/04_run/"
-          "07_business_descriptions",
-          "<node_id>", "<number>", "show")
+# ANSWERS — the data owner's hand only (0.10.0, ruled
+# 2026-10-10): every unmapped number the cards show is ONE row
+# in ONE file:
+#   04_run/07_business_descriptions/
+#   07_business_descriptions_answers_output.csv
+# Open it (Excel works), fill the "answer" column on any open
+# row, save, then re-run DESCRIBE — exactly the answered cards
+# re-propose, nothing else pays. On a VALUE row (kind=value,
+# an unmapped number) the answer column takes:
+#   the meaning in plain words  -> stored in the dictionary,
+#                                  the card speaks it
+#   show                        -> the number stays as shown
+#                                  (closes free, no paid call)
+#   omit                        -> the card is rewritten
+#                                  without the number
+# On a WORDING row (kind=wording, a registered gate finding on
+# a shipped card) it takes:
+#   your own card text          -> becomes your BLESSED text,
+#                                  rendered next run, free
+#   accept                      -> the shipped text stands
+#                                  (recorded waiver, free)
+# You can also: add an inline comment in the SQL itself (the
+# first-choice meaning store) and re-run BUILD + DESCRIBE, or
+# load value meanings into 02_dictionary — both close the open
+# rows on the next DESCRIBE. This cell just shows the file:
+print(open("/lakehouse/default/Files/04_run/"
+           "07_business_descriptions/"
+           "07_business_descriptions_answers_output.csv")
+      .read())
 
 # %%
 # BLESS — the data owner's hand only (edit the placeholders,

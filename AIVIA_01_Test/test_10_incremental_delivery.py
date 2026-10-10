@@ -319,3 +319,47 @@ def test_delivery_txt_says_awaiting_plainly(tmp_path):
     assert "AWAITING YOUR ANSWER" in txt
     assert "999" in txt
     assert "voice: technical" not in txt
+
+
+def test_delivery_txt_marks_delivered_with_questions(tmp_path):
+    """0.10.0 (ruled 2026-10-10): a shipped file with open
+    questions reads as DELIVERED — the visible marker plus the
+    questions, never a block."""
+    delivery = {
+        "reports": [],
+        "reportless_files": [{
+            "file": "FIX_SHOWN",
+            "description": {"text": "Shows the 999 records.",
+                            "voice": "business",
+                            "status": "gate_passed"},
+            "open_questions": [{"number": "999", "where": None,
+                                "finding": "V-1: number 999 has "
+                                           "no stored basis"}],
+            "terms": []}],
+    }
+    txt = sqldesc_cli._delivery_txt(delivery)
+    assert "DELIVERED WITH QUESTIONS" in txt
+    assert "Shows the 999 records." in txt    # the text ships
+    assert "999" in txt                       # the question reads
+    assert "AWAITING YOUR ANSWER" not in txt  # not a block
+
+
+def test_delivery_txt_marks_delivered_with_findings(tmp_path):
+    """0.11.0 (ruled 2026-10-10 evening): a gate_failed card
+    reads as DELIVERED — the text, then the registered
+    findings verbatim; never a block."""
+    delivery = {
+        "reports": [],
+        "reportless_files": [{
+            "file": "FIX_FAILED",
+            "description": {"text": "Reads the fix table.",
+                            "voice": "business",
+                            "status": "gate_failed"},
+            "open_findings": ["V-3: SQL word 'table'"],
+            "terms": []}],
+    }
+    txt = sqldesc_cli._delivery_txt(delivery)
+    assert "DELIVERED WITH FINDINGS" in txt
+    assert "Reads the fix table." in txt      # the text ships
+    assert "SQL word 'table'" in txt          # the register
+    assert "AWAITING YOUR ANSWER" not in txt  # not a block

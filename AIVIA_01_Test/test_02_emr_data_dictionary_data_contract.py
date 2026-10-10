@@ -27,9 +27,14 @@ SQL_DIR = REPO_ROOT / "AIVIA_01_Data" / "01_subject_sql_files"
 sys.path.insert(0, str(CODE_DIR))
 import scriptdom_loader  # noqa: E402
 
+SUBJECT_COUNT = 9  # 8 census files + V_CCHP_PregnantMembers_PBI
+#                    (her ruling 2026-10-10: the view stays in
+#                    the corpus; its 4 unknown tables sit on the
+#                    dictionary-extraction queue)
+
 
 def subject_sql_files():
-    """The 8 subject files — same rule as phase 01: every visible
+    """The subject files — same rule as phase 01: every visible
     non-json file in the folder."""
     return sorted(
         p for p in SQL_DIR.iterdir()
@@ -58,11 +63,12 @@ def test_one_real_subject_file_parses_clean():
     assert messages == []
 
 
-def test_all_8_subject_files_parse_clean():
+def test_all_subject_files_parse_clean():
     # The phase gate: ScriptDom must clear the whole corpus before the
     # tree mapper is built on top of it.
     files = subject_sql_files()
-    assert len(files) == 8, f"expected the 8 subject files, found {len(files)}"
+    assert len(files) == SUBJECT_COUNT, \
+        f"expected {SUBJECT_COUNT} subject files, found {len(files)}"
     failures = {}
     for path in files:
         sql = path.read_text(encoding="utf-8-sig")
@@ -139,12 +145,12 @@ def _walk_nodes(obj, skip=()):
             yield from _walk_nodes(item, skip)
 
 
-def test_tree_covers_all_8_files_sorted(extraction):
+def test_tree_covers_all_files_sorted(extraction):
     entries, out = extraction
     assert out.exists(), "the json must land where the parameter says"
     names = [e["name"] for e in entries]
     assert names == sorted(names)
-    assert len(entries) == 8
+    assert len(entries) == SUBJECT_COUNT
     for e in entries:
         assert e["node"] == "file"
         assert e["dialect"] == "tsql"
@@ -1068,14 +1074,16 @@ def real_graph():
 def test_real_graph_structure_pins_the_corpus(real_graph):
     census = real_graph["census"]
     # Re-based 2026-10-02: the CR_STAT_EXECUTION supplemental entry.
-    assert census["tables"] == 41 and census["columns"] == 1631
-    assert census["joins_by_fk"] == 216  # re-based 2026-10-03: ZC_EVENT scope      # the in-scope join rows
-    assert census["joins_by_rule"] == 182    # DATETIME columns, L08
+    assert census["tables"] == 45 and census["columns"] == 1648
+    assert census["joins_by_fk"] == 220  # re-based 2026-10-10 (+4 supplemental view joins); 2026-10-03: ZC_EVENT scope
+    assert census["joins_by_rule"] == 184    # DATETIME columns, L08
     # (+1 2026-10-02: EXEC_START_TIME's date_dimension rule edge)
     # shape 9 closes: ONE component with the rule edges built —
     # CR_STAT_EXECUTION joins the component through its rule edge
     assert len(census["components"]) == 1
-    assert len(census["components"][0]) == 41  # re-based 2026-10-03: the ZC tables join through the ADT fk edges
+    assert len(census["components"][0]) == 45  # re-based 2026-10-10: the four supplemental view tables
+    # join through their supplemental fk edges; 2026-10-03: the
+    # ZC tables join through the ADT fk edges
 
 
 def test_first_lock_round_rulings_are_mapped(extraction):

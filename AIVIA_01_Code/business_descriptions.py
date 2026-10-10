@@ -97,8 +97,10 @@ S1-S11 and the gate checks G-1..G-7 are ruled design law.
 # "THE GATE v2" section and the design doc's Gate v2 ruling are
 # the law the code below implements. ============================
 
+import csv
 import json
 import re
+import time
 from pathlib import Path
 
 import technical_descriptions as td
@@ -542,6 +544,144 @@ def _field_nodes(dir05, dir02, dir01=None):
 #   7. Repair rounds stay 3 for every repairable class;
 #      basis_gap alone skips them (her words: the goal is not
 #      to fall back — surface to the human).
+#   (ITEMS 3-7 SUPERSEDED 2026-10-10 by the 0.10.0 ANSWERS
+#   FILE block below — basis gaps now ship with the number
+#   shown; awaiting_human narrows to wording failures;
+#   bd.answer() retires. Items 1-2 stand whole.)
+# ===============================================================
+#
+# ==== PSEUDO — 0.10.0 THE ANSWERS FILE (ruled 2026-10-10, ====
+# her words: "when a value is not mapped, can we just show
+# it? don't block the description ... log it in the human
+# eyes log" + "one file, all answers in it, retire the
+# ANSWER cell"; contracts amended same day: 07 status +
+# answers file + V-1, 10 D15, 11 D3/D8 + scorecard keys,
+# 09 awaiting/publish, 02 second writer; AWAITING SUNNY'S
+# APPROVAL; red tests before code):
+#
+#   THE DEFAULT FLIP (supersedes 0.8.0 items 3-7):
+#   1. A basis_gap number no longer blocks: the card SHIPS,
+#      the digits spoken plainly through the column's words
+#      ("departments 100108047, ..."), claiming NO meaning.
+#      Still zero repair rounds, zero escalation for the gap
+#      itself; a card that ASSERTS an unstored meaning still
+#      fails V-1 — show-plainly never licenses invention.
+#   2. The shipped row carries open_questions:
+#      [{"number", "where" (table.column), "finding"}].
+#      awaiting_human remains ONLY for the wording class
+#      that exhausts the 3-round budget (audience_text
+#      empty, last_proposal + gate_findings kept, as today).
+#
+#   THE ONE ANSWERS FILE (the human-eyes log, editable):
+#   3. <out07>/07_business_descriptions_answers_output.csv —
+#      one row per question: node_id, file, where, value,
+#      asked_at, answer (BLANK | meaning text | show |
+#      omit), answered_at, status (open | closed),
+#      closed_by (comment | answer | dictionary | show |
+#      omit). CSV so the data owner fills it in Excel and
+#      it can travel.
+#   4. MERGE-NEVER-OVERWRITE: describe() APPENDS new
+#      question rows (key: node_id + where + value) and
+#      never touches a human-filled cell; a question already
+#      present (open or closed) is never re-added.
+#
+#   THE PICKUP (every describe run, before proposing —
+#   no watcher, no new daemon):
+#   5. For each OPEN row, in order:
+#      a. file hash changed (SQL comment added) -> the hash
+#         retake as today; close as closed_by=comment.
+#      b. answer = meaning text -> write the 02 value
+#         meaning (provenance = answers file, dated) ->
+#         that one node re-proposes with the meaning in the
+#         docket (one paid call); close as closed_by=answer.
+#      c. answer = show -> close FREE (the card already
+#         shows the number); no retake, closed_by=show.
+#      d. answer = omit -> one retake told to speak without
+#         it; close as closed_by=omit.
+#      e. the 02 dictionary now resolves (where, value) —
+#         the F1 bulk route landed -> retake with the
+#         meaning; close as closed_by=dictionary.
+#   6. The retake is the checkpoint-seed retake (one node,
+#      one paid card, nothing else pays); on gate pass the
+#      row's open_questions entry clears.
+#
+#   THE RETIREMENTS + SURFACES:
+#   7. bd.answer() RETIRES (no shim — the notebook cell goes
+#      with it; the runbook ANSWER step rewrites to "fill
+#      the answers CSV, re-run DESCRIBE").
+#   8. Delivery txt: a file whose rows carry open_questions
+#      prints "DELIVERED WITH QUESTIONS (n)" + the rows;
+#      AWAITING keeps only wording failures. Collibra
+#      publish PROCEEDS for delivered-with-questions files;
+#      the skip stays for awaiting_human + files_waiting.
+#   9. Scorecard: status_counts gain
+#      delivered_with_questions; new questions block {open,
+#      closed_this_run, by_closure}; awaiting[] = wording
+#      only; conservation: questions.open == the file's
+#      open rows, closed_this_run == sum(by_closure).
+# ===============================================================
+#
+# ==== PSEUDO — 0.11.0 THE UNIFORM SHIP (ruled 2026-10-10 ====
+# evening, her words: "ship description for this type of gate
+# failures, and register the reason/wording violations ...
+# does not stop the production ... does not get lost either";
+# her two rulings same sitting: ALL finding classes ship
+# (uniform), publish IMMEDIATELY; contracts amended same
+# evening: 07 status+answers file, 09 voice+publish, 10 D15,
+# 11 scorecard; AWAITING SUNNY'S APPROVAL; red before code):
+#
+#   THE SHIP (supersedes the 0.10.0 wording-waits rule):
+#   1. _propose_loop exhaust WITH text -> status gate_failed,
+#      the final text ships as audience_text; findings kept
+#      verbatim on the row (the register). Exhaust with NO
+#      text (three failed calls) -> awaiting_human, the last
+#      class standing.
+#   2. effective ladder: blessed > gate_passed > gate_failed
+#      (> floor); a blessed sentence still silences a failed
+#      card at render, free.
+#
+#   THE REGISTER (the one answers file grows):
+#   3. CSV gains kind (value | wording) + finding columns.
+#      MIGRATION READ: an old csv without them reads once as
+#      kind=value; every write lands the new header.
+#   4. A shipped gate_failed card adds one wording row per
+#      finding: kind=wording, value empty, finding verbatim.
+#      Value rows now carry their finding text too.
+#   5. HER ANSWERS on a wording row:
+#      - replacement text -> a BLESSED sentence in the 07
+#        registry (dated, provenance = the answers file; the
+#        ratify clause's second hand door) -> next build
+#        renders her words, ZERO paid calls; closed_by=bless.
+#        ALL the node's wording rows close together (one text
+#        answers every finding on the card).
+#      - "accept" -> the shipped text stands, a recorded
+#        waiver; closed_by=accept; no retake.
+#      - blank -> stays open; never lost, never re-added.
+#   6. A re-proposed node (hash change) whose finding
+#      dissolved closes its wording rows as closed_by=comment
+#      (same law as value rows).
+#
+#   THE MIGRATION (free, the PTA/LOTE unblock):
+#   7. A CARRIED awaiting_human row WITH last_proposal
+#      converts at carry time: status gate_failed,
+#      audience_text = last_proposal, findings registered to
+#      the csv — zero paid calls. A carried awaiting row with
+#      NO text stays awaiting (nothing to ship).
+#
+#   THE SURFACES:
+#   8. ai_delivery: a gate_failed FILE row ships BUSINESS
+#      voice (the technical floor no longer stands in);
+#      status gate_failed rides the entry; registered
+#      findings ride as open_findings; publish proceeds
+#      (her ruling) — the Collibra skip keeps only
+#      awaiting_human + files_waiting.
+#   9. Delivery txt: "DELIVERED WITH FINDINGS (n)" + the
+#      findings verbatim under the text; AWAITING remains
+#      only for empty-text cards.
+#  10. Scorecard: gate_failed joins status_counts;
+#      questions{} counts wording rows too (they live in the
+#      same csv); by_closure gains bless + accept;
+#      awaiting[] = empty-text cards only.
 # ===============================================================
 #
 # ==== PSEUDO — 0.7.0 THE 07 RENAMES (the naming law, ruled ====
@@ -563,6 +703,120 @@ def _field_nodes(dir05, dir02, dir01=None):
 #   The other three regenerate whole. Readers: ai_delivery,
 #   sqldesc_cli + fixtures, same landing.
 # ===============================================================
+# ==== THE ANSWERS FILE (0.10.0, ruled 2026-10-10 — "one file,
+# all answers in it"; the human-eyes log made editable) =========
+
+ANSWERS_NAME = "07_business_descriptions_answers_output.csv"
+_ANSWERS_FIELDS = ["node_id", "file", "kind", "where", "value",
+                   "finding", "asked_at", "answer",
+                   "answered_at", "status", "closed_by"]
+_VALUES_SHEET = "02_emr_data_dictionary_extraction_value.json"
+
+
+def _read_answers(path):
+    path = Path(path)
+    if not path.exists():
+        return []
+    with open(path, newline="") as fh:
+        rows = list(csv.DictReader(fh))
+    for r in rows:
+        # THE MIGRATION READ (0.11.0): a pre-0.11.0 csv has no
+        # kind/finding columns — old rows read as kind=value;
+        # every write lands the new header
+        r.setdefault("kind", "value")
+        r.setdefault("finding", "")
+        r["kind"] = r["kind"] or "value"
+    return rows
+
+
+def _write_answers(path, rows):
+    with open(path, "w", newline="") as fh:
+        w = csv.DictWriter(fh, fieldnames=_ANSWERS_FIELDS)
+        w.writeheader()
+        w.writerows(rows)
+
+
+def _close_answer(a, how):
+    a["status"] = "closed"
+    a["closed_by"] = how
+    a["answered_at"] = time.strftime("%Y-%m-%d")
+    _METER["closures"][how] = \
+        _METER["closures"].get(how, 0) + 1
+
+
+def _dictionary_meaning(dir02, where, value):
+    """The F1 bulk route: a stored (table, code) meaning. The
+    table must be KNOWN (the where) — a bare code matched across
+    every table would invent a basis, and no mechanism may."""
+    if not where:
+        return None
+    table = str(where).split(".")[0].upper()
+    vp = Path(dir02) / _VALUES_SHEET
+    if not vp.exists():
+        return None
+    for r in json.loads(vp.read_text()):
+        if str(r.get("table_name", "")).upper() == table \
+                and str(r.get("code")) == str(value):
+            return r.get("meaning")
+    return None
+
+
+def _store_value_meaning(dir02, where, value, meaning):
+    """Her filled meaning becomes a 02 value-meaning row —
+    the one store, provenance kept (the 02 contract's second
+    writer, amended 2026-10-10)."""
+    vp = Path(dir02) / _VALUES_SHEET
+    vals = json.loads(vp.read_text()) if vp.exists() else []
+    vals.append({"table_name": str(where or "").split(".")[0],
+                 "code": str(value), "meaning": meaning,
+                 "source": ANSWERS_NAME,
+                 "dated": time.strftime("%Y-%m-%d")})
+    vp.write_text(json.dumps(vals, indent=1))
+
+
+def _bless_from_answers(out07, bless_texts):
+    """0.11.0: a replacement text filled on a wording row lands
+    as HER blessed sentence — dated, provenance the answers
+    file. Delta-by-name: one sentence per node, the new ruling
+    replaces the old."""
+    out07 = Path(out07)
+    reg_path = out07 / \
+        "07_business_descriptions_blessings_output.json"
+    read_path = reg_path
+    if not read_path.exists():
+        legacy = out07 / "07_blessing_registry.json"
+        if legacy.exists():
+            read_path = legacy
+    registry = (json.loads(read_path.read_text())
+                if read_path.exists()
+                else {"names": [], "sentences": []})
+    today = time.strftime("%Y-%m-%d")
+    for node_id, text in bless_texts.items():
+        registry["sentences"] = [
+            s for s in registry.get("sentences", [])
+            if s.get("node_id") != node_id]
+        registry["sentences"].append(
+            {"node_id": node_id, "blessed_text": text,
+             "ruling": f"RULED {today} (the data owner, via "
+                       f"{ANSWERS_NAME}): wording answer"})
+    reg_path.write_text(json.dumps(registry, indent=1))
+
+
+def _inject_meanings(docket, pairs):
+    """The retake's docket carries the answered meaning as an
+    annotation pair — the card speaks the words, V-1 grounds
+    them."""
+    extra = "\n".join(f"- '{m}' ({v})" for v, m in pairs)
+    if isinstance(docket, dict):
+        docket = dict(docket)
+        docket["facts"] = (docket.get("facts") or "") \
+            + "\n" + extra
+        docket["text"] = (docket.get("text") or "") \
+            + "\n" + extra
+        return docket
+    return docket + "\n" + extra
+
+
 def build07(dir05, dir06, out07, dir02, no_llm=False,
             proposer=None, only_file=None,
             skip_files=frozenset(), defer_files=frozenset()):
@@ -591,10 +845,18 @@ def build07(dir05, dir06, out07, dir02, no_llm=False,
         six = [r for r in six
                if r["node_id"].split("::")[1] not in defer_files]
     skip_files = frozenset(skip_files) & set(files)
-    # THE RETAKE (D15): a skipped file's awaiting row WITH her
-    # verdict re-proposes — alone; its siblings seed the
-    # checkpoint so nothing else re-pays.
+    # THE PICKUP (0.10.0, ruled 2026-10-10 — supersedes the
+    # verdict-on-the-row retake): the answers file is the one
+    # human door. A filled answer on a carried row closes its
+    # question — show closes FREE, omit re-proposes without the
+    # number, a meaning lands in 02 and re-proposes with it; a
+    # 02 dictionary row that arrived since (the F1 bulk route)
+    # closes the same way. Only the answered nodes re-pay; their
+    # siblings seed the checkpoint (the retake mechanics stand).
+    answers_path = out07 / ANSWERS_NAME
+    answers = _read_answers(answers_path)
     retake_verdicts = {}
+    retake_meanings = {}
     checkpoint_seed = {}
     carried = []
     if skip_files:
@@ -618,15 +880,98 @@ def build07(dir05, dir06, out07, dir02, no_llm=False,
                 "for: " + ", ".join(missing))
         carried = [r for r in prior_rows
                    if r["node_id"].split("::")[1] in skip_files]
-        retaking = [r for r in carried
-                    if r.get("status") == "awaiting_human"
-                    and r.get("verdicts")]
-        if retaking:
-            retake_files = {r["node_id"].split("::")[1]
-                            for r in retaking}
-            retake_ids = {r["node_id"] for r in retaking}
-            retake_verdicts = {r["node_id"]: r["verdicts"]
-                               for r in retaking}
+        # THE CONVERT (0.11.0, free — the PTA/LOTE unblock): a
+        # carried awaiting row that HOLDS a rejected card ships
+        # it — status gate_failed, zero paid calls; its numbered
+        # questions become open value questions, its findings
+        # register below. An awaiting row with NO text stays.
+        converted = []
+        for r in carried:
+            if r.get("status") == "awaiting_human" \
+                    and r.get("last_proposal"):
+                r = dict(r)
+                r["status"] = "gate_failed"
+                r["audience_text"] = r.pop("last_proposal")
+                r["open_questions"] = [
+                    q for q in r.pop("questions", [])
+                    if q.get("number")]
+            converted.append(r)
+        carried = converted
+        by_id = {r["node_id"]: r for r in carried}
+        retake_ids = set()
+        bless_texts = {}
+        for a in answers:
+            if a.get("status") != "open":
+                continue
+            row = by_id.get(a["node_id"])
+            if row is None:
+                continue
+            ans = (a.get("answer") or "").strip()
+            if a.get("kind") == "wording":
+                # 0.11.0: a wording row takes "accept" (the
+                # shipped text stands, recorded waiver) or her
+                # REPLACEMENT TEXT (-> a blessed sentence,
+                # applied below); blank stays open
+                if ans == "accept":
+                    _close_answer(a, "accept")
+                elif ans:
+                    bless_texts[a["node_id"]] = ans
+                continue
+            if ans == "show":
+                if row.get("status") == "awaiting_human":
+                    # a BLOCKED row (an 0.8.0/0.9.0 tenant's
+                    # carry, or a wording failure): no text
+                    # shipped — show must re-propose, steered
+                    retake_verdicts.setdefault(
+                        a["node_id"], {})[str(a["value"])] = \
+                        "show"
+                    retake_ids.add(a["node_id"])
+                else:
+                    # the card already shows the number —
+                    # closes FREE
+                    row = dict(row)
+                    row["open_questions"] = [
+                        q for q in row.get("open_questions", [])
+                        if str(q.get("number")) != str(a["value"])]
+                    by_id[a["node_id"]] = row
+                _close_answer(a, "show")
+            elif ans == "omit":
+                retake_verdicts.setdefault(
+                    a["node_id"], {})[str(a["value"])] = "omit"
+                retake_ids.add(a["node_id"])
+                _close_answer(a, "omit")
+            elif ans:
+                # her meaning: the 02 store grows, the retake
+                # speaks it (one paid card)
+                _store_value_meaning(dir02, a.get("where"),
+                                     a["value"], ans)
+                retake_meanings.setdefault(
+                    a["node_id"], []).append((a["value"], ans))
+                retake_ids.add(a["node_id"])
+                _close_answer(a, "answer")
+            else:
+                m = _dictionary_meaning(dir02, a.get("where"),
+                                        a["value"])
+                if m is not None:
+                    retake_meanings.setdefault(
+                        a["node_id"], []).append((a["value"], m))
+                    retake_ids.add(a["node_id"])
+                    _close_answer(a, "dictionary")
+        carried = list(by_id.values())
+        if bless_texts:
+            # HER REPLACEMENT TEXT -> the blessed sentence (the
+            # ratify clause's second hand door: the fill IS her
+            # dated ruling, provenance the answers file); free —
+            # the render below speaks her words, no paid call.
+            # ALL the node's open wording rows close together.
+            _bless_from_answers(out07, bless_texts)
+            for a in answers:
+                if a.get("kind") == "wording" \
+                        and a.get("status") == "open" \
+                        and a["node_id"] in bless_texts:
+                    _close_answer(a, "bless")
+        if retake_ids:
+            retake_files = {n.split("::")[1] for n in retake_ids}
             checkpoint_seed = {
                 r["node_id"]: r for r in carried
                 if r["node_id"].split("::")[1] in retake_files
@@ -660,8 +1005,10 @@ def build07(dir05, dir06, out07, dir02, no_llm=False,
                 dir05, dir06, dir02, f)
         else:
             _, items = render_facts(dir05, dir06, dir02, f)
+            t_v = time.monotonic()
             voices = voice_facts(
                 items, out07 / "07_business_descriptions_fact_voices_output.json", registry)
+            _meter_stage("fact_voices", time.monotonic() - t_v)
             docket, _items = docket_v2_for_file(
                 dir05, dir06, dir02, f, voices=voices)
         (out07 / f"{f}.facts.txt").write_text(
@@ -716,15 +1063,35 @@ def build07(dir05, dir06, out07, dir02, no_llm=False,
             if node_id in done:
                 rows.append(done[node_id])
                 continue
+            t_run = time.monotonic()
+            if node_id in retake_meanings:
+                # the answered meaning rides the docket as an
+                # annotation pair — the retake speaks the words
+                docket = _inject_meanings(
+                    docket, retake_meanings[node_id])
             if run is _propose_loop:
                 text, status, findings, used = run(
                     grain, _docket_text(docket), docket,
                     registry,
                     verdicts=retake_verdicts.get(node_id))
+                questions = last_questions()
             else:
-                text, status, findings, used = run(
-                    grain, _docket_text(docket), docket,
-                    registry)
+                res = run(grain, _docket_text(docket), docket,
+                          registry)
+                text, status, findings, used = res[0], res[1], \
+                    res[2], res[3]
+                # an injected proposer MAY return a 5th element:
+                # the shipped card's open questions (0.10.0)
+                questions = (list(res[4]) if len(res) > 4
+                             else [])
+            _meter_stage("cards_field" if grain == "field"
+                         else "cards_file_scope",
+                         time.monotonic() - t_run)
+            # D4: the row records the seat that actually wrote
+            # the shipped (or last-attempted) text; an injected
+            # proposer has no seat — None is the honest record.
+            seat_used = _LAST_SEAT if run is _propose_loop \
+                else None
             # D15: awaiting_human ships NO business text — the
             # floor never rides the business slot again
             if status == "awaiting_human":
@@ -736,8 +1103,13 @@ def build07(dir05, dir06, out07, dir02, no_llm=False,
             row = {"node_id": node_id, "grain": grain,
                    "audience_text": shown,
                    "status": status, "gate_findings": findings,
-                   "rounds_used": used, "model": _MODEL_NAME,
+                   "rounds_used": used, "model": seat_used,
                    "basis_version": BASIS_VERSION}
+            if status not in ("floor", "awaiting_human"):
+                # 0.10.0: the shipped card's basis gaps ride
+                # OUT as open questions — shown, logged, never
+                # a block
+                row["open_questions"] = questions
             if status in ("floor", "awaiting_human") and text:
                 row["last_proposal"] = text  # her eye: what
                 #                      wanted saying, and why not
@@ -761,6 +1133,87 @@ def build07(dir05, dir06, out07, dir02, no_llm=False,
             ck_path.unlink()  # the sheet lands whole below
 
     rows.extend(carried)  # the skipped files' prior rows, verbatim
+
+    # THE MERGE (0.10.0): the engine only ADDS question rows and
+    # closes what resolved — a human-filled cell is never
+    # touched, a known question never re-enters. A re-proposed
+    # node whose old question dissolved closed by the SQL itself
+    # (the inline comment — closed_by comment).
+    def _askable(r):
+        # shipped rows ask through open_questions; awaiting rows
+        # (the wording class, and pre-0.10.0 carries) ask through
+        # their numbered questions — ONE file holds them all
+        if r.get("status") == "awaiting_human":
+            return [q for q in r.get("questions", [])
+                    if q.get("number")]
+        return r.get("open_questions", [])
+
+    spec_ids = {s[0] for s in specs} if not no_llm else set()
+    open_now = {}
+    findings_now = {}
+    for r in rows:
+        open_now[r["node_id"]] = {
+            str(q.get("number")) for q in _askable(r)}
+        findings_now[r["node_id"]] = (
+            set(r.get("gate_findings", []))
+            if r.get("status") == "gate_failed" else set())
+    for a in answers:
+        if a.get("status") != "open" \
+                or (a.get("answer") or "").strip():
+            continue
+        if a["node_id"] not in spec_ids:
+            continue
+        if a.get("kind") == "wording":
+            # the SQL changed and the finding dissolved
+            if a.get("finding") not in \
+                    findings_now.get(a["node_id"], set()):
+                _close_answer(a, "comment")
+        elif str(a["value"]) not in \
+                open_now.get(a["node_id"], set()):
+            _close_answer(a, "comment")
+    known = {(a["node_id"], a.get("where") or "",
+              str(a["value"])) for a in answers
+             if a.get("kind") != "wording"}
+    known_w = {(a["node_id"], a.get("finding") or "")
+               for a in answers if a.get("kind") == "wording"}
+    today = time.strftime("%Y-%m-%d")
+    for r in rows:
+        stem = r["node_id"].split("::")[1] \
+            if "::" in r["node_id"] else r["node_id"]
+        for q in _askable(r):
+            key = (r["node_id"], q.get("where") or "",
+                   str(q.get("number")))
+            if key in known:
+                continue
+            known.add(key)
+            answers.append(
+                {"node_id": r["node_id"], "file": stem,
+                 "kind": "value",
+                 "where": q.get("where") or "",
+                 "value": str(q.get("number")),
+                 "finding": q.get("finding") or "",
+                 "asked_at": today,
+                 "answer": "", "answered_at": "",
+                 "status": "open", "closed_by": ""})
+        # 0.11.0 THE REGISTER: a shipped gate_failed card adds
+        # one wording row per finding — never lost, never again
+        # a block
+        if r.get("status") == "gate_failed":
+            for f in r.get("gate_findings", []):
+                wkey = (r["node_id"], f)
+                if wkey in known_w:
+                    continue
+                known_w.add(wkey)
+                answers.append(
+                    {"node_id": r["node_id"], "file": stem,
+                     "kind": "wording", "where": "",
+                     "value": "", "finding": f,
+                     "asked_at": today,
+                     "answer": "", "answered_at": "",
+                     "status": "open", "closed_by": ""})
+    if answers:
+        _write_answers(answers_path, answers)
+
     (out07 / "07_business_descriptions_output.json").write_text(
         json.dumps(rows, indent=1))
     (out07 / "07_business_descriptions_code_sightings_output.json").write_text(
@@ -785,10 +1238,168 @@ def build07(dir05, dir06, out07, dir02, no_llm=False,
 
 # ---- the paid proposer loop (build-time only; never in tests)
 
-_MODEL_NAME = "gpt-5.4"  # her ruling: the large seat
+# ==== TIERED SEATS — PSEUDO CODE (written BEFORE code; design
+#      11_tiered_seats.md D1-D8 + contract, drafted 2026-10-09;
+#      awaiting Sunny's approval) ==============================
+#
+# D1. THE TWO SEATS, pinned module constants (no env knob):
+#       _MODEL_LARGE = "gpt-5.4"      (today's seat, unchanged)
+#       _MODEL_SMALL = "gpt-5.4-mini"
+#     _MODEL_NAME is RETIRED; every reader of it moves to the
+#     seat map below. THE PRICE CARD beside them:
+#       _PRICE_CARD = {seat: {"input_per_1m": USD,
+#                             "output_per_1m": USD}}
+#     values land on measurement day from OpenAI's published
+#     pricing (per the placeholder law, the red test refuses a
+#     placeholder card at ship).
+#
+# D2. SEAT BY GRAIN (Q1 ruled "use SMALL"):
+#       _SEAT_BY_GRAIN = {"file": LARGE, "scope": LARGE,
+#                         "term_card": SMALL, "field": SMALL}
+#     (fact voices: SMALL, wired in voice_facts below.)
+#
+# D3. THE ESCALATION, inside the existing budget of 3:
+#     in _propose_loop, the seat for a round is
+#       seat = _SEAT_BY_GRAIN[grain]
+#       if seat is SMALL and round_no == 3: seat = LARGE
+#         (meter: escalations.fired += 1; .landed += 1 when
+#          THAT round's gate comes back clean)
+#     BASIS GAPS UNCHANGED: the "has no stored basis" return
+#     already exits on round 1 — it never reaches round 3,
+#     so it can never escalate (D15 stands whole).
+#
+# D4. THE SEAT RECORD: _openai_caller(prompt, seat) returns the
+#     text AND tells the meter {seat, usage} (the API's own
+#     usage counts, verbatim). _propose_loop returns the seat
+#     of its LAST attempt alongside (text, status, findings,
+#     rounds); build07 writes row["model"] = that seat —
+#     the actual writer, never a constant.
+#
+# D6b. THE ACCOUNT REFUSAL (the Echo build): class
+#     AccountRefusal(RuntimeError) raised by _openai_caller on
+#     401 AuthenticationError, or 429 whose body says
+#     insufficient_quota — message carries the provider text +
+#     the named fix. EVERY round loop (here, voice_facts,
+#     bt._propose) re-raises it BEFORE its catch-all
+#     (`except AccountRefusal: raise`): the batch dies at the
+#     FIRST refusal — no burned rounds, nothing recorded
+#     described (describe() writes no ledger/delivery/sheet on
+#     the way out; the checkpoint keeps the already-paid cards).
+#     Timeouts and transient errors stay failed rounds, as today.
+#
+# D8. THE RUN METER (module-level, the scorecard's source):
+#     reset_meter() zeroes it (describe() calls it at start,
+#     beside reset_sightings); the meter accumulates, per run:
+#       seats:   {seat: {calls, input_tokens, output_tokens}}
+#       causes:  {finding-class: count} — class = the finding
+#                text up to its first ":" ("V-1", "V-5",
+#                "call failed", ...), counted at EVERY round
+#       rounds:  {1: n, 2: n, 3: n} — the round a landed card
+#                landed on
+#       escalations: {fired, landed}
+#       voices:  {proposed, blessed_reused, failed}
+#     meter() returns a plain dict; sqldesc_cli builds the
+#     scorecard from it + the sheet rows + its own clock.
+#
+# VOICES (D2/D3): voice_facts tries SMALL once; a voice the
+#     voice-gate refuses gets exactly ONE LARGE retry; still
+#     refused -> the recorded miss (machine fact ships), as
+#     today; store entry "model" = the seat of the kept text.
+# ================================================================
+
+_MODEL_LARGE = "gpt-5.4"       # today's seat, unchanged (D1)
+_MODEL_SMALL = "gpt-5.4-mini"  # the small seat (D1)
+_SEAT_BY_GRAIN = {"file": _MODEL_LARGE, "scope": _MODEL_LARGE,
+                  "term_card": _MODEL_SMALL, "field": _MODEL_SMALL}
+_PRICE_CARD = {
+    # PINNED 2026-10-09 (measurement day, the 11 contract) from
+    # developers.openai.com/api/docs/pricing, Standard tier —
+    # frozen until a re-pin; the usage dashboard verifies.
+    _MODEL_LARGE: {"input_per_1m": 2.50, "output_per_1m": 15.00},
+    _MODEL_SMALL: {"input_per_1m": 0.75, "output_per_1m": 4.50},
+}
 REPAIR_BUDGET = 3
 CALL_TIMEOUT_S = 120  # harness law 2026-10-03: a wedged socket
 #                       can never hang the build
+
+
+class AccountRefusal(RuntimeError):
+    """D6b: the seat says the ACCOUNT cannot pay (bad key, no
+    credits) — the batch stops at the first refusal; nothing is
+    recorded described."""
+
+
+def _check_account_refusal(exc):
+    """Raise AccountRefusal for account-level errors ONLY; a
+    plain rate limit or timeout stays a failed round."""
+    name = type(exc).__name__
+    msg = str(exc)
+    if name == "AuthenticationError":
+        raise AccountRefusal(
+            "the seat refused the account (bad key): " + msg[:300]
+            + " — re-run the key cell with the real key, then "
+            "re-run this cell; nothing was recorded described"
+        ) from exc
+    if name == "RateLimitError" and "insufficient_quota" in msg:
+        raise AccountRefusal(
+            "the seat refused the account (no credits remaining): "
+            + msg[:300] + " — add credits on the billing page, "
+            "then re-run this cell; nothing was recorded described"
+        ) from exc
+    return None
+
+
+# ---- the run meter (D8): the scorecard's one source, counted
+#      at call time from the rows and the clock, never estimated.
+
+_METER = {}
+
+
+def reset_meter():
+    _METER.clear()
+    _METER.update({
+        "seats": {},
+        "causes": {},
+        "rounds": {"1": 0, "2": 0, "3": 0},
+        "escalations": {"fired": 0, "landed": 0},
+        "voices": {"proposed": 0, "blessed_reused": 0,
+                   "failed": 0},
+        "closures": {"comment": 0, "answer": 0, "dictionary": 0,
+                     "show": 0, "omit": 0, "bless": 0,
+                     "accept": 0},
+        "stage_s": {}})
+
+
+reset_meter()
+
+
+def meter():
+    return json.loads(json.dumps(_METER))  # a copy, always
+
+
+def _meter_usage(seat, usage):
+    s = _METER["seats"].setdefault(
+        seat, {"calls": 0, "input_tokens": 0, "output_tokens": 0})
+    s["calls"] += 1
+    if usage is not None:
+        s["input_tokens"] += getattr(usage, "prompt_tokens", 0) or 0
+        s["output_tokens"] += (getattr(usage, "completion_tokens",
+                                       0) or 0)
+
+
+def _meter_causes(findings):
+    for f in findings:
+        cls = str(f).split(":", 1)[0].strip()
+        _METER["causes"][cls] = _METER["causes"].get(cls, 0) + 1
+
+
+def _meter_round(n):
+    _METER["rounds"][str(n)] = _METER["rounds"].get(str(n), 0) + 1
+
+
+def _meter_stage(name, seconds):
+    _METER["stage_s"][name] = (_METER["stage_s"].get(name, 0.0)
+                               + seconds)
 
 
 def _load_key():
@@ -809,32 +1420,90 @@ def _load_key():
         raise RuntimeError("no OPENAI_API_KEY offered at runtime")
 
 
-def _openai_caller(prompt):
+def _openai_caller(prompt, seat=None):
     from openai import OpenAI
     # Accept-Encoding identity (rehearsal find #6, 2026-10-06):
     # Fabric cluster images carry a stale brotli whose process()
     # rejects httpx2's new kwarg — every compressed response
     # died in the decoder (TypeError). Uncompressed responses
     # skip the decoder entirely; works on any cluster.
+    seat = seat or _MODEL_LARGE
     client = OpenAI(api_key=_load_key(),
                     timeout=CALL_TIMEOUT_S, max_retries=2,
                     default_headers={
                         "Accept-Encoding": "identity"})
-    r = client.chat.completions.create(
-        model=_MODEL_NAME,
-        messages=[{"role": "user", "content": prompt}])
+    try:
+        r = client.chat.completions.create(
+            model=seat,
+            messages=[{"role": "user", "content": prompt}])
+    except Exception as exc:
+        _check_account_refusal(exc)  # D6b: 401/no-credits = stop
+        raise
+    _meter_usage(seat, getattr(r, "usage", None))
     return r.choices[0].message.content.strip()
+
+
+def _call_with_seat(caller, prompt, seat):
+    """Callers may take (prompt) or (prompt, seat): the standing
+    suite's one-arg injected callers stay valid (test-locked)."""
+    import inspect
+    try:
+        takes_seat = len(inspect.signature(caller).parameters) >= 2
+    except (TypeError, ValueError):
+        takes_seat = False
+    return caller(prompt, seat) if takes_seat else caller(prompt)
+
+
+# the seat of _propose_loop's LAST attempt — build07 reads it
+# right after the loop returns to stamp the row's "model" (D4);
+# single-threaded by the run law, like _SIGHTINGS.
+_LAST_SEAT = None
+
+
+_LAST_QUESTIONS = []
+
+
+def last_questions():
+    """0.10.0 (ruled 2026-10-10): the open questions of the most
+    recent _propose_loop card — basis gaps that SHIPPED with the
+    number shown plainly. build07 mirrors them onto the row and
+    into the answers file."""
+    return [dict(q) for q in _LAST_QUESTIONS]
+
+
+def _questions_from(basis_findings):
+    """A question per basis finding: the number (the V-label's
+    own digit never wins — the 'V-1: number 999' slip), the
+    where (table.column when the sighting knows it; None is the
+    honest record until it does), the finding verbatim."""
+    out = []
+    for f in basis_findings:
+        m = re.search(r"\b(\d+(?:\.\d+)?)\b",
+                      re.sub(r"^V-\d+:", "", f))
+        out.append({"number": m.group(1) if m else None,
+                    "where": None, "finding": f})
+    return out
 
 
 def _propose_loop(grain, docket_text, docket, registry,
                   caller=None, verdicts=None):
-    """D15 (2026-10-08): no fallback, ever — a BASIS GAP (a
-    number with no annotation and no grounding) is not
-    repairable by wording: ONE call, straight to her; an
-    exhausted budget also lands awaiting_human, never a
-    technical text in the business slot. Her verdicts steer
-    the prompt and the gate."""
+    """D15 AS AMENDED 2026-10-10 (0.10.0, her ruling: "don't
+    block the description"): a BASIS GAP (a number with no
+    annotation and no grounding) is still never repairable by
+    wording and never escalates — but it no longer blocks: the
+    card SHIPS with the number spoken plainly, the gap rides out
+    as an open QUESTION (last_questions). Only the WORDING class
+    repairs, and an exhausted budget lands awaiting_human —
+    never a technical text in the business slot. A card that
+    ASSERTS an unstored meaning still fails: show-plainly never
+    licenses invention (the non-basis V-checks are untouched).
+    Her verdicts steer the prompt and the gate.
+    TIERED (11 D2/D3): SMALL grains run rounds 1-2 on the small
+    seat and round 3 on the large one."""
+    global _LAST_SEAT, _LAST_QUESTIONS
+    _LAST_QUESTIONS = []
     caller = caller or _openai_caller
+    base = _SEAT_BY_GRAIN.get(grain, _MODEL_LARGE)
     findings = []
     if verdicts:
         findings = [
@@ -844,23 +1513,49 @@ def _propose_loop(grain, docket_text, docket, registry,
              "speak without it")
             for n, v in sorted(verdicts.items())]
     text = ""
+    basis = []
     for round_no in range(1, REPAIR_BUDGET + 1):
+        seat = base
+        if base == _MODEL_SMALL and round_no == REPAIR_BUDGET:
+            seat = _MODEL_LARGE  # the escalation (D3)
+            _METER["escalations"]["fired"] += 1
+        _LAST_SEAT = seat
         prompt = build_prompt(grain, docket_text, findings)
         try:
-            text = caller(prompt)
+            text = _call_with_seat(caller, prompt, seat)
+        except AccountRefusal:
+            raise  # D6b: the batch stops, never a failed round
         except Exception as exc:  # noqa: BLE001 — ANY call
             # failure is a failed round, never a dead build
             # (the 2026-10-03 APITimeoutError crash find)
             findings = [f"call failed: {type(exc).__name__}: "
                         f"{str(exc)[:200]}"]
+            _meter_causes(findings)
             continue
         findings = gate(text, docket, grain, registry,
                         verdicts=verdicts)
+        basis = [f for f in findings
+                 if "has no stored basis" in f]
+        findings = [f for f in findings if f not in basis]
         if not findings:
+            _meter_round(round_no)
+            if seat != base:
+                _METER["escalations"]["landed"] += 1
+            if basis:
+                _meter_causes(basis)  # the ask stays countable
+                _LAST_QUESTIONS = _questions_from(basis)
             return text, "gate_passed", [], round_no
-        if any("has no stored basis" in f for f in findings):
-            return text, "awaiting_human", findings, round_no
-    return text, "awaiting_human", findings, REPAIR_BUDGET
+        # only the wording findings feed the repair prompt —
+        # a basis gap cannot be reworded into a basis
+        _meter_causes(findings + basis)
+    if text:
+        # 0.11.0 (uniform ship, her ruling): the exhausted card
+        # SHIPS its final text — the wording findings stay on
+        # the row as the register, the basis gaps ride out as
+        # open questions. Only an EMPTY text still waits.
+        _LAST_QUESTIONS = _questions_from(basis)
+        return text, "gate_failed", findings, REPAIR_BUDGET
+    return text, "awaiting_human", findings + basis, REPAIR_BUDGET
 
 
 # ==== FIELD DOCKET v2 — PSEUDO CODE (written before code;
@@ -1085,13 +1780,26 @@ _VOICE_PROMPT = (
     "stays 'has a recorded <x>'.\n")
 
 
-def _openai_voicer(fact):
-    return _openai_caller(_VOICE_PROMPT + fact)
+def _openai_voicer(fact, seat=None):
+    return _openai_caller(_VOICE_PROMPT + fact,
+                          seat or _MODEL_SMALL)
+
+
+def _voicer_takes_seat(voicer):
+    import inspect
+    try:
+        return len(inspect.signature(voicer).parameters) >= 2
+    except (TypeError, ValueError):
+        return False
 
 
 def voice_facts(items, store_path, registry, voicer=None):
     """One scoped call per NEW fact; stored; blessed > gated
-    proposed > the machine fact. Machine writes PROPOSED only."""
+    proposed > the machine fact. Machine writes PROPOSED only.
+    TIERED (11 D2/D3): the SMALL seat voices first; a voice the
+    gate refuses gets exactly ONE LARGE retry, then the recorded
+    miss. One-arg voicers (the standing suite) keep the old
+    single-attempt contract."""
     store_path = Path(store_path)
     store = (json.loads(store_path.read_text())
              if store_path.exists() else {})
@@ -1099,28 +1807,51 @@ def voice_facts(items, store_path, registry, voicer=None):
                for s in registry.get("sentences", [])
                if s.get("fact_key") and s.get("blessed_text")}
     voicer = voicer or _openai_voicer
+    tiered = _voicer_takes_seat(voicer)
     out = {}
     changed = False
     for key, fact in items:
         if key in blessed:
+            _METER["voices"]["blessed_reused"] += 1
             out[key] = blessed[key]
             continue
         if key not in store:
+            seat = _MODEL_SMALL if tiered else None
             try:
-                voice = voicer(fact)
+                voice = (voicer(fact, _MODEL_SMALL) if tiered
+                         else voicer(fact))
+            except AccountRefusal:
+                raise  # D6b: the batch stops at the first refusal
             except Exception as exc:  # noqa: BLE001 — a failed
                 voice = None          # voice is a recorded miss,
                 findings = [f"call failed: {type(exc).__name__}: "
                         f"{str(exc)[:200]}"]
             else:
                 findings = _voice_gate(voice, fact)
+            if findings and tiered:  # ONE LARGE retry (D3)
+                seat = _MODEL_LARGE
+                try:
+                    retry = voicer(fact, _MODEL_LARGE)
+                except AccountRefusal:
+                    raise
+                except Exception as exc:  # noqa: BLE001
+                    retry = None
+                    findings = [f"call failed: "
+                                f"{type(exc).__name__}: "
+                                f"{str(exc)[:200]}"]
+                else:
+                    retry_findings = _voice_gate(retry, fact)
+                    if not retry_findings:
+                        voice, findings = retry, []
             store[key] = {"machine_fact": fact,
                           "voice": None if findings else voice,
                           "status": ("failed" if findings
                                      else "proposed"),
                           "findings": findings,
-                          "model": _MODEL_NAME,
+                          "model": seat,
                           "basis_version": BASIS_VERSION}
+            _METER["voices"]["failed" if findings
+                             else "proposed"] += 1
             changed = True
         entry = store[key]
         out[key] = entry["voice"] or fact
@@ -1167,30 +1898,10 @@ def docket_v2_for_file(dir05, dir06, dir02, fname, voices=None,
             "population": base["population"]}, items
 
 
-def answer(out07, node_id, number, verdict):
-    """HER HAND ONLY (D15, 2026-10-08): record a verdict on an
-    awaiting_human row — "show" (the number may ride) or
-    "omit" (the card speaks without it). The next describe run
-    re-takes exactly this node. "Give it a meaning" needs no
-    function: she adds the inline comment to the SQL and the
-    changed hash re-takes the file."""
-    if verdict not in ("show", "omit"):
-        raise ValueError("a verdict is 'show' or 'omit' — "
-                         "a meaning belongs in the SQL as an "
-                         "inline comment (her ruling)")
-    out07 = Path(out07)
-    sheet_path = out07 / "07_business_descriptions_output.json"
-    rows = json.loads(sheet_path.read_text())
-    row = next((r for r in rows if r["node_id"] == node_id),
-               None)
-    if row is None:
-        raise ValueError(f"no row {node_id}")
-    if row.get("status") != "awaiting_human":
-        raise ValueError("verdicts land only on awaiting_human "
-                         f"rows; {node_id} is {row.get('status')}")
-    row.setdefault("verdicts", {})[str(number)] = verdict
-    sheet_path.write_text(json.dumps(rows, indent=1))
-    return row
+# bd.answer() RETIRED 2026-10-10 (her word: "one file, all
+# answers in it, retire the ANSWER cell") — every human answer
+# lands in the answers CSV (ANSWERS_NAME above); the next
+# describe run picks it up.
 
 
 # ==== THE NAME LADDER (code; pseudo above) ==========================

@@ -104,6 +104,9 @@ What is the output of this data contract?
   - status: proposed | gate_passed | blessed | floor — the
     EFFECTIVE text ladder is blessed > gate_passed > floor; a
     floor row's audience_text IS the 06 sentence, verbatim.
+    (0.11.0 adds gate_failed: a SHIPPED business text that
+    exhausted repairs — blessed still beats it in the
+    effective ladder.)
     THE FLOOR RETIRES AS A BUSINESS TEXT (RULED 2026-10-08,
     her words: "a fallback is not going to be a candidate to
     replace business description"; effective at the 0.8.0
@@ -119,6 +122,40 @@ What is the output of this data contract?
     the one meaning store is the SQL itself) · LET THE NUMBER
     SHOW (a recorded waiver on the row) · KEEP IT OUT (the
     card must speak without it).
+    (AMENDED 2026-10-10, her ruling — "when a value is not
+    mapped, can we just show it? don't block the description
+    because of it. we can still log it in the human eyes
+    log" + "one file, all answers in it, retire the ANSWER
+    cell"; effective at the 0.10.0 build): awaiting_human
+    NARROWS to the wording class alone — a card that
+    exhausts the 3-round repair budget. A BASIS GAP no
+    longer blocks: the card SHIPS with the number spoken
+    plainly in its column's words, claiming no meaning; the
+    row carries open_questions (same fields as QUESTIONS
+    above) and the delivery marks the file "delivered with
+    questions". The three per-question verdicts above are
+    SUPERSEDED by the answers file (next entry): all human
+    answers land there, the bd.answer() door and the
+    notebook ANSWER cell are RETIRED.
+    (AMENDED 2026-10-10 evening, her ruling — "ship
+    description for this type of gate failures, and
+    register the reason/wording violations ... does not
+    stop the production ... does not get lost either";
+    UNIFORM, all finding classes, publish immediately;
+    effective at the 0.11.0 build): a card that exhausts
+    the repair budget WITH text SHIPS that final text —
+    status gate_failed, audience_text = the last proposal,
+    gate_findings kept, and every finding REGISTERED as a
+    wording row in the answers file. awaiting_human narrows
+    to the EMPTY-TEXT class alone: three failed calls, no
+    text to ship. MIGRATION (free): a carried awaiting row
+    WITH last_proposal converts to shipped gate_failed on
+    the next run, zero paid calls — the text already
+    exists.
+  - open_questions (0.10.0): [{number, where (table.column),
+    finding}] on a SHIPPED row — mirrors of the open rows in
+    the answers file; empty when every number has a stored
+    basis or a closed answer.
   - gate_findings: the named objections (empty when clean);
     after the repair budget (3 rounds) the LAST findings stay
     on the row for Sunny's eye.
@@ -136,6 +173,45 @@ What is the output of this data contract?
     is a contract violation (the bless() door enforces); the
     build READS it first in the effective ladder. Seed candidates staged from 03
     sunny_synonyms at L02, ratified by her before first use.
+- 07_business_descriptions_answers_output.csv (0.10.0, RULED
+  2026-10-10 — THE ONE ANSWERS FILE, the human-eyes log made
+  editable; CSV so a data owner can fill it in Excel and it
+  can travel; AMENDED same evening, 0.11.0 — wording rows
+  join, the one file carries EVERY open item):
+  - one row per open question: node_id, file, kind (value |
+    wording), where (table.column), value, finding (the gate
+    finding verbatim), asked_at, answer (BLANK | meaning
+    text | show | omit), answered_at, status (open | closed),
+    closed_by (comment | answer | dictionary).
+  - WORDING ROWS (0.11.0): kind=wording, one per registered
+    gate finding on a shipped gate_failed card; value empty,
+    finding verbatim. Her answer: REPLACEMENT TEXT (the whole
+    card, her words) -> lands as her BLESSED sentence in the
+    registry (dated ruling, provenance = this file — the
+    ratify clause's second hand door), effective at the next
+    rerender, zero paid calls; or "accept" -> the shipped
+    text stands, the finding closes as a recorded waiver;
+    blank -> stays open, never lost. closed_by gains
+    bless | accept. MIGRATION READ: a pre-0.11.0 csv without
+    kind/finding columns is honored once — old rows read as
+    kind=value; every write lands the new header.
+  - MERGE-NEVER-OVERWRITE: the engine only ADDS question rows
+    and only the human fills answer cells; a filled cell is
+    never touched by a rerun.
+  - PICKUP (every describe run, before proposing):
+    · meaning text -> a 02 value meaning (provenance = this
+      file, dated) -> exactly that card re-takes (one paid
+      call), closed_by answer;
+    · show -> closes FREE (the card already shows the
+      number), no retake;
+    · omit -> one retake told to speak without it;
+    · an SQL inline comment added -> the hash retake as
+      today, the question closes as closed_by comment;
+    · a 02 dictionary load (the F1 bulk route) that now
+      resolves an open (column, value) -> retake with the
+      meaning in the docket, closed_by dictionary.
+  - a card may still FAIL for ASSERTING an unstored meaning —
+    the show-plainly default never licenses invention.
 - 07_business_descriptions/<file_name>.txt — the per-file
   business text, TRACKED build output: the file's S7 template +
   per-scope and per-field lines with status marks; the
@@ -194,7 +270,13 @@ whitelist is RETIRED — see the design doc's Gate v2 section):
       value-set mapping is a BASIS GAP: not repairable by
       rewording — it SKIPS the repair rounds entirely (no
       paid retries into the same wall) and lands as a named
-      question for her (the awaiting_human path above). The
+      question for her (the awaiting_human path above).
+      (AMENDED 2026-10-10, 0.10.0: the basis gap still skips
+      every repair round, but the card now SHIPS — the
+      digits plain, spoken through the column's words,
+      claiming nothing; only a card that ASSERTS an unstored
+      meaning fails V-1. The named question lands OPEN in
+      the answers file, not awaiting_human.) The
       header block comment's Description: line joins the file
       card's docket as the FIRST-CHOICE wording (her ruling,
       same day).

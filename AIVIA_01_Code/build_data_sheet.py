@@ -91,18 +91,26 @@ def build_data_sheet(sql_dir, sheet_path, embedder):
     sql_dir = Path(sql_dir)
     sheet_path = Path(sheet_path)
 
-    # Step 1 — list the sql files.
+    # Step 1 — list the sql files, keyed by STEM (the Echo fix,
+    # 2026-10-10: the .sql rename's second bite — folder names
+    # carry .sql, the sheet's ruled rows never did; keying raw
+    # names dropped every ruled row and re-paid every embedding).
+    def _stem(name):
+        return name[:-4] if name.endswith(".sql") else name
+
     file_names = sorted(
-        p.name
+        _stem(p.name)
         for p in sql_dir.iterdir()
         if p.is_file() and not p.name.startswith(".") and p.suffix != ".json"
     )
 
-    # Step 2 — read the existing sheet, if there is one.
+    # Step 2 — read the existing sheet, if there is one; rows key
+    # by the same stem, so a sheet from either side of the rename
+    # is honored.
     existing = {}
     if sheet_path.exists():
         with open(sheet_path, encoding="utf-8") as f:
-            existing = {row["file_name"]: row for row in json.load(f)}
+            existing = {_stem(row["file_name"]): row for row in json.load(f)}
 
     # Step 3 — decide each row; rows for deleted files are dropped by
     # building only from file_names.

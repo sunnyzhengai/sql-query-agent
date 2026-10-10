@@ -1061,10 +1061,13 @@ def test_07_gate_demands_annotation_words_over_digits():
     assert any("47080" in f for f in omitted), omitted
 
 
-def test_07_basis_gap_skips_repairs_one_call():
-    """A number with no annotation and no grounding is not
-    repairable by wording: ONE call, straight to the human —
-    zero paid retries into the same wall."""
+def test_07_basis_gap_ships_shown_one_call():
+    """0.10.0 (ruled 2026-10-10, her words: "don't block the
+    description"): a number with no annotation and no
+    grounding is STILL not repairable by wording — ONE call,
+    zero paid retries — but the card now SHIPS with the
+    number spoken plainly; the gap becomes an open QUESTION,
+    never a block and never an invented meaning."""
     calls = []
 
     def caller(prompt):
@@ -1076,9 +1079,13 @@ def test_07_basis_gap_skips_repairs_one_call():
               "gap": False, "params": False, "population": False}
     text, status, findings, used = bd._propose_loop(
         "scope", docket["text"], docket, {}, caller=caller)
-    assert status == "awaiting_human"
+    assert status == "gate_passed"
     assert len(calls) == 1 and used == 1
-    assert any("999" in f for f in findings)
+    assert "999" in text              # shown, not blocked
+    assert findings == []             # a question, not a failure
+    (q,) = bd.last_questions()
+    assert q["number"] == "999"
+    assert set(q) >= {"number", "where", "finding"}
 
 
 def test_07_awaiting_row_ships_no_text_and_names_questions(
@@ -1104,64 +1111,456 @@ def test_07_awaiting_row_ships_no_text_and_names_questions(
     assert "999" in q["finding"]
 
 
-def test_07_answer_records_her_verdict(tmp_path):
+def test_07_the_answer_cell_is_retired():
+    """0.10.0 (her word, 2026-10-10): "one file, all answers
+    in it, retire the ANSWER cell" — bd.answer() is gone; the
+    answers CSV is the one human door."""
+    assert not hasattr(bd, "answer")
+    assert bd.ANSWERS_NAME == \
+        "07_business_descriptions_answers_output.csv"
+
+
+# ==== 0.10.0 THE ANSWERS FILE (ruled 2026-10-10: show the
+# unmapped value, log the question, ONE editable file for all
+# answers; red before code) =====================================
+
+ANSWERS_FIELDS = ["node_id", "file", "kind", "where", "value",
+                  "finding", "asked_at", "answer",
+                  "answered_at", "status", "closed_by"]
+
+
+def _question_999():
+    # the where names the table — the dictionary route resolves
+    # only a KNOWN (table, code) pair; a bare code matched
+    # across every table would invent a basis
+    return {"number": "999", "where": "FIX_TABLE.FIX_COL",
+            "finding": "V-1: number 999 has no stored basis"}
+
+
+def _shipped_spy(grain, docket_text, docket, registry):
+    """A proposer MAY return a 5th element: the open questions
+    of a card that shipped with its number shown. Each grain
+    asks a DISTINCT value — one shared value would let a single
+    answer resolve every sibling through the dictionary route
+    (the ask-once propagation, correct but untestable for the
+    exactly-that-card law)."""
+    value = {"file": "999", "scope": "888"}.get(grain, "777")
+    q = {"number": value, "where": "FIX_TABLE.FIX_COL",
+         "finding": f"V-1: number {value} has no stored basis"}
+    return (f"The card shows {value}.", "gate_passed", [], 1,
+            [q])
+
+
+def _read_answers(out):
+    import csv
+    with open(out / bd.ANSWERS_NAME, newline="") as fh:
+        return list(csv.DictReader(fh))
+
+
+def _fill_answer(out, node_id, answer):
+    import csv
+    rows = _read_answers(out)
+    for r in rows:
+        if r["node_id"] == node_id:
+            r["answer"] = answer
+    with open(out / bd.ANSWERS_NAME, "w", newline="") as fh:
+        w = csv.DictWriter(fh, fieldnames=ANSWERS_FIELDS)
+        w.writeheader()
+        w.writerows(rows)
+
+
+def test_07_shipped_questions_land_in_the_answers_csv(tmp_path):
+    """A shipped row's open questions mirror into the ONE
+    answers file — open rows, blank answer cells, the exact
+    header the data owner fills."""
     out = tmp_path / "07"
     out.mkdir()
+    rows = bd.build07(DIR05, DIR06, out, DIR02, no_llm=False,
+                      proposer=_shipped_spy, only_file=CENSUS)
+    row = next(r for r in rows if r["grain"] == "file")
+    assert row["status"] == "gate_passed"
+    assert row["audience_text"] == "The card shows 999."
+    assert row["open_questions"][0]["number"] == "999"
+    csvrows = _read_answers(out)
+    assert csvrows and set(csvrows[0]) == set(ANSWERS_FIELDS)
+    mine = [r for r in csvrows
+            if r["node_id"] == "file::" + CENSUS]
+    assert len(mine) == 1
+    assert mine[0]["value"] == "999"
+    assert mine[0]["status"] == "open"
+    assert mine[0]["answer"] == ""
+    assert mine[0]["asked_at"]        # dated, never blank
 
-    def spy(grain, docket_text, docket, registry):
-        return ("wanted 999", "awaiting_human",
-                ["V-1: number 999 has no stored basis"], 1)
 
+def test_07_answers_csv_merge_never_overwrites(tmp_path):
+    """The engine only ADDS question rows; a human-filled cell
+    survives every rerun, and a known question never
+    re-enters."""
+    out = tmp_path / "07"
+    out.mkdir()
     bd.build07(DIR05, DIR06, out, DIR02, no_llm=False,
-               proposer=spy, only_file=CENSUS)
+               proposer=_shipped_spy, only_file=CENSUS)
     node = "file::" + CENSUS
-    bd.answer(out, node, "999", "show")
+    _fill_answer(out, node, "show")
     sheet = json.loads(
         (out / "07_business_descriptions_output.json").read_text())
-    row = next(r for r in sheet if r["node_id"] == node)
-    assert row["verdicts"] == {"999": "show"}
-    import pytest
-    with pytest.raises(ValueError):
-        bd.answer(out, node, "999", "maybe")
+    all_files = {r["node_id"].split("::")[1] for r in sheet}
+
+    bd.build07(DIR05, DIR06, out, DIR02, no_llm=False,
+               proposer=_shipped_spy, only_file=CENSUS,
+               skip_files=all_files)
+    mine = [r for r in _read_answers(out) if r["node_id"] == node]
+    assert len(mine) == 1              # never re-added
+    assert mine[0]["answer"] == "show"  # never overwritten
 
 
-def test_07_verdict_retakes_only_the_answered_node(tmp_path):
-    """A skipped file's awaiting row WITH a verdict re-proposes
-    — alone. Every other row carries verbatim, zero extra paid
-    calls (the checkpoint-seed mechanics)."""
+def test_07_answer_show_closes_free(tmp_path):
+    """Her 'show' costs nothing: the card already shows the
+    number — the question closes, no retake, zero paid
+    calls."""
+    out = tmp_path / "07"
+    out.mkdir()
+    bd.build07(DIR05, DIR06, out, DIR02, no_llm=False,
+               proposer=_shipped_spy, only_file=CENSUS)
+    node = "file::" + CENSUS
+    _fill_answer(out, node, "show")
+    sheet = json.loads(
+        (out / "07_business_descriptions_output.json").read_text())
+    all_files = {r["node_id"].split("::")[1] for r in sheet}
+    calls = []
+
+    def spy(grain, docket_text, docket, registry):
+        calls.append(grain)
+        return ("never spoken", "gate_passed", [], 1)
+
+    rows = bd.build07(DIR05, DIR06, out, DIR02, no_llm=False,
+                      proposer=spy, only_file=CENSUS,
+                      skip_files=all_files)
+    assert calls == []                 # FREE
+    after = next(r for r in rows if r["node_id"] == node)
+    assert after["audience_text"] == "The card shows 999."
+    assert after["open_questions"] == []
+    (mine,) = [r for r in _read_answers(out)
+               if r["node_id"] == node]
+    assert mine["status"] == "closed"
+    assert mine["closed_by"] == "show"
+    assert mine["answered_at"]
+
+
+def test_07_answer_omit_retakes_only_that_node(tmp_path):
+    """Her 'omit' re-proposes exactly the answered card — one
+    paid call, every other row carried verbatim (the
+    checkpoint-seed mechanics)."""
+    out = tmp_path / "07"
+    out.mkdir()
+    bd.build07(DIR05, DIR06, out, DIR02, no_llm=False,
+               proposer=_shipped_spy, only_file=CENSUS)
+    node = "file::" + CENSUS
+    _fill_answer(out, node, "omit")
+    sheet = json.loads(
+        (out / "07_business_descriptions_output.json").read_text())
+    before = {r["node_id"]: r for r in sheet}
+    all_files = {r["node_id"].split("::")[1] for r in sheet}
+    calls = []
+
+    def spy(grain, docket_text, docket, registry):
+        calls.append(grain)
+        return ("Speaks without it.", "gate_passed", [], 1)
+
+    rows = bd.build07(DIR05, DIR06, out, DIR02, no_llm=False,
+                      proposer=spy, only_file=CENSUS,
+                      skip_files=all_files)
+    assert calls == ["file"]           # the one node, once
+    after = {r["node_id"]: r for r in rows}
+    assert after[node]["audience_text"] == "Speaks without it."
+    assert after[node]["open_questions"] == []
+    for nid, r in before.items():
+        if nid != node:
+            assert after[nid] == r, nid
+    (mine,) = [r for r in _read_answers(out)
+               if r["node_id"] == node]
+    assert mine["status"] == "closed"
+    assert mine["closed_by"] == "omit"
+
+
+def _tiny_02(tmp_path):
+    """A writable 02 home: the table sheet build07 reads, the
+    value sheet the pickup writes."""
+    d02 = tmp_path / "02"
+    d02.mkdir()
+    for sheet in ("table", "column", "value", "iniitm"):
+        (d02 / f"02_emr_data_dictionary_extraction_{sheet}.json"
+         ).write_text("[]")
+    return d02
+
+
+def test_07_answer_meaning_writes_02_and_steers_the_retake(
+        tmp_path):
+    """A filled meaning becomes a 02 value meaning WITH
+    provenance, and exactly that card re-proposes with the
+    meaning in its docket."""
+    out = tmp_path / "07"
+    out.mkdir()
+    d02 = _tiny_02(tmp_path)
+    bd.build07(DIR05, DIR06, out, d02, no_llm=False,
+               proposer=_shipped_spy, only_file=CENSUS)
+    node = "file::" + CENSUS
+    _fill_answer(out, node, "the fix emergency department")
+    sheet = json.loads(
+        (out / "07_business_descriptions_output.json").read_text())
+    all_files = {r["node_id"].split("::")[1] for r in sheet}
+    seen = []
+
+    def spy(grain, docket_text, docket, registry):
+        seen.append((grain, docket_text))
+        return ("Speaks the meaning.", "gate_passed", [], 1)
+
+    bd.build07(DIR05, DIR06, out, d02, no_llm=False,
+               proposer=spy, only_file=CENSUS,
+               skip_files=all_files)
+    assert [g for g, _ in seen] == ["file"]
+    assert "the fix emergency department" in seen[0][1]
+    vals = json.loads(
+        (d02 / "02_emr_data_dictionary_extraction_value.json")
+        .read_text())
+    (v,) = [r for r in vals if str(r["code"]) == "999"]
+    assert v["meaning"] == "the fix emergency department"
+    assert bd.ANSWERS_NAME in v["source"]   # provenance
+    (mine,) = [r for r in _read_answers(out)
+               if r["node_id"] == node]
+    assert mine["status"] == "closed"
+    assert mine["closed_by"] == "answer"
+
+
+def test_07_dictionary_load_resolves_open_questions(tmp_path):
+    """The F1 bulk route: a 02 value meaning that lands AFTER
+    the question opened closes it on the next run — retake
+    with the meaning in the docket, closed_by dictionary."""
+    out = tmp_path / "07"
+    out.mkdir()
+    d02 = _tiny_02(tmp_path)
+    bd.build07(DIR05, DIR06, out, d02, no_llm=False,
+               proposer=_shipped_spy, only_file=CENSUS)
+    node = "file::" + CENSUS
+    (d02 / "02_emr_data_dictionary_extraction_value.json"
+     ).write_text(json.dumps([{"table_name": "FIX_TABLE",
+                               "code": "999",
+                               "meaning": "the fix department"}]))
+    sheet = json.loads(
+        (out / "07_business_descriptions_output.json").read_text())
+    all_files = {r["node_id"].split("::")[1] for r in sheet}
+    seen = []
+
+    def spy(grain, docket_text, docket, registry):
+        seen.append((grain, docket_text))
+        return ("Speaks the meaning.", "gate_passed", [], 1)
+
+    bd.build07(DIR05, DIR06, out, d02, no_llm=False,
+               proposer=spy, only_file=CENSUS,
+               skip_files=all_files)
+    assert [g for g, _ in seen] == ["file"]
+    assert "the fix department" in seen[0][1]
+    (mine,) = [r for r in _read_answers(out)
+               if r["node_id"] == node]
+    assert mine["status"] == "closed"
+    assert mine["closed_by"] == "dictionary"
+
+
+# ==== 0.11.0 THE UNIFORM SHIP (ruled 2026-10-10 evening: every
+# gate failure with text ships; findings register in the one
+# answers file; red before code) ================================
+
+
+def test_07_wording_exhaust_ships_gate_failed():
+    """An exhausted card WITH text ships — status gate_failed,
+    the final text stands, the findings kept verbatim. Three
+    rounds still paid, never a fourth."""
+    calls = []
+
+    def caller(prompt):
+        calls.append(prompt)
+        return "This selection reads the table."  # V-3 forever
+
+    docket = {"facts": "- a selection of fix records",
+              "text": "- a selection of fix records",
+              "gap": False, "params": False, "population": False}
+    text, status, findings, used = bd._propose_loop(
+        "scope", docket["text"], docket, {}, caller=caller)
+    assert status == "gate_failed"
+    assert text == "This selection reads the table."  # ships
+    assert any("table" in f for f in findings)  # registered
+    assert len(calls) == used == bd.REPAIR_BUDGET
+
+
+def _failed_spy(grain, docket_text, docket, registry):
+    return ("Reads the fix table.", "gate_failed",
+            ["V-3: SQL word 'table'",
+             "V-4: a field is one short plain paragraph"], 3)
+
+
+def test_07_gate_failed_registers_wording_rows(tmp_path):
+    """A shipped gate_failed card's findings land as wording
+    rows in the answers csv — kind=wording, finding verbatim,
+    value empty, open."""
+    out = tmp_path / "07"
+    out.mkdir()
+    rows = bd.build07(DIR05, DIR06, out, DIR02, no_llm=False,
+                      proposer=_failed_spy, only_file=CENSUS)
+    row = next(r for r in rows if r["grain"] == "file")
+    assert row["status"] == "gate_failed"
+    assert row["audience_text"] == "Reads the fix table."
+    node = "file::" + CENSUS
+    mine = [r for r in _read_answers(out)
+            if r["node_id"] == node and r["kind"] == "wording"]
+    assert len(mine) == 2
+    assert {r["finding"] for r in mine} == {
+        "V-3: SQL word 'table'",
+        "V-4: a field is one short plain paragraph"}
+    assert all(r["status"] == "open" and r["value"] == ""
+               for r in mine)
+
+
+def test_07_accept_closes_the_finding_free(tmp_path):
+    """Her 'accept': the shipped text stands, the finding
+    closes as a recorded waiver — zero paid calls."""
+    out = tmp_path / "07"
+    out.mkdir()
+    bd.build07(DIR05, DIR06, out, DIR02, no_llm=False,
+               proposer=_failed_spy, only_file=CENSUS)
+    node = "file::" + CENSUS
+    _fill_answer(out, node, "accept")
+    sheet = json.loads(
+        (out / "07_business_descriptions_output.json").read_text())
+    all_files = {r["node_id"].split("::")[1] for r in sheet}
+    calls = []
+
+    def spy(grain, docket_text, docket, registry):
+        calls.append(grain)
+        return ("never spoken", "gate_passed", [], 1)
+
+    rows = bd.build07(DIR05, DIR06, out, DIR02, no_llm=False,
+                      proposer=spy, only_file=CENSUS,
+                      skip_files=all_files)
+    assert calls == []                      # FREE
+    after = next(r for r in rows if r["node_id"] == node)
+    assert after["audience_text"] == "Reads the fix table."
+    mine = [r for r in _read_answers(out)
+            if r["node_id"] == node and r["kind"] == "wording"]
+    assert all(r["status"] == "closed"
+               and r["closed_by"] == "accept" for r in mine)
+
+
+def test_07_replacement_text_blesses_and_closes_all(tmp_path):
+    """Her replacement text becomes a BLESSED sentence — the
+    registry row carries the dated ruling with the answers file
+    as provenance; EVERY wording row of the node closes
+    together; the rendered txt speaks her words. Zero paid
+    calls."""
+    out = tmp_path / "07"
+    out.mkdir()
+    bd.build07(DIR05, DIR06, out, DIR02, no_llm=False,
+               proposer=_failed_spy, only_file=CENSUS)
+    node = "file::" + CENSUS
+    _fill_answer(out, node, "Her own card text, ruled.")
+    sheet = json.loads(
+        (out / "07_business_descriptions_output.json").read_text())
+    all_files = {r["node_id"].split("::")[1] for r in sheet}
+    calls = []
+
+    def spy(grain, docket_text, docket, registry):
+        calls.append(grain)
+        return ("never spoken", "gate_passed", [], 1)
+
+    bd.build07(DIR05, DIR06, out, DIR02, no_llm=False,
+               proposer=spy, only_file=CENSUS,
+               skip_files=all_files)
+    assert calls == []                      # bless is FREE
+    reg = json.loads(
+        (out / "07_business_descriptions_blessings_output.json")
+        .read_text())
+    (s,) = [s for s in reg["sentences"] if s["node_id"] == node]
+    assert s["blessed_text"] == "Her own card text, ruled."
+    assert bd.ANSWERS_NAME in s["ruling"]   # provenance, dated
+    mine = [r for r in _read_answers(out)
+            if r["node_id"] == node and r["kind"] == "wording"]
+    assert mine and all(r["status"] == "closed"
+                        and r["closed_by"] == "bless"
+                        for r in mine)      # ALL close together
+    txt = (out / f"{CENSUS}.txt").read_text()
+    assert "Her own card text, ruled." in txt  # her words render
+
+
+def test_07_carried_awaiting_with_text_converts_free(tmp_path):
+    """The PTA/LOTE unblock: a carried awaiting row that holds
+    a rejected card converts to shipped gate_failed at carry —
+    zero paid calls; its findings register. A carried awaiting
+    row with NO text stays awaiting."""
     out = tmp_path / "07"
     out.mkdir()
     bd.build07(DIR05, DIR06, out, DIR02, no_llm=True)
     sheet_p = out / "07_business_descriptions_output.json"
     sheet = json.loads(sheet_p.read_text())
     node = "file::" + CENSUS
+    empty_node = "file::" + LOTE
     for r in sheet:
         if r["node_id"] == node:
             r["status"] = "awaiting_human"
             r["audience_text"] = ""
-            r["last_proposal"] = "wanted 999"
-            r["questions"] = [{"number": "999",
-                               "finding": "no stored basis"}]
-            r["verdicts"] = {"999": "show"}
+            r["last_proposal"] = "The rejected words."
+            r["gate_findings"] = ["V-3: SQL word 'table'"]
+        if r["node_id"] == empty_node:
+            r["status"] = "awaiting_human"
+            r["audience_text"] = ""
+            r["gate_findings"] = ["call failed: TimeoutError"]
     sheet_p.write_text(json.dumps(sheet, indent=1))
-    before = {r["node_id"]: r for r in sheet}
-
+    all_files = {r["node_id"].split("::")[1] for r in sheet}
     calls = []
 
     def spy(grain, docket_text, docket, registry):
         calls.append(grain)
-        return ("Her answer spoke.", "gate_passed", [], 1)
+        return ("never spoken", "gate_passed", [], 1)
 
-    all_files = {r["node_id"].split("::")[1] for r in sheet}
     rows = bd.build07(DIR05, DIR06, out, DIR02, no_llm=False,
                       proposer=spy, skip_files=all_files)
-    assert calls == ["file"]           # the one node, once
+    assert calls == []                      # the convert is FREE
     after = {r["node_id"]: r for r in rows}
-    assert after[node]["status"] == "gate_passed"
-    assert after[node]["audience_text"] == "Her answer spoke."
-    for nid, r in before.items():
-        if nid != node:
-            assert after[nid] == r, nid
+    assert after[node]["status"] == "gate_failed"
+    assert after[node]["audience_text"] == "The rejected words."
+    assert after[empty_node]["status"] == "awaiting_human"
+    assert after[empty_node]["audience_text"] == ""
+    mine = [r for r in _read_answers(out)
+            if r["node_id"] == node and r["kind"] == "wording"]
+    (w,) = mine
+    assert w["finding"] == "V-3: SQL word 'table'"
+    assert w["status"] == "open"
+
+
+def test_07_old_header_answers_csv_honored_once(tmp_path):
+    """The migration read: a pre-0.11.0 csv (no kind/finding
+    columns) reads once — old rows live on as kind=value; the
+    rewrite lands the new header."""
+    import csv
+    out = tmp_path / "07"
+    out.mkdir()
+    old_fields = ["node_id", "file", "where", "value",
+                  "asked_at", "answer", "answered_at",
+                  "status", "closed_by"]
+    with open(out / bd.ANSWERS_NAME, "w", newline="") as fh:
+        w = csv.DictWriter(fh, fieldnames=old_fields)
+        w.writeheader()
+        w.writerow({"node_id": "file::" + CENSUS,
+                    "file": CENSUS, "where": "", "value": "999",
+                    "asked_at": "2026-10-09", "answer": "",
+                    "answered_at": "", "status": "open",
+                    "closed_by": ""})
+    rows = bd.build07(DIR05, DIR06, out, DIR02, no_llm=False,
+                      proposer=_shipped_spy, only_file=CENSUS)
+    assert rows
+    csvrows = _read_answers(out)
+    assert set(csvrows[0]) == set(ANSWERS_FIELDS)  # new header
+    old = [r for r in csvrows if r["value"] == "999"
+           and (r["where"] or "") == ""]
+    assert old and old[0]["kind"] == "value"       # carried
 
 
 def test_07_defer_files_dropped_without_carry_or_refusal(tmp_path):

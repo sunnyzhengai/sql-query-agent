@@ -228,12 +228,41 @@ D15. THE 0.8.0 SLICE (RULED 2026-10-08 evening, the view-test
       side dictionary, no registry row, the comment stored
       nowhere else (her ruling; high-occurrence numbers may
       earn a store later, recorded option only).
+      (AMENDED 2026-10-10: the recorded option is EXERCISED —
+      value meanings now also live in the 02 dictionary, fed
+      by the answers file's hand route and the F1 bulk
+      route; the SQL inline comment stays FIRST CHOICE when
+      both exist.)
     - THE HEADER Description: line -> the file card's
       first-choice wording.
     - BASIS GAPS go to HER, not to repair rounds and never to
       a technical fallback: status awaiting_human, questions
       named, publish skips; her verdicts = fix the SQL
       comment / let it show / keep it out.
+      (SUPERSEDED 2026-10-10, her ruling — "don't block the
+      description, log it in the human eyes log"; the 0.10.0
+      slice: a basis gap SHIPS with the number shown plainly
+      in the column's words, the question logged OPEN in
+      07_business_descriptions_answers_output.csv — ONE
+      editable file, all answers in it (meaning | show |
+      omit), the ANSWER cell retired; publish PROCEEDS, the
+      marker lives in the delivery txt and the scorecard,
+      never in Collibra. awaiting_human narrows to the
+      wording class that exhausts the repair budget. Still
+      never a repair round, never an escalation, never an
+      invented meaning.)
+      (AMENDED AGAIN the same evening — the 0.11.0 UNIFORM
+      SHIP, her ruling after the PTA read: "ship description
+      for this type of gate failures, and register the
+      reason". An exhausted card WITH text ships as
+      gate_failed — the business text stands, every finding
+      registered as a wording row in the answers file; her
+      answer there is replacement text (-> her blessed
+      sentence, free rerender) or accept (recorded waiver).
+      Publish proceeds. awaiting_human narrows to the
+      EMPTY-TEXT class alone. The repair rounds remain the
+      quality driver; the gate's findings are never lost,
+      and never again a block.)
     - THE VIEW TIE: build08 learns the view consumption
       patterns (NativeQuery SELECT ... FROM <object>, and
       [Item="..."] table imports) so views reach their

@@ -136,11 +136,16 @@ GOLDEN_COUNTS = {
     # entry, 05 gap-first gate): +1 table, +3 columns, no-match
     # 1 -> 0, +1 date_dimension rule edge (EXEC_START_TIME is a
     # date column), +4 abstracts.
-    "dict_tables": 41, "dict_columns": 1631, "dict_joins": 5262,
+    # Re-based 2026-10-10 (Sunny's ruling: the
+    # V_CCHP_PregnantMembers_PBI view joins the corpus; her four
+    # supplemental tables — COVERAGE, PAT_ACTIVE_REG,
+    # PAT_PER_CARR_ADDR, PLAN_GRP_BEN_PLAN): +4 tables,
+    # +17 columns, +2 join edges (measured, the re-base law).
+    "dict_tables": 45, "dict_columns": 1648, "dict_joins": 5266,
     "dict_values": 14489, "dict_value_embeddings": 14489,
     "dict_no_match": 0, "chat_abstract_names": 1660,
-    "chat_technical_terms": 9, "graph_join_edges": 398,
-    "graph_table_nodes": 41, "graph_column_nodes": 1631,
+    "chat_technical_terms": 9, "graph_join_edges": 404,
+    "graph_table_nodes": 45, "graph_column_nodes": 1648,
 }
 
 ABSTRACT_FIELDS = {"object_kind", "object_id", "object_name",

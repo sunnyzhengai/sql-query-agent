@@ -12,6 +12,30 @@ work outputs never come back to the repo) · one wheel (ONE
 sqldesc wheel in the environment) · blessed-only (no unblessed
 name reaches Collibra).
 
+WHEEL 0.11.0 (ruled + SHIPPED 2026-10-10 evening, the uniform
+ship): NO gate finding blocks a description anymore. An
+unmapped number ships shown plainly (a value row in the
+answers csv); a card that exhausts its repair rounds ships its
+final text with the findings REGISTERED (wording rows in the
+same csv — answer with your own text, which becomes your
+blessed card, or the word accept). The only card that still
+waits is one with no text at all (three failed calls). The csv
+gains kind + finding columns (an older csv is read once and
+rewritten). Collibra publishes delivered cards, findings and
+all; only awaiting_human and files_waiting keep the skip.
+WHEEL 0.10.0 (same day, the answers file): an unmapped number
+no longer blocks — the card ships with the number shown and
+the question lands as an open row in
+04_run/07_business_descriptions/
+07_business_descriptions_answers_output.csv (see Step 04's
+ANSWERS block). bd.answer() and the notebook ANSWER cell are
+RETIRED — all answers go in that one csv.
+UPGRADING A 0.8.x/0.9.x TENANT: publish the new wheel (one
+wheel, fresh session), keep everything in 04_run, re-run from
+RUN 2. Nothing re-pays; on the first DESCRIBE the old awaiting
+rows convert by themselves — blocked cards that hold a
+rejected text ship it (findings registered), and every
+numbered question appears in the answers csv, ready to fill.
 WHEEL 0.7.0 (ruled + SHIPPED 2026-10-08, the step table in
 10_work_wheel_data_contract.md): `<step>_output` file names,
 the BUILD/DESCRIBE cell split with the 13-stamp staleness
@@ -335,6 +359,21 @@ RUN 6 — the eye: prints `04_run/12_ai_delivery_output.txt`.
     Delivery entries are PAID FILES ONLY; each report lists
     files_described / files_waiting — the publish notebook
     skips any report still waiting.
+ANSWERS — the one human door (0.10.0, ruled 2026-10-10; the
+    ANSWER cell with bd.answer() is RETIRED): a number the
+    engine cannot ground SHIPS shown plainly and lands as an
+    open row in
+    `04_run/07_business_descriptions/07_business_descriptions_answers_output.csv`.
+    The delivery marks such files "DELIVERED WITH QUESTIONS" —
+    they still publish. To answer: open the csv (Excel works),
+    fill the `answer` column — a plain-words meaning (stored in
+    the dictionary, the card speaks it), `show` (stays as
+    shown, closes free), or `omit` (rewritten without it) —
+    save, re-run RUN 5. Exactly the answered cards re-propose;
+    the engine never overwrites a filled cell. The other two
+    routes close the same rows on the next run: an inline
+    comment in the SQL itself (first choice), or value meanings
+    loaded into `02_dictionary`.
 
 ## Step 07 — gap-check and bless (the data owner's hand)
 

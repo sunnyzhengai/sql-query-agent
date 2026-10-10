@@ -5,6 +5,7 @@ Graph model: AIVIA_01_GRAPH · source table: f01_subject_sql_files_graph
 (the embedding-free graph export table — ruled 2026-09-27: the graph
 cannot hold the 3072-number array as a property; embeddings stay in
 f01_subject_sql_files_lh_table and are validated by the local suite)
+Regenerated 2026-10-10 (her ruling: V_CCHP_PregnantMembers_PBI joins the corpus — 9 files).
 Mirror pytest: test_01_graph_gql_gates.py re-derives every expected value
 below from the data sheet — if the sheet changes, the mirror goes red until
 this doc is regenerated to match.
@@ -18,7 +19,7 @@ How to run (the FABRIC_GRAPH_LOAD.md dialect rules, learned live 2026-09-09):
 
 ---
 
-## Gate G1 — 8 nodes, one per report
+## Gate G1 — 9 nodes, one per file
 
 ```gql
 MATCH (f:SQL_FILE) RETURN count(f) AS fileCount
@@ -26,7 +27,7 @@ MATCH (f:SQL_FILE) RETURN count(f) AS fileCount
 
 Expected:
 ```
-fileCount = 8
+fileCount = 9
 ```
 
 ## Gate G2 — every file name arrived, none invented
@@ -35,7 +36,7 @@ fileCount = 8
 MATCH (f:SQL_FILE) RETURN f.fileName AS fileName ORDER BY fileName
 ```
 
-Expected (8 rows, this exact order):
+Expected (9 rows, this exact order):
 ```
 COOK_RPT_USP_CCHCS_ADT_MONTHLY_INPATIENT_CENSUS_TOTALS_SSRS
 COOK_RPT_usp_PTA_CensusDashboard_PBI
@@ -45,6 +46,7 @@ Reporting_USP_CCHCS_CC_ADT_Monthly_IP_Census_Totals_SSRS
 Reporting_USP_CCMC_LOTE_Census_Interpreter_Services_Detail_PBI
 Reporting_USP_CCMC_LOTE_Census_Interpreter_Services_Summary_PBI
 Reporting_USP_Hospitalist_Daily_Census_Report_92a_PBI
+V_CCHP_PregnantMembers_PBI
 ```
 
 ## Gate G3 — no duplicate nodes
@@ -55,7 +57,7 @@ MATCH (f:SQL_FILE) RETURN count(DISTINCT f.fileName) AS distinctNames
 
 Expected:
 ```
-distinctNames = 8
+distinctNames = 9
 ```
 
 ## Gate G4 — database property, grouped
@@ -68,7 +70,7 @@ GROUP BY f.databaseName
 
 Expected (databaseName | files):
 ```
-CookClarity | 8
+CookClarity | 9
 ```
 
 ## Gate G5 — schema property, grouped
@@ -83,7 +85,7 @@ ORDER BY schemaName
 Expected (schemaName | files):
 ```
 COOK_RPT | 3
-Reporting | 5
+Reporting | 6
 ```
 
 ## Gate G6 — no blank or missing database/schema values
@@ -111,7 +113,7 @@ select count(*) as graphTableRows from f01_subject_sql_files_graph
 
 Expected:
 ```
-graphTableRows = 8
+graphTableRows = 9
 ```
 
 ## Retired gates G7/G8 (embeddings in the graph) — ruled 2026-09-27

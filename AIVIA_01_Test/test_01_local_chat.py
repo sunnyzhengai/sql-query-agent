@@ -67,9 +67,9 @@ def test_rank_files_returns_all_rows_sorted_by_score():
 
 
 def test_census_question_returns_all_files_scored_and_sorted():
-    """Sunny's case 1: 'What reports are for census?' -> all 8 returned."""
+    """Sunny's case 1: 'What reports are for census?' -> all 9 returned."""
     ranked = answer("What reports are for census?", SHEET_PATH, real_embedder)
-    assert len(ranked) == 8, "chat must return ALL files, never a subset"
+    assert len(ranked) == 9, "chat must return ALL files, never a subset"
     for r in ranked:
         assert isinstance(r["score"], float)
     scores = [r["score"] for r in ranked]
@@ -80,9 +80,9 @@ def test_ccmc_question_returns_all_files():
     """Sunny's md (ruled 2026-09-26): the 2 CCMC names 'may or may not be
     ranked higher' — the embeddings cannot tell CCMC from CCHCS on file
     names alone, so no ranking is pinned. Only the firm part holds:
-    all 8 files come back, both CCMC files among them."""
+    all 9 files come back, both CCMC files among them."""
     ranked = answer("Which reports for for CCMC?", SHEET_PATH, real_embedder)
-    assert len(ranked) == 8
+    assert len(ranked) == 9
     names = {r["file_name"] for r in ranked}
     assert CCMC_FILES <= names
 

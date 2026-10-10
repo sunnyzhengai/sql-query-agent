@@ -89,8 +89,12 @@ def test_intake_sheet_carries_every_field():
         assert field in text, field
 
 
-def test_publish_template_carries_the_laws():
-    text = (DELIVERY / "collibra_publish_notebook.md").read_text()
+def test_publish_notebook_carries_the_laws():
+    """AMENDED 2026-10-10 (Brief_Notebook_Import_Law, her rule:
+    importable, never copy-paste): the code laws live in the
+    versioned .py; the .ipynb twin is GENERATED from it and
+    stays in step; the .md keeps the runbook prose."""
+    text = (DELIVERY / "collibra_publish_notebook.py").read_text()
     assert "DRY_RUN  = True" in text          # dry-first
     assert "SANDBOX  = True" in text          # sandbox-first
     assert 'bt_name_status") == "blessed"' in text  # blessed-only
@@ -100,6 +104,20 @@ def test_publish_template_carries_the_laws():
                 "TECHDEF_ATTR_ID", "REPORT_TYPE_ID",
                 "SANDBOX_DOMAIN", "TOKEN_SECRET"):
         assert cfg in text, cfg               # intake-fed CONFIG
+    # the ipynb twin is generated from the .py — never drifts
+    import json as _json
+    import sys as _sys
+    _sys.path.insert(0, str(DELIVERY.parent / "AIVIA_01_Code"))
+    from sync_notebook import split_cells
+    nb = _json.loads(
+        (DELIVERY / "collibra_publish_notebook.ipynb").read_text())
+    nb_cells = ["".join(c["source"]).strip()
+                for c in nb["cells"]]
+    assert nb_cells == split_cells(text)
+    # the md is prose only — import steps, no fenced code
+    md = (DELIVERY / "collibra_publish_notebook.md").read_text()
+    assert "Import notebook" in md
+    assert "```" not in md                    # no code to drift
 
 
 def test_delivery_folder_is_clean():

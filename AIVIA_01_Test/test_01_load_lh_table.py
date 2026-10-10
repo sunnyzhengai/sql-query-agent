@@ -48,13 +48,13 @@ def good_row(name="PROC_A"):
     }
 
 
-def test_real_sheet_becomes_8_camelcase_rows_with_embeddings_intact():
+def test_real_sheet_becomes_9_camelcase_rows_with_embeddings_intact():
     with open(SHEET_PATH, encoding="utf-8") as f:
         sheet = {r["file_name"]: r for r in json.load(f)}
 
     rows = to_table_rows(SHEET_PATH)
 
-    assert len(rows) == 8
+    assert len(rows) == 9  # re-based 2026-10-10: the view
     for row in rows:
         assert list(row.keys()) == CAMEL_COLUMNS
         original = sheet[row["fileName"]]

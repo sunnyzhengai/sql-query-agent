@@ -102,6 +102,13 @@ No discovery csv.
     DEST_COLUMN_NAME names each ZC table's id column, so the queries derive
     from data, never guessed. Sheet fields: table_name, code, meaning.
   - no embeddings on iniitm or values this phase; revisit at the chat step.
+  - SECOND WRITER for value meanings (AMENDED 2026-10-10, the 0.10.0
+    show-and-log ruling): a meaning the human fills into
+    07_business_descriptions_answers_output.csv becomes a value-meaning row
+    beside the ZC extraction — same shape (table_name/column, code, meaning)
+    plus provenance (source = the answers file, dated). The ZC/bulk route and
+    the hand route feed the ONE store; the 11 design's F1 bulk door for
+    work-tenant value tables stays an open design item.
 - Move 2 therefore generates FIVE queries — table, column, join, pk, iniitm —
   all filtered by CLARITY_TBL.TABLE_NAME IN (the used tables) plus the de-dup
   filter, ids joined inside each query, standalone-runnable. Move 3 generates

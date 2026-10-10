@@ -24,11 +24,17 @@ import json
 import os
 import sys
 import tempfile
+import time
 from pathlib import Path
 
 _EMPTY_02 = ("02_emr_data_dictionary_extraction_column.json",
              "02_emr_data_dictionary_extraction_join.json",
-             "02_emr_data_dictionary_extraction_value.json")
+             "02_emr_data_dictionary_extraction_value.json",
+             # the FOURTH file (the 10 contract, corrected
+             # 2026-10-06: column + value + TABLE + join) — its
+             # absence crashed the dict-less describe path
+             # (caught by the 11 suite, 2026-10-09)
+             "02_emr_data_dictionary_extraction_table.json")
 
 
 def _point_at_packaged_dll():
@@ -503,6 +509,22 @@ def _corpus_files(sql_dir):
                   and p.suffix != ".json")
 
 
+# ==== THE EMPTY-LEDGER REFUSAL — PSEUDO CODE (written BEFORE
+#      code; 11_tiered_seats.md D6a, the 2026-10-09 field find:
+#      a 0-byte old-name ledger on the first work tenant died as
+#      a bare JSONDecodeError; awaiting Sunny's approval) ========
+# _read_ledger, amended: for the first ledger name that EXISTS,
+#   read its text; if the text is blank, or json.loads refuses,
+#   raise ValueError naming the file and the fix:
+#     "the ledger file <name> is empty or unreadable: delete it
+#      for a clean start, or rebuild it if cards were already
+#      paid"
+#   — never fall through to the other name (a half-dead ledger
+#   must be looked at, not silently bypassed), never a bare
+#   JSONDecodeError.
+# ================================================================
+
+
 def _read_ledger(out_dir):
     """THE MIGRATION READ (2026-10-08): the new name first; a
     pre-rename tenant's old ledger is honored so the rename
@@ -510,7 +532,19 @@ def _read_ledger(out_dir):
     for name in (LEDGER_NAME, LEDGER_OLD):
         p = Path(out_dir) / name
         if p.exists():
-            return json.loads(p.read_text())
+            text = p.read_text()
+            if text.strip():
+                try:
+                    return json.loads(text)
+                except ValueError:
+                    pass
+            # D6a (the 2026-10-09 field find): refuse by name,
+            # never a bare JSONDecodeError, never a silent
+            # fall-through to the other ledger name.
+            raise ValueError(
+                f"the ledger file {name} is empty or unreadable: "
+                "delete it for a clean start, or rebuild it if "
+                "cards were already paid")
     return {"hashes": {}}
 
 
@@ -616,6 +650,44 @@ def build(tmdl_dir, sql_dir, out_dir, dict_dir=None):
     return out
 
 
+# ==== THE RUN SCORECARD — PSEUDO CODE (written BEFORE code;
+#      11_tiered_seats.md D8 + contract, RULED 2026-10-09:
+#      "at the end of each run, i can read the scorecard and
+#      know where we are"; awaiting Sunny's approval) ===========
+#
+# describe(), amended around the existing chain:
+#   t0: bd.reset_meter() beside the existing reset; a step
+#       clock (time.monotonic) brackets each stage —
+#       cards_file_scope + cards_field (split inside build07's
+#       loop by spec grain), fact_voices, business_terms,
+#       delivery_assembly, total.
+#   on AccountRefusal (D6b): let it rise — record_corpus and
+#       the delivery writes sit AFTER the paid chain, so a
+#       refused batch records nothing described (the checkpoint
+#       alone keeps the paid cards). No scorecard ships for a
+#       refused run — a half-run has no honest totals.
+#   after deliver lands: build the scorecard dict —
+#       files{described_this_run, already_done, remaining}
+#         from the plan;
+#       status_counts by grain from the 07 sheet rows + the
+#         terms rows + the meter's voice counts;
+#       failure_causes / rounds / escalations / seats from
+#         bd.meter(); usd = tokens x bd._PRICE_CARD;
+#       awaiting[] = the awaiting rows' node_id + verbatim
+#         findings;
+#       timings_s from the step clock.
+#   CONSERVATION, asserted before any byte lands (a red
+#       scorecard does not ship): every active spec in exactly
+#       one status count; rounds 1+2+3 == landed cards;
+#       fired >= landed; awaiting[] length == the
+#       awaiting_human count; timing steps sum ~ total.
+#   write <out>/14_run_scorecard_output.json + the txt twin
+#       (causes biggest-first, then rounds, escalations,
+#       awaiting questions verbatim, timings, seats + usd);
+#       print the txt tail in the cell.
+# ================================================================
+
+
 def describe(tmdl_dir, sql_dir, out_dir, dict_dir=None,
              max_new=None, force=False):
     """THE DESCRIBE DOOR (D14): the paid batch — 07 cards + 09
@@ -649,10 +721,15 @@ def describe(tmdl_dir, sql_dir, out_dir, dict_dir=None,
         deferred = plan["new"][len(taken):]
         skip = {Path(n).stem for n in plan["done"]}
         defer = {Path(n).stem for n in deferred}
-        bd.build07(d05, out, d07, d02,
-                   skip_files=skip, defer_files=defer)
+        bd.reset_meter()  # D8: the scorecard counts THIS run
+        t0 = time.monotonic()
+        rows07 = bd.build07(d05, out, d07, d02,
+                            skip_files=skip, defer_files=defer)
+        t_bt = time.monotonic()
         bt.build09(d05, out, d02, d07, out, out,
                    skip_files=skip, defer_files=defer)
+        bt_s = time.monotonic() - t_bt
+        t_dl = time.monotonic()
         record_corpus(sql_dir, out, files=taken)
         print(f"{len(taken)} described ({len(skip)} already "
               f"done), {len(deferred)} remain")
@@ -663,7 +740,198 @@ def describe(tmdl_dir, sql_dir, out_dir, dict_dir=None,
     print(f"delivery: {len(delivery['reports'])} report(s), "
           f"{len(delivery['reportless_files'])} reportless "
           "file(s)")
+    scorecard = _build_scorecard(
+        bd, rows07, delivery,
+        files={"described_this_run": len(taken),
+               "already_done": len(skip),
+               "remaining": len(deferred)},
+        timings={"business_terms": bt_s,
+                 "delivery_assembly": time.monotonic() - t_dl,
+                 "total": time.monotonic() - t0},
+        questions=_questions_counts(bd, d07))
+    (out / SCORECARD_NAME).write_text(
+        json.dumps(scorecard, indent=1))
+    txt = _scorecard_txt(scorecard)
+    (out / SCORECARD_TXT_NAME).write_text(txt)
+    print(txt)
     return delivery
+
+
+SCORECARD_NAME = "14_run_scorecard_output.json"
+SCORECARD_TXT_NAME = "14_run_scorecard_output.txt"
+_SC_LAW = ("counted from the rows and the clock, never "
+           "summarized by a model; no silent caps")
+
+
+def _questions_counts(bd, d07):
+    """The scorecard's questions block (0.10.0): open counted
+    from the answers file's rows, closures from the run meter —
+    never summarized."""
+    import csv
+    p = Path(d07) / bd.ANSWERS_NAME
+    open_n = 0
+    if p.exists():
+        with open(p, newline="") as fh:
+            open_n = sum(1 for r in csv.DictReader(fh)
+                         if r.get("status") == "open")
+    closures = bd.meter().get("closures", {})
+    by = {k: closures.get(k, 0)
+          for k in ("comment", "answer", "dictionary",
+                    "show", "omit", "bless", "accept")}
+    return {"open": open_n,
+            "closed_this_run": sum(by.values()),
+            "by_closure": by}
+
+
+def _build_scorecard(bd, rows07, delivery, files, timings,
+                     questions=None):
+    """D8: mechanical truth only. Status counts read the sheet
+    and the delivery; causes/rounds/escalations/seats/voices
+    read the run meter; a red scorecard does not ship (the
+    conservation asserts below). 0.10.0: a shipped row with
+    open questions counts delivered_with_questions — the
+    visible marker; the questions block counts the answers
+    file."""
+    m = bd.meter()
+    status_counts = {}
+    for r in rows07:
+        g = status_counts.setdefault(r["grain"], {})
+        key = r["status"]
+        if key not in ("awaiting_human", "floor",
+                       "gate_failed") \
+                and r.get("open_questions"):
+            key = "delivered_with_questions"
+        g[key] = g.get(key, 0) + 1
+    term_counts = {}
+    entries = (delivery.get("reports", [])
+               + delivery.get("reportless_files", []))
+    for e in entries:
+        for t in e.get("terms", []):
+            term_counts[t["status"]] = \
+                term_counts.get(t["status"], 0) + 1
+    if term_counts:
+        status_counts["term_card"] = term_counts
+    status_counts["voice"] = m["voices"]
+    awaiting = [{"node_id": r["node_id"],
+                 "questions": list(r.get("gate_findings", []))}
+                for r in rows07
+                if r["status"] == "awaiting_human"]
+    causes = sorted(
+        ({"class": c, "count": n} for c, n in m["causes"].items()),
+        key=lambda c: (-c["count"], c["class"]))
+    rounds = {f"round_{k}": v for k, v in m["rounds"].items()}
+    seats = {}
+    for seat in bd._PRICE_CARD:
+        u = m["seats"].get(seat, {"calls": 0, "input_tokens": 0,
+                                  "output_tokens": 0})
+        card = bd._PRICE_CARD[seat]
+        usd = None
+        if (card["input_per_1m"] is not None
+                and card["output_per_1m"] is not None):
+            usd = round(
+                u["input_tokens"] / 1e6 * card["input_per_1m"]
+                + u["output_tokens"] / 1e6 * card["output_per_1m"],
+                4)
+        seats[seat] = dict(u, usd=usd)
+    timings_s = {
+        "cards_file_scope": m["stage_s"].get("cards_file_scope",
+                                             0.0),
+        "cards_field": m["stage_s"].get("cards_field", 0.0),
+        "fact_voices": m["stage_s"].get("fact_voices", 0.0),
+        "business_terms": timings["business_terms"],
+        "delivery_assembly": timings["delivery_assembly"],
+        "total": timings["total"]}
+    if questions is None:
+        questions = {"open": 0, "closed_this_run": 0,
+                     "by_closure": {"comment": 0, "answer": 0,
+                                    "dictionary": 0, "show": 0,
+                                    "omit": 0}}
+    sc = {"files": files, "status_counts": status_counts,
+          "failure_causes": causes, "rounds": rounds,
+          "escalations": m["escalations"], "awaiting": awaiting,
+          "questions": questions,
+          "timings_s": {k: round(v, 3)
+                        for k, v in timings_s.items()},
+          "seats": seats, "price_card": bd._PRICE_CARD,
+          "_law": _SC_LAW}
+    # CONSERVATION — a red scorecard does not ship.
+    counted = sum(n for g, c in status_counts.items()
+                  if g in ("file", "scope", "field")
+                  for n in c.values())
+    red = []
+    if counted != len(rows07):
+        red.append(f"status counts {counted} != rows "
+                   f"{len(rows07)}")
+    awaiting_n = sum(
+        status_counts.get(g, {}).get("awaiting_human", 0)
+        for g in ("file", "scope", "field"))
+    if len(awaiting) != awaiting_n:
+        red.append(f"awaiting list {len(awaiting)} != counted "
+                   f"{awaiting_n}")
+    if sc["escalations"]["fired"] < sc["escalations"]["landed"]:
+        red.append("escalations landed exceed fired")
+    if sc["questions"]["closed_this_run"] != \
+            sum(sc["questions"]["by_closure"].values()):
+        red.append("closures do not sum")
+    if any(v < 0 for v in sc["timings_s"].values()):
+        red.append("a negative timing")
+    if red:
+        raise ValueError("scorecard conservation red: "
+                         + "; ".join(red))
+    return sc
+
+
+def _scorecard_txt(sc):
+    """The human twin: causes biggest first, the awaiting
+    questions verbatim, every number the json carries."""
+    f = sc["files"]
+    lines = ["==== RUN SCORECARD ====",
+             f"files: {f['described_this_run']} described this "
+             f"run, {f['already_done']} already done, "
+             f"{f['remaining']} remaining", "",
+             "status by grain:"]
+    for g, counts in sc["status_counts"].items():
+        inner = ", ".join(f"{k} {v}" for k, v in
+                          sorted(counts.items()))
+        lines.append(f"  {g}: {inner or 'none'}")
+    lines += ["", "failure causes (biggest first):"]
+    if sc["failure_causes"]:
+        lines += [f"  {c['class']}: {c['count']}"
+                  for c in sc["failure_causes"]]
+    else:
+        lines.append("  none")
+    r = sc["rounds"]
+    lines += ["",
+              "rounds landed: " + ", ".join(
+                  f"round {k.split('_')[1]}: {v}"
+                  for k, v in sorted(r.items())),
+              f"escalations: fired {sc['escalations']['fired']}, "
+              f"landed {sc['escalations']['landed']}"]
+    q = sc["questions"]
+    by = ", ".join(f"{k} {v}"
+                   for k, v in q["by_closure"].items() if v)
+    lines += ["",
+              f"questions: {q['open']} open, "
+              f"{q['closed_this_run']} closed this run"
+              + (f" ({by})" if by else "")]
+    lines += ["", f"AWAITING YOUR ANSWER ({len(sc['awaiting'])}):"]
+    if sc["awaiting"]:
+        for a in sc["awaiting"]:
+            lines.append(f"  {a['node_id']}")
+            lines += [f"    - {q2}" for q2 in a["questions"]]
+    else:
+        lines.append("  none")
+    lines += ["", "timings (seconds):"]
+    lines += [f"  {k}: {v}" for k, v in sc["timings_s"].items()]
+    lines += ["", "seats:"]
+    for seat, u in sc["seats"].items():
+        usd = (f"usd {u['usd']}" if u["usd"] is not None
+               else "usd: unpriced (price card awaits "
+                    "measurement day)")
+        lines.append(f"  {seat}: {u['calls']} call(s), "
+                     f"{u['input_tokens']} in / "
+                     f"{u['output_tokens']} out tokens, {usd}")
+    return "\n".join(lines) + "\n"
 
 
 def _delivery_txt(delivery):
@@ -679,6 +947,33 @@ def _delivery_txt(delivery):
                 f"-- TERM [{t['bt_name_status']}]: "
                 f"{t['bt_name']}\n{t['business_description']}\n")
 
+    def _open_questions(e):
+        # 0.10.0: DELIVERED, with the questions visible — the
+        # marker, never a block; her answers go in the one file
+        oq = e.get("open_questions", [])
+        if oq:
+            qs = "; ".join(
+                f"{x.get('number') or '?'} — {x['finding']}"
+                for x in oq)
+            blocks.append(
+                f"DELIVERED WITH QUESTIONS ({len(oq)}): {qs}\n"
+                "(the text above ships; to answer, fill "
+                "07_business_descriptions/"
+                "07_business_descriptions_answers_output.csv "
+                "and re-run DESCRIBE)\n")
+        # 0.11.0: the register — a gate_failed card ships with
+        # its findings visible; her answer is replacement text
+        # (blessed) or "accept", in the same one file
+        of = e.get("open_findings", [])
+        if of:
+            blocks.append(
+                f"DELIVERED WITH FINDINGS ({len(of)}): "
+                + "; ".join(of) + "\n"
+                "(the text above ships; to answer, fill the "
+                "wording rows in 07_business_descriptions/"
+                "07_business_descriptions_answers_output.csv — "
+                "your own text, or the word accept)\n")
+
     for e in delivery["reports"]:
         d = e.get("description") or {}
         waiting = e.get("files_waiting", [])
@@ -689,6 +984,7 @@ def _delivery_txt(delivery):
                          if waiting else "")
                       + f"voice: {d.get('voice', 'technical')}\n\n"
                       f"{d.get('text', '')}\n")
+        _open_questions(e)
         _terms(e)
     for e in delivery["reportless_files"]:
         d = e.get("description") or {}
@@ -700,8 +996,13 @@ def _delivery_txt(delivery):
                           "AWAITING YOUR ANSWER on: "
                           f"{qs or 'see the 07 sheet'}\n"
                           "(no business description ships "
-                          "until you rule — fix the SQL "
-                          "comment, or answer show/omit)\n")
+                          "until you answer — numbered "
+                          "questions: fill the answer column "
+                          "in 07_business_descriptions/"
+                          "07_business_descriptions_answers"
+                          "_output.csv and re-run DESCRIBE; "
+                          "wording findings: fix the SQL or "
+                          "bless your own text)\n")
             _terms(e)
             continue
         blocks.append(f"==== FILE: {e['file']} ====\n"
@@ -709,6 +1010,7 @@ def _delivery_txt(delivery):
                       "terms stay unpublished)\n"
                       f"voice: {d.get('voice', 'technical')}\n\n"
                       f"{d.get('text', '')}\n")
+        _open_questions(e)
         _terms(e)
     return "\n".join(blocks)
 

@@ -41,17 +41,19 @@ def test_golden_counts_to_the_digit(built):
     # entry (05 gap-first gate) — +1 table, +3 columns, no-match 0,
     # +1 date_dimension rule edge, +4 abstracts.
     assert ldt.GOLDEN_COUNTS == {
-        "dict_tables": 41, "dict_columns": 1631, "dict_joins": 5262,
+        "dict_tables": 45, "dict_columns": 1648, "dict_joins": 5266,
         "dict_values": 14489, "dict_value_embeddings": 14489,
         "dict_no_match": 0, "chat_abstract_names": 1660,
-        "chat_technical_terms": 9, "graph_join_edges": 398,
-        "graph_table_nodes": 41, "graph_column_nodes": 1631}
+        "chat_technical_terms": 9, "graph_join_edges": 404,
+        "graph_table_nodes": 45, "graph_column_nodes": 1648}
     assert set(tables) == set(ldt.GOLDEN_COUNTS)
     for name, expected in ldt.GOLDEN_COUNTS.items():
         assert len(tables[name]) == expected, name
         assert census[name] == expected, name
-    assert census["joinsByFk"] == 216  # re-based 2026-10-03
-    assert census["joinsByRule"] == 182  # +1: EXEC_START_TIME's
+    assert census["joinsByFk"] == 220  # re-based 2026-10-10 (+4 supplemental view joins), prior 2026-10-03
+    assert census["joinsByRule"] == 184  # +2 (2026-10-10): the
+    # supplemental BEN_PLAN_TERM_DT/BEN_PLAN_EFF_DATE date
+    # columns, after +1: EXEC_START_TIME's
     # date_dimension rule edge (the 2026-10-02 supplemental entry)
 
 
@@ -104,7 +106,7 @@ def test_graph_join_edges_shape(built):
         assert e["destinTableId"] in node_ids
         pairs = json.loads(e["columnPairs"])
         assert pairs and pairs[0]["source_column_name"]
-    assert kinds == {"joins_by_fk": 216, "joins_by_rule": 182}
+    assert kinds == {"joins_by_fk": 220, "joins_by_rule": 184}
 
 
 def test_terms_table_matches_the_md(built):

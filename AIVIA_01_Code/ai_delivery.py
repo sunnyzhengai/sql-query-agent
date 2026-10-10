@@ -320,11 +320,34 @@ def assemble(out_dir, dir07, dir08, dir06, described=None):
                 for r in seven
                 if r["grain"] == "file"
                 and r.get("status") == "awaiting_human"}
+    # 0.10.0 (ruled 2026-10-10): a shipped card's open
+    # questions ride the entry — DELIVERED, visibly marked in
+    # the txt twin; publish proceeds (the Collibra skip stays
+    # for awaiting_human and files_waiting only)
+    openq = {r["node_id"].split("::")[1]:
+             r["open_questions"]
+             for r in seven
+             if r["grain"] == "file"
+             and r.get("open_questions")}
+    # 0.11.0 (the uniform ship): a gate_failed card SHIPS its
+    # business text — the technical floor no longer stands in;
+    # the registered findings ride the entry as open_findings
+    shipped_failed = {r["node_id"].split("::")[1]:
+                      (r["audience_text"],
+                       list(r.get("gate_findings", [])))
+                      for r in seven
+                      if r["grain"] == "file"
+                      and r.get("status") == "gate_failed"
+                      and r.get("audience_text")}
 
     def _desc(stem):
         if stem in cards:
             return {"text": cards[stem], "voice": "business",
                     "status": "gate_passed"}
+        if stem in shipped_failed:
+            return {"text": shipped_failed[stem][0],
+                    "voice": "business",
+                    "status": "gate_failed"}
         if stem in awaiting:
             return {"text": "", "voice": "none",
                     "status": "awaiting_human"}
@@ -365,6 +388,13 @@ def assemble(out_dir, dir07, dir08, dir06, described=None):
         qs = [q for s in have for q in awaiting.get(s, [])]
         if qs:
             entry["questions"] = qs
+        oq = [q for s in have for q in openq.get(s, [])]
+        if oq:
+            entry["open_questions"] = oq
+        of = [f for s in have
+              for f in shipped_failed.get(s, ("", []))[1]]
+        if of:
+            entry["open_findings"] = of
         delivery["reports"].append(entry)
     delivery["reportless_files"] = []
     for stem in sorted(set(floors) - tied):
@@ -374,6 +404,10 @@ def assemble(out_dir, dir07, dir08, dir06, described=None):
                  "terms": old_file_terms.get(stem, [])}
         if stem in awaiting and awaiting[stem]:
             entry["questions"] = awaiting[stem]
+        if stem in openq:
+            entry["open_questions"] = openq[stem]
+        if stem in shipped_failed and shipped_failed[stem][1]:
+            entry["open_findings"] = shipped_failed[stem][1]
         delivery["reportless_files"].append(entry)
     if "09" in delivery["counts"]:
         _recount(delivery)

@@ -523,21 +523,28 @@ def test_09_l19_half_described_report_says_its_lists(tmp_path):
     assert "beta" not in rep["description"]["text"]
 
 
-def test_09_l20_gate_failed_status_rides_out(tmp_path):
-    """Processed-but-failed is honest: technical voice, status
-    gate_failed — distinguishable from never-processed."""
+def test_09_l20_gate_failed_ships_business_voice(tmp_path):
+    """0.11.0 (ruled 2026-10-10 evening): a gate_failed card
+    SHIPS its text in the BUSINESS voice — the technical floor
+    no longer stands in; the status stays honest and the
+    registered findings ride the entry."""
     import ai_delivery
     dirs = _fixture(tmp_path)
     d06, d07, d08, out = dirs[1], dirs[3], dirs[4], dirs[-1]
     _w(d07, "07_business_descriptions_output.json", [
         {"node_id": A, "grain": "file", "status": "gate_failed",
-         "audience_text": "A card that failed the gate."},
+         "audience_text": "A card that failed the gate.",
+         "gate_findings": ["V-3: SQL word 'table'"]},
     ])
     _ledgered(out, "FIX_RPT_ALPHA")
     ai_delivery.assemble(out, d07, d08, d06)
     rep = _delivery(out)["reports"][0]
-    assert rep["description"]["voice"] == "technical"
+    assert rep["description"]["voice"] == "business"
     assert rep["description"]["status"] == "gate_failed"
+    assert rep["description"]["text"] \
+        == "A card that failed the gate."
+    (f,) = rep["open_findings"]
+    assert f == "V-3: SQL word 'table'"
 
 
 def test_09_l21_no_ledger_is_legacy_unfiltered(tmp_path):
@@ -577,6 +584,32 @@ def test_09_l23_awaiting_human_ships_no_text_and_its_questions(
     assert rep["description"]["text"] == ""
     assert rep["description"]["voice"] == "none"
     (q,) = rep["questions"]
+    assert q["number"] == "999"
+
+
+def test_09_l24_delivered_with_questions_publishes(tmp_path):
+    """0.10.0 (ruled 2026-10-10): a shipped card with open
+    questions is DELIVERED — business voice, publishable
+    status; the open questions ride the entry so the delivery
+    txt can mark it. The Collibra skip stays for
+    awaiting_human and files_waiting only."""
+    import ai_delivery
+    dirs = _fixture(tmp_path)
+    d06, d07, d08, out = dirs[1], dirs[3], dirs[4], dirs[-1]
+    _w(d07, "07_business_descriptions_output.json", [
+        {"node_id": A, "grain": "file", "status": "gate_passed",
+         "audience_text": "Shows the 999 records.",
+         "open_questions": [{"number": "999", "where": None,
+                             "finding": "V-1: number 999 has "
+                                        "no stored basis"}]},
+    ])
+    _ledgered(out, "FIX_RPT_ALPHA")
+    ai_delivery.assemble(out, d07, d08, d06)
+    rep = _delivery(out)["reports"][0]
+    assert rep["description"]["status"] == "gate_passed"
+    assert rep["description"]["voice"] == "business"
+    assert rep["description"]["text"] == "Shows the 999 records."
+    (q,) = rep["open_questions"]
     assert q["number"] == "999"
 
 

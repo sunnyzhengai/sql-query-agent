@@ -20,7 +20,52 @@ from pathlib import Path
 CODE = Path(__file__).resolve().parent
 REPO = CODE.parent
 DLL = "Microsoft.SqlServer.TransactSql.ScriptDom.dll"
-VERSION = "0.8.0"  # D15 (2026-10-08 evening): comment-first
+VERSION = "0.11.0"  # THE UNIFORM SHIP (ruled 2026-10-10
+# evening, her words: "ship description for this type of gate
+# failures, and register the reason/wording violations ...
+# does not stop the production ... does not get lost either";
+# ALL classes ship, publish immediately — her two same-sitting
+# rulings): an exhausted card WITH text ships as gate_failed
+# (business voice everywhere), findings REGISTERED as wording
+# rows in the one answers csv (kind + finding columns join;
+# migration read for the old header); her wording answers:
+# replacement text -> her BLESSED sentence (free rerender,
+# delta-by-name registry write w/ provenance) | accept ->
+# recorded waiver; carried awaiting rows holding a rejected
+# card CONVERT to shipped gate_failed free; awaiting_human
+# narrows to the empty-text class (three failed calls);
+# delivery gains open_findings + DELIVERED WITH FINDINGS txt;
+# scorecard: gate_failed counts, by_closure gains bless +
+# accept.
+# 0.10.0: THE ANSWERS FILE (ruled 2026-10-10, her
+# words: "when a value is not mapped, can we just show it?
+# don't block the description" + "one file, all answers in it,
+# retire the ANSWER cell"): a basis gap SHIPS with the number
+# shown plainly in the column's words (never an invented
+# meaning) and lands as an OPEN row in
+# 07_business_descriptions_answers_output.csv — the one
+# editable human door (Excel-fillable, travels); answer =
+# meaning (-> 02 value meaning w/ provenance, retake speaks
+# it) | show (closes FREE on shipped cards; steers the retake
+# on carried awaiting rows) | omit (retake without it); SQL
+# inline comment and 02 dictionary loads (F1 hand route) close
+# the same rows next DESCRIBE; merge-never-overwrite;
+# awaiting_human narrows to wording failures; bd.answer()
+# RETIRED; delivery entries carry open_questions +
+# "DELIVERED WITH QUESTIONS" txt marker, publish proceeds;
+# scorecard: delivered_with_questions count + questions block
+# {open, closed_this_run, by_closure}.
+# 0.9.0: TIERED SEATS + THE RUN SCORECARD (11,
+# 2026-10-09): two pinned seats (gpt-5.4 / gpt-5.4-mini), seat
+# by grain (file/scope LARGE; term/field/voice SMALL), the
+# round-3 escalation, the honest model record, the run meter +
+# 14_run_scorecard_output pair, the price card (pinned from
+# published pricing 2026-10-09); D6a the empty-ledger named
+# refusal (her 0-byte field find); D6b AccountRefusal — a 401
+# bad key / 429 no-credits stops the whole batch, nothing
+# recorded described (the Echo build, fired twice in one day);
+# the fourth empty-02 stage file (dict-less describe crashed).
+# 0.8.0: D15 (2026-10-08 evening): comment-first
 # voicing (06.4.0 re-pin, header Description: first choice),
 # the no-fallback gate (basis gaps -> awaiting_human, one
 # call; verdicts show/omit via bd.answer; the retake), the

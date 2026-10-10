@@ -261,3 +261,39 @@ def test_removed_file_row_disappears(build_data_sheet, tmp_path):
     build_data_sheet(folder, sheet, real_embedder)
 
     assert set(read_sheet(sheet)) == {"PROC_A"}
+
+
+def test_sql_suffix_never_orphans_a_ruled_row(build_data_sheet, tmp_path):
+    """THE ECHO (2026-10-10, the .sql rename's second bite): the
+    generator keyed folder names WITH .sql against sheet rows
+    WITHOUT it — every ruled row dropped, every file re-embedded,
+    blanks over her fills. The law: rows key by STEM; a ruled row
+    survives the rename; only truly new files embed."""
+    folder = make_sql_folder(tmp_path, ["PROC_A.sql"])
+    sheet = folder / "sheet.json"
+    sheet.write_text(json.dumps([{
+        "file_name": "PROC_A",
+        "database_name": "CookClarity",
+        "schema_name": "Reporting",
+        "file_name_embedding": [0.5] * EMBEDDING_LENGTH,
+    }], indent=2))
+    calls = []
+
+    def counting_embedder(names):
+        calls.append(list(names))
+        return real_embedder(names)
+
+    build_data_sheet(folder, sheet, counting_embedder)  # no raise
+    rows = read_sheet(sheet)
+    (row,) = rows.values()
+    assert row["database_name"] == "CookClarity"   # her fill kept
+    assert row["schema_name"] == "Reporting"
+    assert calls == []                             # nothing re-paid
+
+    (folder / "PROC_B.sql").write_text("SELECT 2;", encoding="utf-8")
+    with pytest.raises(ValueError) as e:
+        build_data_sheet(folder, sheet, counting_embedder)
+    assert "PROC_B" in str(e.value)
+    assert "PROC_A" not in str(e.value)            # only the new one
+    rows = read_sheet(sheet)
+    assert len(rows) == 2 and len(calls) == 1      # one new embed

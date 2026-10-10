@@ -115,10 +115,12 @@ def test_ratification_gate_refuses_unratified_library(tmp_path):
 
 # ------------------------------------------------- the real 8-file estate
 
-def test_all_eight_files_build_with_no_exclusions(built):
+def test_all_subject_files_build_with_no_exclusions(built):
+    # 9 = 8 census files + V_CCHP_PregnantMembers_PBI (her
+    # ruling 2026-10-10: the view joins the corpus)
     out, _ = built
     files = _load(out, "05_semantic_graph_file_output.json")
-    assert len(files) == 8
+    assert len(files) == 9
     assert _load(out, "05_semantic_graph_exclusion_ledger_output.json") == []
 
 
