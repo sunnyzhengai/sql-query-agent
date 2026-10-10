@@ -330,10 +330,20 @@ cell overwrites by name and touches nothing else.
 
 THE NOTEBOOK IS A VERSIONED FILE — do not hand-edit cells:
 `notebook_work_wheel.py`, shipped beside this runbook (SETUP
-A-E once, RUN 1-6 per batch, BLESS at the end). Push it to the
-Fabric notebook item with one command from the home repo's
-sync tool (browser sign-in; lakehouse/environment attachments
-preserved; ALL code cells replaced):
+A-E once, RUN 1-6 per batch, BLESS at the end). Two equal
+update paths — pick by where you stand:
+
+THE IMPORT PATH (her standing practice, 2026-10-10 — no
+cross-tenant sign-on from the personal laptop): download
+`notebook_work_wheel.ipynb` raw from GitHub -> workspace ->
+Import notebook -> attach the environment + default lakehouse
+to the NEW item (import cannot carry attachments) -> DELETE
+the old notebook item (or rename it _old) so a stale cell is
+never run by accident. The notebook holds no state; nothing
+is lost by replacing it.
+
+THE SYNC PATH (from a machine that signs into the tenant):
+one command, attachments preserved, ALL code cells replaced:
 
     python3.11 sync_notebook.py \
         --workspace <workspace-id> --notebook <notebook-item-id> \
