@@ -75,3 +75,7 @@ aisql/_source_packs/
 # rebuilt from the csvs by build_dictionary_sheets.py (reuse law)
 AIVIA_01_Data/02_emr_data_dictionary/02_emr_data_dictionary_extraction_column.json
 AIVIA_01_Data/02_emr_data_dictionary/02_emr_data_dictionary_extraction_value_embeddings.json
+
+# local run outputs (her rule 2026-10-10: real folder, never scratchpad;
+# paid artifacts live on disk — the ledger carries them run to run)
+aivia_01_out/
