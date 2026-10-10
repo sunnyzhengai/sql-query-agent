@@ -42,6 +42,22 @@ D2. RESOLUTION — a binding resolves against the 01 subject
     corpus by schema/name, case-insensitive, brackets stripped
     (the prior resolve() law). Unresolved bindings are COUNTED
     rows in the ledger, never dropped, never guessed.
+    (AMENDED 2026-10-10 evening, the census-tie find — her two
+    ledger lines: `CookClarity.[COOK_RPT].[usp_PTA_
+    CensusDashboard_PBI]` and `[CookClarity].[Reporting].[USP_
+    Hospitalist_Daily_Census_Report_92a_PBI]` resolved to
+    NOTHING while the files sat in the corpus as
+    `COOK_RPT_usp_PTA_CensusDashboard_PBI.sql` / `Reporting_
+    USP_Hospitalist_Daily_Census_Report_92a_PBI.sql`; built at
+    the first failure per the Echo Law, her lines verbatim as
+    the red tests): the target normalizes — brackets stripped,
+    case folded, a leading DATABASE qualifier dropped — and
+    matching tries the SPECIFIC name first, then the legacy:
+    1. schema_object.sql  (the intake's collision-safe naming)
+    2. object.sql         (the bare naming, the CCHP regression)
+    Ambiguity stays impossible by construction: the intake's
+    bare-name collision preflight refuses a corpus where the
+    two forms could disagree.
 
 D3. NO SYNTHETIC SHELLS — divergence from prior art, named: the
     sepsis estate minted a fake report per uncovered proc

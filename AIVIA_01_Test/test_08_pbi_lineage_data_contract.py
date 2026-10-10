@@ -272,3 +272,57 @@ def test_08_l9_same_bare_name_in_two_workspaces_both_kept(tmp_path):
         ["USP_FIX_ONE.sql"]
     assert by_name["WS Fix Two/Fix Twin"]["executes"] == \
         ["USP_FIX_TWO.sql"]
+
+
+# ---------------- 0.11.1 THE SCHEMA-QUALIFIED TIE (ruled
+# 2026-10-10 evening — the census find: the work TMDL calls
+# procs by DATABASE-qualified three-part names while the
+# intake's collision-safe corpus names files Schema_Object.sql;
+# every binding landed unresolved and zero reports tied. Her
+# ledger lines verbatim are the locks. RED before code.
+
+def test_08_three_part_target_finds_schema_object_file():
+    import pbi_lineage as pl
+    corpus = ["COOK_RPT_usp_PTA_CensusDashboard_PBI.sql",
+              "Reporting_USP_Hospitalist_Daily_Census_Report_92a_PBI.sql"]
+    assert pl.resolve(
+        "CookClarity.[COOK_RPT].[usp_PTA_CensusDashboard_PBI]",
+        corpus) == "COOK_RPT_usp_PTA_CensusDashboard_PBI.sql"
+    assert pl.resolve(
+        "[CookClarity].[Reporting]."
+        "[USP_Hospitalist_Daily_Census_Report_92a_PBI]",
+        corpus) == ("Reporting_USP_Hospitalist_Daily_Census_"
+                    "Report_92a_PBI.sql")
+
+
+def test_08_case_folds_across_every_part():
+    import pbi_lineage as pl
+    corpus = ["COOK_RPT_USP_SPS_ANTIMICROBIAL_DAYS_ON_THERAPY.sql"]
+    assert pl.resolve(
+        "COOKCLARITY.[COOK_RPT].[USP_SPS_ANTIMICROBIAL_DAYS_"
+        "ON_THERAPY]", corpus) == corpus[0]
+
+
+def test_08_bare_object_naming_still_resolves():
+    """The CCHP regression: a corpus named object.sql (no
+    schema prefix) keeps tying exactly as before."""
+    import pbi_lineage as pl
+    corpus = ["USP_CCHPCHICPilotHIT_PBI.sql"]
+    assert pl.resolve(
+        "EXECDB.[rpt].[USP_CCHPCHICPilotHIT_PBI]",
+        corpus) == corpus[0]
+    assert pl.resolve("rpt.USP_CCHPCHICPilotHIT_PBI",
+                      corpus) == corpus[0]
+
+
+def test_08_specific_name_beats_the_legacy():
+    import pbi_lineage as pl
+    corpus = ["Reporting_X.sql", "X.sql"]
+    assert pl.resolve("db.Reporting.X", corpus) \
+        == "Reporting_X.sql"
+
+
+def test_08_a_miss_is_still_none():
+    import pbi_lineage as pl
+    assert pl.resolve("db.schema.NOWHERE",
+                      ["Reporting_X.sql"]) is None

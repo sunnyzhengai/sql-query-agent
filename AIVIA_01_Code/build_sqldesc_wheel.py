@@ -20,7 +20,17 @@ from pathlib import Path
 CODE = Path(__file__).resolve().parent
 REPO = CODE.parent
 DLL = "Microsoft.SqlServer.TransactSql.ScriptDom.dll"
-VERSION = "0.11.0"  # THE UNIFORM SHIP (ruled 2026-10-10
+VERSION = "0.11.1"  # THE SCHEMA-QUALIFIED TIE (ruled 2026-10-10
+# evening, the census find on her tenant: the work TMDL calls
+# procs by DATABASE-qualified three-part names
+# (CookClarity.[COOK_RPT].[usp_...]) while the intake's
+# collision-safe corpus names files Schema_Object.sql — every
+# binding unresolved, zero reports tied. resolve() normalizes
+# (brackets, case, leading db part dropped) and tries
+# schema_object.sql FIRST, then the legacy object.sql (the
+# CCHP regression); her two ledger lines verbatim are the red
+# locks.
+# 0.11.0: THE UNIFORM SHIP (ruled 2026-10-10
 # evening, her words: "ship description for this type of gate
 # failures, and register the reason/wording violations ...
 # does not stop the production ... does not get lost either";

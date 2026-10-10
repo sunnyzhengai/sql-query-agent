@@ -201,17 +201,33 @@ def read_models(tmdl_root):
 
 
 def resolve(raw_target, corpus_files):
-    """D2: brackets stripped, last name part, case-insensitive
-    into the flat 01 corpus; a miss returns None, the caller
-    writes the counted row — never a guess."""
+    """D2 AS AMENDED 2026-10-10 (the census-tie find): the work
+    TMDL calls procs by DATABASE-qualified three-part names
+    while the intake's collision-safe corpus names files
+    Schema_Object.sql — so the target normalizes (brackets
+    stripped, case folded, the leading database part dropped)
+    and matching tries the SPECIFIC name first, then the
+    legacy bare name:
+      1. schema_object.sql   (the collision-safe naming)
+      2. object.sql          (the bare naming — CCHP)
+    A miss returns None, the caller writes the counted row —
+    never a guess."""
     if not raw_target:
         return None
-    tail = raw_target.replace("[", "").replace("]", "")
-    name = tail.split(".")[-1].strip()
-    want = (name + ".sql").lower()
-    for f in corpus_files:
-        if f.lower() == want:
-            return f
+    parts = [p.strip() for p in
+             raw_target.replace("[", "").replace("]", "")
+             .split(".") if p.strip()]
+    if not parts:
+        return None
+    wants = []
+    if len(parts) >= 2:
+        wants.append(f"{parts[-2]}_{parts[-1]}.sql".lower())
+    wants.append((parts[-1] + ".sql").lower())
+    by_lower = {f.lower(): f for f in corpus_files}
+    for want in wants:
+        hit = by_lower.get(want)
+        if hit is not None:
+            return hit
     return None
 
 
