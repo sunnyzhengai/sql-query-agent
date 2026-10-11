@@ -30,6 +30,36 @@ Fabric's Import notebook. This page keeps only the prose.
      **Overview** -> copy **Vault URI**
      (`https://<vault-name>.vault.azure.net/`).
 
+## Finding the CONFIG uuids (added 2026-10-10, her methods)
+
+Two routes; both need only a Collibra sign-in:
+
+THE URL ROUTE (domains only):
+1. Open any Business Term in Collibra; on its page click the
+   DOMAIN it lives in (the glossary, in the breadcrumb).
+2. The address bar now ends `/domain/<uuid>` — that uuid is
+   BT_DOMAIN_ID (if this is the glossary the terms should
+   land in). Same walk on your test domain gives
+   SANDBOX_DOMAIN.
+3. Caution: a term's OWN url ends `/asset/<uuid>` — that is
+   the term's id, never a domain or type id.
+
+THE FINDER CELL (everything else): the notebook's FINDER
+cell (right after AUTH) lists names and ids by search word —
+domains, the Business Term and Power BI Report asset types
+(BT_TYPE_ID / REPORT_TYPE_ID), and the Description /
+Technical Definition attribute types (DESC_ATTR_ID /
+TECHDEF_ATTR_ID). Read-only; run it once AUTH prints 200.
+If "Technical Definition" has no match, your org lacks that
+attribute type — pick the existing name that serves, or ask
+the admin to add it.
+
+THE SANDBOX DOMAIN is a throwaway glossary for the one-row
+rehearsal (law 5.2): any Test/Sandbox glossary domain works;
+if none exists, create one (+ New domain -> type Glossary ->
+"AIVIA Sandbox") or ask the admin — its contents never
+matter and can be deleted.
+
 ## The laws it implements
 
 - BLESSED-ONLY: unblessed term names never leave.

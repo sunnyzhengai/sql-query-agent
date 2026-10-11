@@ -76,6 +76,29 @@ r = S.get(f"{BASE_URL}/rest/2.0/auth/sessions/current")
 print("auth:", r.status_code)   # expect 200
 
 # %%
+# FINDER — read-only, fills the CONFIG blanks (run after AUTH
+# prints 200; added 2026-10-10 at her ask). Domains can also
+# be read from the browser: open the domain in Collibra and
+# its URL ends /domain/<uuid> — THAT uuid. (A term's own URL
+# is /asset/<uuid> — the term's id, NOT the domain's.)
+def find(path, name):
+    rows = S.get(f"{BASE_URL}/rest/2.0/{path}",
+                 params={"name": name,
+                         "nameMatchMode": "ANYWHERE",
+                         "limit": 10}).json().get("results", [])
+    for x in rows:
+        print(f"{path:15} | {x['name']:50} | {x['id']}")
+    if not rows:
+        print(f"{path:15} | (no match for {name!r})")
+
+find("domains", "glossary")   # <- words from YOUR term domain
+find("domains", "sandbox")    # <- and your test domain
+find("assetTypes", "Business Term")        # -> BT_TYPE_ID
+find("assetTypes", "Power BI Report")      # -> REPORT_TYPE_ID
+find("attributeTypes", "Description")      # -> DESC_ATTR_ID
+find("attributeTypes", "Technical Definition")  # -> TECHDEF
+
+# %%
 # LOAD — the delivery file; gather the work. Skips: an
 # incomplete report (files_waiting) and an unanswered card
 # (awaiting_human) never ship; delivered cards ship even with
