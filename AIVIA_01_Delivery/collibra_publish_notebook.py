@@ -40,27 +40,38 @@ SANDBOX  = True    # True = write terms into SANDBOX_DOMAIN,
                    # limit to ONE report + ONE term (law 5.2)
 
 # %%
-# AUTH — two forms, pick ONE (added 2026-10-10, her practice):
+# AUTH — fill exactly ONE form, run, SCRUB the same sitting
+# (paste-interim law: pasted secrets ride cell history and
+# screenshots; scrub, then rotate/change what you pasted).
 #
-# FORM 1 (vault): the token lives in Azure Key Vault;
-# TOKEN_SECRET is the secret's NAME; the vault url comes from
-# portal.azure.com -> search "Key vaults" (view glitchy? click
-# "select Simplified View" in the banner) -> your vault ->
-# Overview -> Vault URI.
-#   token = notebookutils.credentials.getSecret(
-#       "https://<vault-name>.vault.azure.net/", TOKEN_SECRET)
-#
-# FORM 2 (paste-interim, her standing key practice — no vault
-# under the work sign-in): paste the token below, run, SCRUB
-# back to the placeholder the same sitting, and rotate the
-# token in Collibra afterward (a pasted token rides cell
-# history and screenshots; rotation makes stray copies dead).
+# FORM A — an API token from the Collibra admin (SSO shops:
+#   the ask is "an API token or service account for the REST
+#   2.0 API, read/write on the term + sandbox domains").
+# FORM B — your Collibra username + password (works when you
+#   sign into Collibra with a password, not only SSO).
+# FORM C — vault (when one exists): uncomment, TOKEN_SECRET =
+#   the secret's NAME; vault url: portal.azure.com -> search
+#   "Key vaults" (banner glitch? "select Simplified View") ->
+#   your vault -> Overview -> Vault URI.
 import requests
 
-token = "PASTE-COLLIBRA-TOKEN-HERE"  # Form 2: scrub after run
+TOKEN    = "PASTE-TOKEN-OR-LEAVE"   # Form A
+USERNAME = "PASTE-USER-OR-LEAVE"    # Form B
+PASSWORD = "PASTE-PASS-OR-LEAVE"    # Form B
+
 S = requests.Session()
-S.headers.update({"Authorization": f"Bearer {token}",
-                  "Content-Type": "application/json"})
+S.headers.update({"Content-Type": "application/json"})
+if TOKEN != "PASTE-TOKEN-OR-LEAVE":
+    S.headers["Authorization"] = f"Bearer {TOKEN}"
+elif USERNAME != "PASTE-USER-OR-LEAVE":
+    S.auth = (USERNAME, PASSWORD)
+else:
+    raise ValueError("fill Form A or Form B above "
+                     "(or uncomment Form C)")
+# Form C (vault):
+# token = notebookutils.credentials.getSecret(
+#     "https://<vault-name>.vault.azure.net/", TOKEN_SECRET)
+# S.headers["Authorization"] = f"Bearer {token}"
 r = S.get(f"{BASE_URL}/rest/2.0/auth/sessions/current")
 print("auth:", r.status_code)   # expect 200
 
