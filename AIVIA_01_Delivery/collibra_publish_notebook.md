@@ -57,7 +57,7 @@ the admin to add it.
 THE SANDBOX DOMAIN is a throwaway glossary for the one-row
 rehearsal (law 5.2): any Test/Sandbox glossary domain works;
 if none exists, create one (+ New domain -> type Glossary ->
-"AIVIA Sandbox") or ask the admin — its contents never
+"Term Sandbox") or ask the admin — its contents never
 matter and can be deleted.
 
 ## The laws it implements
