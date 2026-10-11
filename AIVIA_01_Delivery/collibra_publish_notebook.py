@@ -40,11 +40,24 @@ SANDBOX  = True    # True = write terms into SANDBOX_DOMAIN,
                    # limit to ONE report + ONE term (law 5.2)
 
 # %%
-# AUTH — the token from a secret, never a literal
+# AUTH — two forms, pick ONE (added 2026-10-10, her practice):
+#
+# FORM 1 (vault): the token lives in Azure Key Vault;
+# TOKEN_SECRET is the secret's NAME; the vault url comes from
+# portal.azure.com -> search "Key vaults" (view glitchy? click
+# "select Simplified View" in the banner) -> your vault ->
+# Overview -> Vault URI.
+#   token = notebookutils.credentials.getSecret(
+#       "https://<vault-name>.vault.azure.net/", TOKEN_SECRET)
+#
+# FORM 2 (paste-interim, her standing key practice — no vault
+# under the work sign-in): paste the token below, run, SCRUB
+# back to the placeholder the same sitting, and rotate the
+# token in Collibra afterward (a pasted token rides cell
+# history and screenshots; rotation makes stray copies dead).
 import requests
 
-token = notebookutils.credentials.getSecret("____vault_url____",
-                                            TOKEN_SECRET)
+token = "PASTE-COLLIBRA-TOKEN-HERE"  # Form 2: scrub after run
 S = requests.Session()
 S.headers.update({"Authorization": f"Bearer {token}",
                   "Content-Type": "application/json"})

@@ -15,8 +15,20 @@ Fabric's Import notebook. This page keeps only the prose.
    hand once (the same lesson as the work wheel's import
    fallback, 2026-10-09).
 3. Fill the CONFIG cell from `tenant_intake.md` section 4
-   (Collibra URL, the token's vault secret name, the domain,
-   asset-type and attribute-type ids, the sandbox domain).
+   (Collibra URL — NO trailing slash — the domain, asset-type
+   and attribute-type ids, the sandbox domain).
+4. The token, two forms (the AUTH cell carries both):
+   - FORM 2 (her standing practice — no vault under the work
+     sign-in): paste the Collibra API token in the AUTH cell,
+     run, scrub back to `PASTE-COLLIBRA-TOKEN-HERE` the same
+     sitting, rotate the token in Collibra afterward.
+   - FORM 1 (vault, when one exists): store the token as a
+     Key Vault secret; TOKEN_SECRET is the secret's NAME. The
+     vault url: `portal.azure.com` -> search **Key vaults**
+     (if the banner says "having trouble showing this view",
+     click **select Simplified View**) -> click your vault ->
+     **Overview** -> copy **Vault URI**
+     (`https://<vault-name>.vault.azure.net/`).
 
 ## The laws it implements
 
